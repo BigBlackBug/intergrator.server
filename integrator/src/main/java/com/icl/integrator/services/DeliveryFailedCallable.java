@@ -1,10 +1,10 @@
-package com.icl.integrator.async.service;
+package com.icl.integrator.services;
 
 import com.icl.integrator.dto.DestinationDTO;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.ResponseToSourceDTO;
-import com.icl.integrator.util.EndpointConnector;
+import com.icl.integrator.util.connectors.EndpointConnector;
 
 import java.text.MessageFormat;
 import java.util.UUID;

@@ -1,8 +1,9 @@
-package com.icl.integrator.async;
+package com.icl.integrator;
 
 import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.ResponseToSourceDTO;
 import com.icl.integrator.dto.SourceDataDTO;
+import com.icl.integrator.services.PacketProcessor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
@@ -26,10 +27,9 @@ import java.util.Map;
 @RequestMapping(value = "/integrator/",
                 consumes = MediaType.APPLICATION_JSON_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE)
-public abstract class AsyncConnectorController {
+public abstract class MainController {
 
-    private static Log logger = LogFactory.getLog(
-            AsyncConnectorController.class);
+    private static Log logger = LogFactory.getLog(MainController.class);
 
     @RequestMapping(value = "processData")
     public
@@ -39,8 +39,9 @@ public abstract class AsyncConnectorController {
             HttpServletRequest request) {
         logger.info(MessageFormat.format("Received a request from source " +
                                                  "({0}:{1,number,#})",
-                    request.getRemoteHost(),request.getRemotePort()));
-        AsyncPacketProcessor processor = createProcessor();
+                                         request.getRemoteHost(),
+                                         request.getRemotePort()));
+        PacketProcessor processor = createProcessor();
         Map<String, String> serviceToReqID = processor.process(packet);
         ResponseFromTargetDTO<Map> fromTargetDTO =
                 new ResponseFromTargetDTO<>(serviceToReqID, Map.class);
@@ -49,5 +50,5 @@ public abstract class AsyncConnectorController {
         return responseToSourceDTO;
     }
 
-    protected abstract AsyncPacketProcessor createProcessor();
+    protected abstract PacketProcessor createProcessor();
 }

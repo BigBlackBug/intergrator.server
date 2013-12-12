@@ -1,8 +1,11 @@
-package com.icl.integrator.util;
+package com.icl.integrator.util.connectors;
 
 import com.icl.integrator.dto.DestinationDTO;
 import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
+import com.icl.integrator.services.AddressMappingService;
+import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.util.IntegratorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,15 +48,14 @@ public class EndpointConnectorFactory {
                 HttpEndpointDescriptorDTO descriptor =
                         (HttpEndpointDescriptorDTO)
                                 endpoint.getDescriptor();
-                URL url = null;
                 try {
-                    url = new URL("HTTP", descriptor.getHost(),
-                                  descriptor.getPort(),
-                                  descriptor.getPath());
+                    URL url = new URL("HTTP", descriptor.getHost(),
+                                      descriptor.getPort(),
+                                      descriptor.getPath());
+                    return new HTTPEndpointConnector(url);
                 } catch (MalformedURLException e) {
                     throw new IntegratorException(e);
                 }
-                return new HTTPEndpointConnector(url);
             }
             default: {
                 return null;

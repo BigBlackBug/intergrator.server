@@ -1,16 +1,16 @@
-package com.icl.integrator.util;
+package com.icl.integrator.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.icl.integrator.task.Callback;
-import com.icl.integrator.task.DatabaseRetryHandler;
-import com.icl.integrator.task.DatabaseRetryHandlerFactory;
-import com.icl.integrator.task.TaskCreator;
 import com.icl.integrator.model.TaskLogEntry;
+import com.icl.integrator.task.Callback;
+import com.icl.integrator.task.TaskCreator;
+import com.icl.integrator.task.retryhandler.DatabaseRetryHandler;
+import com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
 import java.text.SimpleDateFormat;
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * Time: 15:08
  * To change this template use File | Settings | File Templates.
  */
-@Component
+@Service
 public class RequestScheduler {
 
     private static final int THREAD_CORE_POOL_SIZE = 5;

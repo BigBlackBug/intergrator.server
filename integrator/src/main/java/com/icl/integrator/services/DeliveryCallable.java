@@ -1,9 +1,9 @@
-package com.icl.integrator.async.service;
+package com.icl.integrator.services;
 
 import com.icl.integrator.dto.RequestToTargetDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.SourceDataDTO;
-import com.icl.integrator.util.EndpointConnector;
+import com.icl.integrator.util.connectors.EndpointConnector;
 
 import java.util.concurrent.Callable;
 

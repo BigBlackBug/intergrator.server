@@ -1,4 +1,4 @@
-package com.icl.integrator.util;
+package com.icl.integrator.util.connectors;
 
 import org.springframework.web.client.RestTemplate;
 
@@ -21,13 +21,9 @@ public class HTTPEndpointConnector implements EndpointConnector {
     }
 
     @Override
-    public <Request, Response> Response sendRequest(Request data,
-                                                    Class<Response> responseClass)
-            throws Exception {
+    public <Request, Response> Response sendRequest(
+            Request data, Class<Response> responseClass) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-//        RequestToTargetDTO dto = new RequestToTargetDTO();
-//        dto.setAdditionalData(packet.getAdditionalData());
-//        dto.setData(packet.getData());
         return restTemplate.postForObject(url.toURI(), data,
                                           responseClass);
     }

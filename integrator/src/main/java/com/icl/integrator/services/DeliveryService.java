@@ -1,16 +1,15 @@
-package com.icl.integrator.async.service;
+package com.icl.integrator.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.model.TaskLogEntry;
 import com.icl.integrator.task.Callback;
-import com.icl.integrator.task.DatabaseRetryHandler;
-import com.icl.integrator.task.DatabaseRetryHandlerFactory;
+import com.icl.integrator.task.retryhandler.DatabaseRetryHandler;
+import com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory;
 import com.icl.integrator.task.TaskCreator;
-import com.icl.integrator.util.EndpointConnector;
-import com.icl.integrator.util.EndpointConnectorFactory;
-import com.icl.integrator.util.RequestScheduler;
+import com.icl.integrator.util.connectors.EndpointConnector;
+import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;

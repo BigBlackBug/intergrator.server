@@ -2,10 +2,10 @@ package com.icl.integrator;
 
 import com.icl.integrator.model.TaskLogEntry;
 import com.icl.integrator.task.Callback;
-import com.icl.integrator.task.DatabaseRetryHandler;
-import com.icl.integrator.task.DatabaseRetryHandlerFactory;
+import com.icl.integrator.task.retryhandler.DatabaseRetryHandler;
+import com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory;
 import com.icl.integrator.task.TaskCreator;
-import com.icl.integrator.util.AddressMappingService;
+import com.icl.integrator.services.AddressMappingService;
 import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

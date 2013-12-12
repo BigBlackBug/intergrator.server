@@ -1,6 +1,5 @@
-package com.icl.integrator.async;
+package com.icl.integrator.services;
 
-import com.icl.integrator.async.service.DeliveryService;
 import com.icl.integrator.dto.DestinationDTO;
 import com.icl.integrator.dto.SourceDataDTO;
 import org.apache.commons.logging.Log;
@@ -18,9 +17,9 @@ import java.util.UUID;
  * Time: 10:01
  * To change this template use File | Settings | File Templates.
  */
-public class AsyncPacketProcessor {
+public class PacketProcessor {
 
-    private static Log logger = LogFactory.getLog(AsyncPacketProcessor.class);
+    private static Log logger = LogFactory.getLog(PacketProcessor.class);
 
     @Autowired
     private DeliveryService deliveryService;

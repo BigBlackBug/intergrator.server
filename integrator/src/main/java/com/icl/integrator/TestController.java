@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping(value="/api/",consumes = MediaType.APPLICATION_JSON_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE)
 @Controller
-public class HelloController {
+public class TestController {
 
-    private final Log logger = LogFactory.getLog(HelloController.class);
+    private final Log logger = LogFactory.getLog(TestController.class);
     @RequestMapping(value="accept_response",method = RequestMethod.POST)
     public void
     acceptResponse(@RequestBody ResponseToSourceDTO responseDTO){

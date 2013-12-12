@@ -50,21 +50,21 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <context:component-scan base-package="com.icl.integrator"/>
 
     <bean id="asyncProcessor"
-          class="com.icl.integrator.async.AsyncPacketProcessor"
+          class="com.icl.integrator.services.PacketProcessor"
           scope="prototype">
     </bean>
     <bean id="asyncConnectorController"
-          class="com.icl.integrator.async.AsyncConnectorController">
+          class="com.icl.integrator.MainController">
         <lookup-method name="createProcessor" bean="asyncProcessor"/>
     </bean>
 
     <bean id="limitHandler"
-          class="com.icl.integrator.task.DatabaseRetryLimitHandler"
+          class="com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler"
           scope="prototype">
         <!--<aop:scoped-proxy proxy-target-class="true"/>-->
     </bean>
     <bean id="limitHandlerFactory"
-          class="com.icl.integrator.task.DatabaseRetryHandlerFactory">
+          class="com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory">
         <lookup-method name="createHandler" bean="limitHandler"/>
     </bean>
     <bean id="objectMapper"

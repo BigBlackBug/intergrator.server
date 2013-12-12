@@ -1,4 +1,4 @@
-package com.icl.integrator.util;
+package com.icl.integrator.util.connectors;
 
 /**
  * Created with IntelliJ IDEA.

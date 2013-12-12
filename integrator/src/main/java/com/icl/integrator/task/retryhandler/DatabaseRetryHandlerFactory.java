@@ -1,4 +1,4 @@
-package com.icl.integrator.task;
+package com.icl.integrator.task.retryhandler;
 
 import org.springframework.stereotype.Component;
 
