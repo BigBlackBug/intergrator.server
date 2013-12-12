@@ -7,20 +7,20 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.icl.integrator.dto.SourceEndpointDTO;
-import com.icl.integrator.dto.source.HttpSourceEndpointDTO;
-import com.icl.integrator.dto.source.SourceEndpointDescriptor;
+import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.io.IOException;
 
 public final class SourceEndpointDeserializer extends
-        JsonDeserializer<SourceEndpointDTO> {
+        JsonDeserializer<EndpointDTO> {
 
     public SourceEndpointDeserializer() {
     }
 
     @Override
-    public SourceEndpointDTO deserialize(JsonParser jp,
+    public EndpointDTO deserialize(JsonParser jp,
                                          DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
         ObjectNode treeNode = jp.readValueAsTree();
@@ -35,10 +35,10 @@ public final class SourceEndpointDeserializer extends
             throw new JsonMappingException("'descriptor' is not " +
                                                    "specified");
         }
-        SourceEndpointDescriptor dto2 = null;
+        EndpointDescriptor dto2 = null;
         try {
             if (type == EndpointType.HTTP) {
-                HttpSourceEndpointDTO dto = new HttpSourceEndpointDTO();
+                HttpEndpointDescriptorDTO dto = new HttpEndpointDescriptorDTO();
                 dto.setHost(descriptor.get("host").asText());
                 dto.setPath(descriptor.get("path").asText());
                 dto.setPort(descriptor.get("port").asInt());
@@ -52,9 +52,9 @@ public final class SourceEndpointDeserializer extends
                             "the descriptor is not specified", npe);
         }
 
-        SourceEndpointDTO<SourceEndpointDescriptor>
+        EndpointDTO<EndpointDescriptor>
                 endpointDTO =
-                new SourceEndpointDTO<>();
+                new EndpointDTO<>();
         endpointDTO.setDescriptor(dto2);
         endpointDTO.setEndpointType(type);
         return endpointDTO;

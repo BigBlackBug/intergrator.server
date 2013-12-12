@@ -1,35 +1,20 @@
 package com.icl.integrator.dto;
 
+import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.util.EndpointType;
 
-/**
- * Created with IntelliJ IDEA.
- * User: BigBlackBug
- * Date: 29.11.13
- * Time: 10:21
- * To change this template use File | Settings | File Templates.
- */
-public class EndpointDTO {
-
-    private String serviceName;
+public class EndpointDTO<T extends EndpointDescriptor> {
 
     private EndpointType endpointType;
+
+    private T descriptor;
 
     public EndpointDTO() {
     }
 
-    public EndpointDTO(String serviceName,
-                       EndpointType endpointType) {
-        this.serviceName = serviceName;
+    public EndpointDTO(EndpointType endpointType, T descriptor) {
         this.endpointType = endpointType;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+        this.descriptor = descriptor;
     }
 
     public EndpointType getEndpointType() {
@@ -40,4 +25,11 @@ public class EndpointDTO {
         this.endpointType = endpointType;
     }
 
+    public T getDescriptor() {
+        return descriptor;
+    }
+
+    public void setDescriptor(T descriptor) {
+        this.descriptor = descriptor;
+    }
 }

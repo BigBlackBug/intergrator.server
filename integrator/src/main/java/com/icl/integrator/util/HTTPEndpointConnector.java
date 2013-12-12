@@ -1,8 +1,5 @@
 package com.icl.integrator.util;
 
-import com.icl.integrator.dto.RequestToTargetDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.SourceDataDTO;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URL;
@@ -24,11 +21,14 @@ public class HTTPEndpointConnector implements EndpointConnector {
     }
 
     @Override
-    public ResponseFromTargetDTO sendRequest(SourceDataDTO packet) throws Exception {
+    public <Request, Response> Response sendRequest(Request data,
+                                                    Class<Response> responseClass)
+            throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-        RequestToTargetDTO dto = new RequestToTargetDTO();
-        dto.setAdditionalData(packet.getAdditionalData());
-        dto.setData(packet.getData());
-        return restTemplate.postForObject(url.toURI(), dto, ResponseFromTargetDTO.class);
+//        RequestToTargetDTO dto = new RequestToTargetDTO();
+//        dto.setAdditionalData(packet.getAdditionalData());
+//        dto.setData(packet.getData());
+        return restTemplate.postForObject(url.toURI(), data,
+                                          responseClass);
     }
 }

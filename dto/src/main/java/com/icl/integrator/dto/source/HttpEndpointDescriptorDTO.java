@@ -7,7 +7,7 @@ package com.icl.integrator.dto.source;
  * Time: 16:00
  * To change this template use File | Settings | File Templates.
  */
-public class HttpSourceEndpointDTO implements SourceEndpointDescriptor {
+public class HttpEndpointDescriptorDTO implements EndpointDescriptor {
 
     private String host;
 
@@ -15,7 +15,7 @@ public class HttpSourceEndpointDTO implements SourceEndpointDescriptor {
 
     private String path;
 
-    public HttpSourceEndpointDTO() {
+    public HttpEndpointDescriptorDTO() {
     }
 
     public String getHost() {

@@ -1,8 +1,5 @@
 package com.icl.integrator.util;
 
-import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.SourceDataDTO;
-
 /**
  * Created with IntelliJ IDEA.
  * User: BigBlackBug
@@ -12,6 +9,7 @@ import com.icl.integrator.dto.SourceDataDTO;
  */
 public interface EndpointConnector {
 
-	public ResponseFromTargetDTO sendRequest(SourceDataDTO packet) throws Exception;
+    public <Request, Response> Response sendRequest(
+            Request data,Class<Response> responseClass)throws Exception;
 
 }

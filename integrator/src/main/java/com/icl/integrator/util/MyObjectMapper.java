@@ -2,7 +2,7 @@ package com.icl.integrator.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.icl.integrator.dto.SourceEndpointDTO;
+import com.icl.integrator.dto.EndpointDTO;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,12 +13,13 @@ import com.icl.integrator.dto.SourceEndpointDTO;
  */
 public class MyObjectMapper extends ObjectMapper {
 
-    public MyObjectMapper(){
+    public static final String MODULE_NAME = "MyObjectMapper";
+
+    public MyObjectMapper() {
         super();
-        SimpleModule testModule =
-                new SimpleModule("MyModule")
-                        .addDeserializer(SourceEndpointDTO.class,
-                                         new SourceEndpointDeserializer());
+        SimpleModule testModule = new SimpleModule(MODULE_NAME);
+        testModule.addDeserializer(
+                EndpointDTO.class, new SourceEndpointDeserializer());
         registerModule(testModule);
     }
 
