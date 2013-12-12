@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+    <context:annotation-config/>
+    <!--
+       Turn on AspectJ @Configurable support. As a result, any time you
+       instantiate an object, Spring will attempt to perform dependency
+       injection on that object. This occurs for instantiation via the "new"
+       keyword, as well as via reflection. This is possible because AspectJ
+       is used to "weave" Roo-based applications at compile time. In effect
+       this feature allows dependency injection of any object at all in your
+       system, which is a very useful feature (without @Configurable you'd
+       only be able to dependency inject objects acquired from Spring or
+       subsequently presented to a specific Spring dependency injection
+       method). Roo applications use this useful feature in a number of
+       areas, such as @PersistenceContext injection into entities.
+   -->
+    <context:spring-configured/>
+
+
+    <!--
+       This declaration will cause Spring to locate every @Component,
+       @Repository and @Service in your application. In practical terms this
+       allows you to write a POJO and then simply annotate the new POJO as an
+       @Service and Spring will automatically detect, instantiate and
+       dependency inject your service at startup time. Importantly, you can
+       then also have your new service injected into any other class that
+       requires it simply by declaring a field for your service inside the
+       relying class and Spring will inject it. Note that two exclude filters
+       are declared. The first ensures that Spring doesn't spend time
+       introspecting Roo-specific ITD aspects. The second ensures Roo doesn't
+       instantiate your @Controller classes, as these should be instantiated
+       by a web tier application context. Refer to web.xml for more details
+       about the web tier application context setup services.
+
+       Furthermore, this turns on @Autowired, @PostConstruct etc support. These
+       annotations allow you to use common Spring and Java Enterprise Edition
+       annotations in your classes without needing to do any special configuration.
+       The most commonly used annotation is @Autowired, which instructs Spring to
+       dependency inject an object into your class.
+   -->
+    <context:component-scan base-package="com.icl.integrator"/>
+
+    <bean id="asyncProcessor"
+          class="com.icl.integrator.async.AsyncPacketProcessor"
+          scope="prototype">
+    </bean>
+    <bean id="asyncConnectorController"
+          class="com.icl.integrator.async.AsyncConnectorController">
+        <lookup-method name="createProcessor" bean="asyncProcessor"/>
+    </bean>
+
+    <bean id="limitHandler"
+          class="com.icl.integrator.task.DatabaseRetryLimitHandler"
+          scope="prototype">
+        <!--<aop:scoped-proxy proxy-target-class="true"/>-->
+    </bean>
+    <bean id="limitHandlerFactory"
+          class="com.icl.integrator.task.DatabaseRetryHandlerFactory">
+        <lookup-method name="createHandler" bean="limitHandler"/>
+    </bean>
+    <bean id="objectMapper"
+          class="com.icl.integrator.util.MyObjectMapper"/>
+    <bean id="jacksonMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="objectMapper" ref="objectMapper"/>
+    </bean>
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="jacksonMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+          id="entityManagerFactory">
+        <property name="persistenceUnitName" value="develop"/>
+
+        <!-- Необходимо для использования Pageable в параметрах методов JpaRepository'ев -->
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        </property>
+
+        <property name="persistenceProvider"
+                  ref="hibernatePersistenceProvider"/>
+    </bean>
+
+    <bean id="hibernatePersistenceProvider"
+          class="org.hibernate.ejb.HibernatePersistence">
+    </bean>
+
+    <bean id="transactionManager"
+          class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <!-- mode aspect-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver"-->
+    <!--id="tilesViewResolver">-->
+    <!--<property name="viewClass"-->
+    <!--value="org.springframework.web.servlet.view.tiles2.TilesView"/>-->
+    <!--</bean>-->
+    <bean id="cnManager"
+          class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="ignoreAcceptHeader" value="true"/>
+        <property name="defaultContentType" value="application/json"/>
+    </bean>
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="contentNegotiationManager" ref="cnManager"/>
+        <!--<property name="viewResolvers">-->
+        <!--<list>-->
+        <!--<ref bean="tilesViewResolver"/>-->
+        <!--</list>-->
+        <!--</property>-->
+        <property name="defaultViews">
+            <list>
+                <bean
+                        class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+                    <property name="prefixJson" value="true"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <!--<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
+    <!--<property name="viewClass"-->
+    <!--value="org.springframework.web.servlet.view.JstlView"/>-->
+    <!--<property name="prefix" value="/WEB-INF/views/"/>-->
+    <!--<property name="suffix" value=".jsp"/>-->
+    <!--</bean>-->
+</beans>
