@@ -3,9 +3,13 @@ package com.icl.integrator;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.ResponseToSourceDTO;
 import com.icl.integrator.dto.SourceDataDTO;
+import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.PacketProcessor;
+import com.icl.integrator.services.RegistrationService;
+import com.icl.integrator.services.TargetRegistrationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +35,9 @@ public abstract class MainController {
 
     private static Log logger = LogFactory.getLog(MainController.class);
 
+    @Autowired
+    private RegistrationService registrationService;
+
     @RequestMapping(value = "processData")
     public
     @ResponseBody
@@ -48,6 +55,30 @@ public abstract class MainController {
         ResponseToSourceDTO responseToSourceDTO =
                 new ResponseToSourceDTO(fromTargetDTO);
         return responseToSourceDTO;
+    }
+
+    /*
+    * {service:{name:'',port:'',url:''},actions:[{name:'',url:''}]}
+    * */
+
+    @RequestMapping(value = "registerTarget")
+    public
+    @ResponseBody
+    ResponseToSourceDTO
+    registerTarget(@RequestBody(
+            required = true) TargetRegistrationDTO registractionDTO,
+                   HttpServletRequest request) {
+        logger.info(MessageFormat.format("Received a registration request " +
+                                                 "from source " +
+                                                 "({0}:{1,number,#})",
+                                         request.getRemoteHost(),
+                                         request.getRemotePort()));
+        try {
+            registrationService.register(registractionDTO);
+        } catch (TargetRegistrationException ex) {
+            //TODO impl
+        }
+        return null;
     }
 
     protected abstract PacketProcessor createProcessor();

@@ -21,6 +21,11 @@ public class HTTPEndpointConnector implements EndpointConnector {
     }
 
     @Override
+    public void testConnection() throws Exception {
+        //TODO implement. catch rest exception. if 404 - fail
+    }
+
+    @Override
     public <Request, Response> Response sendRequest(
             Request data, Class<Response> responseClass) throws Exception {
         RestTemplate restTemplate = new RestTemplate();

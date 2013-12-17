@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ public class AddressMapping {
             name = "SERVICE_NAME")
     private String serviceName;
 
-    @Column(name = "SREVICE_PORT")
+    @Column(name = "SERVICE_PORT")
     private Integer servicePort;
 
     @Column(nullable = false, length = 255,
@@ -32,7 +33,7 @@ public class AddressMapping {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "addressMapping")
     @Cascade(value = org.hibernate.annotations.CascadeType.ALL)
-    private List<ActionMapping> actionMappings;
+    private List<ActionMapping> actionMappings = new ArrayList<>();
 
     @Id
     @Type(type = "com.icl.integrator.model.OracleGuidType")
@@ -76,4 +77,7 @@ public class AddressMapping {
         this.serviceName = serviceName;
     }
 
+    public void addActionMaping(ActionMapping actionMapping) {
+        actionMappings.add(actionMapping);
+    }
 }

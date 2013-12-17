@@ -40,6 +40,16 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-all:5.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-amqp:5.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-broker:5.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-client:5.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.fusesource.hawtbuf:hawtbuf:1.9" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-openwire-legacy:5.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.qpid:proton-jms:0.3.0-fuse-2" level="project" />
     <orderEntry type="module" module-name="dto" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.2.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.2.3" level="project" />
@@ -49,7 +59,6 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.2.3" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.0.9" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.0.9" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.2" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.janino:janino:2.5.16" level="project" />
     <orderEntry type="library" name="Maven: com.oracle:ojdbc14:10.1.0.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:3.2.1.RELEASE" level="project" />
