@@ -15,7 +15,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "TASK_LOG_ENTRY")
+@Table(name = "INTEGRATOR_TASK_LOG_ENTRY")
 public class TaskLogEntry {
 
     @Id

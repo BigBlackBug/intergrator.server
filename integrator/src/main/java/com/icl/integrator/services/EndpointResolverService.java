@@ -1,12 +1,10 @@
 package com.icl.integrator.services;
 
+import com.icl.integrator.model.JMSServiceEndpoint;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -18,11 +16,9 @@ import java.net.URL;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class AddressMappingService {
+public class EndpointResolverService {
 
     public static final String DEFAULT_PROTOCOL = "HTTP";
-
-    public static final String ACCEPT_RESPONSE_ACTION = "accept_response";
 
     @PersistenceContext
     private EntityManager em;
@@ -31,11 +27,11 @@ public class AddressMappingService {
     public URL getServiceURL(String serviceName, String action) {
         Query query = em.createQuery(
                 "select " +
-                        "addr.serviceURL,addr.servicePort," +
+                        "address.serviceURL,address.servicePort," +
                         "actions.actionURL " +
-                        "from AddressMapping addr " +
-                        "join addr.actionMappings actions " +
-                        "where addr.serviceName=:serviceName " +
+                        "from HttpServiceEndpoint address " +
+                        "join address.httpActions actions " +
+                        "where address.serviceName=:serviceName " +
                         "and actions.actionName=:actionName")
                 .setParameter("actionName",
                               action).setParameter
@@ -52,6 +48,16 @@ public class AddressMappingService {
         } catch (MalformedURLException e) {
             return null;
         }
+    }
+
+    @Transactional
+    public JMSServiceEndpoint getJmsEndpoint(String serviceName) {
+        TypedQuery<JMSServiceEndpoint> query = em.createQuery(
+                "select ep from JMSServiceEndpoint ep " +
+                        "where ep.serviceName=:serviceName",
+                JMSServiceEndpoint.class)
+                .setParameter("serviceName", serviceName);
+        return query.getSingleResult();
     }
 
     private static final class QueryResult {

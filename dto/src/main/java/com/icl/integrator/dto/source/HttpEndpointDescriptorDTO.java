@@ -13,7 +13,7 @@ public class HttpEndpointDescriptorDTO implements EndpointDescriptor {
 
     private int port;
 
-    private String path;
+//    private String path;   //action
 
     public HttpEndpointDescriptorDTO() {
     }
@@ -26,13 +26,13 @@ public class HttpEndpointDescriptorDTO implements EndpointDescriptor {
         this.host = host;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
+//    public String getPath() {
+//        return path;
+//    }
+//
+//    public void setPath(String path) {
+//        this.path = path;
+//    }
 
     public int getPort() {
         return port;
@@ -40,5 +40,33 @@ public class HttpEndpointDescriptorDTO implements EndpointDescriptor {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        HttpEndpointDescriptorDTO that = (HttpEndpointDescriptorDTO) o;
+
+        if (port != that.port) {
+            return false;
+        }
+        if (!host.equals(that.host)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = host.hashCode();
+        result = 31 * result + port;
+        return result;
     }
 }

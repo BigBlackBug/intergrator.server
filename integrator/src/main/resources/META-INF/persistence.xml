@@ -47,13 +47,12 @@
                       value="org.hibernate.dialect.Oracle10gDialect"/>
             <property name="hibernate.connection.url"
                       value="jdbc:oracle:thin:@192.168.84.21:1521:ORCL"/>
-            <!--<property name="hibernate.connection.url" value="jdbc:oracle:thin:@alpha1:1521:ORCL"/>-->
             <property name="hibernate.connection.username" value="regcard"/>
             <property name="hibernate.connection.password" value="regcard"/>
             <property name="hibernate.connection.driver_class"
                       value="oracle.jdbc.OracleDriver"/>
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
 
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
 
             <property name="hibernate.connection.provider_class"
                       value="org.hibernate.connection.C3P0ConnectionProvider"/>

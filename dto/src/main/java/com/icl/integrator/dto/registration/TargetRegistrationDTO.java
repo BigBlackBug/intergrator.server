@@ -1,6 +1,7 @@
 package com.icl.integrator.dto.registration;
 
 import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.util.EndpointType;
 
 import java.util.List;
 
@@ -11,15 +12,19 @@ import java.util.List;
  * Time: 14:47
  * To change this template use File | Settings | File Templates.
  */
-public class TargetRegistrationDTO {
+public class TargetRegistrationDTO<T extends ActionDescriptor> {
 
     private String serviceName;
 
     private EndpointDTO endpoint;
 
-    private List<ActionDTO> actions;
+    private List<ActionEndpointDTO<T>> actions;
 
     public TargetRegistrationDTO() {
+    }
+
+    public EndpointType getEndpointType() {
+        return endpoint.getEndpointType();
     }
 
     public EndpointDTO getEndpoint() {
@@ -38,11 +43,11 @@ public class TargetRegistrationDTO {
         this.serviceName = serviceName;
     }
 
-    public List<ActionDTO> getActions() {
+    public List<ActionEndpointDTO<T>> getActions() {
         return actions;
     }
 
-    public void setActions(List<ActionDTO> actions) {
+    public void setActions(List<ActionEndpointDTO<T>> actions) {
         this.actions = actions;
     }
 }

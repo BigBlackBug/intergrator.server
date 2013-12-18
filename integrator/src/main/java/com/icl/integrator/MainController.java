@@ -80,6 +80,15 @@ public abstract class MainController {
         }
         return null;
     }
+//    @RequestMapping(value = "test")
+//    public
+//    @ResponseBody
+//    ResponseToSourceDTO test(HttpServletRequest request) {
+//        JMSServiceEndpoint
+//        return null;
+//    }
+//    @PersistenceContext
+//    EntityManager em;
 
     protected abstract PacketProcessor createProcessor();
 }

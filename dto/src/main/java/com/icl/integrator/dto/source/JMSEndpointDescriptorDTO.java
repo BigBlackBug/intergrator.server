@@ -9,17 +9,13 @@ import java.util.Map;
  * Time: 10:39
  * To change this template use File | Settings | File Templates.
  */
-public class JMSEndpointDescriptorDTO {
+public class JMSEndpointDescriptorDTO implements EndpointDescriptor {
 
     private Map<String, String> jndiProperties;
 
     private String connectionFactory;
 
-    private String username;
-
-    private String password;
-
-    private String queueName;
+//    private QueueDTO queueDTO;   //action
 
     public JMSEndpointDescriptorDTO() {
     }
@@ -40,27 +36,39 @@ public class JMSEndpointDescriptorDTO {
         this.jndiProperties = jndiProperties;
     }
 
-    public String getUsername() {
-        return username;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        JMSEndpointDescriptorDTO that = (JMSEndpointDescriptorDTO) o;
+
+        if (!connectionFactory.equals(that.connectionFactory)) {
+            return false;
+        }
+        if (!jndiProperties.equals(that.jndiProperties)) {
+            return false;
+        }
+
+        return true;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    @Override
+    public int hashCode() {
+        int result = jndiProperties.hashCode();
+        result = 31 * result + connectionFactory.hashCode();
+        return result;
     }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getQueueName() {
-        return queueName;
-    }
-
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
-    }
+//
+//    public QueueDTO getQueueDTO() {
+//        return queueDTO;
+//    }
+//
+//    public void setQueueDTO(QueueDTO queueDTO) {
+//        this.queueDTO = queueDTO;
+//    }
 }

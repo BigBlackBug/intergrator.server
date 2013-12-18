@@ -18,22 +18,21 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "ADDRESS_MAPPING")
-public class AddressMapping {
+public class HttpServiceEndpoint {
 
     @Column(unique = true, nullable = false, length = 255,
             name = "SERVICE_NAME")
     private String serviceName;
 
-    @Column(name = "SERVICE_PORT")
+    @Column(name = "SREVICE_PORT")
     private Integer servicePort;
 
-    @Column(nullable = false, length = 255,
-            name = "SERVICE_URL")
+    @Column(nullable = false, length = 255, name = "SERVICE_URL")
     private String serviceURL;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "addressMapping")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "httpServiceEndpoint")
     @Cascade(value = org.hibernate.annotations.CascadeType.ALL)
-    private List<ActionMapping> actionMappings = new ArrayList<>();
+    private List<HttpAction> httpActions = new ArrayList<>();
 
     @Id
     @Type(type = "com.icl.integrator.model.OracleGuidType")
@@ -42,7 +41,7 @@ public class AddressMapping {
     @GenericGenerator(name = "system-uuid", strategy = "uuid2")
     private UUID id;
 
-    public AddressMapping() {
+    public HttpServiceEndpoint() {
     }
 
     public Integer getServicePort() {
@@ -53,12 +52,13 @@ public class AddressMapping {
         this.servicePort = servicePort;
     }
 
-    public List<ActionMapping> getActionMappings() {
-        return actionMappings;
+    public List<HttpAction> getHttpActions() {
+        return httpActions;
     }
 
-    public void setActionMappings(List<ActionMapping> actionMappings) {
-        this.actionMappings = actionMappings;
+    public void setHttpActions(
+            List<HttpAction> httpActions) {
+        this.httpActions = httpActions;
     }
 
     public String getServiceURL() {
@@ -77,7 +77,7 @@ public class AddressMapping {
         this.serviceName = serviceName;
     }
 
-    public void addActionMaping(ActionMapping actionMapping) {
-        actionMappings.add(actionMapping);
+    public void addActionMaping(HttpAction httpAction) {
+        httpActions.add(httpAction);
     }
 }

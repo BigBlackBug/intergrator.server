@@ -16,12 +16,12 @@ public class HTTPEndpointConnector implements EndpointConnector {
 
     private final URL url;
 
-    public HTTPEndpointConnector(URL url) {
+    HTTPEndpointConnector(URL url) {
         this.url = url;
     }
 
     @Override
-    public void testConnection() throws Exception {
+    public void testConnection() throws ConnectionException {
         //TODO implement. catch rest exception. if 404 - fail
     }
 

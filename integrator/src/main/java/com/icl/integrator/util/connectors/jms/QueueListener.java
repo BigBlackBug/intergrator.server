@@ -14,7 +14,9 @@ public class QueueListener implements MessageListener {
         if (message instanceof TextMessage) {
             final TextMessage textMessage = (TextMessage) message;
             try {
-                System.out.println(textMessage.getText());
+                System.out.println("Пришло сообщение на КАГБЭ " +
+                                           "соурс" + textMessage
+                        .getText());
             } catch (final JMSException e) {
                 e.printStackTrace();
             }

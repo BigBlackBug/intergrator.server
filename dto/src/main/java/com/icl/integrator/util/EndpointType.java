@@ -8,5 +8,5 @@ package com.icl.integrator.util;
  * To change this template use File | Settings | File Templates.
  */
 public enum EndpointType {
-	HTTP
+    HTTP, JMS
 }

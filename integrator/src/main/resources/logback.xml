@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration scan="true" scanPeriod="3 seconds">
-
     <property name="LOG_FILES_HOME" value="/tmp"/>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--<filter class="ch.qos.logback.core.filter.EvaluatorFilter">-->
@@ -35,24 +34,6 @@
     </appender>
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-        <!--<filter class="ch.qos.logback.core.filter.EvaluatorFilter">-->
-            <!--<evaluator> &lt;!&ndash; defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator &ndash;&gt;-->
-                <!--<expression>org.springframework.security.access.AccessDeniedException.class.isInstance(throwable)-->
-                <!--</expression>-->
-            <!--</evaluator>-->
-            <!--<OnMismatch>NEUTRAL</OnMismatch>-->
-            <!--<OnMatch>DENY</OnMatch>-->
-        <!--</filter>-->
-        <!--<filter class="ch.qos.logback.core.filter.EvaluatorFilter">-->
-            <!--<evaluator> &lt;!&ndash; defaults to type ch.qos.logback.classic.boolex.JaninoEventEvaluator &ndash;&gt;-->
-                <!--<expression>-->
-                    <!--com.icl.ios.registration.card.exception.SessionExpiredException.class.isInstance(throwable)-->
-                <!--</expression>-->
-            <!--</evaluator>-->
-            <!--<OnMismatch>NEUTRAL</OnMismatch>-->
-            <!--<OnMatch>DENY</OnMatch>-->
-        <!--</filter>-->
-
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n</pattern>
         </encoder>

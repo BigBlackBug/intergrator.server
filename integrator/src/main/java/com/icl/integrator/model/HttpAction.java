@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "ACTION_MAPPING")
-public class ActionMapping {
+public class HttpAction {
 
     @Column(nullable = false, length = 255, name = "ACTION_NAME")
     private String actionName;
@@ -33,9 +33,9 @@ public class ActionMapping {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ADDRESS_MAPPING_ID", nullable = false,
                 updatable = false)
-    private AddressMapping addressMapping;
+    private HttpServiceEndpoint httpServiceEndpoint;
 
-    public ActionMapping() {
+    public HttpAction() {
     }
 
     public void setActionName(String actionName) {
@@ -46,11 +46,11 @@ public class ActionMapping {
         this.actionURL = actionURL;
     }
 
-    public AddressMapping getAddressMapping() {
-        return addressMapping;
+    public HttpServiceEndpoint getHttpServiceEndpoint() {
+        return httpServiceEndpoint;
     }
 
-    public void setAddressMapping(AddressMapping addressMapping) {
-        this.addressMapping = addressMapping;
+    public void setHttpServiceEndpoint(HttpServiceEndpoint httpServiceEndpoint) {
+        this.httpServiceEndpoint = httpServiceEndpoint;
     }
 }

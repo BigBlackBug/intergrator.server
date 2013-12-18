@@ -4,60 +4,36 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
-import com.icl.integrator.dto.source.EndpointDescriptor;
+import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.registration.ActionDescriptor;
 
 import java.io.IOException;
 
 public final class SourceEndpointDeserializer extends
-        JsonDeserializer<EndpointDTO> {
+        JsonDeserializer<ServiceDTO> {
 
     public SourceEndpointDeserializer() {
     }
 
     @Override
-    public EndpointDTO deserialize(JsonParser jp,
-                                         DeserializationContext ctxt)
+    public ServiceDTO deserialize(JsonParser jp,
+                                  DeserializationContext ctx)
             throws IOException, JsonProcessingException {
         ObjectNode treeNode = jp.readValueAsTree();
-        JsonNode endpointType = treeNode.get("endpointType");
-        if (endpointType == null) {
-            throw new JsonMappingException("'endpointType' is not " +
-                                                   "specified");
-        }
-        EndpointType type = EndpointType.valueOf(endpointType.asText());
-        JsonNode descriptor = treeNode.get("descriptor");
-        if (descriptor == null) {
-            throw new JsonMappingException("'descriptor' is not " +
-                                                   "specified");
-        }
-        EndpointDescriptor dto2 = null;
-        try {
-            if (type == EndpointType.HTTP) {
-                HttpEndpointDescriptorDTO dto = new HttpEndpointDescriptorDTO();
-                dto.setHost(descriptor.get("host").asText());
-                dto.setPath(descriptor.get("path").asText());
-                dto.setPort(descriptor.get("port").asInt());
-                dto2 = dto;
-            } else {
-                //
-            }
-        } catch (NullPointerException npe) {
-            throw new JsonMappingException(
-                    "One of the fields of " +
-                            "the descriptor is not specified", npe);
-        }
+        MyObjectMapper mapper = new MyObjectMapper();
+        EndpointDTO endpointDTO = mapper.readValue
+                (treeNode.get("endpoint").toString(), EndpointDTO.class);
+//                getEndpointDTO(treeNode.get("endpoint"));
 
-        EndpointDTO<EndpointDescriptor>
-                endpointDTO =
-                new EndpointDTO<>();
-        endpointDTO.setDescriptor(dto2);
-        endpointDTO.setEndpointType(type);
-        return endpointDTO;
+        ActionDescriptor actionDescriptor = mapper.parseActionDescriptor(
+                treeNode.get("actionDescriptor"),
+                endpointDTO.getEndpointType());
+        ServiceDTO serviceDTO = new ServiceDTO();
+        serviceDTO.setEndpoint(endpointDTO);
+        serviceDTO.setActionDescriptor(actionDescriptor);
+        return serviceDTO;
     }
 
 }

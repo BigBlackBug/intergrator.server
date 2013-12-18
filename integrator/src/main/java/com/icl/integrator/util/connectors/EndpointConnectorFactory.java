@@ -2,8 +2,14 @@ package com.icl.integrator.util.connectors;
 
 import com.icl.integrator.dto.DestinationDTO;
 import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.registration.HttpActionDTO;
+import com.icl.integrator.dto.registration.QueueDTO;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
-import com.icl.integrator.services.AddressMappingService;
+import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
+import com.icl.integrator.model.JMSServiceEndpoint;
+import com.icl.integrator.services.EndpointResolverService;
 import com.icl.integrator.util.EndpointType;
 import com.icl.integrator.util.IntegratorException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +29,22 @@ import java.net.URL;
 public class EndpointConnectorFactory {
 
     @Autowired
-    private AddressMappingService addressService;
+    private EndpointResolverService endpointResolverService;
 
     public EndpointConnector createEndpointConnector(
             DestinationDTO destination, String action) {
         switch (destination.getEndpointType()) {
             case HTTP: {
-                URL url = addressService
+                URL url = endpointResolverService
                         .getServiceURL(destination.getServiceName(),
                                        action);
                 return new HTTPEndpointConnector(url);
+            }
+            case JMS: {
+                JMSServiceEndpoint jmsEndpoint = endpointResolverService
+                        .getJmsEndpoint(destination.getServiceName());
+                return new JMSEndpointConnector(
+                        jmsEndpoint, jmsEndpoint.getActionByName(action));
             }
             default: {
                 return null;
@@ -40,26 +52,42 @@ public class EndpointConnectorFactory {
         }
     }
 
-    public EndpointConnector createEndpointConnector(EndpointDTO endpoint)
-            throws IntegratorException {
+    public EndpointConnector createEndpointConnector(EndpointDTO endpoint,
+                                                     ActionDescriptor descr) {
         EndpointType endpointType = endpoint.getEndpointType();
         switch (endpointType) {
             case HTTP: {
-                HttpEndpointDescriptorDTO descriptor =
-                        (HttpEndpointDescriptorDTO)
-                                endpoint.getDescriptor();
+                HttpEndpointDescriptorDTO endpointDescriptor =
+                        (HttpEndpointDescriptorDTO) endpoint.getDescriptor();
+                HttpActionDTO actionDescriptor = (HttpActionDTO) descr;
                 try {
-                    URL url = new URL("HTTP", descriptor.getHost(),
-                                      descriptor.getPort(),
-                                      descriptor.getPath());
+                    URL url = new URL("HTTP", endpointDescriptor.getHost(),
+                                      endpointDescriptor.getPort(),
+                                      actionDescriptor.getPath());
                     return new HTTPEndpointConnector(url);
                 } catch (MalformedURLException e) {
                     throw new IntegratorException(e);
                 }
             }
+            case JMS: {
+                JMSEndpointDescriptorDTO endpointDescriptor =
+                        (JMSEndpointDescriptorDTO) endpoint.getDescriptor();
+                QueueDTO actionDescriptor = (QueueDTO) descr;
+                return new JMSEndpointConnector(endpointDescriptor,
+                                                actionDescriptor);
+            }
             default: {
                 return null;
             }
         }
+    }
+
+    //адрес возврата
+    //TODO refactor to proxy
+    public EndpointConnector createEndpointConnector(ServiceDTO serviceDTO)
+            throws IntegratorException {
+        EndpointDTO endpoint = serviceDTO.getEndpoint();
+        return createEndpointConnector(endpoint,
+                                       serviceDTO.getActionDescriptor());
     }
 }

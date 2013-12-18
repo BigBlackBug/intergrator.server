@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class SourceDataDTO {
 
-    private EndpointDTO source;
+    private ServiceDTO source;
 
     private List<DestinationDTO> destinations;
 
@@ -25,11 +25,11 @@ public class SourceDataDTO {
     public SourceDataDTO() {
     }
 
-    public EndpointDTO getSource() {
+    public ServiceDTO getSource() {
         return source;
     }
 
-    public void setSource(EndpointDTO source) {
+    public void setSource(ServiceDTO source) {
         this.source = source;
     }
 

@@ -20,7 +20,7 @@
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="" />
         <datasource-mapping>
-          <factory-entry name="develop" />
+          <factory-entry name="develop" value="adc00fa5-f373-4e60-a09e-f5873b803810" />
         </datasource-mapping>
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/src/main/resources/META-INF/persistence.xml" />
       </configuration>
@@ -50,13 +50,20 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-context:3.2.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-expression:3.2.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-tx:3.2.1.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-all:5.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-amqp:5.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-broker:5.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.activemq:activemq-client:5.8.0" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.6" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: org.fusesource.hawtbuf:hawtbuf:1.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-broker:5.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.activemq:activemq-openwire-legacy:5.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.qpid:proton-jms:0.3.0-fuse-2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.qpid:proton:0.3.0-fuse-2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.qpid:proton-api:0.3.0-fuse-2" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.47" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.47" level="project" />
     <orderEntry type="module" module-name="dto" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.2.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.2.3" level="project" />

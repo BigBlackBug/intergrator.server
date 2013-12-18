@@ -32,4 +32,32 @@ public class EndpointDTO<T extends EndpointDescriptor> {
     public void setDescriptor(T descriptor) {
         this.descriptor = descriptor;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        EndpointDTO that = (EndpointDTO) o;
+
+        if (!descriptor.equals(that.descriptor)) {
+            return false;
+        }
+        if (endpointType != that.endpointType) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = endpointType.hashCode();
+        result = 31 * result + descriptor.hashCode();
+        return result;
+    }
 }
