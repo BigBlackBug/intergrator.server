@@ -11,6 +11,7 @@ import com.icl.integrator.util.MyObjectMapper;
 import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
@@ -59,7 +60,32 @@ public class JMSEndpointConnector implements EndpointConnector {
 
     @Override
     public void testConnection() throws ConnectionException {
-        //TODO
+        Context ctx;
+        try {
+            ctx = new InitialContext(
+                    new Hashtable<>(connectionData.getJndiProperties()));
+        } catch (NamingException e) {
+            throw new ConnectionException("Неверно указаны параметры jndi", e);
+        }
+        ConnectionFactory factory;
+        try {
+            factory = (ConnectionFactory) ctx
+                    .lookup(connectionData.getConnectionFactory());
+        } catch (NamingException e) {
+            throw new ConnectionException(
+                    "Такой ConnectionFactory не существует", e);
+        }
+        try {
+            Connection connection = factory.createConnection(
+                    queueDescriptor.getUsername(),
+                    queueDescriptor.getPassword());
+            Session session = connection.createSession(false,
+                                                       Session.AUTO_ACKNOWLEDGE);
+            session.createQueue(queueDescriptor.getQueueName());
+        } catch (JMSException ex) {
+            throw new ConnectionException("Невозможно установить соединение " +
+                                                  "с очередью", ex);
+        }
     }
 
     @Override
@@ -68,12 +94,12 @@ public class JMSEndpointConnector implements EndpointConnector {
             throws Exception {
         Context ctx = new InitialContext(
                 new Hashtable<>(connectionData.getJndiProperties()));
-        QueueConnectionFactory factory = (QueueConnectionFactory) ctx
+        ConnectionFactory factory = (ConnectionFactory) ctx
                 .lookup(connectionData.getConnectionFactory());
-        QueueConnection connection = factory.createQueueConnection(
+        Connection connection = factory.createConnection(
                 queueDescriptor.getUsername(), queueDescriptor.getPassword());
-        QueueSession session =
-                connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+        Session session = connection.createSession(false,
+                                                   Session.AUTO_ACKNOWLEDGE);
         Queue queue = session.createQueue(queueDescriptor.getQueueName());
         MessageProducer producer = session.createProducer(queue);
         String dataJson = serializer.writeValueAsString(data);

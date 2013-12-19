@@ -13,6 +13,7 @@ public class ResponseToSourceDTO {
     public ResponseToSourceDTO(ResponseFromTargetDTO result, String serviceName,
                                String requestID) {
         this.result = result;
+
         this.serviceName = serviceName;
         this.requestID = requestID;
     }
@@ -22,6 +23,38 @@ public class ResponseToSourceDTO {
     }
 
     public ResponseToSourceDTO() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ResponseToSourceDTO that = (ResponseToSourceDTO) o;
+
+        if (!requestID.equals(that.requestID)) {
+            return false;
+        }
+        if (!result.equals(that.result)) {
+            return false;
+        }
+        if (!serviceName.equals(that.serviceName)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result1 = result.hashCode();
+        result1 = 31 * result1 + serviceName.hashCode();
+        result1 = 31 * result1 + requestID.hashCode();
+        return result1;
     }
 
     public String getRequestID() {

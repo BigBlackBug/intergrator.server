@@ -1,5 +1,6 @@
 package com.icl.integrator;
 
+import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.ResponseToSourceDTO;
 import com.icl.integrator.dto.SourceDataDTO;
@@ -64,31 +65,27 @@ public abstract class MainController {
     @RequestMapping(value = "registerTarget")
     public
     @ResponseBody
-    ResponseToSourceDTO
-    registerTarget(@RequestBody(
-            required = true) TargetRegistrationDTO registractionDTO,
+    ResponseFromTargetDTO<Map>
+    registerTarget(@RequestBody(required = true)
+                   TargetRegistrationDTO registrationDTO,
                    HttpServletRequest request) {
         logger.info(MessageFormat.format("Received a registration request " +
                                                  "from source " +
                                                  "({0}:{1,number,#})",
                                          request.getRemoteHost(),
                                          request.getRemotePort()));
+        ResponseFromTargetDTO<Map> response;
         try {
-            registrationService.register(registractionDTO);
+            Map result = registrationService.register(registrationDTO);
+            response = new ResponseFromTargetDTO<>(result, Map.class);
         } catch (TargetRegistrationException ex) {
-            //TODO impl
+            ErrorDTO errorDTO = new ErrorDTO();
+            errorDTO.setErrorMessage(ex.getMessage());
+            errorDTO.setDeveloperMessage(ex.getCause().getMessage());
+            response = new ResponseFromTargetDTO<>(errorDTO);
         }
-        return null;
+        return response;
     }
-//    @RequestMapping(value = "test")
-//    public
-//    @ResponseBody
-//    ResponseToSourceDTO test(HttpServletRequest request) {
-//        JMSServiceEndpoint
-//        return null;
-//    }
-//    @PersistenceContext
-//    EntityManager em;
 
     protected abstract PacketProcessor createProcessor();
 }

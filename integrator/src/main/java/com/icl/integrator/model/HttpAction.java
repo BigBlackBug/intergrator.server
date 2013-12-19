@@ -1,5 +1,6 @@
 package com.icl.integrator.model;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -33,24 +34,34 @@ public class HttpAction {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ADDRESS_MAPPING_ID", nullable = false,
                 updatable = false)
+    @Cascade(value = org.hibernate.annotations.CascadeType.PERSIST)
     private HttpServiceEndpoint httpServiceEndpoint;
 
     public HttpAction() {
-    }
-
-    public void setActionName(String actionName) {
-        this.actionName = actionName;
-    }
-
-    public void setActionURL(String actionURL) {
-        this.actionURL = actionURL;
     }
 
     public HttpServiceEndpoint getHttpServiceEndpoint() {
         return httpServiceEndpoint;
     }
 
-    public void setHttpServiceEndpoint(HttpServiceEndpoint httpServiceEndpoint) {
+    public void setHttpServiceEndpoint(
+            HttpServiceEndpoint httpServiceEndpoint) {
         this.httpServiceEndpoint = httpServiceEndpoint;
+    }
+
+    public String getActionName() {
+        return actionName;
+    }
+
+    public void setActionName(String actionName) {
+        this.actionName = actionName;
+    }
+
+    public String getActionURL() {
+        return actionURL;
+    }
+
+    public void setActionURL(String actionURL) {
+        this.actionURL = actionURL;
     }
 }

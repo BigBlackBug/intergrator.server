@@ -21,6 +21,34 @@ public class SuccessDTO<T> {
     public SuccessDTO() {
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SuccessDTO that = (SuccessDTO) o;
+
+        if (!responseClass.equals(that.responseClass)) {
+            return false;
+        }
+        if (!responseValue.equals(that.responseValue)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = responseClass.hashCode();
+        result = 31 * result + responseValue.hashCode();
+        return result;
+    }
+
     public Class<T> getResponseClass() {
         return responseClass;
     }

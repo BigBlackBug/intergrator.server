@@ -86,4 +86,8 @@ public class JMSServiceEndpoint {
         }
         return null;
     }
+
+    public void addAction(JMSAction action) {
+        jmsActions.add(action);
+    }
 }

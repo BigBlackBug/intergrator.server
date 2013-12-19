@@ -19,13 +19,51 @@ public class ResponseFromTargetDTO<T> {
     }
 
     public ResponseFromTargetDTO(T response, Class<T> responseClass) {
-        this.success = true;
+        this(true);
         this.response = new SuccessDTO<T>(responseClass, response);
     }
 
+    public ResponseFromTargetDTO(boolean success) {
+        this.success = success;
+    }
+
     public ResponseFromTargetDTO(ErrorDTO error) {
-        this.success = false;
+        this(false);
+
         this.error = error;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ResponseFromTargetDTO that = (ResponseFromTargetDTO) o;
+
+        if (success != that.success) {
+            return false;
+        }
+        if (error != null ? !error.equals(that.error) : that.error != null) {
+            return false;
+        }
+        if (response != null ? !response
+                .equals(that.response) : that.response != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = response != null ? response.hashCode() : 0;
+        result = 31 * result + (success ? 1 : 0);
+        result = 31 * result + (error != null ? error.hashCode() : 0);
+        return result;
     }
 
     public SuccessDTO<T> getResponse() {
@@ -38,5 +76,9 @@ public class ResponseFromTargetDTO<T> {
 
     public boolean isSuccess() {
         return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 }

@@ -80,4 +80,8 @@ public class HttpServiceEndpoint {
     public void addActionMaping(HttpAction httpAction) {
         httpActions.add(httpAction);
     }
+
+    public void addAction(HttpAction action) {
+        httpActions.add(action);
+    }
 }

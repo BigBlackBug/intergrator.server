@@ -23,6 +23,38 @@ public class ActionEndpointDTO<T extends ActionDescriptor> {
         this.actionDescriptor = actionDescriptor;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ActionEndpointDTO that = (ActionEndpointDTO) o;
+
+        if (forceRegister != that.forceRegister) {
+            return false;
+        }
+        if (!actionDescriptor.equals(that.actionDescriptor)) {
+            return false;
+        }
+        if (!actionName.equals(that.actionName)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = actionName.hashCode();
+        result = 31 * result + (forceRegister ? 1 : 0);
+        result = 31 * result + actionDescriptor.hashCode();
+        return result;
+    }
+
     public boolean isForceRegister() {
         return forceRegister;
     }

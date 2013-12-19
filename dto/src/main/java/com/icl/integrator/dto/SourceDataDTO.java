@@ -25,6 +25,48 @@ public class SourceDataDTO {
     public SourceDataDTO() {
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SourceDataDTO that = (SourceDataDTO) o;
+
+        if (!action.equals(that.action)) {
+            return false;
+        }
+        if (additionalData != null ? !additionalData
+                .equals(that.additionalData) : that.additionalData != null) {
+            return false;
+        }
+        if (!data.equals(that.data)) {
+            return false;
+        }
+        if (!destinations.equals(that.destinations)) {
+            return false;
+        }
+        if (!source.equals(that.source)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = source.hashCode();
+        result = 31 * result + destinations.hashCode();
+        result = 31 * result + action.hashCode();
+        result = 31 * result + data.hashCode();
+        result = 31 * result + (additionalData != null ? additionalData
+                .hashCode() : 0);
+        return result;
+    }
+
     public ServiceDTO getSource() {
         return source;
     }

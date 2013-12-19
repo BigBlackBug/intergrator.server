@@ -13,8 +13,6 @@ public class HttpEndpointDescriptorDTO implements EndpointDescriptor {
 
     private int port;
 
-//    private String path;   //action
-
     public HttpEndpointDescriptorDTO() {
     }
 
@@ -25,14 +23,6 @@ public class HttpEndpointDescriptorDTO implements EndpointDescriptor {
     public void setHost(String host) {
         this.host = host;
     }
-
-//    public String getPath() {
-//        return path;
-//    }
-//
-//    public void setPath(String path) {
-//        this.path = path;
-//    }
 
     public int getPort() {
         return port;

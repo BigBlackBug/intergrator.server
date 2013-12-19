@@ -15,8 +15,6 @@ public class JMSEndpointDescriptorDTO implements EndpointDescriptor {
 
     private String connectionFactory;
 
-//    private QueueDTO queueDTO;   //action
-
     public JMSEndpointDescriptorDTO() {
     }
 
@@ -63,12 +61,4 @@ public class JMSEndpointDescriptorDTO implements EndpointDescriptor {
         result = 31 * result + connectionFactory.hashCode();
         return result;
     }
-//
-//    public QueueDTO getQueueDTO() {
-//        return queueDTO;
-//    }
-//
-//    public void setQueueDTO(QueueDTO queueDTO) {
-//        this.queueDTO = queueDTO;
-//    }
 }

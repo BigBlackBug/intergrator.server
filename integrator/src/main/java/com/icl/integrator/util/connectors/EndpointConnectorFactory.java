@@ -83,7 +83,6 @@ public class EndpointConnectorFactory {
     }
 
     //адрес возврата
-    //TODO refactor to proxy
     public EndpointConnector createEndpointConnector(ServiceDTO serviceDTO)
             throws IntegratorException {
         EndpointDTO endpoint = serviceDTO.getEndpoint();

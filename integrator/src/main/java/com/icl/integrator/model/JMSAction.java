@@ -1,9 +1,10 @@
 package com.icl.integrator.model;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.UUID;
 
 /**
@@ -39,6 +40,7 @@ public class JMSAction {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ENDPOINT_ID", nullable = false,
                 updatable = false)
+    @Cascade(value = org.hibernate.annotations.CascadeType.PERSIST)
     private JMSServiceEndpoint jmsServiceEndpoint;
 
     public JMSAction() {

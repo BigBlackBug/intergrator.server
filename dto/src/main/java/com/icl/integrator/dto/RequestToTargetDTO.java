@@ -11,26 +11,56 @@ import java.util.Map;
  */
 public class RequestToTargetDTO {
 
-	private Map<String, Object> data;
+    private Map<String, Object> data;
 
-	private Map<String, Object> additionalData;
-
-	public Map<String, Object> getData() {
-		return data;
-	}
+    private Map<String, Object> additionalData;
 
     public RequestToTargetDTO() {
     }
 
+    public Map<String, Object> getData() {
+        return data;
+    }
+
     public void setData(Map<String, Object> data) {
-		this.data = data;
-	}
+        this.data = data;
+    }
 
-	public Map<String, Object> getAdditionalData() {
-		return additionalData;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-	public void setAdditionalData(Map<String, Object> additionalData) {
-		this.additionalData = additionalData;
-	}
+        RequestToTargetDTO that = (RequestToTargetDTO) o;
+
+        if (additionalData != null ? !additionalData
+                .equals(that.additionalData) : that.additionalData != null) {
+            return false;
+        }
+        if (data != null ? !data.equals(that.data) : that.data != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = data != null ? data.hashCode() : 0;
+        result = 31 * result + (additionalData != null ? additionalData
+                .hashCode() : 0);
+        return result;
+    }
+
+    public Map<String, Object> getAdditionalData() {
+        return additionalData;
+    }
+
+    public void setAdditionalData(Map<String, Object> additionalData) {
+        this.additionalData = additionalData;
+    }
 }

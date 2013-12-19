@@ -37,15 +37,61 @@ public class ErrorDTO {
     public ErrorDTO() {
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ErrorDTO errorDTO = (ErrorDTO) o;
+
+        if (errorCode != errorDTO.errorCode) {
+            return false;
+        }
+        if (developerMessage != null ? !developerMessage
+                .equals(errorDTO.developerMessage) : errorDTO.developerMessage != null) {
+            return false;
+        }
+        if (!errorMessage.equals(errorDTO.errorMessage)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = errorMessage.hashCode();
+        result = 31 * result + (developerMessage != null ? developerMessage
+                .hashCode() : 0);
+        result = 31 * result + errorCode;
+        return result;
+    }
+
     public int getErrorCode() {
         return errorCode;
+    }
+
+    public void setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
     }
 
     public String getErrorMessage() {
         return errorMessage;
     }
 
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     public String getDeveloperMessage() {
         return developerMessage;
+    }
+
+    public void setDeveloperMessage(String developerMessage) {
+        this.developerMessage = developerMessage;
     }
 }

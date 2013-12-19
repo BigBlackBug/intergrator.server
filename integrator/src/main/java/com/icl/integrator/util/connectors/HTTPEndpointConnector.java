@@ -1,8 +1,13 @@
 package com.icl.integrator.util.connectors;
 
+import com.icl.integrator.dto.RequestToTargetDTO;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,7 +27,22 @@ public class HTTPEndpointConnector implements EndpointConnector {
 
     @Override
     public void testConnection() throws ConnectionException {
-        //TODO implement. catch rest exception. if 404 - fail
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            restTemplate.postForObject(url.toURI(), new RequestToTargetDTO(),
+                                       null);
+        } catch (URISyntaxException e) {
+            throw new ConnectionException("URL не валиден", e);
+            //игнорируем 500 ошибку, так как посылаем заведомо говнозапрос
+        } catch (HttpClientErrorException ex) {//TODO ask
+            String message = MessageFormat.format(
+                    "Сервер вернул код {0}. Сообщение об ошибке:'{1}'",
+                                                 ex.getStatusCode(),
+                                                 ex.getStatusText());
+            throw new ConnectionException(message,ex);
+        } catch (ResourceAccessException ex) {
+            throw new ConnectionException("Ошибка I/O", ex);
+        }
     }
 
     @Override

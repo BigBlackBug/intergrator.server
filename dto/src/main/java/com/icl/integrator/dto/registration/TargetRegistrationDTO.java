@@ -27,6 +27,30 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
         return endpoint.getEndpointType();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        TargetRegistrationDTO that = (TargetRegistrationDTO) o;
+
+        if (!actions.equals(that.actions)) {
+            return false;
+        }
+        if (!endpoint.equals(that.endpoint)) {
+            return false;
+        }
+        if (!serviceName.equals(that.serviceName)) {
+            return false;
+        }
+
+        return true;
+    }
+
     public EndpointDTO getEndpoint() {
         return endpoint;
     }
@@ -49,5 +73,13 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
 
     public void setActions(List<ActionEndpointDTO<T>> actions) {
         this.actions = actions;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = serviceName.hashCode();
+        result = 31 * result + endpoint.hashCode();
+        result = 31 * result + actions.hashCode();
+        return result;
     }
 }

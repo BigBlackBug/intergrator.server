@@ -24,6 +24,34 @@ public class DestinationDTO {
         this.endpointType = endpointType;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DestinationDTO that = (DestinationDTO) o;
+
+        if (endpointType != that.endpointType) {
+            return false;
+        }
+        if (!serviceName.equals(that.serviceName)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = serviceName.hashCode();
+        result = 31 * result + endpointType.hashCode();
+        return result;
+    }
+
     public String getServiceName() {
         return serviceName;
     }
