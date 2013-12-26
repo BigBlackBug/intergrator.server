@@ -15,7 +15,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "IJA")
+@Table(name = "JMS_ACTION")
 public class JMSAction {
 
     @Column(nullable = false, length = 255, name = "ACTION_NAME")

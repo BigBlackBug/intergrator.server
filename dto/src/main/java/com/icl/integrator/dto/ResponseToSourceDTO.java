@@ -13,7 +13,6 @@ public class ResponseToSourceDTO {
     public ResponseToSourceDTO(ResponseFromTargetDTO result, String serviceName,
                                String requestID) {
         this.result = result;
-
         this.serviceName = serviceName;
         this.requestID = requestID;
     }
@@ -42,7 +41,8 @@ public class ResponseToSourceDTO {
         if (!result.equals(that.result)) {
             return false;
         }
-        if (!serviceName.equals(that.serviceName)) {
+        if (serviceName != null ? !serviceName
+                .equals(that.serviceName) : that.serviceName != null) {
             return false;
         }
 
@@ -52,7 +52,8 @@ public class ResponseToSourceDTO {
     @Override
     public int hashCode() {
         int result1 = result.hashCode();
-        result1 = 31 * result1 + serviceName.hashCode();
+        result1 = 31 * result1 + (serviceName != null ? serviceName
+                .hashCode() : 0);
         result1 = 31 * result1 + requestID.hashCode();
         return result1;
     }

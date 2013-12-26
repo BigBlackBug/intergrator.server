@@ -17,14 +17,14 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "ADDRESS_MAPPING")
+@Table(name = "HTTP_ENDPOINT")
 public class HttpServiceEndpoint {
 
     @Column(unique = true, nullable = false, length = 255,
             name = "SERVICE_NAME")
     private String serviceName;
 
-    @Column(name = "SREVICE_PORT")
+    @Column(name = "SERVICE_PORT")
     private Integer servicePort;
 
     @Column(nullable = false, length = 255, name = "SERVICE_URL")

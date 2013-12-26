@@ -12,6 +12,7 @@ import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
 import com.icl.integrator.task.retryhandler.DatabaseRetryHandler;
 import com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory;
+import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.apache.commons.logging.Log;
@@ -50,7 +51,7 @@ public class DeliveryService {
     private ObjectMapper serializer;
 
     public UUID deliver(DestinationDTO destination,
-                        SourceDataDTO packet) {
+                        SourceDataDTO packet) throws IntegratorException {
         logger.info("Scheduling a request to target " +
                             destination.getServiceName());
         EndpointConnector destinationConnector =
@@ -73,7 +74,7 @@ public class DeliveryService {
         UUID requestID = UUID.randomUUID();
         logger.info("Generated an ID for the request: " + quote(
                 requestID.toString()));
-        //TODO add deliverycallable description
+
         DatabaseRetryHandler handler =
                 databaseRetryHandlerFactory.createHandler();
         TaskLogEntry logEntry = new TaskLogEntry();
@@ -95,7 +96,7 @@ public class DeliveryService {
 
         TaskCreator<ResponseFromTargetDTO> deliveryTaskCreator =
                 new TaskCreator<>(deliveryCallable);
-
+        //TODO add deliverycallable description
         scheduler.schedule(deliveryTaskCreator, handler);
         return requestID;
     }

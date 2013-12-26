@@ -148,7 +148,7 @@
     <!--userName="${jms.username}"-->
     <!--password="${jms.password}"/>-->
     <bean id="jmsConnectorController"
-          class="com.icl.integrator.util.connectors.jms.QueueListener">
+          class="com.icl.integrator.JmsController">
         <lookup-method name="createProcessor" bean="asyncProcessor"/>
     </bean>
 
@@ -173,6 +173,6 @@
     <!-- listener container definition using the jms namespace, concurrency is the max number of concurrent listeners that can be started -->
     <jms:listener-container concurrency="10">
         <jms:listener id="QueueListener" destination="IntegratorQueue"
-                      ref="queueListener"/>
+                      ref="jmsController"/>
     </jms:listener-container>
 </beans>

@@ -17,7 +17,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "IJE")
+@Table(name = "JMS_ENDPOINT")
 public class JMSServiceEndpoint {
 
     @Column(unique = true, nullable = false, length = 255,

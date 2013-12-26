@@ -32,7 +32,8 @@ public class EndpointConnectorFactory {
     private EndpointResolverService endpointResolverService;
 
     public EndpointConnector createEndpointConnector(
-            DestinationDTO destination, String action) {
+            DestinationDTO destination, String action)
+            throws IntegratorException {
         switch (destination.getEndpointType()) {
             case HTTP: {
                 URL url = endpointResolverService
@@ -53,13 +54,13 @@ public class EndpointConnectorFactory {
     }
 
     public EndpointConnector createEndpointConnector(EndpointDTO endpoint,
-                                                     ActionDescriptor descr) {
+                                                     ActionDescriptor descriptor) {
         EndpointType endpointType = endpoint.getEndpointType();
         switch (endpointType) {
             case HTTP: {
                 HttpEndpointDescriptorDTO endpointDescriptor =
                         (HttpEndpointDescriptorDTO) endpoint.getDescriptor();
-                HttpActionDTO actionDescriptor = (HttpActionDTO) descr;
+                HttpActionDTO actionDescriptor = (HttpActionDTO) descriptor;
                 try {
                     URL url = new URL("HTTP", endpointDescriptor.getHost(),
                                       endpointDescriptor.getPort(),
@@ -72,7 +73,7 @@ public class EndpointConnectorFactory {
             case JMS: {
                 JMSEndpointDescriptorDTO endpointDescriptor =
                         (JMSEndpointDescriptorDTO) endpoint.getDescriptor();
-                QueueDTO actionDescriptor = (QueueDTO) descr;
+                QueueDTO actionDescriptor = (QueueDTO) descriptor;
                 return new JMSEndpointConnector(endpointDescriptor,
                                                 actionDescriptor);
             }

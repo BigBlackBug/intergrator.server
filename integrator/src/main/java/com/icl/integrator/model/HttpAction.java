@@ -15,7 +15,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "ACTION_MAPPING")
+@Table(name = "HTTP_ACTION")
 public class HttpAction {
 
     @Column(nullable = false, length = 255, name = "ACTION_NAME")
@@ -32,7 +32,7 @@ public class HttpAction {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ADDRESS_MAPPING_ID", nullable = false,
+    @JoinColumn(name = "ENDPOINT_ID", nullable = false,
                 updatable = false)
     @Cascade(value = org.hibernate.annotations.CascadeType.PERSIST)
     private HttpServiceEndpoint httpServiceEndpoint;

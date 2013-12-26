@@ -1,7 +1,10 @@
 package com.icl.integrator.services;
 
 import com.icl.integrator.dto.DestinationDTO;
+import com.icl.integrator.dto.ErrorDTO;
+import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.SourceDataDTO;
+import com.icl.integrator.util.IntegratorException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +27,22 @@ public class PacketProcessor {
     @Autowired
     private DeliveryService deliveryService;
 
-    public Map<String, String> process(SourceDataDTO packet) {
-        Map<String, String> serviceToRequestID = new HashMap<>();
+    public Map<String, ResponseFromTargetDTO<String>> process(
+            SourceDataDTO packet) {
+        Map<String, ResponseFromTargetDTO<String>> serviceToRequestID = new
+                HashMap<>();
         for (DestinationDTO destination : packet.getDestinations()) {
-            UUID requestID = deliveryService.deliver(destination, packet);
-            serviceToRequestID.put(destination.getServiceName(),
-                                   requestID.toString());
+            ResponseFromTargetDTO<String> response;
+            try {
+                UUID requestID = deliveryService.deliver(destination, packet);
+                response = new ResponseFromTargetDTO<>(requestID.toString(),
+                                                       String.class);
+            } catch (IntegratorException ex) {
+                ErrorDTO error = new ErrorDTO(ex.getMessage(),
+                                              ex.getCause().getMessage());
+                response = new ResponseFromTargetDTO<>(error);
+            }
+            serviceToRequestID.put(destination.getServiceName(), response);
         }
         return serviceToRequestID;
     }

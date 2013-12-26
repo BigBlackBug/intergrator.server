@@ -2,7 +2,6 @@ package com.icl.integrator;
 
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.ResponseToSourceDTO;
 import com.icl.integrator.dto.SourceDataDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.PacketProcessor;
@@ -42,7 +41,7 @@ public abstract class MainController {
     @RequestMapping(value = "processData")
     public
     @ResponseBody
-    ResponseToSourceDTO
+    ResponseFromTargetDTO<Map>
     process(@RequestBody(required = true) SourceDataDTO packet,
             HttpServletRequest request) {
         logger.info(MessageFormat.format("Received a request from source " +
@@ -50,18 +49,14 @@ public abstract class MainController {
                                          request.getRemoteHost(),
                                          request.getRemotePort()));
         PacketProcessor processor = createProcessor();
-        Map<String, String> serviceToReqID = processor.process(packet);
-        ResponseFromTargetDTO<Map> fromTargetDTO =
-                new ResponseFromTargetDTO<>(serviceToReqID, Map.class);
-        ResponseToSourceDTO responseToSourceDTO =
-                new ResponseToSourceDTO(fromTargetDTO);
-        return responseToSourceDTO;
+        Map<String, ResponseFromTargetDTO<String>>
+                resultMap = processor.process(packet);
+        return new ResponseFromTargetDTO<>(resultMap, Map.class);
     }
 
     /*
     * {service:{name:'',port:'',url:''},actions:[{name:'',url:''}]}
     * */
-
     @RequestMapping(value = "registerTarget")
     public
     @ResponseBody

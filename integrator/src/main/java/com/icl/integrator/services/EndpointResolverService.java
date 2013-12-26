@@ -1,6 +1,7 @@
 package com.icl.integrator.services;
 
 import com.icl.integrator.model.JMSServiceEndpoint;
+import com.icl.integrator.util.IntegratorException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,8 @@ public class EndpointResolverService {
     private EntityManager em;
 
     @Transactional
-    public URL getServiceURL(String serviceName, String action) {
+    public URL getServiceURL(String serviceName, String action)
+            throws IntegratorException {
         Query query = em.createQuery(
                 "select " +
                         "address.serviceURL,address.servicePort," +
@@ -44,20 +46,34 @@ public class EndpointResolverService {
                            queryResult.servicePort,
                            queryResult.actionURL);
         } catch (NoResultException ex) {
-            return null;  //TODO add NPE handler
-        } catch (MalformedURLException e) {
-            return null;
+            throw new IntegratorException("Сервис " + serviceName + ", " +
+                                                  "принимающий запросы типа " +
+                                                  action + " не " +
+                                                  "зарегистрирован",
+                                          ex);
+        } catch (MalformedURLException ex) {
+            throw new IntegratorException("При регистрации сервиса был указан" +
+                                                  " невалидный адрес, " +
+                                                  "поэтому послать запрос " +
+                                                  "на него невозможно",
+                                          ex);
         }
     }
 
     @Transactional
-    public JMSServiceEndpoint getJmsEndpoint(String serviceName) {
+    public JMSServiceEndpoint getJmsEndpoint(String serviceName)
+            throws IntegratorException {
         TypedQuery<JMSServiceEndpoint> query = em.createQuery(
                 "select ep from JMSServiceEndpoint ep " +
                         "where ep.serviceName=:serviceName",
                 JMSServiceEndpoint.class)
                 .setParameter("serviceName", serviceName);
-        return query.getSingleResult();
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException ex) {
+            throw new IntegratorException("Сервис " + serviceName +
+                                                  " не зарегистрирован", ex);
+        }
     }
 
     private static final class QueryResult {
