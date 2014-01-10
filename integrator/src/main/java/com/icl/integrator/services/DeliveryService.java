@@ -9,6 +9,7 @@ import com.icl.integrator.dto.ResponseToSourceDTO;
 import com.icl.integrator.dto.SourceDataDTO;
 import com.icl.integrator.model.TaskLogEntry;
 import com.icl.integrator.task.Callback;
+import com.icl.integrator.task.Descriptor;
 import com.icl.integrator.task.TaskCreator;
 import com.icl.integrator.task.retryhandler.DatabaseRetryHandler;
 import com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory;
@@ -68,7 +69,7 @@ public class DeliveryService {
         return deliver(deliveryCallable, destination, packet);
     }
 
-    private UUID deliver(DeliveryCallable deliveryCallable,
+    private UUID deliver(final DeliveryCallable deliveryCallable,
                          DestinationDTO destinationDTO,
                          SourceDataDTO packet) {
         UUID requestID = UUID.randomUUID();
@@ -96,20 +97,36 @@ public class DeliveryService {
 
         TaskCreator<ResponseFromTargetDTO> deliveryTaskCreator =
                 new TaskCreator<>(deliveryCallable);
-        //TODO add deliverycallable description
+        deliveryTaskCreator.setDescriptor(
+            new Descriptor<TaskCreator<ResponseFromTargetDTO>>() {
+                @Override
+                public String describe(
+                        TaskCreator<ResponseFromTargetDTO> creator) {
+                    return "Отправка запроса: "+
+                            deliveryCallable.getConnector().toString();
+                }
+            });
         scheduler.schedule(deliveryTaskCreator, handler);
         return requestID;
     }
 
-    private UUID deliver(DeliveryCallable deliveryCallable,
+    private UUID deliver(final DeliveryCallable deliveryCallable,
                          EndpointConnector sourceConnector,
                          DestinationDTO destinationDTO) {
         UUID requestID = UUID.randomUUID();
         logger.info("Generated an ID for the request: " + quote(
                 requestID.toString()));
-        //TODO add deliverycallable description
         TaskCreator<ResponseFromTargetDTO> deliveryTaskCreator =
                 new TaskCreator<>(deliveryCallable);
+        deliveryTaskCreator.setDescriptor(
+            new Descriptor<TaskCreator<ResponseFromTargetDTO>>() {
+                @Override
+                public String describe(
+                        TaskCreator<ResponseFromTargetDTO> creator) {
+                    return "Отправка запроса: "+
+                            deliveryCallable.getConnector().toString();
+                }
+            });
         Callable<Void> deliveryFailedCallable = new DeliveryFailedCallable(
                 sourceConnector, destinationDTO, requestID);
         deliveryTaskCreator.setCallback(new DeliverySuccessCallback(
@@ -126,16 +143,15 @@ public class DeliveryService {
                 Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        ResponseToSourceDTO data =
-                                new ResponseToSourceDTO(
-                                        responseDTO,
-                                        destination.getServiceName(),
-                                        requestID.toString());
-                        sourceConnector.sendRequest(data,
-            /*TODO ask*/ ResponseFromTargetDTO.class);
-                        return null;
-                    }
-                };
+            ResponseToSourceDTO data =
+                    new ResponseToSourceDTO(
+                            responseDTO,
+                            destination.getServiceName(),
+                            requestID.toString());
+            sourceConnector.sendRequest(data,ResponseFromTargetDTO.class);
+            return null;
+            }
+        };
 
         private final DestinationDTO destination;
 
@@ -166,13 +182,20 @@ public class DeliveryService {
             DatabaseRetryHandler handler =
                     databaseRetryHandlerFactory.createHandler();
             TaskLogEntry logEntry = new TaskLogEntry(
-                    MessageFormat.format(message,
-                                         ""/*TODO endpoint toString or w/e*/),
+                    MessageFormat.format(message, sourceConnector.toString()),
                     node);
             handler.setLogEntry(logEntry);
-            //TODO add successCallable description
-            scheduler.schedule(
-                    new TaskCreator<>(successCallable), handler);
+            TaskCreator<Void> taskCreator = new TaskCreator<>(successCallable);
+            taskCreator.setDescriptor(
+                new Descriptor<TaskCreator<Void>>() {
+                    @Override
+                    public String describe(
+                            TaskCreator<Void> creator) {
+                        return "Отправка запроса: " +
+                                sourceConnector.toString();
+                    }
+                });
+            scheduler.schedule(taskCreator, handler);
         }
     }
 }

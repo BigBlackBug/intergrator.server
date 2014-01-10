@@ -27,8 +27,12 @@ public class TaskCreator<T> {
 
     private Descriptor<TaskCreator<T>> descriptor;
 
-    public TaskCreator(Callable<T> callable) {
-        taskRunnable = new TaskRunnable<T>(callable);
+    public TaskCreator(Callable<T> action) {
+        taskRunnable = new TaskRunnable<>(action);
+    }
+
+    public Callable<T> getAction() {
+        return taskRunnable.action;
     }
 
     public TaskCreator setCallback(Callback<T> callback) {
@@ -41,8 +45,8 @@ public class TaskCreator<T> {
         return this;
     }
 
-    public String getTaskDescription(){
-        if(descriptor == null){
+    public String getTaskDescription() {
+        if (descriptor == null) {
             return super.toString();
         }
         return descriptor.describe(this);
@@ -77,22 +81,22 @@ public class TaskCreator<T> {
     public class TaskRunnable<T> implements Runnable {
 
         private Callback<Exception> defaultExceptionHandler =
-            new Callback<Exception>() {
-                @Override
-                public void execute(Exception exception) {
-                    logger.error("An exception has occurred", exception);
-                }
-            };
+                new Callback<Exception>() {
+                    @Override
+                    public void execute(Exception exception) {
+                        logger.error("An exception has occurred", exception);
+                    }
+                };
 
         private Callback<T> callback;
 
-        private Callable<T> runnable;
+        private Callable<T> action;
 
         private Map<Class<? extends Exception>, Callback<? extends Exception>>
                 exceptionHandlerMap = new HashMap<>();
 
-        TaskRunnable(Callable<T> runnable) {
-            this.runnable = runnable;
+        TaskRunnable(Callable<T> action) {
+            this.action = action;
         }
 
         public <Y extends Exception>
@@ -108,21 +112,21 @@ public class TaskCreator<T> {
 
         @Override
         public void run() {
-            T result = null;
+            T result;
             try {
-                result = runnable.call();
+                result = action.call();
             } catch (Exception e) {
                 Class<?> excClass = e.getClass();
-                Callback exceptionCallback = null;
+                Callback exceptionCallback;
                 do {
                     exceptionCallback =
                             exceptionHandlerMap.get(excClass);
                     if (exceptionCallback != null) {
-                       break;
+                        break;
                     }
                     excClass = excClass.getSuperclass();
                 } while (!excClass.equals(Exception.class));
-                if(exceptionCallback == null){
+                if (exceptionCallback == null) {
                     exceptionCallback = defaultExceptionHandler;
                 }
                 exceptionCallback.execute(e);

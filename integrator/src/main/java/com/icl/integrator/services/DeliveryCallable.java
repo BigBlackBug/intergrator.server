@@ -14,9 +14,13 @@ class DeliveryCallable implements Callable<ResponseFromTargetDTO> {
     private final EndpointConnector connector;
 
     DeliveryCallable(EndpointConnector connector,
-                               SourceDataDTO packet) {
+                     SourceDataDTO packet) {
         this.connector = connector;
         this.packet = packet;
+    }
+
+    public EndpointConnector getConnector() {
+        return connector;
     }
 
     @Override

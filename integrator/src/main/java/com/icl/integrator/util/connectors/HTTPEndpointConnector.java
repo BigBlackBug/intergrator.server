@@ -37,9 +37,9 @@ public class HTTPEndpointConnector implements EndpointConnector {
         } catch (HttpClientErrorException ex) {//TODO unimportant?
             String message = MessageFormat.format(
                     "Сервер вернул код {0}. Сообщение об ошибке:'{1}'",
-                                                 ex.getStatusCode(),
-                                                 ex.getStatusText());
-            throw new ConnectionException(message,ex);
+                    ex.getStatusCode(),
+                    ex.getStatusText());
+            throw new ConnectionException(message, ex);
         } catch (ResourceAccessException ex) {
             throw new ConnectionException("Ошибка I/O", ex);
         }
@@ -52,4 +52,13 @@ public class HTTPEndpointConnector implements EndpointConnector {
         return restTemplate.postForObject(url.toURI(), data,
                                           responseClass);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Тип соединения: HTTP").
+                append("URL: ").append(url.toString());
+        return sb.toString();
+    }
+
 }

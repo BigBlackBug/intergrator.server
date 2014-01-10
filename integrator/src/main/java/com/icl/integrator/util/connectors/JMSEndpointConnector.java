@@ -109,4 +109,18 @@ public class JMSEndpointConnector implements EndpointConnector {
         connection.close();
         return null;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Тип соединения: JMS\n")
+                .append("Параметры соединения:\n")
+                .append("\tConnectionFactory: ")
+                .append(connectionData.getConnectionFactory())
+                .append("\tJNDI Connection Properties: '")
+                .append(connectionData.getJndiProperties().toString())
+                .append("\tQueueName: ")
+                .append(queueDescriptor.getQueueName());
+        return sb.toString();
+    }
 }
