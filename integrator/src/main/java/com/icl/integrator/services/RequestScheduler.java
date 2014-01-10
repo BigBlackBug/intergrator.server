@@ -54,25 +54,36 @@ public class RequestScheduler {
 
     public <T> void schedule(final TaskCreator<T> taskCreator,
                              final TaskCreator<Void> onRetryLimitExceeded) {
-        schedule(taskCreator, onRetryLimitExceeded, TimeUnit.SECONDS,
-                 DEFAULT_DELIVERY_DELAY_SECONDS,
-                 DEFAULT_DELIVERY_ATTEMPT_NUMBER);
+        schedule(taskCreator, onRetryLimitExceeded, true,
+                 DEFAULT_DELIVERY_ATTEMPT_NUMBER,
+                 TimeUnit.SECONDS,
+                 DEFAULT_DELIVERY_DELAY_SECONDS);
     }
 
     public <T> void schedule(final TaskCreator<T> taskCreator,
                              final Callable<Void> onRetryLimitExceeded) {
-        schedule(taskCreator, new TaskCreator<Void>(onRetryLimitExceeded),
+        schedule(taskCreator, new TaskCreator<>(onRetryLimitExceeded),
+                 true,
+                 DEFAULT_DELIVERY_ATTEMPT_NUMBER,
                  TimeUnit.SECONDS,
-                 DEFAULT_DELIVERY_DELAY_SECONDS,
-                 DEFAULT_DELIVERY_ATTEMPT_NUMBER);
+                 DEFAULT_DELIVERY_DELAY_SECONDS);
+    }
+
+    public <T> void schedule(final TaskCreator<T> taskCreator) {
+        schedule(taskCreator, null,
+                 false,
+                 DEFAULT_DELIVERY_ATTEMPT_NUMBER,
+                 TimeUnit.SECONDS,
+                 DEFAULT_DELIVERY_DELAY_SECONDS);
     }
 
     public <T> void schedule(final TaskCreator<T> taskCreator,
                              final TaskCreator<Void> onRetryLimitExceeded,
-                             final TimeUnit timeUnit, final long delay,
-                             final int attemptNumber) {
+                             boolean scheduleRetries,
+                             final int attemptNumber,
+                             final TimeUnit timeUnit, final long delay){
         retryIndexMap.put(taskCreator.getTaskID(), 1);
-        Runnable runnable =
+        if(scheduleRetries){
             taskCreator.addExceptionHandler(
                 new Callback<RestClientException>() {
                     @Override
@@ -122,8 +133,9 @@ public class RequestScheduler {
                     retryIndexMap
                             .put(taskCreator.getTaskID(), retryIndex + 1);
                     }
-                }, RestClientException.class).create();
-        EXECUTOR.submit(runnable);
+                }, RestClientException.class);
+        }
+        EXECUTOR.submit(taskCreator.create());
     }
 
     private long getNextRetryInterval(int retryIndex,

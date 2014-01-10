@@ -15,13 +15,25 @@ public class DestinationDTO {
 
     private EndpointType endpointType;
 
-    public DestinationDTO() {
-    }
+    private boolean scheduleRedelivery;
 
     public DestinationDTO(String serviceName,
                           EndpointType endpointType) {
+        this();
         this.serviceName = serviceName;
         this.endpointType = endpointType;
+    }
+
+    public DestinationDTO() {
+        this.scheduleRedelivery = false;
+    }
+
+    public boolean scheduleRedelivery() {
+        return scheduleRedelivery;
+    }
+
+    public void setScheduleRedelivery(boolean scheduleRedelivery) {
+        this.scheduleRedelivery = scheduleRedelivery;
     }
 
     @Override

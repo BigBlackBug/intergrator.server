@@ -113,13 +113,13 @@ public class JMSEndpointConnector implements EndpointConnector {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Тип соединения: JMS\n")
-                .append("Параметры соединения:\n")
-                .append("\tConnectionFactory: ")
+        sb.append("Тип соединения: JMS")
+                .append("\nПараметры соединения:")
+                .append("\n\tConnectionFactory: ")
                 .append(connectionData.getConnectionFactory())
-                .append("\tJNDI Connection Properties: '")
+                .append("\n\tJNDI Connection Properties: '")
                 .append(connectionData.getJndiProperties().toString())
-                .append("\tQueueName: ")
+                .append("\n\tQueueName: ")
                 .append(queueDescriptor.getQueueName());
         return sb.toString();
     }

@@ -30,7 +30,7 @@ public class HTTPEndpointConnector implements EndpointConnector {
         RestTemplate restTemplate = new RestTemplate();
         try {
             restTemplate.postForObject(url.toURI(), new RequestToTargetDTO(),
-                                       null);
+                                       Object.class);
         } catch (URISyntaxException e) {
             throw new ConnectionException("URL не валиден", e);
             //игнорируем 500 ошибку, так как посылаем заведомо говнозапрос
@@ -56,7 +56,7 @@ public class HTTPEndpointConnector implements EndpointConnector {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Тип соединения: HTTP").
+        sb.append("Тип соединения: HTTP\n").
                 append("URL: ").append(url.toString());
         return sb.toString();
     }

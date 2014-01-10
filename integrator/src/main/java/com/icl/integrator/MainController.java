@@ -1,12 +1,13 @@
 package com.icl.integrator;
 
-import com.icl.integrator.dto.ErrorDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.SourceDataDTO;
+import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.PacketProcessor;
 import com.icl.integrator.services.RegistrationService;
 import com.icl.integrator.services.TargetRegistrationException;
+import com.icl.integrator.util.connectors.ConnectionException;
+import com.icl.integrator.util.connectors.EndpointConnector;
+import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +40,11 @@ public abstract class MainController {
     @Autowired
     private RegistrationService registrationService;
 
+    @Autowired
+    private
+    EndpointConnectorFactory
+            connectorFactory;
+
     @RequestMapping(value = "processData")
     public
     @ResponseBody
@@ -54,9 +61,13 @@ public abstract class MainController {
         return new ResponseFromTargetDTO<>(resultMap, Map.class);
     }
 
-    /*
-    * {service:{name:'',port:'',url:''},actions:[{name:'',url:''}]}
-    * */
+    @RequestMapping(value = "ping", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    boolean ping() {
+        return true;
+    }
+
     @RequestMapping(value = "registerTarget")
     public
     @ResponseBody
@@ -82,5 +93,34 @@ public abstract class MainController {
         return response;
     }
 
+    @RequestMapping(value = "checkAvailability")
+    public
+    @ResponseBody
+    ResponseFromTargetDTO<Boolean>
+    isAvailable(@RequestBody(required = true)
+                PingDTO pingDTO,
+                HttpServletRequest request) {
+        logger.info(MessageFormat.format("Received a registration request " +
+                                                 "from source " +
+                                                 "({0}:{1,number,#})",
+                                         request.getRemoteHost(),
+                                         request.getRemotePort()));
+        EndpointConnector connector = connectorFactory
+                .createEndpointConnector(
+                        new DestinationDTO(pingDTO.getServiceName(),
+                                           pingDTO.getEndpointType()),
+                        pingDTO.getAction());
+        try {
+            connector.testConnection();
+            return new ResponseFromTargetDTO<>(Boolean.TRUE, Boolean.class);
+        } catch (ConnectionException ex) {
+            ErrorDTO error = new ErrorDTO();
+            error.setErrorMessage(ex.getMessage());
+            error.setDeveloperMessage(ex.getCause().getMessage());
+            return new ResponseFromTargetDTO<>(error);
+        }
+    }
+
     protected abstract PacketProcessor createProcessor();
+
 }

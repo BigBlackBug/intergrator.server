@@ -106,7 +106,12 @@ public class DeliveryService {
                             deliveryCallable.getConnector().toString();
                 }
             });
-        scheduler.schedule(deliveryTaskCreator, handler);
+        //
+        if (destinationDTO.scheduleRedelivery()) {
+            scheduler.schedule(deliveryTaskCreator, handler);
+        } else {
+            scheduler.schedule(deliveryTaskCreator);
+        }
         return requestID;
     }
 
@@ -123,8 +128,8 @@ public class DeliveryService {
                 @Override
                 public String describe(
                         TaskCreator<ResponseFromTargetDTO> creator) {
-                    return "Отправка запроса: "+
-                            deliveryCallable.getConnector().toString();
+                return "Отправка запроса: "+
+                        deliveryCallable.getConnector().toString();
                 }
             });
         Callable<Void> deliveryFailedCallable = new DeliveryFailedCallable(
@@ -132,7 +137,11 @@ public class DeliveryService {
         deliveryTaskCreator.setCallback(new DeliverySuccessCallback(
                 sourceConnector, destinationDTO, requestID));
 
-        scheduler.schedule(deliveryTaskCreator, deliveryFailedCallable);
+        if (destinationDTO.scheduleRedelivery()) {
+            scheduler.schedule(deliveryTaskCreator, deliveryFailedCallable);
+        } else {
+            scheduler.schedule(deliveryTaskCreator);
+        }
         return requestID;
     }
 
@@ -191,8 +200,7 @@ public class DeliveryService {
                     @Override
                     public String describe(
                             TaskCreator<Void> creator) {
-                        return "Отправка запроса: " +
-                                sourceConnector.toString();
+                    return "Отправка запроса: " + sourceConnector.toString();
                     }
                 });
             scheduler.schedule(taskCreator, handler);

@@ -37,8 +37,7 @@ public class EndpointConnectorFactory {
         switch (destination.getEndpointType()) {
             case HTTP: {
                 URL url = endpointResolverService
-                        .getServiceURL(destination.getServiceName(),
-                                       action);
+                        .getServiceURL(destination.getServiceName(), action);
                 return new HTTPEndpointConnector(url);
             }
             case JMS: {
