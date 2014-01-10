@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -41,11 +42,9 @@ public abstract class MainController {
     private RegistrationService registrationService;
 
     @Autowired
-    private
-    EndpointConnectorFactory
-            connectorFactory;
+    private EndpointConnectorFactory connectorFactory;
 
-    @RequestMapping(value = "processData")
+    @RequestMapping(value = "processData", method = RequestMethod.POST)
     public
     @ResponseBody
     ResponseFromTargetDTO<Map>
@@ -64,11 +63,13 @@ public abstract class MainController {
     @RequestMapping(value = "ping", method = RequestMethod.GET)
     public
     @ResponseBody
-    boolean ping() {
-        return true;
+    Map<String, String> ping() {
+        return new HashMap<String, String>() {{
+            put("result", "true");
+        }};
     }
 
-    @RequestMapping(value = "registerTarget")
+    @RequestMapping(value = "registerTarget", method = RequestMethod.POST)
     public
     @ResponseBody
     ResponseFromTargetDTO<Map>
@@ -93,7 +94,7 @@ public abstract class MainController {
         return response;
     }
 
-    @RequestMapping(value = "checkAvailability")
+    @RequestMapping(value = "checkAvailability", method = RequestMethod.POST)
     public
     @ResponseBody
     ResponseFromTargetDTO<Boolean>

@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration("file:integrator/src/main/webapp/WEB-INF/" +
-                              "applicationContext.xml")
+                              "integrator-servlet.xml")
 public class AppTests {
 
     private static Log logger =
