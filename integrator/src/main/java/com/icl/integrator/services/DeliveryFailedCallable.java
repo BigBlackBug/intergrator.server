@@ -19,8 +19,8 @@ class DeliveryFailedCallable implements Callable<Void> {
     private final EndpointConnector sourceConnector;
 
     DeliveryFailedCallable(EndpointConnector sourceConnector,
-                                     DestinationDTO targetDestination,
-                                     UUID requestID) {
+                           DestinationDTO targetDestination,
+                           UUID requestID) {
         this.sourceConnector = sourceConnector;
         this.targetDestination = targetDestination;
         this.requestID = requestID;
@@ -39,8 +39,8 @@ class DeliveryFailedCallable implements Callable<Void> {
                 responseFromTarget,
                 targetServiceName,
                 requestID.toString());
-        sourceConnector.sendRequest(requestData,
-            /*TODO ask*/ ResponseFromTargetDTO.class);
+         /*TODO we're not expecting any response I guess*/
+        sourceConnector.sendRequest(requestData, ResponseFromTargetDTO.class);
         return null;
     }
 }
