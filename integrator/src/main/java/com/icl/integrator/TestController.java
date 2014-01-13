@@ -19,36 +19,37 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * Time: 12:43
  * To change this template use File | Settings | File Templates.
  */
-@RequestMapping(value="/api/",consumes = MediaType.APPLICATION_JSON_VALUE,
+@RequestMapping(value = "/api/", consumes = MediaType.APPLICATION_JSON_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE)
 @Controller
 public class TestController {
 
     private final Log logger = LogFactory.getLog(TestController.class);
-    @RequestMapping(value="accept_response",method = RequestMethod.POST)
+
+    @RequestMapping(value = "accept_response", method = RequestMethod.POST)
     public void
-    acceptResponse(@RequestBody ResponseToSourceDTO responseDTO){
-        logger.info("accepted response from integrator from "+responseDTO
+    acceptResponse(@RequestBody ResponseToSourceDTO responseDTO) {
+        logger.info("accepted response from integrator from " + responseDTO
                 .getServiceName());
     }
 
-    @RequestMapping(value="destination",method = RequestMethod.POST)
-    public @ResponseBody
+    @RequestMapping(value = "destination", method = RequestMethod.POST)
+    public
+    @ResponseBody
     ResponseFromTargetDTO<String>
-    destination(@RequestBody RequestToTargetDTO requestToTargetDTO){
+    destination(@RequestBody RequestToTargetDTO requestToTargetDTO) {
         logger.info("destination accepted request from " +
-                            "integrator "+requestToTargetDTO);
-        return new ResponseFromTargetDTO<>("RESPONSE",String.class);
+                            "integrator " + requestToTargetDTO);
+        return new ResponseFromTargetDTO<>("RESPONSE", String.class);
     }
 
-    @RequestMapping(value="destination2",method = RequestMethod.POST)
-    public @ResponseBody
+    @RequestMapping(value = "destination2", method = RequestMethod.POST)
+    public
+    @ResponseBody
     ResponseFromTargetDTO<String>
-    destination2(@RequestBody RequestToTargetDTO requestToTargetDTO){
+    destination2(@RequestBody RequestToTargetDTO requestToTargetDTO) {
         logger.info("destination2 accepted request from " +
-                            "integrator "+requestToTargetDTO);
-        return new ResponseFromTargetDTO<>("RESPONSE",String.class);
+                            "integrator " + requestToTargetDTO);
+        return new ResponseFromTargetDTO<>("RESPONSE", String.class);
     }
-
-
 }

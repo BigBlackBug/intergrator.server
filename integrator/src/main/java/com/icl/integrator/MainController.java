@@ -3,6 +3,7 @@ package com.icl.integrator;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.PacketProcessor;
+import com.icl.integrator.services.PacketProcessorFactory;
 import com.icl.integrator.services.RegistrationService;
 import com.icl.integrator.services.TargetRegistrationException;
 import com.icl.integrator.util.connectors.ConnectionException;
@@ -34,7 +35,7 @@ import java.util.Map;
 @RequestMapping(value = "/integrator/",
                 consumes = MediaType.APPLICATION_JSON_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE)
-public abstract class MainController {
+public class MainController {
 
     private static Log logger = LogFactory.getLog(MainController.class);
 
@@ -44,20 +45,23 @@ public abstract class MainController {
     @Autowired
     private EndpointConnectorFactory connectorFactory;
 
+    @Autowired
+    private PacketProcessorFactory processorFactory;
+
     @RequestMapping(value = "processData", method = RequestMethod.POST)
     public
     @ResponseBody
-    ResponseFromTargetDTO<Map>
+    Map
     process(@RequestBody(required = true) SourceDataDTO packet,
             HttpServletRequest request) {
         logger.info(MessageFormat.format("Received a request from source " +
                                                  "({0}:{1,number,#})",
                                          request.getRemoteHost(),
                                          request.getRemotePort()));
-        PacketProcessor processor = createProcessor();
+        PacketProcessor processor = processorFactory.createProcessor();
         Map<String, ResponseFromTargetDTO<String>>
                 resultMap = processor.process(packet);
-        return new ResponseFromTargetDTO<>(resultMap, Map.class);
+        return resultMap;
     }
 
     @RequestMapping(value = "ping", method = RequestMethod.GET)
@@ -86,10 +90,7 @@ public abstract class MainController {
             Map result = registrationService.register(registrationDTO);
             response = new ResponseFromTargetDTO<>(result, Map.class);
         } catch (TargetRegistrationException ex) {
-            ErrorDTO errorDTO = new ErrorDTO();
-            errorDTO.setErrorMessage(ex.getMessage());
-            errorDTO.setDeveloperMessage(ex.getCause().getMessage());
-            response = new ResponseFromTargetDTO<>(errorDTO);
+            response = new ResponseFromTargetDTO<>(new ErrorDTO(ex));
         }
         return response;
     }
@@ -115,13 +116,8 @@ public abstract class MainController {
             connector.testConnection();
             return new ResponseFromTargetDTO<>(Boolean.TRUE, Boolean.class);
         } catch (ConnectionException ex) {
-            ErrorDTO error = new ErrorDTO();
-            error.setErrorMessage(ex.getMessage());
-            error.setDeveloperMessage(ex.getCause().getMessage());
-            return new ResponseFromTargetDTO<>(error);
+            return new ResponseFromTargetDTO<>(new ErrorDTO(ex));
         }
     }
-
-    protected abstract PacketProcessor createProcessor();
 
 }

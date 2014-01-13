@@ -54,24 +54,32 @@
        dependency inject an object into your class.
    -->
     <context:component-scan base-package="com.icl.integrator"/>
+
+    <bean id="packetProcessorFactory"
+          class="com.icl.integrator.services.PacketProcessorFactory">
+        <lookup-method name="createProcessor" bean="asyncProcessor"/>
+    </bean>
+
     <bean id="asyncProcessor"
           class="com.icl.integrator.services.PacketProcessor"
           scope="prototype">
     </bean>
-    <bean id="asyncConnectorController"
-          class="com.icl.integrator.MainController">
-        <lookup-method name="createProcessor" bean="asyncProcessor"/>
-    </bean>
+
+    <!--<bean id="asyncConnectorController"-->
+            <!--class="com.icl.integrator.MainController"/>-->
 
     <bean id="limitHandler"
           class="com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler"
           scope="prototype">
         <!--<aop:scoped-proxy proxy-target-class="true"/>-->
     </bean>
+
     <bean id="limitHandlerFactory"
           class="com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory">
         <lookup-method name="createHandler" bean="limitHandler"/>
     </bean>
+
+    <!--Jackson configuration-->
     <bean id="objectMapper"
           class="com.icl.integrator.util.MyObjectMapper"/>
     <bean id="jacksonMessageConverter"
@@ -85,6 +93,7 @@
             </list>
         </property>
     </bean>
+    <!--Jackson configuration-->
 
     <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
           id="entityManagerFactory">
@@ -147,17 +156,18 @@
     <!--<amq:connectionFactory id="amqConnectionFactory" brokerURL="${jms.url}"-->
     <!--userName="${jms.username}"-->
     <!--password="${jms.password}"/>-->
-    <bean id="jmsConnectorController"
-          class="com.icl.integrator.JmsController">
-        <lookup-method name="createProcessor" bean="asyncProcessor"/>
-    </bean>
+    <!--<bean id="jmsConnectorController"-->
+    <!--class="com.icl.integrator.JmsController">-->
+    <!--<lookup-method name="createProcessor" bean="asyncProcessor"/>-->
+    <!--</bean>-->
 
     <amq:broker useJmx="false" persistent="false">
         <amq:transportConnectors>
             <amq:transportConnector uri="tcp://localhost:0"/>
         </amq:transportConnectors>
     </amq:broker>
-    <amq:connectionFactory id="amqConnectionFactory" brokerURL="tcp://localhost:61616"/>
+    <amq:connectionFactory id="amqConnectionFactory"
+                           brokerURL="tcp://localhost:61616"/>
     <!-- CachingConnectionFactory Definition, sessionCacheSize property is the number of sessions to cache -->
     <bean id="connectionFactory"
           class="org.springframework.jms.connection.CachingConnectionFactory">

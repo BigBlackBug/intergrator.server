@@ -8,8 +8,13 @@
 
     <servlet>
         <servlet-name>integrator</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet
+        <servlet-class>
+            org.springframework.web.servlet.DispatcherServlet
         </servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/integrator-servlet.xml</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 

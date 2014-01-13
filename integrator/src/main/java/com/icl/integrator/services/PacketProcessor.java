@@ -38,8 +38,7 @@ public class PacketProcessor {
                 response = new ResponseFromTargetDTO<>(requestID.toString(),
                                                        String.class);
             } catch (IntegratorException ex) {
-                ErrorDTO error = new ErrorDTO(ex.getMessage(),
-                                              ex.getCause().getMessage());
+                ErrorDTO error = new ErrorDTO(ex);
                 response = new ResponseFromTargetDTO<>(error);
             }
             serviceToRequestID.put(destination.getServiceName(), response);

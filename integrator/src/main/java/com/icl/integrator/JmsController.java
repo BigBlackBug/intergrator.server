@@ -2,6 +2,7 @@ package com.icl.integrator;
 
 import com.icl.integrator.dto.SourceDataDTO;
 import com.icl.integrator.services.PacketProcessor;
+import com.icl.integrator.services.PacketProcessorFactory;
 import com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler;
 import com.icl.integrator.util.MyObjectMapper;
 import org.apache.commons.logging.Log;
@@ -22,8 +23,11 @@ public class JmsController implements MessageListener {
     @Autowired
     private MyObjectMapper mapper = new MyObjectMapper();
 
+    @Autowired
+    private PacketProcessorFactory processorFactory;
+
     public void onMessage(final Message message) {
-        SourceDataDTO packet = null;
+        SourceDataDTO packet;
         if (message instanceof TextMessage) {
             String content;
             try {
@@ -53,15 +57,11 @@ public class JmsController implements MessageListener {
             return;
         }
         try {
-            createProcessor().process(packet);
+            PacketProcessor processor = processorFactory.createProcessor();
+            processor.process(packet);
         } catch (Exception ex) {
             logger.error("Ошибка отправки", ex);
         }
-    }
-
-    //in runtime is replaced by proxy
-    protected PacketProcessor createProcessor() {
-        return null;
     }
 
 }

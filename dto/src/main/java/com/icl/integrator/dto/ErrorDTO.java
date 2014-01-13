@@ -1,5 +1,7 @@
 package com.icl.integrator.dto;
 
+import com.icl.integrator.util.Utils;
+
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -24,6 +26,10 @@ public class ErrorDTO {
 
     public ErrorDTO(String errorMessage, String developerMessage) {
         this(errorMessage, developerMessage, -1);
+    }
+
+    public ErrorDTO(Exception ex) {
+        this(ex.getMessage(), Utils.getStackTraceAsString(ex));
     }
 
     public ErrorDTO(String errorMessage, int errorCode) {
@@ -55,11 +61,7 @@ public class ErrorDTO {
                 .equals(errorDTO.developerMessage) : errorDTO.developerMessage != null) {
             return false;
         }
-        if (!errorMessage.equals(errorDTO.errorMessage)) {
-            return false;
-        }
-
-        return true;
+        return errorMessage.equals(errorDTO.errorMessage);
     }
 
     @Override

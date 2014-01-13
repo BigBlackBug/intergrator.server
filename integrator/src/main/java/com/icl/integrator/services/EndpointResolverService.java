@@ -48,7 +48,7 @@ public class EndpointResolverService {
         } catch (NoResultException ex) {
             throw new IntegratorException("Сервис " + serviceName + ", " +
                                                   "принимающий запросы типа " +
-                                                  action + " не " +
+                                                  action + ", не " +
                                                   "зарегистрирован",
                                           ex);
         } catch (MalformedURLException ex) {

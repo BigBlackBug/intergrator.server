@@ -69,11 +69,8 @@ public class RegistrationService {
                 }
                 actions.add(actionEndpoint);
             } catch (ConnectionException ex) {
-                ErrorDTO errorDTO = new ErrorDTO();
-                errorDTO.setErrorMessage(ex.getMessage());
-                errorDTO.setDeveloperMessage(ex.getCause().getMessage());
                 ResponseFromTargetDTO<Void> dto =
-                        new ResponseFromTargetDTO<>(errorDTO);
+                        new ResponseFromTargetDTO<>(new ErrorDTO(ex));
                 result.put(actionEndpoint.getActionName(), dto);
             }
 
