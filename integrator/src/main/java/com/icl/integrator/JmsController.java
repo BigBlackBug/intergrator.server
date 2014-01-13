@@ -59,6 +59,8 @@ public class JmsController implements MessageListener {
         try {
             PacketProcessor processor = processorFactory.createProcessor();
             processor.process(packet);
+            //TODO если есть сорс конечно надо отправлять обратно ему
+            // результаты process
         } catch (Exception ex) {
             logger.error("Ошибка отправки", ex);
         }
