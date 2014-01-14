@@ -19,6 +19,11 @@ public class HttpActionDTO implements ActionDescriptor {
     }
 
     @Override
+    public String toString() {
+        return "path";
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

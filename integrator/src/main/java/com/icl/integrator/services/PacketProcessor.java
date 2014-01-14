@@ -1,9 +1,6 @@
 package com.icl.integrator.services;
 
-import com.icl.integrator.dto.DestinationDTO;
-import com.icl.integrator.dto.ErrorDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.SourceDataDTO;
+import com.icl.integrator.dto.*;
 import com.icl.integrator.util.IntegratorException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,8 +24,7 @@ public class PacketProcessor {
     @Autowired
     private DeliveryService deliveryService;
 
-    public Map<String, ResponseFromTargetDTO<String>> process(
-            SourceDataDTO packet) {
+    public void process(SourceDataDTO packet) {
         Map<String, ResponseFromTargetDTO<String>> serviceToRequestID = new
                 HashMap<>();
         for (DestinationDTO destination : packet.getDestinations()) {
@@ -43,7 +39,10 @@ public class PacketProcessor {
             }
             serviceToRequestID.put(destination.getServiceName(), response);
         }
-        return serviceToRequestID;
+        ServiceDTO sourceService = packet.getSource();
+        if (sourceService != null) {
+            deliveryService.deliver(sourceService, serviceToRequestID);
+        }
     }
 
 }

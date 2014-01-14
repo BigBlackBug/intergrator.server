@@ -100,7 +100,7 @@ public class AppTests {
     public void testHttpDeserializer() throws Exception {
         ServiceDTO serviceDTO = new ServiceDTO();
         ActionDescriptor descriptor = new HttpActionDTO("PATH");
-        serviceDTO.setActionDescriptor(descriptor);
+        serviceDTO.setSourceResponseAction(descriptor);
         serviceDTO.setEndpoint(getHttpDTO());
         String s = mapper.writeValueAsString(serviceDTO);
         ServiceDTO serviceDTO1 = mapper.readValue(s, ServiceDTO.class);
@@ -110,7 +110,7 @@ public class AppTests {
     public void testDeserializer() throws Exception {
         ServiceDTO serviceDTO = new ServiceDTO();
         ActionDescriptor descriptor = getQueueDTO();
-        serviceDTO.setActionDescriptor(descriptor);
+        serviceDTO.setSourceResponseAction(descriptor);
         serviceDTO.setEndpoint(getJMSDTO());
         String s = mapper.writeValueAsString(serviceDTO);
         ServiceDTO serviceDTO1 = mapper.readValue(s, ServiceDTO.class);

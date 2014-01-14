@@ -13,10 +13,30 @@ public class ServiceDTO {
 
     private EndpointDTO endpoint;
 
-    private ActionDescriptor actionDescriptor;
+//    private ActionDescriptor actionDescriptor;
+
+    private ActionDescriptor sourceResponseAction;
+
+    private ActionDescriptor targetResponseAction;
 
     public ServiceDTO() {
 
+    }
+
+    public ActionDescriptor getSourceResponseAction() {
+        return sourceResponseAction;
+    }
+
+    public void setSourceResponseAction(ActionDescriptor sourceResponseAction) {
+        this.sourceResponseAction = sourceResponseAction;
+    }
+
+    public ActionDescriptor getTargetResponseAction() {
+        return targetResponseAction;
+    }
+
+    public void setTargetResponseAction(ActionDescriptor targetResponseAction) {
+        this.targetResponseAction = targetResponseAction;
     }
 
     public EndpointDTO getEndpoint() {
@@ -26,40 +46,13 @@ public class ServiceDTO {
     public void setEndpoint(EndpointDTO endpoint) {
         this.endpoint = endpoint;
     }
+//
+//    public ActionDescriptor getActionDescriptor() {
+//        return actionDescriptor;
+//    }
+//
+//    public void setActionDescriptor(ActionDescriptor actionDescriptor) {
+//        this.actionDescriptor = actionDescriptor;
+//    }
 
-    public ActionDescriptor getActionDescriptor() {
-        return actionDescriptor;
-    }
-
-    public void setActionDescriptor(ActionDescriptor actionDescriptor) {
-        this.actionDescriptor = actionDescriptor;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        ServiceDTO that = (ServiceDTO) o;
-
-        if (!actionDescriptor.equals(that.actionDescriptor)) {
-            return false;
-        }
-        if (!endpoint.equals(that.endpoint)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = endpoint.hashCode();
-        result = 31 * result + actionDescriptor.hashCode();
-        return result;
-    }
 }

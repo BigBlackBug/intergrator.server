@@ -74,4 +74,9 @@ public class QueueDTO implements ActionDescriptor {
         result = 31 * result + queueName.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "username: " + username + " queue: " + queueName;
+    }
 }

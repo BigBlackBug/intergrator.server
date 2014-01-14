@@ -3,10 +3,7 @@ package com.icl.integrator.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.icl.integrator.dto.DestinationDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.ResponseToSourceDTO;
-import com.icl.integrator.dto.SourceDataDTO;
+import com.icl.integrator.dto.*;
 import com.icl.integrator.model.TaskLogEntry;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.Descriptor;
@@ -22,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -51,6 +49,22 @@ public class DeliveryService {
     @Autowired
     private ObjectMapper serializer;
 
+    public void deliver(ServiceDTO sourceService,
+                        Map<String, ResponseFromTargetDTO<String>> resultMap)
+            throws IntegratorException {
+        logger.info("Scheduling a request back to service " +
+                            "defined as source -> " +
+                            sourceService.getSourceResponseAction());
+
+        EndpointConnector sourceConnector = factory.createEndpointConnector
+                (sourceService.getEndpoint(),
+                 sourceService.getSourceResponseAction());
+        DeliveryCallable<Map<String, ResponseFromTargetDTO<String>>>
+                deliveryCallable =
+                new DeliveryCallable<>(sourceConnector, resultMap);
+        scheduler.schedule(new TaskCreator<>(deliveryCallable));
+    }
+
     public UUID deliver(DestinationDTO destination,
                         SourceDataDTO packet) throws IntegratorException {
         logger.info("Scheduling a request to target " +
@@ -58,42 +72,32 @@ public class DeliveryService {
         EndpointConnector destinationConnector =
                 factory.createEndpointConnector(destination,
                                                 packet.getAction());
-
-        DeliveryCallable deliveryCallable =
-                new DeliveryCallable(destinationConnector, packet);
-        if (packet.getSource() != null) {
-            EndpointConnector sourceConnector = factory.createEndpointConnector(
-                    packet.getSource());
+        //---
+        RequestToTargetDTO dto = new RequestToTargetDTO();
+        dto.setAdditionalData(packet.getAdditionalData());
+        dto.setData(packet.getData());
+        DeliveryCallable<RequestToTargetDTO> deliveryCallable =
+                new DeliveryCallable<>(destinationConnector, dto);
+        ServiceDTO sourceService = packet.getSource();
+        if (sourceService != null) {
+            EndpointDTO endpoint = sourceService.getEndpoint();
+            EndpointConnector sourceConnector = factory
+                    .createEndpointConnector(endpoint,
+                                             sourceService.getTargetResponseAction());
             return deliver(deliveryCallable, sourceConnector, destination);
         }
         return deliver(deliveryCallable, destination, packet);
     }
 
-    private UUID deliver(final DeliveryCallable deliveryCallable,
-                         DestinationDTO destinationDTO,
-                         SourceDataDTO packet) {
+    private <T> UUID deliver(final DeliveryCallable<T> deliveryCallable,
+                             DestinationDTO destinationDTO,
+                             SourceDataDTO packet) {
         UUID requestID = UUID.randomUUID();
         logger.info("Generated an ID for the request: " + quote(
                 requestID.toString()));
 
         DatabaseRetryHandler handler =
-                databaseRetryHandlerFactory.createHandler();
-        TaskLogEntry logEntry = new TaskLogEntry();
-        String generalMessage = "Не могу доставить запрос {0} " +
-                "на сервис {1}";
-        String targetServiceName = destinationDTO.getServiceName();
-        generalMessage = MessageFormat.format(generalMessage, requestID,
-                                              targetServiceName);
-        logEntry.setMessage(generalMessage);
-        String dataJson = null;
-        try {
-            dataJson = serializer.writeValueAsString(packet.getData());
-        } catch (JsonProcessingException e) {
-            logEntry.setAdditionalMessage(e.getMessage());
-            logger.info("Unable to serialize incoming json data");
-        }
-        logEntry.setDataJson(dataJson);
-        handler.setLogEntry(logEntry);
+                createRetryHandler(packet, destinationDTO, requestID);
 
         TaskCreator<ResponseFromTargetDTO> deliveryTaskCreator =
                 new TaskCreator<>(deliveryCallable);
@@ -102,8 +106,8 @@ public class DeliveryService {
                 @Override
                 public String describe(
                         TaskCreator<ResponseFromTargetDTO> creator) {
-                    return "Отправка запроса: "+
-                            deliveryCallable.getConnector().toString();
+                return "Отправка запроса: " +
+                        deliveryCallable.getConnector().toString();
                 }
             });
         //
@@ -115,9 +119,45 @@ public class DeliveryService {
         return requestID;
     }
 
-    private UUID deliver(final DeliveryCallable deliveryCallable,
-                         EndpointConnector sourceConnector,
-                         DestinationDTO destinationDTO) {
+    private DatabaseRetryHandler createRetryHandler(
+            SourceDataDTO packet, DestinationDTO destinationDTO,
+            UUID requestID) {
+        DatabaseRetryHandler handler =
+                databaseRetryHandlerFactory.createHandler();
+        RequestToTargetDTO request = new RequestToTargetDTO();
+        request.setData(packet.getData());
+        request.setAdditionalData(packet.getAdditionalData());
+        TaskLogEntry logEntry =
+                createTaskLogEntry(request, destinationDTO, requestID);
+        handler.setLogEntry(logEntry);
+        return handler;
+    }
+
+    private TaskLogEntry createTaskLogEntry(RequestToTargetDTO packet,
+                                            DestinationDTO destinationDTO,
+                                            UUID requestID) {
+        TaskLogEntry logEntry = new TaskLogEntry();
+        String generalMessage = "Не могу доставить запрос {0} " +
+                "на сервис {1}";
+        String targetServiceName = destinationDTO.getServiceName();
+        generalMessage = MessageFormat.format(generalMessage, requestID,
+                                              targetServiceName);
+        logEntry.setMessage(generalMessage);
+
+        String dataJson = null;
+        try {
+            dataJson = serializer.writeValueAsString(packet);
+        } catch (JsonProcessingException e) {
+            logEntry.setAdditionalMessage(e.getMessage());
+            logger.info("Unable to serialize incoming json data");
+        }
+        logEntry.setDataJson(dataJson);
+        return logEntry;
+    }
+
+    private <T> UUID deliver(final DeliveryCallable<T> deliveryCallable,
+                             EndpointConnector sourceConnector,
+                             DestinationDTO destinationDTO) {
         UUID requestID = UUID.randomUUID();
         logger.info("Generated an ID for the request: " + quote(
                 requestID.toString()));
@@ -128,7 +168,7 @@ public class DeliveryService {
                 @Override
                 public String describe(
                         TaskCreator<ResponseFromTargetDTO> creator) {
-                return "Отправка запроса: "+
+                return "Отправка запроса: " +
                         deliveryCallable.getConnector().toString();
                 }
             });
@@ -152,15 +192,16 @@ public class DeliveryService {
                 Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-            ResponseToSourceDTO data =
-                    new ResponseToSourceDTO(
-                            responseDTO,
-                            destination.getServiceName(),
-                            requestID.toString());
-            sourceConnector.sendRequest(data,ResponseFromTargetDTO.class);
-            return null;
-            }
-        };
+                        ResponseToSourceDTO data =
+                                new ResponseToSourceDTO(
+                                        responseDTO,
+                                        destination.getServiceName(),
+                                        requestID.toString());
+                        sourceConnector
+                                .sendRequest(data, ResponseFromTargetDTO.class);
+                        return null;
+                    }
+                };
 
         private final DestinationDTO destination;
 
@@ -196,13 +237,14 @@ public class DeliveryService {
             handler.setLogEntry(logEntry);
             TaskCreator<Void> taskCreator = new TaskCreator<>(successCallable);
             taskCreator.setDescriptor(
-                new Descriptor<TaskCreator<Void>>() {
-                    @Override
-                    public String describe(
-                            TaskCreator<Void> creator) {
-                    return "Отправка запроса: " + sourceConnector.toString();
-                    }
-                });
+                    new Descriptor<TaskCreator<Void>>() {
+                        @Override
+                        public String describe(
+                                TaskCreator<Void> creator) {
+                            return "Отправка запроса: " + sourceConnector
+                                    .toString();
+                        }
+                    });
             scheduler.schedule(taskCreator, handler);
         }
     }

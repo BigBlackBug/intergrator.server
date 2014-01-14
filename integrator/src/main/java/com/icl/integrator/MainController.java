@@ -51,7 +51,7 @@ public class MainController {
     @RequestMapping(value = "processData", method = RequestMethod.POST)
     public
     @ResponseBody
-    Map
+    void
     process(@RequestBody(required = true) SourceDataDTO packet,
             HttpServletRequest request) {
         logger.info(MessageFormat.format("Received a request from source " +
@@ -59,9 +59,7 @@ public class MainController {
                                          request.getRemoteHost(),
                                          request.getRemotePort()));
         PacketProcessor processor = processorFactory.createProcessor();
-        Map<String, ResponseFromTargetDTO<String>>
-                resultMap = processor.process(packet);
-        return resultMap;
+        processor.process(packet);
     }
 
     @RequestMapping(value = "ping", method = RequestMethod.GET)

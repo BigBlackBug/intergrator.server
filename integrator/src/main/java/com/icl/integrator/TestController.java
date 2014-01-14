@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -26,11 +28,22 @@ public class TestController {
 
     private final Log logger = LogFactory.getLog(TestController.class);
 
-    @RequestMapping(value = "accept_response", method = RequestMethod.POST)
+    @RequestMapping(value = "accept_source_response", method = RequestMethod
+            .POST)
     public void
-    acceptResponse(@RequestBody ResponseToSourceDTO responseDTO) {
-        logger.info("accepted response from integrator from " + responseDTO
-                .getServiceName());
+    acceptSourceResponse(
+            @RequestBody Map<String, ResponseFromTargetDTO<String>> responseDTO) {
+        logger.info("received source response from integrator from " +
+                            responseDTO);
+    }
+
+    @RequestMapping(value = "accept_target_response", method = RequestMethod
+            .POST)
+    public void
+    acceptTargetSResponse(@RequestBody ResponseToSourceDTO responseDTO) {
+        logger.info("received target response from integrator from " +
+                            responseDTO
+                                    .getServiceName());
     }
 
     @RequestMapping(value = "destination", method = RequestMethod.POST)
@@ -38,7 +51,7 @@ public class TestController {
     @ResponseBody
     ResponseFromTargetDTO<String>
     destination(@RequestBody RequestToTargetDTO requestToTargetDTO) {
-        logger.info("destination accepted request from " +
+        logger.info("destination received a request from " +
                             "integrator " + requestToTargetDTO);
         return new ResponseFromTargetDTO<>("RESPONSE", String.class);
     }

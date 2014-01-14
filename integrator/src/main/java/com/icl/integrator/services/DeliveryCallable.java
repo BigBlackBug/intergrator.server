@@ -1,20 +1,18 @@
 package com.icl.integrator.services;
 
-import com.icl.integrator.dto.RequestToTargetDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.SourceDataDTO;
 import com.icl.integrator.util.connectors.EndpointConnector;
 
 import java.util.concurrent.Callable;
 
-class DeliveryCallable implements Callable<ResponseFromTargetDTO> {
+class DeliveryCallable<T> implements Callable<ResponseFromTargetDTO> {
 
-    private final SourceDataDTO packet;
+    private final T packet;
 
     private final EndpointConnector connector;
 
     DeliveryCallable(EndpointConnector connector,
-                     SourceDataDTO packet) {
+                     T packet) {
         this.connector = connector;
         this.packet = packet;
     }
@@ -25,9 +23,9 @@ class DeliveryCallable implements Callable<ResponseFromTargetDTO> {
 
     @Override
     public ResponseFromTargetDTO call() throws Exception {
-        RequestToTargetDTO dto = new RequestToTargetDTO();
-        dto.setAdditionalData(packet.getAdditionalData());
-        dto.setData(packet.getData());
-        return connector.sendRequest(dto, ResponseFromTargetDTO.class);
+//        RequestToTargetDTO dto = new RequestToTargetDTO();
+//        dto.setAdditionalData(packet.getAdditionalData());
+//        dto.setData(packet.getData());
+        return connector.sendRequest(packet, ResponseFromTargetDTO.class);
     }
 }

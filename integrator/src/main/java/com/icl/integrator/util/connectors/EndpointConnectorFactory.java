@@ -2,7 +2,6 @@ package com.icl.integrator.util.connectors;
 
 import com.icl.integrator.dto.DestinationDTO;
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.HttpActionDTO;
 import com.icl.integrator.dto.registration.QueueDTO;
@@ -80,13 +79,5 @@ public class EndpointConnectorFactory {
                 return null;
             }
         }
-    }
-
-    //адрес возврата
-    public EndpointConnector createEndpointConnector(ServiceDTO serviceDTO)
-            throws IntegratorException {
-        EndpointDTO endpoint = serviceDTO.getEndpoint();
-        return createEndpointConnector(endpoint,
-                                       serviceDTO.getActionDescriptor());
     }
 }
