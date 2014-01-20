@@ -19,14 +19,16 @@
       <configuration>
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="" />
-        <datasource-mapping>
-          <factory-entry name="develop" value="dd417fee-7c0e-4739-8f66-350b6ee689b3" />
-        </datasource-mapping>
+        <datasource-mapping />
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/src/main/resources/META-INF/persistence.xml" />
       </configuration>
     </facet>
     <facet type="Spring" name="Spring">
-      <configuration />
+      <configuration>
+        <fileset id="fileset" name="Spring Application Context" removed="false">
+          <file>file://$MODULE_DIR$/src/main/webapp/WEB-INF/integrator-servlet.xml</file>
+        </fileset>
+      </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
@@ -40,15 +42,19 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.apache.xbean:xbean-spring:3.7" level="project" />
-    <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.0.3" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-jms:3.2.1.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-beans:3.2.1.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-core:3.2.1.RELEASE" level="project" />
+    <orderEntry type="module" module-name="dto" />
+    <orderEntry type="module" module-name="api" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-web:3.2.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aop:3.2.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:3.2.1.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-core:3.2.1.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.0.3" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context:3.2.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-expression:3.2.1.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xbean:xbean-spring:3.7" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jms:3.2.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-tx:3.2.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.apache.activemq:activemq-all:5.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.activemq:activemq-amqp:5.8.0" level="project" />
@@ -64,7 +70,6 @@
     <orderEntry type="library" name="Maven: org.apache.qpid:proton-api:0.3.0-fuse-2" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.47" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.47" level="project" />
-    <orderEntry type="module" module-name="dto" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.2.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.2.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.2.3" level="project" />
@@ -90,8 +95,6 @@
     <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache:1.2.3" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-c3p0:3.6.9.Final" level="project" />
     <orderEntry type="library" name="Maven: c3p0:c3p0:0.9.1" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-web:3.2.1.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet.jsp:jsp-api:2.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:3.2.1.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:3.2.1.RELEASE" level="project" />

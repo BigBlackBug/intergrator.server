@@ -1,5 +1,6 @@
 package com.icl.integrator;
 
+import com.icl.integrator.api.IntegratorHttpAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.PacketProcessor;
@@ -12,15 +13,8 @@ import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,10 +26,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 @Controller
-@RequestMapping(value = "/integrator/",
-                consumes = MediaType.APPLICATION_JSON_VALUE,
-                produces = MediaType.APPLICATION_JSON_VALUE)
-public class MainController {
+public class MainController implements IntegratorHttpAPI {
 
     private static Log logger = LogFactory.getLog(MainController.class);
 
@@ -48,41 +39,31 @@ public class MainController {
     @Autowired
     private PacketProcessorFactory processorFactory;
 
-    @RequestMapping(value = "processData", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    void
-    process(@RequestBody(required = true) SourceDataDTO packet,
-            HttpServletRequest request) {
-        logger.info(MessageFormat.format("Received a request from source " +
-                                                 "({0}:{1,number,#})",
-                                         request.getRemoteHost(),
-                                         request.getRemotePort()));
+    @Override
+    public void process(SourceDataDTO packet) {
+//        logger.info(MessageFormat.format("Received a request from source " +
+//                                                 "({0}:{1,number,#})",
+//                                         request.getRemoteHost(),
+//                                         request.getRemotePort()));
         PacketProcessor processor = processorFactory.createProcessor();
         processor.process(packet);
     }
 
-    @RequestMapping(value = "ping", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    Map<String, String> ping() {
+    @Override
+    public Map<String, String> ping() {
         return new HashMap<String, String>() {{
             put("result", "true");
         }};
     }
 
-    @RequestMapping(value = "registerTarget", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    ResponseFromTargetDTO<Map>
-    registerTarget(@RequestBody(required = true)
-                   TargetRegistrationDTO registrationDTO,
-                   HttpServletRequest request) {
-        logger.info(MessageFormat.format("Received a registration request " +
-                                                 "from source " +
-                                                 "({0}:{1,number,#})",
-                                         request.getRemoteHost(),
-                                         request.getRemotePort()));
+    @Override
+    public ResponseFromTargetDTO<Map>
+    registerTarget(TargetRegistrationDTO registrationDTO) {
+//        logger.info(MessageFormat.format("Received a registration request " +
+//                                                 "from source " +
+//                                                 "({0}:{1,number,#})",
+//                                         request.getRemoteHost(),
+//                                         request.getRemotePort()));
         ResponseFromTargetDTO<Map> response;
         try {
             Map result = registrationService.register(registrationDTO);
@@ -93,18 +74,13 @@ public class MainController {
         return response;
     }
 
-    @RequestMapping(value = "checkAvailability", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    ResponseFromTargetDTO<Boolean>
-    isAvailable(@RequestBody(required = true)
-                PingDTO pingDTO,
-                HttpServletRequest request) {
-        logger.info(MessageFormat.format("Received a registration request " +
-                                                 "from source " +
-                                                 "({0}:{1,number,#})",
-                                         request.getRemoteHost(),
-                                         request.getRemotePort()));
+    @Override
+    public ResponseFromTargetDTO<Boolean> isAvailable(PingDTO pingDTO) {
+//        logger.info(MessageFormat.format("Received a registration request " +
+//                                                 "from source " +
+//                                                 "({0}:{1,number,#})",
+//                                         request.getRemoteHost(),
+//                                         request.getRemotePort()));
         EndpointConnector connector = connectorFactory
                 .createEndpointConnector(
                         new DestinationDTO(pingDTO.getServiceName(),
