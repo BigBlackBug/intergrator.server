@@ -5,19 +5,19 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.SourceServiceDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 
 import java.io.IOException;
 
 public final class SourceEndpointDeserializer extends
-        JsonDeserializer<ServiceDTO> {
+        JsonDeserializer<SourceServiceDTO> {
 
     public SourceEndpointDeserializer() {
     }
 
     @Override
-    public ServiceDTO deserialize(JsonParser jp, DeserializationContext ctx)
+    public SourceServiceDTO deserialize(JsonParser jp, DeserializationContext ctx)
             throws IOException {
         ObjectNode treeNode = jp.readValueAsTree();
         MyObjectMapper mapper = new MyObjectMapper();
@@ -30,7 +30,7 @@ public final class SourceEndpointDeserializer extends
         ActionDescriptor targetResponse = mapper.parseActionDescriptor(
                 treeNode.get("targetResponseAction"),
                 endpointDTO.getEndpointType());
-        ServiceDTO serviceDTO = new ServiceDTO();
+        SourceServiceDTO serviceDTO = new SourceServiceDTO();
         serviceDTO.setEndpoint(endpointDTO);
         serviceDTO.setSourceResponseAction(sourceResponse);
         serviceDTO.setTargetResponseAction(targetResponse);

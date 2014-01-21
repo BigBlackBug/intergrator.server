@@ -1,10 +1,12 @@
 package com.icl.integrator.api;
 
 import com.icl.integrator.dto.PingDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.SourceDataDTO;
+import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.dto.DeliveryDTO;
+import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,18 +18,21 @@ import java.util.Map;
  */
 public interface IntegratorAPI {
 
-    public void deliver(SourceDataDTO packet);
+    public void deliver(DeliveryDTO packet);
 
     public Boolean ping();
 
-    public ResponseFromTargetDTO<Map> registerService(
-            TargetRegistrationDTO registrationDTO);
+    public ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            TargetRegistrationDTO<?> registrationDTO);
 
-    public ResponseFromTargetDTO<Boolean> isAvailable(PingDTO pingDTO);
+    public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO);
 
-//    public List<String> getServiceList();
+    public ResponseDTO<List<ServiceDTO>> getServiceList();
 //
-//    public void getSupportedActions()  ;
+//    public void getSupportedActions(String serviceName,
+// EndpointType endpointType)  ;//GET again
 
     //TODO add action to service
+
+    //TODO add an api for services
 }

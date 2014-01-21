@@ -10,26 +10,27 @@ import java.util.Map;
  * Time: 9:20
  * To change this template use File | Settings | File Templates.
  */
-public class SourceDataDTO {
+public class DeliveryDTO {
 
-    private ServiceDTO source;
+    private SourceServiceDTO sourceService;
 
     private List<DestinationDTO> destinations;
 
     private String action;
 
+    //TODO use request data instead
     private Map<String, Object> data;
 
     private Map<String, Object> additionalData;
 
-    public SourceDataDTO(ServiceDTO source, String action,
-                         List<DestinationDTO> destinations) {
-        this.source = source;
+    public DeliveryDTO(SourceServiceDTO sourceService, String action,
+                       List<DestinationDTO> destinations) {
+        this.sourceService = sourceService;
         this.action = action;
         this.destinations = destinations;
     }
 
-    public SourceDataDTO() {
+    public DeliveryDTO() {
     }
 
     @Override
@@ -41,7 +42,7 @@ public class SourceDataDTO {
             return false;
         }
 
-        SourceDataDTO that = (SourceDataDTO) o;
+        DeliveryDTO that = (DeliveryDTO) o;
 
         if (!action.equals(that.action)) {
             return false;
@@ -56,7 +57,7 @@ public class SourceDataDTO {
         if (!destinations.equals(that.destinations)) {
             return false;
         }
-        if (!source.equals(that.source)) {
+        if (!sourceService.equals(that.sourceService)) {
             return false;
         }
 
@@ -65,7 +66,7 @@ public class SourceDataDTO {
 
     @Override
     public int hashCode() {
-        int result = source.hashCode();
+        int result = sourceService.hashCode();
         result = 31 * result + destinations.hashCode();
         result = 31 * result + action.hashCode();
         result = 31 * result + data.hashCode();
@@ -74,12 +75,12 @@ public class SourceDataDTO {
         return result;
     }
 
-    public ServiceDTO getSource() {
-        return source;
+    public SourceServiceDTO getSourceService() {
+        return sourceService;
     }
 
-    public void setSource(ServiceDTO source) {
-        this.source = source;
+    public void setSourceService(SourceServiceDTO sourceService) {
+        this.sourceService = sourceService;
     }
 
     public List<DestinationDTO> getDestinations() {

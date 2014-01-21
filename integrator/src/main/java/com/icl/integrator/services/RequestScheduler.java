@@ -127,6 +127,7 @@ public class RequestScheduler {
                     logger.info(
                             "Rescheduling next request to " + DATE_FORMAT
                                     .format(nextRequestDate));
+                    //TODO ping first, then send
                     EXECUTOR.schedule(taskCreator.create(),
                                       nextRetryInterval,
                                       TimeUnit.MILLISECONDS);

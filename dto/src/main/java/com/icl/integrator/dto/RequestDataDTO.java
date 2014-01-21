@@ -9,21 +9,22 @@ import java.util.Map;
  * Time: 13:05
  * To change this template use File | Settings | File Templates.
  */
-public class RequestToTargetDTO {
+public class RequestDataDTO {
 
+    //TODO refactor to include class name.
     private Map<String, Object> data;
 
     private Map<String, Object> additionalData;
 
-    public RequestToTargetDTO() {
+    public RequestDataDTO() {
     }
 
-    public RequestToTargetDTO(Map<String, Object> data) {
+    public RequestDataDTO(Map<String, Object> data) {
         this.data = data;
     }
 
-    public RequestToTargetDTO(Map<String, Object> data,
-                              Map<String, Object> additionalData) {
+    public RequestDataDTO(Map<String, Object> data,
+                          Map<String, Object> additionalData) {
         this.data = data;
         this.additionalData = additionalData;
     }
@@ -45,7 +46,7 @@ public class RequestToTargetDTO {
             return false;
         }
 
-        RequestToTargetDTO that = (RequestToTargetDTO) o;
+        RequestDataDTO that = (RequestDataDTO) o;
 
         if (additionalData != null ? !additionalData
                 .equals(that.additionalData) : that.additionalData != null) {

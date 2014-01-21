@@ -4,20 +4,20 @@ import java.util.UUID;
 
 public class ResponseToSourceDTO {
 
-    private ResponseFromTargetDTO result;
+    private ResponseDTO result;
 
     private String serviceName;
 
     private String requestID;
 
-    public ResponseToSourceDTO(ResponseFromTargetDTO result, String serviceName,
+    public ResponseToSourceDTO(ResponseDTO result, String serviceName,
                                String requestID) {
         this.result = result;
         this.serviceName = serviceName;
         this.requestID = requestID;
     }
 
-    public ResponseToSourceDTO(ResponseFromTargetDTO result) {
+    public ResponseToSourceDTO(ResponseDTO result) {
         this(result, null, UUID.randomUUID().toString());
     }
 
@@ -62,7 +62,7 @@ public class ResponseToSourceDTO {
         return requestID;
     }
 
-    public ResponseFromTargetDTO getResult() {
+    public ResponseDTO getResult() {
         return result;
     }
 

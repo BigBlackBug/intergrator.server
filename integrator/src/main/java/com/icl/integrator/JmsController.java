@@ -2,8 +2,9 @@ package com.icl.integrator;
 
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.PingDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.SourceDataDTO;
+import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.dto.DeliveryDTO;
+import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.PacketProcessor;
 import com.icl.integrator.services.PacketProcessorFactory;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.jms.*;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -32,7 +34,7 @@ public class JmsController implements MessageListener,IntegratorAPI {
     private PacketProcessorFactory processorFactory;
 
     public void onMessage(final Message message) {
-        SourceDataDTO packet;
+        DeliveryDTO packet;
         if (message instanceof TextMessage) {
             String content;
             try {
@@ -42,7 +44,7 @@ public class JmsController implements MessageListener,IntegratorAPI {
                 return;
             }
             try {
-                packet = mapper.readValue(content, SourceDataDTO.class);
+                packet = mapper.readValue(content, DeliveryDTO.class);
             } catch (IOException e) {
                 logger.error("Не могу десериализовать сообщение в объект", e);
                 return;
@@ -50,7 +52,7 @@ public class JmsController implements MessageListener,IntegratorAPI {
         } else if (message instanceof ObjectMessage) {
             ObjectMessage objectMessage = (ObjectMessage) message;
             try {
-                packet = (SourceDataDTO) objectMessage.getObject();
+                packet = (DeliveryDTO) objectMessage.getObject();
             } catch (JMSException e) {
                 logger.error("Ошибка получения объекта из сообщения", e);
                 return;
@@ -65,7 +67,7 @@ public class JmsController implements MessageListener,IntegratorAPI {
     }
 
     @Override
-    public void deliver(SourceDataDTO packet) {
+    public void deliver(DeliveryDTO packet) {
         try {
             PacketProcessor processor = processorFactory.createProcessor();
             processor.process(packet);
@@ -80,16 +82,21 @@ public class JmsController implements MessageListener,IntegratorAPI {
         return null;
     }
 
-
     @Override
-    public ResponseFromTargetDTO<Map> registerService(
-            TargetRegistrationDTO registrationDTO) {
+    public ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            TargetRegistrationDTO<?> registrationDTO) {
         //TODO implement
         return null;
     }
 
     @Override
-    public ResponseFromTargetDTO<Boolean> isAvailable(PingDTO pingDTO) {
+    public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO) {
+        //TODO implement
+        return null;
+    }
+
+    @Override
+    public ResponseDTO<List<ServiceDTO>> getServiceList() {
         //TODO implement
         return null;
     }

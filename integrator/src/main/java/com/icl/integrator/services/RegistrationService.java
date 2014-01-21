@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.ErrorDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
+import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
@@ -54,10 +54,10 @@ public class RegistrationService {
     private PersistenceService persistenceService;
 
     public <T extends ActionDescriptor>
-    Map<String, ResponseFromTargetDTO<Void>> register
+    Map<String, ResponseDTO<Void>> register
             (TargetRegistrationDTO<T> registrationDTO)
             throws TargetRegistrationException {
-        Map<String, ResponseFromTargetDTO<Void>> result = new HashMap<>();
+        Map<String, ResponseDTO<Void>> result = new HashMap<>();
 
         EndpointDTO endpoint = registrationDTO.getEndpoint();
         List<ActionEndpointDTO<T>> actions = new ArrayList<>();
@@ -69,8 +69,8 @@ public class RegistrationService {
                 }
                 actions.add(actionEndpoint);
             } catch (ConnectionException ex) {
-                ResponseFromTargetDTO<Void> dto =
-                        new ResponseFromTargetDTO<>(new ErrorDTO(ex));
+                ResponseDTO<Void> dto =
+                        new ResponseDTO<>(new ErrorDTO(ex));
                 result.put(actionEndpoint.getActionName(), dto);
             }
 
@@ -93,7 +93,7 @@ public class RegistrationService {
     void processJMS(EndpointDTO endpoint,
                     TargetRegistrationDTO registrationDTO,
                     List<ActionEndpointDTO<T>> actions,
-                    Map<String, ResponseFromTargetDTO<Void>> result)
+                    Map<String, ResponseDTO<Void>> result)
             throws TargetRegistrationException {
         String serviceName = registrationDTO.getServiceName();
         JMSEndpointDescriptorDTO descriptor =
@@ -108,17 +108,17 @@ public class RegistrationService {
             throw new TargetRegistrationException("Ошибка регистрации", ex);
         }
         for (JMSAction action : httpActions) {
-            ResponseFromTargetDTO<Void> responseDTO;
+            ResponseDTO<Void> responseDTO;
             try {
                 action.setJmsServiceEndpoint(serviceEntity);
                 serviceEntity.addAction(action);
                 persistenceService.saveAction(action);
-                responseDTO = new ResponseFromTargetDTO<>(true);
+                responseDTO = new ResponseDTO<>(true);
             } catch (DataAccessException ex) {
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setErrorMessage("Ошибка регистрации");
                 errorDTO.setDeveloperMessage(ex.getMessage());
-                responseDTO = new ResponseFromTargetDTO<>(errorDTO);
+                responseDTO = new ResponseDTO<>(errorDTO);
             }
             result.put(action.getActionName(), responseDTO);
         }
@@ -129,7 +129,7 @@ public class RegistrationService {
     void processHttp(EndpointDTO endpoint,
                      TargetRegistrationDTO registrationDTO,
                      List<ActionEndpointDTO<T>> actions,
-                     Map<String, ResponseFromTargetDTO<Void>> result)
+                     Map<String, ResponseDTO<Void>> result)
             throws TargetRegistrationException {
         String serviceName = registrationDTO.getServiceName();
         HttpEndpointDescriptorDTO descriptor =
@@ -144,17 +144,17 @@ public class RegistrationService {
             throw new TargetRegistrationException("Ошибка регистрации", ex);
         }
         for (HttpAction action : httpActions) {
-            ResponseFromTargetDTO<Void> responseDTO;
+            ResponseDTO<Void> responseDTO;
             try {
                 action.setHttpServiceEndpoint(serviceEntity);
                 serviceEntity.addAction(action);
                 persistenceService.saveAction(action);
-                responseDTO = new ResponseFromTargetDTO<>(true);
+                responseDTO = new ResponseDTO<>(true);
             } catch (DataAccessException ex) {
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setErrorMessage("Ошибка регистрации");
                 errorDTO.setDeveloperMessage(ex.getMessage());
-                responseDTO = new ResponseFromTargetDTO<>(errorDTO);
+                responseDTO = new ResponseDTO<>(errorDTO);
             }
             result.put(action.getActionName(), responseDTO);
         }

@@ -1,7 +1,7 @@
 package com.icl.integrator;
 
-import com.icl.integrator.dto.RequestToTargetDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
+import com.icl.integrator.dto.RequestDataDTO;
+import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ResponseToSourceDTO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +32,7 @@ public class TestController {
             .POST)
     public void
     acceptSourceResponse(
-            @RequestBody Map<String, ResponseFromTargetDTO<String>> responseDTO) {
+            @RequestBody Map<String, ResponseDTO<String>> responseDTO) {
         logger.info("received source response from integrator from " +
                             responseDTO);
     }
@@ -49,20 +49,20 @@ public class TestController {
     @RequestMapping(value = "destination", method = RequestMethod.POST)
     public
     @ResponseBody
-    ResponseFromTargetDTO<String>
-    destination(@RequestBody RequestToTargetDTO requestToTargetDTO) {
+    ResponseDTO<String>
+    destination(@RequestBody RequestDataDTO requestDataDTO) {
         logger.info("destination received a request from " +
-                            "integrator " + requestToTargetDTO);
-        return new ResponseFromTargetDTO<>("RESPONSE", String.class);
+                            "integrator " + requestDataDTO);
+        return new ResponseDTO<>("RESPONSE", String.class);
     }
 
     @RequestMapping(value = "destination2", method = RequestMethod.POST)
     public
     @ResponseBody
-    ResponseFromTargetDTO<String>
-    destination2(@RequestBody RequestToTargetDTO requestToTargetDTO) {
+    ResponseDTO<String>
+    destination2(@RequestBody RequestDataDTO requestDataDTO) {
         logger.info("destination2 accepted request from " +
-                            "integrator " + requestToTargetDTO);
-        return new ResponseFromTargetDTO<>("RESPONSE", String.class);
+                            "integrator " + requestDataDTO);
+        return new ResponseDTO<>("RESPONSE", String.class);
     }
 }

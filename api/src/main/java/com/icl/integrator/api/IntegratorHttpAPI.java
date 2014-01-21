@@ -1,8 +1,9 @@
 package com.icl.integrator.api;
 
+import com.icl.integrator.dto.DeliveryDTO;
 import com.icl.integrator.dto.PingDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.SourceDataDTO;
+import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,7 +28,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
 
     @Override
     @RequestMapping(value = "deliver", method = RequestMethod.POST)
-    public void deliver(@RequestBody(required = true) SourceDataDTO packet);
+    public void deliver(@RequestBody(required = true) DeliveryDTO packet);
 
     @Override
     @RequestMapping(value = "ping", method = RequestMethod.GET)
@@ -38,13 +40,20 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @RequestMapping(value = "registerService", method = RequestMethod.POST)
     public
     @ResponseBody
-    ResponseFromTargetDTO<Map> registerService(@RequestBody(required = true)
-                                               TargetRegistrationDTO registrationDTO);
+    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            @RequestBody(required = true)
+            TargetRegistrationDTO<?> registrationDTO);
 
     @Override
     @RequestMapping(value = "checkAvailability", method = RequestMethod.POST)
     public
     @ResponseBody
-    ResponseFromTargetDTO<Boolean> isAvailable(@RequestBody(required = true)
-                                               PingDTO pingDTO);
+    ResponseDTO<Boolean> isAvailable(@RequestBody(required = true)
+                                     PingDTO pingDTO);
+
+    @Override
+    @RequestMapping(value = "getServiceList", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    ResponseDTO<List<ServiceDTO>> getServiceList();
 }

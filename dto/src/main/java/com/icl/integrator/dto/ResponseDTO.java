@@ -7,7 +7,7 @@ package com.icl.integrator.dto;
  * Time: 13:43
  * To change this template use File | Settings | File Templates.
  */
-public class ResponseFromTargetDTO<T> {
+public class ResponseDTO<T> {
 
     protected SuccessDTO<T> response;
 
@@ -15,19 +15,25 @@ public class ResponseFromTargetDTO<T> {
 
     protected ErrorDTO error;
 
-    public ResponseFromTargetDTO() {
+    public ResponseDTO() {
     }
 
-    public ResponseFromTargetDTO(T response, Class<T> responseClass) {
+    //TODO разобраться, а нужен ли нам вообще responseClass
+    public ResponseDTO(T response, Class<T> responseClass) {
         this(true);
         this.response = new SuccessDTO<T>(responseClass, response);
     }
 
-    public ResponseFromTargetDTO(boolean success) {
+    public ResponseDTO(T response) {
+        this(true);
+        this.response = new SuccessDTO<T>(response);
+    }
+
+    public ResponseDTO(boolean success) {
         this.success = success;
     }
 
-    public ResponseFromTargetDTO(ErrorDTO error) {
+    public ResponseDTO(ErrorDTO error) {
         this(false);
 
         this.error = error;
@@ -42,7 +48,7 @@ public class ResponseFromTargetDTO<T> {
             return false;
         }
 
-        ResponseFromTargetDTO that = (ResponseFromTargetDTO) o;
+        ResponseDTO that = (ResponseDTO) o;
 
         if (success != that.success) {
             return false;

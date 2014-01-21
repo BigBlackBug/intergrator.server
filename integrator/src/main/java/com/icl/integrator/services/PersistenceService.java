@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -62,5 +63,17 @@ public class PersistenceService {
         } else {
             return em.merge(endpoint);
         }
+    }
+
+    @Transactional
+    public List<HttpServiceEndpoint> getHttpServices() {
+        return em.createQuery("select ep from HttpServiceEndpoint ep",
+                              HttpServiceEndpoint.class).getResultList();
+    }
+
+    @Transactional
+    public List<JMSServiceEndpoint> getJmsServices() {
+        return em.createQuery("select ep from JMSServiceEndpoint ep",
+                              JMSServiceEndpoint.class).getResultList();
     }
 }

@@ -10,6 +10,7 @@ import com.icl.integrator.util.EndpointType;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,11 +25,18 @@ public class Main {
     public static void main(String args[]) {
         IntegratorHttpClient httpClient = new IntegratorHttpClient
                 ("localhost", 8080);
-        register(httpClient);
+        getServiceList(httpClient);
+//        register(httpClient);
+//
+//        ping(httpClient);
+//
+//        process(httpClient);
+    }
 
-        ping(httpClient);
 
-        process(httpClient);
+    public static void getServiceList(IntegratorHttpClient httpClient){
+        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
+        System.out.println(serviceList);
     }
 
     public static void ping(IntegratorHttpClient httpClient) {
@@ -36,21 +44,21 @@ public class Main {
         pingDTO.setAction("ACTION");
         pingDTO.setServiceName("NEW_SERVICE");
         pingDTO.setEndpointType(EndpointType.HTTP);
-        ResponseFromTargetDTO<Boolean> available =
+        ResponseDTO<Boolean> available =
                 httpClient.isAvailable(pingDTO);
         System.out.println(available);
     }
 
     public static void process(IntegratorHttpClient httpClient) {
-        SourceDataDTO sourceDataDTO = new SourceDataDTO();
-        sourceDataDTO.setAction("ACTION");
-        sourceDataDTO.setData(new HashMap<String, Object>() {{
+        DeliveryDTO deliveryDTO = new DeliveryDTO();
+        deliveryDTO.setAction("ACTION");
+        deliveryDTO.setData(new HashMap<String, Object>() {{
             put("a", "b");
         }});
         DestinationDTO destination = new DestinationDTO(
                 "NEW_SERVICE", EndpointType.HTTP);
-        sourceDataDTO.setDestinations(Arrays.asList(destination));
-        httpClient.deliver(sourceDataDTO);
+        deliveryDTO.setDestinations(Arrays.asList(destination));
+        httpClient.deliver(deliveryDTO);
     }
 
     public static void register(IntegratorHttpClient httpClient) {
@@ -79,7 +87,7 @@ public class Main {
         actionDTO.setForceRegister(true);
         regDTO.setActions(Arrays.asList(actionDTO));
         //----------------------------------------------------------------------
-        ResponseFromTargetDTO<Map> response =
+        ResponseDTO<Map<String, ResponseDTO<Void>>> response =
                 httpClient.registerService(regDTO);
         System.out.println(response);
     }

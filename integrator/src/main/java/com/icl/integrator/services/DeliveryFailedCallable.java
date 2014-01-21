@@ -2,7 +2,7 @@ package com.icl.integrator.services;
 
 import com.icl.integrator.dto.DestinationDTO;
 import com.icl.integrator.dto.ErrorDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
+import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ResponseToSourceDTO;
 import com.icl.integrator.util.connectors.EndpointConnector;
 
@@ -33,14 +33,14 @@ class DeliveryFailedCallable implements Callable<Void> {
         String targetServiceName = targetDestination.getServiceName();
         ErrorDTO errorDTO = new ErrorDTO(MessageFormat.format
                 (generalMessage, requestID, targetServiceName));
-        ResponseFromTargetDTO<Object> responseFromTarget =
-                new ResponseFromTargetDTO<>(errorDTO);
+        ResponseDTO<Object> responseFromTarget =
+                new ResponseDTO<>(errorDTO);
         ResponseToSourceDTO requestData = new ResponseToSourceDTO(
                 responseFromTarget,
                 targetServiceName,
                 requestID.toString());
          /*TODO we're not expecting any response I guess*/
-        sourceConnector.sendRequest(requestData, ResponseFromTargetDTO.class);
+        sourceConnector.sendRequest(requestData, ResponseDTO.class);
         return null;
     }
 }

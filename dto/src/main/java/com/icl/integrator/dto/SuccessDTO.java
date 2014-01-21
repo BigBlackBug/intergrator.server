@@ -18,6 +18,10 @@ public class SuccessDTO<T> {
         this.responseValue = responseValue;
     }
 
+    public SuccessDTO(T responseValue) {
+        this.responseValue = responseValue;
+    }
+
     public SuccessDTO() {
     }
 

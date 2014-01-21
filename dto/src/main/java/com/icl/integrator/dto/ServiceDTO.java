@@ -1,64 +1,44 @@
 package com.icl.integrator.dto;
 
-import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.util.EndpointType;
 
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
- * Date: 18.12.13
- * Time: 11:31
+ * Date: 21.01.14
+ * Time: 12:00
  * To change this template use File | Settings | File Templates.
  */
 public class ServiceDTO {
 
-    private EndpointDTO endpoint;
+    private String serviceName;
 
-    private ActionDescriptor sourceResponseAction;
+    private EndpointType endpointType;
 
-    private ActionDescriptor targetResponseAction;
-
-    public ServiceDTO() {
+    public ServiceDTO(){
 
     }
 
-    public ServiceDTO(EndpointDTO endpoint,
-                      ActionDescriptor sourceResponseAction,
-                      ActionDescriptor targetResponseAction) {
-        this.endpoint = endpoint;
-        this.sourceResponseAction = sourceResponseAction;
-        this.targetResponseAction = targetResponseAction;
+    public ServiceDTO(String serviceName,
+                      EndpointType endpointType) {
+
+        this.serviceName = serviceName;
+        this.endpointType = endpointType;
     }
 
-    public ActionDescriptor getSourceResponseAction() {
-        return sourceResponseAction;
+    public String getServiceName() {
+        return serviceName;
     }
 
-    public void setSourceResponseAction(ActionDescriptor sourceResponseAction) {
-        this.sourceResponseAction = sourceResponseAction;
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
-    public ActionDescriptor getTargetResponseAction() {
-        return targetResponseAction;
+    public EndpointType getEndpointType() {
+        return endpointType;
     }
 
-    public void setTargetResponseAction(ActionDescriptor targetResponseAction) {
-        this.targetResponseAction = targetResponseAction;
+    public void setEndpointType(EndpointType endpointType) {
+        this.endpointType = endpointType;
     }
-
-    public EndpointDTO getEndpoint() {
-        return endpoint;
-    }
-
-    public void setEndpoint(EndpointDTO endpoint) {
-        this.endpoint = endpoint;
-    }
-//
-//    public ActionDescriptor getActionDescriptor() {
-//        return actionDescriptor;
-//    }
-//
-//    public void setActionDescriptor(ActionDescriptor actionDescriptor) {
-//        this.actionDescriptor = actionDescriptor;
-//    }
-
 }

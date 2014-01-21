@@ -24,22 +24,22 @@ public class PacketProcessor {
     @Autowired
     private DeliveryService deliveryService;
 
-    public void process(SourceDataDTO packet) {
-        Map<String, ResponseFromTargetDTO<String>> serviceToRequestID = new
+    public void process(DeliveryDTO packet) {
+        Map<String, ResponseDTO<String>> serviceToRequestID = new
                 HashMap<>();
         for (DestinationDTO destination : packet.getDestinations()) {
-            ResponseFromTargetDTO<String> response;
+            ResponseDTO<String> response;
             try {
                 UUID requestID = deliveryService.deliver(destination, packet);
-                response = new ResponseFromTargetDTO<>(requestID.toString(),
+                response = new ResponseDTO<>(requestID.toString(),
                                                        String.class);
             } catch (IntegratorException ex) {
                 ErrorDTO error = new ErrorDTO(ex);
-                response = new ResponseFromTargetDTO<>(error);
+                response = new ResponseDTO<>(error);
             }
             serviceToRequestID.put(destination.getServiceName(), response);
         }
-        ServiceDTO sourceService = packet.getSource();
+        SourceServiceDTO sourceService = packet.getSourceService();
         //TODO добавить лок, чтоб сначала выполнялся этот запрос
         if (sourceService != null) {
             deliveryService.deliver(sourceService, serviceToRequestID);
