@@ -76,4 +76,13 @@ public class PingDTO {
     public void setEndpointType(EndpointType endpointType) {
         this.endpointType = endpointType;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Service: ").append(serviceName).append(" ").
+                append("Action: ").append(action).append(" ").
+                append("Type: ").append(endpointType);
+        return sb.toString();
+    }
 }

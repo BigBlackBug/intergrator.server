@@ -1,6 +1,10 @@
 package com.icl.integrator;
 
+import com.icl.integrator.api.IntegratorAPI;
+import com.icl.integrator.dto.PingDTO;
+import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.SourceDataDTO;
+import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.PacketProcessor;
 import com.icl.integrator.services.PacketProcessorFactory;
 import com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler;
@@ -13,9 +17,10 @@ import org.springframework.stereotype.Component;
 import javax.jms.*;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Map;
 
 @Component
-public class JmsController implements MessageListener {
+public class JmsController implements MessageListener,IntegratorAPI {
 
     private final static Log logger = LogFactory.getLog(
             DatabaseRetryLimitHandler.class);
@@ -56,14 +61,38 @@ public class JmsController implements MessageListener {
                     message.getClass()));
             return;
         }
+        deliver(packet);
+    }
+
+    @Override
+    public void deliver(SourceDataDTO packet) {
         try {
             PacketProcessor processor = processorFactory.createProcessor();
             processor.process(packet);
-            //TODO если есть сорс конечно надо отправлять обратно ему
-            // результаты process
         } catch (Exception ex) {
             logger.error("Ошибка отправки", ex);
         }
     }
 
+    @Override
+    public Boolean ping() {
+        //TODO implement
+        return null;
+    }
+
+
+    @Override
+    public ResponseFromTargetDTO<Map> registerService(
+            TargetRegistrationDTO registrationDTO) {
+        //TODO implement
+        return null;
+    }
+
+    @Override
+    public ResponseFromTargetDTO<Boolean> isAvailable(PingDTO pingDTO) {
+        //TODO implement
+        return null;
+    }
+
+    //TODO добавить поддержку всех остальных функций
 }

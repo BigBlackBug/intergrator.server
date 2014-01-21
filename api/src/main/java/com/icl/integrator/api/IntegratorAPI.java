@@ -14,14 +14,18 @@ import java.util.Map;
  * Time: 11:26
  * To change this template use File | Settings | File Templates.
  */
-public interface CleanAPI {
+public interface IntegratorAPI {
 
-    public void process(SourceDataDTO packet);
+    public void deliver(SourceDataDTO packet);
 
-    public Map<String, String> ping();
+    public Boolean ping();
 
-    public ResponseFromTargetDTO<Map> registerTarget(
+    public ResponseFromTargetDTO<Map> registerService(
             TargetRegistrationDTO registrationDTO);
 
     public ResponseFromTargetDTO<Boolean> isAvailable(PingDTO pingDTO);
+
+//    public List<String> getServiceList();
+//
+//    public void getSupportedActions()  ;
 }

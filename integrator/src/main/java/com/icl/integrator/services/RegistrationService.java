@@ -18,12 +18,12 @@ import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +103,7 @@ public class RegistrationService {
                 createJmsEntity(descriptor, serviceName);
         try {
             serviceEntity = persistenceService.saveService(serviceEntity);
-        } catch (PersistenceException ex) {
+        } catch (DataAccessException ex) {
             logger.error("GG", ex);
             throw new TargetRegistrationException("Ошибка регистрации", ex);
         }
@@ -114,7 +114,7 @@ public class RegistrationService {
                 serviceEntity.addAction(action);
                 persistenceService.saveAction(action);
                 responseDTO = new ResponseFromTargetDTO<>(true);
-            } catch (PersistenceException ex) {
+            } catch (DataAccessException ex) {
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setErrorMessage("Ошибка регистрации");
                 errorDTO.setDeveloperMessage(ex.getMessage());
@@ -139,7 +139,7 @@ public class RegistrationService {
                 createHttpEntity(descriptor, serviceName);
         try {
             serviceEntity = persistenceService.saveService(serviceEntity);
-        } catch (PersistenceException ex) {
+        } catch (DataAccessException ex) {
             logger.error("GG", ex);
             throw new TargetRegistrationException("Ошибка регистрации", ex);
         }
@@ -150,7 +150,7 @@ public class RegistrationService {
                 serviceEntity.addAction(action);
                 persistenceService.saveAction(action);
                 responseDTO = new ResponseFromTargetDTO<>(true);
-            } catch (PersistenceException ex) {
+            } catch (DataAccessException ex) {
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setErrorMessage("Ошибка регистрации");
                 errorDTO.setDeveloperMessage(ex.getMessage());

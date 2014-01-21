@@ -22,24 +22,24 @@ import java.util.Map;
 @RequestMapping(value = "/integrator/",
                 consumes = MediaType.APPLICATION_JSON_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE)
-public interface IntegratorHttpAPI extends CleanAPI {
+public interface IntegratorHttpAPI extends IntegratorAPI {
 
     @Override
-    @RequestMapping(value = "process", method = RequestMethod.POST)
-    public void process(@RequestBody(required = true) SourceDataDTO packet);
+    @RequestMapping(value = "deliver", method = RequestMethod.POST)
+    public void deliver(@RequestBody(required = true) SourceDataDTO packet);
 
     @Override
     @RequestMapping(value = "ping", method = RequestMethod.GET)
     public
     @ResponseBody
-    Map<String, String> ping();
+    Boolean ping();
 
     @Override
-    @RequestMapping(value = "registerTarget", method = RequestMethod.POST)
+    @RequestMapping(value = "registerService", method = RequestMethod.POST)
     public
     @ResponseBody
-    ResponseFromTargetDTO<Map> registerTarget(@RequestBody(required = true)
-                                              TargetRegistrationDTO registrationDTO);
+    ResponseFromTargetDTO<Map> registerService(@RequestBody(required = true)
+                                               TargetRegistrationDTO registrationDTO);
 
     @Override
     @RequestMapping(value = "checkAvailability", method = RequestMethod.POST)

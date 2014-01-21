@@ -26,7 +26,7 @@ public class HttpAction {
 
     @Id
     @Type(type = "com.icl.integrator.model.OracleGuidType")
-    @Column(name = "ACTION_MAP_ID")
+    @Column(name = "ACTION_ID")
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid2")
     private UUID id;

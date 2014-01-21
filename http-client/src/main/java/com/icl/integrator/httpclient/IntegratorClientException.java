@@ -1,4 +1,4 @@
-package com.icl.integrator;
+package com.icl.integrator.httpclient;
 
 /**
  * Created with IntelliJ IDEA.

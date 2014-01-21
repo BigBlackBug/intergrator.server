@@ -14,8 +14,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -40,30 +40,22 @@ public class MainController implements IntegratorHttpAPI {
     private PacketProcessorFactory processorFactory;
 
     @Override
-    public void process(SourceDataDTO packet) {
-//        logger.info(MessageFormat.format("Received a request from source " +
-//                                                 "({0}:{1,number,#})",
-//                                         request.getRemoteHost(),
-//                                         request.getRemotePort()));
+    public void deliver(@RequestBody(required = true) SourceDataDTO packet) {
+        logger.info("Received a delivery request");
         PacketProcessor processor = processorFactory.createProcessor();
         processor.process(packet);
     }
 
     @Override
-    public Map<String, String> ping() {
-        return new HashMap<String, String>() {{
-            put("result", "true");
-        }};
+    public Boolean ping() {
+        return true;
     }
 
     @Override
     public ResponseFromTargetDTO<Map>
-    registerTarget(TargetRegistrationDTO registrationDTO) {
-//        logger.info(MessageFormat.format("Received a registration request " +
-//                                                 "from source " +
-//                                                 "({0}:{1,number,#})",
-//                                         request.getRemoteHost(),
-//                                         request.getRemotePort()));
+    registerService(@RequestBody(required = true)
+                    TargetRegistrationDTO registrationDTO) {
+        logger.info("Received a service registration request");
         ResponseFromTargetDTO<Map> response;
         try {
             Map result = registrationService.register(registrationDTO);
@@ -75,12 +67,9 @@ public class MainController implements IntegratorHttpAPI {
     }
 
     @Override
-    public ResponseFromTargetDTO<Boolean> isAvailable(PingDTO pingDTO) {
-//        logger.info(MessageFormat.format("Received a registration request " +
-//                                                 "from source " +
-//                                                 "({0}:{1,number,#})",
-//                                         request.getRemoteHost(),
-//                                         request.getRemotePort()));
+    public ResponseFromTargetDTO<Boolean> isAvailable(
+            @RequestBody(required = true) PingDTO pingDTO) {
+        logger.info("Received a ping request for " + pingDTO);
         EndpointConnector connector = connectorFactory
                 .createEndpointConnector(
                         new DestinationDTO(pingDTO.getServiceName(),

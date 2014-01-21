@@ -36,7 +36,7 @@ public class HttpServiceEndpoint {
 
     @Id
     @Type(type = "com.icl.integrator.model.OracleGuidType")
-    @Column(name = "ADDR_MAP_ID")
+    @Column(name = "ENDPOINT_ID")
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid2")
     private UUID id;

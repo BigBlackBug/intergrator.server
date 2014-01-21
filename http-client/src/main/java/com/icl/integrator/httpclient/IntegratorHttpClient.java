@@ -1,4 +1,4 @@
-package com.icl.integrator;
+package com.icl.integrator.httpclient;
 
 import com.icl.integrator.api.IntegratorHttpAPI;
 import com.icl.integrator.dto.PingDTO;
@@ -31,17 +31,32 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
 
     private final int port;
 
-    public IntegratorHttpClient(String host, int port) {
-        this.path = getClass().getInterfaces()[0]
-                .getAnnotation(RequestMapping.class).value()[0];
+    public IntegratorHttpClient(String host, String deployPath, int port) {
+        this.path = createControllerPath(deployPath);
         this.host = host;
         this.port = port;
     }
 
+    public IntegratorHttpClient(String host, int port) {
+        this(host, "", port);
+    }
+
+    private String createControllerPath(String deployPath) {
+        String controllerPath = getClass().getInterfaces()[0]
+                .getAnnotation(RequestMapping.class).value()[0];
+        StringBuilder sb = new StringBuilder();
+
+        if (!deployPath.isEmpty() && !deployPath.startsWith("/")) {
+            sb.append("/");
+        }
+        sb.append(deployPath).append(controllerPath);
+        return sb.toString();
+    }
+
     @Override
-    public void process(SourceDataDTO packet) {
+    public void deliver(SourceDataDTO packet) {
         HttpMethodDescriptor methodPair = getMethodPath(
-                "process", SourceDataDTO.class);
+                "deliver", SourceDataDTO.class);
         try {
             sendRequest(packet, Void.class, methodPair);
         } catch (MalformedURLException e) {
@@ -50,21 +65,21 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public Map<String, String> ping() {
+    public Boolean ping() {
         HttpMethodDescriptor methodPair = getMethodPath("ping");
         try {
-            return (Map<String, String>) sendRequest(
-                    null, Map.class, methodPair);
+            return sendRequest(null, Boolean.class, methodPair);
         } catch (MalformedURLException e) {
             throw new IntegratorClientException(e);
         }
     }
 
     @Override
-    public ResponseFromTargetDTO<Map> registerTarget(
+    @SuppressWarnings("unchecked")
+    public ResponseFromTargetDTO<Map> registerService(
             TargetRegistrationDTO registrationDTO) {
         HttpMethodDescriptor methodPair = getMethodPath(
-                "registerTarget", TargetRegistrationDTO.class);
+                "registerService", TargetRegistrationDTO.class);
         try {
             return (ResponseFromTargetDTO<Map>)
                     sendRequest(registrationDTO, ResponseFromTargetDTO.class,
@@ -75,9 +90,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public ResponseFromTargetDTO<Boolean> isAvailable(PingDTO pingDTO) {
         HttpMethodDescriptor methodPair = getMethodPath(
-                "registerTarget", TargetRegistrationDTO.class);
+                "isAvailable", PingDTO.class);
         try {
             return (ResponseFromTargetDTO<Boolean>)
                     sendRequest(pingDTO, ResponseFromTargetDTO.class,
@@ -118,7 +134,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
             return restTemplate.postForObject(urlString, data,
                                               responseClass);
         } else {
-            throw new NotImplementedException();
+            throw new MethodNotSupportedException();
         }
     }
 
