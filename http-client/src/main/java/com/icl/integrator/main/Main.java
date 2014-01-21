@@ -33,8 +33,7 @@ public class Main {
 //        process(httpClient);
     }
 
-
-    public static void getServiceList(IntegratorHttpClient httpClient){
+    public static void getServiceList(IntegratorHttpClient httpClient) {
         ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
         System.out.println(serviceList);
     }
@@ -52,9 +51,10 @@ public class Main {
     public static void process(IntegratorHttpClient httpClient) {
         DeliveryDTO deliveryDTO = new DeliveryDTO();
         deliveryDTO.setAction("ACTION");
-        deliveryDTO.setData(new HashMap<String, Object>() {{
-            put("a", "b");
-        }});
+        deliveryDTO.setData(new RequestDataDTO(
+            new HashMap<String, Object>() {{
+                put("a", "b");
+            }}));
         DestinationDTO destination = new DestinationDTO(
                 "NEW_SERVICE", EndpointType.HTTP);
         deliveryDTO.setDestinations(Arrays.asList(destination));

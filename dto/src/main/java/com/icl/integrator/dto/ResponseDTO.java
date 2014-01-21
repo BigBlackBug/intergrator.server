@@ -21,12 +21,12 @@ public class ResponseDTO<T> {
     //TODO разобраться, а нужен ли нам вообще responseClass
     public ResponseDTO(T response, Class<T> responseClass) {
         this(true);
-        this.response = new SuccessDTO<T>(responseClass, response);
+        this.response = new SuccessDTO<>(responseClass, response);
     }
 
     public ResponseDTO(T response) {
         this(true);
-        this.response = new SuccessDTO<T>(response);
+        this.response = new SuccessDTO<>(response);
     }
 
     public ResponseDTO(boolean success) {
@@ -35,7 +35,6 @@ public class ResponseDTO<T> {
 
     public ResponseDTO(ErrorDTO error) {
         this(false);
-
         this.error = error;
     }
 

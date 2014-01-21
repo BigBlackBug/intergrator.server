@@ -1,7 +1,6 @@
 package com.icl.integrator.dto;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,10 +17,7 @@ public class DeliveryDTO {
 
     private String action;
 
-    //TODO use request data instead
-    private Map<String, Object> data;
-
-    private Map<String, Object> additionalData;
+    private RequestDataDTO data;
 
     public DeliveryDTO(SourceServiceDTO sourceService, String action,
                        List<DestinationDTO> destinations) {
@@ -47,17 +43,14 @@ public class DeliveryDTO {
         if (!action.equals(that.action)) {
             return false;
         }
-        if (additionalData != null ? !additionalData
-                .equals(that.additionalData) : that.additionalData != null) {
-            return false;
-        }
         if (!data.equals(that.data)) {
             return false;
         }
         if (!destinations.equals(that.destinations)) {
             return false;
         }
-        if (!sourceService.equals(that.sourceService)) {
+        if (sourceService != null ? !sourceService
+                .equals(that.sourceService) : that.sourceService != null) {
             return false;
         }
 
@@ -66,12 +59,10 @@ public class DeliveryDTO {
 
     @Override
     public int hashCode() {
-        int result = sourceService.hashCode();
+        int result = sourceService != null ? sourceService.hashCode() : 0;
         result = 31 * result + destinations.hashCode();
         result = 31 * result + action.hashCode();
         result = 31 * result + data.hashCode();
-        result = 31 * result + (additionalData != null ? additionalData
-                .hashCode() : 0);
         return result;
     }
 
@@ -99,19 +90,11 @@ public class DeliveryDTO {
         this.action = action;
     }
 
-    public Map<String, Object> getData() {
+    public RequestDataDTO getData() {
         return data;
     }
 
-    public void setData(Map<String, Object> data) {
+    public void setData(RequestDataDTO data) {
         this.data = data;
-    }
-
-    public Map<String, Object> getAdditionalData() {
-        return additionalData;
-    }
-
-    public void setAdditionalData(Map<String, Object> additionalData) {
-        this.additionalData = additionalData;
     }
 }

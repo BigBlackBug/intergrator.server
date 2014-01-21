@@ -73,11 +73,8 @@ public class DeliveryService {
                 factory.createEndpointConnector(destination,
                                                 packet.getAction());
         //---
-        RequestDataDTO dto = new RequestDataDTO();
-        dto.setAdditionalData(packet.getAdditionalData());
-        dto.setData(packet.getData());
         DeliveryCallable<RequestDataDTO> deliveryCallable =
-                new DeliveryCallable<>(destinationConnector, dto);
+                new DeliveryCallable<>(destinationConnector, packet.getData());
         SourceServiceDTO sourceService = packet.getSourceService();
         if (sourceService != null) {
             //TODO targetResponse may be null
@@ -125,11 +122,8 @@ public class DeliveryService {
             UUID requestID) {
         DatabaseRetryHandler handler =
                 databaseRetryHandlerFactory.createHandler();
-        RequestDataDTO request = new RequestDataDTO();
-        request.setData(packet.getData());
-        request.setAdditionalData(packet.getAdditionalData());
         TaskLogEntry logEntry =
-                createTaskLogEntry(request, destinationDTO, requestID);
+                createTaskLogEntry(packet.getData(), destinationDTO, requestID);
         handler.setLogEntry(logEntry);
         return handler;
     }

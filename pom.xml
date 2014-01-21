@@ -12,6 +12,7 @@
         <module>integrator</module>
         <module>http-client</module>
         <module>api</module>
+        <module>spring-api</module>
     </modules>
 
     <properties>

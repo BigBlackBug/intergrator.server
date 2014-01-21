@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.icl.integrator</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>spring-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!--<dependency>-->

@@ -1,9 +1,9 @@
 package com.icl.integrator;
 
-import com.icl.integrator.api.IntegratorHttpAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.*;
+import com.icl.integrator.springapi.IntegratorHttpAPI;
 import com.icl.integrator.util.connectors.ConnectionException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;

@@ -1,5 +1,6 @@
-package com.icl.integrator.api;
+package com.icl.integrator.springapi;
 
+import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.DeliveryDTO;
 import com.icl.integrator.dto.PingDTO;
 import com.icl.integrator.dto.ResponseDTO;

@@ -29,8 +29,7 @@ public interface IntegratorAPI {
 
     public ResponseDTO<List<ServiceDTO>> getServiceList();
 
-    public ResponseDTO<List<String>> getSupportedActions(
-            ServiceDTO serviceDTO);
+    public ResponseDTO<List<String>> getSupportedActions(ServiceDTO serviceDTO);
 
     //TODO add action to service
 

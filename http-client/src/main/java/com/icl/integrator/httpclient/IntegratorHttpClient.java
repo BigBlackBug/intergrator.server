@@ -1,11 +1,11 @@
 package com.icl.integrator.httpclient;
 
-import com.icl.integrator.api.IntegratorHttpAPI;
 import com.icl.integrator.dto.DeliveryDTO;
 import com.icl.integrator.dto.PingDTO;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -175,13 +175,13 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         String urlString = url.toString();
         HttpEntity<Request> requestEntity = new HttpEntity<>(data);
         if (methodType.equals(RequestMethod.GET)) {
-            return restTemplate.exchange(urlString, HttpMethod.GET,
-                                         requestEntity,
-                                         responseClass).getBody();
+            return restTemplate.
+                    exchange(urlString, HttpMethod.GET,
+                             requestEntity, responseClass).getBody();
         } else if (methodType.equals(RequestMethod.POST)) {
-            return restTemplate.exchange(urlString, HttpMethod.POST,
-                                         requestEntity,
-                                         responseClass).getBody();
+            return restTemplate.
+                    exchange(urlString, HttpMethod.POST,
+                             requestEntity, responseClass).getBody();
         } else {
             throw new MethodNotSupportedException();
         }
