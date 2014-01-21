@@ -19,6 +19,16 @@ public class QueueDTO implements ActionDescriptor {
 
     }
 
+    public QueueDTO(String queueName, String username, String password) {
+        this.queueName = queueName;
+        this.username = username;
+        this.password = password;
+    }
+
+    public QueueDTO(String queueName) {
+        this.queueName = queueName;
+    }
+
     public String getPassword() {
         return password;
     }

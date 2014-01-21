@@ -36,10 +36,12 @@ public class SuccessDTO<T> {
 
         SuccessDTO that = (SuccessDTO) o;
 
-        if (!responseClass.equals(that.responseClass)) {
+        if (responseClass != null ? !responseClass
+                .equals(that.responseClass) : that.responseClass != null) {
             return false;
         }
-        if (!responseValue.equals(that.responseValue)) {
+        if (responseValue != null ? !responseValue
+                .equals(that.responseValue) : that.responseValue != null) {
             return false;
         }
 
@@ -48,8 +50,9 @@ public class SuccessDTO<T> {
 
     @Override
     public int hashCode() {
-        int result = responseClass.hashCode();
-        result = 31 * result + responseValue.hashCode();
+        int result = responseClass != null ? responseClass.hashCode() : 0;
+        result = 31 * result + (responseValue != null ? responseValue
+                .hashCode() : 0);
         return result;
     }
 

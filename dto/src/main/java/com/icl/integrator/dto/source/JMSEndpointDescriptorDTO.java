@@ -18,6 +18,12 @@ public class JMSEndpointDescriptorDTO implements EndpointDescriptor {
     public JMSEndpointDescriptorDTO() {
     }
 
+    public JMSEndpointDescriptorDTO(String connectionFactory,
+                                    Map<String, String> jndiProperties) {
+        this.connectionFactory = connectionFactory;
+        this.jndiProperties = jndiProperties;
+    }
+
     public String getConnectionFactory() {
         return connectionFactory;
     }

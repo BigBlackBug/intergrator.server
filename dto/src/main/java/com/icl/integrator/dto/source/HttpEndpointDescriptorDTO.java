@@ -16,6 +16,11 @@ public class HttpEndpointDescriptorDTO implements EndpointDescriptor {
     public HttpEndpointDescriptorDTO() {
     }
 
+    public HttpEndpointDescriptorDTO(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
     public String getHost() {
         return host;
     }

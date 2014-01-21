@@ -25,12 +25,13 @@ public class Main {
     public static void main(String args[]) {
         IntegratorHttpClient httpClient = new IntegratorHttpClient
                 ("localhost", 8080);
-        getServiceList(httpClient);
+//        getServiceList(httpClient);
+//
 //        register(httpClient);
 //
 //        ping(httpClient);
-//
-//        process(httpClient);
+
+        process(httpClient);
     }
 
     public static void getServiceList(IntegratorHttpClient httpClient) {
@@ -50,11 +51,21 @@ public class Main {
 
     public static void process(IntegratorHttpClient httpClient) {
         DeliveryDTO deliveryDTO = new DeliveryDTO();
+        SourceServiceDTO sourceServiceDTO = new SourceServiceDTO();
+        HttpEndpointDescriptorDTO desr = new
+                HttpEndpointDescriptorDTO("192.168.84.142", 8080);
+        sourceServiceDTO
+                .setEndpoint(new EndpointDTO<>(EndpointType.HTTP, desr));
+        sourceServiceDTO.setSourceResponseAction(
+                new HttpActionDTO("/api/accept_source_response"));
+        sourceServiceDTO.setTargetResponseAction(new HttpActionDTO
+                                                         ("/api/accept_target_response"));
+        deliveryDTO.setSourceService(sourceServiceDTO);
         deliveryDTO.setAction("ACTION");
         deliveryDTO.setData(new RequestDataDTO(
-            new HashMap<String, Object>() {{
-                put("a", "b");
-            }}));
+                new HashMap<String, Object>() {{
+                    put("a", "b");
+                }}));
         DestinationDTO destination = new DestinationDTO(
                 "NEW_SERVICE", EndpointType.HTTP);
         deliveryDTO.setDestinations(Arrays.asList(destination));
