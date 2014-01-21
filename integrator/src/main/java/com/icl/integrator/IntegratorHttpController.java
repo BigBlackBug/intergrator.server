@@ -100,4 +100,18 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         return response;
     }
 
+    @Override
+    public ResponseDTO<List<String>> getSupportedActions(
+            @RequestBody(required = true) ServiceDTO serviceDTO) {
+        ResponseDTO<List<String>> response;
+        try {
+            List<String> actions =
+                    integratorService.getSupportedActions(serviceDTO);
+            response = new ResponseDTO<>(actions);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
+        return response;
+    }
+
 }

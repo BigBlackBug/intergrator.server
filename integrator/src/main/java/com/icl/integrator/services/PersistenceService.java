@@ -76,4 +76,20 @@ public class PersistenceService {
         return em.createQuery("select ep from JMSServiceEndpoint ep",
                               JMSServiceEndpoint.class).getResultList();
     }
+
+    @Transactional
+    public List<String> getHttpActions(String serviceName) {
+        String query = "select action.actionName from HttpServiceEndpoint ep join " +
+                "ep.httpActions action where ep.serviceName=:serviceName";
+        return em.createQuery(query, String.class).
+                setParameter("serviceName", serviceName).getResultList();
+    }
+
+    @Transactional
+    public List<String> getJmsActions(String serviceName) {
+        String query = "select action.actionName from JMSServiceEndpoint ep join " +
+                "ep.jmsActions action where ep.serviceName=:serviceName";
+        return em.createQuery(query, String.class).
+                setParameter("serviceName", serviceName).getResultList();
+    }
 }

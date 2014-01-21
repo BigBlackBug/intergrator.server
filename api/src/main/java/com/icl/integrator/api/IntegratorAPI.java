@@ -1,8 +1,8 @@
 package com.icl.integrator.api;
 
+import com.icl.integrator.dto.DeliveryDTO;
 import com.icl.integrator.dto.PingDTO;
 import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.DeliveryDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 
@@ -28,9 +28,9 @@ public interface IntegratorAPI {
     public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO);
 
     public ResponseDTO<List<ServiceDTO>> getServiceList();
-//
-//    public void getSupportedActions(String serviceName,
-// EndpointType endpointType)  ;//GET again
+
+    public ResponseDTO<List<String>> getSupportedActions(
+            ServiceDTO serviceDTO);
 
     //TODO add action to service
 

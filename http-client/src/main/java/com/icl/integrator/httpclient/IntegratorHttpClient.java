@@ -92,8 +92,9 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "registerService", TargetRegistrationDTO.class);
         ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<Void>>>>
-                type = new ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<Void>>>>() {
-        };
+                type =
+                new ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<Void>>>>() {
+                };
         try {
             return sendRequest(registrationDTO, type, methodPair);
         } catch (MalformedURLException e) {
@@ -126,6 +127,21 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
                     new ParameterizedTypeReference<ResponseDTO<List<ServiceDTO>>>() {
                     };
             return sendRequest(null, type, methodPair);
+        } catch (MalformedURLException e) {
+            throw new IntegratorClientException(e);
+        }
+    }
+
+    @Override
+    public ResponseDTO<List<String>> getSupportedActions(
+            ServiceDTO serviceDTO) {
+        HttpMethodDescriptor methodPair = getMethodPath("getSupportedList");
+        try {
+            ParameterizedTypeReference<ResponseDTO<List<String>>>
+                    type =
+                    new ParameterizedTypeReference<ResponseDTO<List<String>>>() {
+                    };
+            return sendRequest(serviceDTO, type, methodPair);
         } catch (MalformedURLException e) {
             throw new IntegratorClientException(e);
         }

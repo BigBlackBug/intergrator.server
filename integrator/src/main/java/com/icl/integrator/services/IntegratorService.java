@@ -23,6 +23,24 @@ public class IntegratorService {
     @Autowired
     private PersistenceService persistenceService;
 
+    public List<String> getSupportedActions(ServiceDTO serviceDTO) {
+        EndpointType endpointType = serviceDTO.getEndpointType();
+        switch (endpointType) {
+            case HTTP: {
+                return persistenceService.getHttpActions(
+                        serviceDTO.getServiceName());
+            }
+            case JMS: {
+                return persistenceService.getJmsActions(
+                        serviceDTO.getServiceName());
+            }
+            default: {
+                return null;
+            }
+        }
+
+    }
+
     public List<ServiceDTO> getServiceList() {
         List<ServiceDTO> result = new ArrayList<>();
         List<HttpServiceEndpoint> httpServices =

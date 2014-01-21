@@ -56,4 +56,11 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public
     @ResponseBody
     ResponseDTO<List<ServiceDTO>> getServiceList();
+
+    @Override
+    @RequestMapping(value = "getSupportedActions", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    ResponseDTO<List<String>> getSupportedActions(
+            @RequestBody(required = true) ServiceDTO serviceDTO);
 }

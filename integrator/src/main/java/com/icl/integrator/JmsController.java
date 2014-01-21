@@ -101,5 +101,12 @@ public class JmsController implements MessageListener,IntegratorAPI {
         return null;
     }
 
+    @Override
+    public ResponseDTO<List<String>> getSupportedActions(
+            ServiceDTO serviceDTO) {
+        //TODO implement
+        return null;
+    }
+
     //TODO добавить поддержку всех остальных функций
 }
