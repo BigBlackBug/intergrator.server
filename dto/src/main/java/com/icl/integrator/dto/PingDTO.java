@@ -14,8 +14,8 @@ public class PingDTO {
 
     }
 
-    public PingDTO(String serviceName, EndpointType endpointType,
-                   String action) {
+    public PingDTO(String serviceName, String action,
+                   EndpointType endpointType) {
         this.action = action;
         this.serviceName = serviceName;
         this.endpointType = endpointType;

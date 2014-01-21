@@ -18,6 +18,16 @@ public class RequestToTargetDTO {
     public RequestToTargetDTO() {
     }
 
+    public RequestToTargetDTO(Map<String, Object> data) {
+        this.data = data;
+    }
+
+    public RequestToTargetDTO(Map<String, Object> data,
+                              Map<String, Object> additionalData) {
+        this.data = data;
+        this.additionalData = additionalData;
+    }
+
     public Map<String, Object> getData() {
         return data;
     }

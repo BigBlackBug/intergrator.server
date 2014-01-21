@@ -22,6 +22,13 @@ public class SourceDataDTO {
 
     private Map<String, Object> additionalData;
 
+    public SourceDataDTO(ServiceDTO source, String action,
+                         List<DestinationDTO> destinations) {
+        this.source = source;
+        this.action = action;
+        this.destinations = destinations;
+    }
+
     public SourceDataDTO() {
     }
 

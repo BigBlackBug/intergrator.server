@@ -24,6 +24,14 @@ public class DestinationDTO {
         this.endpointType = endpointType;
     }
 
+    public DestinationDTO(String serviceName,
+                          EndpointType endpointType,
+                          boolean scheduleRedelivery) {
+        this.serviceName = serviceName;
+        this.endpointType = endpointType;
+        this.scheduleRedelivery = scheduleRedelivery;
+    }
+
     public DestinationDTO() {
         this.scheduleRedelivery = false;
     }

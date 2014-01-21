@@ -13,14 +13,20 @@ public class ServiceDTO {
 
     private EndpointDTO endpoint;
 
-//    private ActionDescriptor actionDescriptor;
-
     private ActionDescriptor sourceResponseAction;
 
     private ActionDescriptor targetResponseAction;
 
     public ServiceDTO() {
 
+    }
+
+    public ServiceDTO(EndpointDTO endpoint,
+                      ActionDescriptor sourceResponseAction,
+                      ActionDescriptor targetResponseAction) {
+        this.endpoint = endpoint;
+        this.sourceResponseAction = sourceResponseAction;
+        this.targetResponseAction = targetResponseAction;
     }
 
     public ActionDescriptor getSourceResponseAction() {

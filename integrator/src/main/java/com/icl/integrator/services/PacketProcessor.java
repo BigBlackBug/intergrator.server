@@ -40,6 +40,7 @@ public class PacketProcessor {
             serviceToRequestID.put(destination.getServiceName(), response);
         }
         ServiceDTO sourceService = packet.getSource();
+        //TODO добавить лок, чтоб сначала выполнялся этот запрос
         if (sourceService != null) {
             deliveryService.deliver(sourceService, serviceToRequestID);
         }

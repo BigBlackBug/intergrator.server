@@ -28,4 +28,6 @@ public interface IntegratorAPI {
 //    public List<String> getServiceList();
 //
 //    public void getSupportedActions()  ;
+
+    //TODO add action to service
 }

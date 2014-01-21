@@ -55,7 +55,7 @@ public class DeliveryService {
         logger.info("Scheduling a request back to service " +
                             "defined as source -> " +
                             sourceService.getSourceResponseAction());
-
+        //TODO sourceResponse may be null
         EndpointConnector sourceConnector = factory.createEndpointConnector
                 (sourceService.getEndpoint(),
                  sourceService.getSourceResponseAction());
@@ -80,6 +80,7 @@ public class DeliveryService {
                 new DeliveryCallable<>(destinationConnector, dto);
         ServiceDTO sourceService = packet.getSource();
         if (sourceService != null) {
+            //TODO targetResponse may be null
             EndpointDTO endpoint = sourceService.getEndpoint();
             EndpointConnector sourceConnector = factory
                     .createEndpointConnector(endpoint,

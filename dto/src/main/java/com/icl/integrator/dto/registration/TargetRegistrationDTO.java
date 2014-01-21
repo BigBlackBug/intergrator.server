@@ -23,6 +23,14 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
     public TargetRegistrationDTO() {
     }
 
+    public TargetRegistrationDTO(String serviceName,
+                                 EndpointDTO endpoint,
+                                 List<ActionEndpointDTO<T>> actions) {
+        this.serviceName = serviceName;
+        this.endpoint = endpoint;
+        this.actions = actions;
+    }
+
     public EndpointType getEndpointType() {
         return endpoint.getEndpointType();
     }
