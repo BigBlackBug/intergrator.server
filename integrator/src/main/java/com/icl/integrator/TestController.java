@@ -32,7 +32,7 @@ public class TestController
     @Override
     @RequestMapping(value = "accept_source_response",
                     method = RequestMethod.POST)
-    public void acceptSourceResponse(
+    public void handleResponseFromIntegrator(
             @RequestBody ResponseFromIntegratorDTO responseDTO) {
         logger.info("received source response from integrator from " +
                             responseDTO);
@@ -41,7 +41,7 @@ public class TestController
     @RequestMapping(value = "accept_target_response",
                     method = RequestMethod.POST)
     @Override
-    public void acceptTargetResponse(
+    public void handleResponseFromTarget(
             @RequestBody ResponseFromTargetDTO responseDTO) {
         logger.info("received target response from integrator from " +
                             responseDTO.getServiceName());
@@ -50,7 +50,7 @@ public class TestController
     //TODO maybe needs response body here
     @RequestMapping(value = "destination", method = RequestMethod.POST)
     @Override
-    public ResponseDTO acceptRequest(
+    public ResponseDTO handleRequest(
             @RequestBody RequestDataDTO requestDataDTO) {
         logger.info("destination received a request from " +
                             "integrator " + requestDataDTO);

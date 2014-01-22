@@ -16,9 +16,10 @@ public interface SourceSpringService extends SourceService {
 
     @Override
     public void
-    acceptSourceResponse(@RequestBody ResponseFromIntegratorDTO responseDTO);
+    handleResponseFromIntegrator(
+            @RequestBody ResponseFromIntegratorDTO responseDTO);
 
     @Override
-    public void acceptTargetResponse(@RequestBody ResponseFromTargetDTO
-                                             responseDTO);
+    public void handleResponseFromTarget(@RequestBody ResponseFromTargetDTO
+                                                 responseDTO);
 }

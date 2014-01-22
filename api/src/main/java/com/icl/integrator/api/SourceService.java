@@ -12,8 +12,9 @@ import com.icl.integrator.dto.ResponseFromTargetDTO;
  */
 public interface SourceService {
 
-    public void acceptSourceResponse(ResponseFromIntegratorDTO responseDTO);
+    public void handleResponseFromIntegrator(ResponseFromIntegratorDTO
+                                                     responseDTO);
 
-    public void acceptTargetResponse(ResponseFromTargetDTO responseDTO);
+    public void handleResponseFromTarget(ResponseFromTargetDTO responseDTO);
 
 }

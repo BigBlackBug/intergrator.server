@@ -183,6 +183,6 @@
     <!-- listener container definition using the jms namespace, concurrency is the max number of concurrent listeners that can be started -->
     <jms:listener-container concurrency="10">
         <jms:listener id="QueueListener" destination="IntegratorQueue"
-                      ref="jmsController"/>
+                      ref="integratorJmsController"/>
     </jms:listener-container>
 </beans>

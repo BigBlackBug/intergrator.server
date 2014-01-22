@@ -19,5 +19,5 @@ public interface TargetSpringService<T> extends TargetService<T> {
     public
     @ResponseBody
     ResponseDTO<T>
-    acceptRequest(@RequestBody RequestDataDTO requestDataDTO);
+    handleRequest(@RequestBody RequestDataDTO requestDataDTO);
 }

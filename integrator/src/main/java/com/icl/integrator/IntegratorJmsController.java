@@ -1,9 +1,9 @@
 package com.icl.integrator;
 
 import com.icl.integrator.api.IntegratorAPI;
+import com.icl.integrator.dto.DeliveryDTO;
 import com.icl.integrator.dto.PingDTO;
 import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.DeliveryDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.PacketProcessor;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class JmsController implements MessageListener,IntegratorAPI {
+public class IntegratorJmsController implements MessageListener, IntegratorAPI {
 
     private final static Log logger = LogFactory.getLog(
             DatabaseRetryLimitHandler.class);
