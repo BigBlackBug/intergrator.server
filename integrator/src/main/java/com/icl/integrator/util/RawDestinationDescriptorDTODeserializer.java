@@ -21,7 +21,7 @@ public final class RawDestinationDescriptorDTODeserializer extends
                                                    DeserializationContext ctx)
             throws IOException {
         ObjectNode treeNode = jp.readValueAsTree();
-        MyObjectMapper mapper = new MyObjectMapper();
+        IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         EndpointDTO endpointDTO = mapper.readValue
                 (treeNode.get("endpoint").toString(), EndpointDTO.class);
 

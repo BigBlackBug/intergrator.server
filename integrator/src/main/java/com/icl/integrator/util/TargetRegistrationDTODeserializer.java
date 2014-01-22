@@ -29,7 +29,7 @@ public class TargetRegistrationDTODeserializer extends
     public TargetRegistrationDTO deserialize(
             JsonParser jp, DeserializationContext ctxt) throws IOException {
         ObjectNode treeNode = jp.readValueAsTree();
-        MyObjectMapper mapper = new MyObjectMapper();
+        IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         TargetRegistrationDTO dto = new TargetRegistrationDTO();
         dto.setServiceName(treeNode.get("serviceName").asText());
         EndpointDTO endpoint =
@@ -50,22 +50,13 @@ public class TargetRegistrationDTODeserializer extends
     private <T extends ActionDescriptor>
     List<ActionEndpointDTO<T>> getActions(
             JsonNode actions, EndpointType endpointType) throws IOException {
-        MyObjectMapper mapper = new MyObjectMapper();
+        IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         List<ActionEndpointDTO<T>> result = new ArrayList<>();
         int size = actions.size();
         for (int i = 0; i < size; i++) {
             JsonNode node = actions.get(i);
-
-            String actionName = node.get("actionName").asText();
-            boolean forceRegister = node.get("forceRegister").asBoolean();
-            ActionDescriptor actionDescriptor = mapper.parseActionDescriptor(
-                    node.get("actionDescriptor"),
-                    endpointType);
-            ActionEndpointDTO actionEndpoint = new
-                    ActionEndpointDTO<>();
-            actionEndpoint.setActionDescriptor(actionDescriptor);
-            actionEndpoint.setActionName(actionName);
-            actionEndpoint.setForceRegister(forceRegister);
+            ActionEndpointDTO<T> actionEndpoint =
+                    mapper.parseActionEndpoint(node, endpointType);
             result.add(actionEndpoint);
         }
         return result;

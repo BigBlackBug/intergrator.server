@@ -2,6 +2,7 @@ package com.icl.integrator.springapi;
 
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,6 +68,11 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public
     @ResponseBody
     ResponseDTO<List<String>> getSupportedActions(
-            @RequestBody(
-                    required = true) ServiceDTOWithResponseHandler serviceDTO);
+            @RequestBody(required = true)
+            ServiceDTOWithResponseHandler serviceDTO);
+
+    @Override
+    @RequestMapping(value = "addAction", method = RequestMethod.POST)
+    @ResponseBody
+    ResponseDTO addAction(@RequestBody(required = true) AddActionDTO actionDTO);
 }

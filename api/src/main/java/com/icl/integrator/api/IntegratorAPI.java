@@ -1,6 +1,7 @@
 package com.icl.integrator.api;
 
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public interface IntegratorAPI {
     public ResponseDTO<List<String>> getSupportedActions(
             ServiceDTOWithResponseHandler serviceDTO);
 
+    public ResponseDTO addAction(AddActionDTO actionDTO);
     //TODO add action to service
 
     //TODO get service info?

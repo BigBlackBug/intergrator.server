@@ -1,11 +1,15 @@
 package com.icl.integrator.services;
 
 import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.model.HttpAction;
 import com.icl.integrator.model.HttpServiceEndpoint;
+import com.icl.integrator.model.JMSAction;
 import com.icl.integrator.model.JMSServiceEndpoint;
 import com.icl.integrator.util.EndpointType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +26,39 @@ public class IntegratorService {
 
     @Autowired
     private PersistenceService persistenceService;
+
+    @Transactional
+    public <T extends ActionDescriptor> void addAction(
+            AddActionDTO<T> actionDTO) {
+        ActionEndpointDTO<T> action = actionDTO.getAction();
+        ServiceDTO service = actionDTO.getService();
+        EndpointType endpointType = service.getEndpointType();
+
+        String actionName = action.getActionName();
+
+        if (endpointType == EndpointType.HTTP) {
+            HttpServiceEndpoint serviceEndpoint =
+                    persistenceService.getHttpService(service.getServiceName());
+            HttpActionDTO newActionDTO = (HttpActionDTO)
+                    action.getActionDescriptor();
+            HttpAction newAction = new HttpAction();
+            newAction.setActionName(actionName);
+            newAction.setActionURL(newActionDTO.getPath());
+            newAction.setHttpServiceEndpoint(serviceEndpoint);
+            serviceEndpoint.addAction(newAction);
+        } else if (endpointType == EndpointType.JMS) {
+            JMSServiceEndpoint serviceEndpoint =
+                    persistenceService.getJmsService(service.getServiceName());
+            QueueDTO queueDTO = (QueueDTO) action.getActionDescriptor();
+            JMSAction newAction = new JMSAction();
+            newAction.setActionName(actionName);
+            newAction.setPassword(queueDTO.getPassword());
+            newAction.setQueueName(queueDTO.getQueueName());
+            newAction.setUsername(queueDTO.getUsername());
+            newAction.setJmsServiceEndpoint(serviceEndpoint);
+            serviceEndpoint.addAction(newAction);
+        }
+    }
 
     public List<String> getSupportedActions(ServiceDTO serviceDTO) {
         EndpointType endpointType = serviceDTO.getEndpointType();

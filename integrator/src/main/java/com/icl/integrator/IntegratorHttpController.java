@@ -1,6 +1,7 @@
 package com.icl.integrator;
 
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.*;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
@@ -134,7 +135,8 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
     @Override
     public ResponseDTO<List<String>> getSupportedActions(
-            @RequestBody(required = true) ServiceDTOWithResponseHandler serviceDTO) {
+            @RequestBody(
+                    required = true) ServiceDTOWithResponseHandler serviceDTO) {
         ResponseDTO<List<String>> response;
         try {
             List<String> actions =
@@ -148,6 +150,19 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
                 serviceDTO.getIntegratorResponseHandler();
         if (responseHandler != null) {
             deliveryService.deliver(responseHandler, response);
+        }
+        return response;
+    }
+
+    @Override
+    public ResponseDTO addAction(
+            @RequestBody(required = true) AddActionDTO actionDTO) {
+        ResponseDTO response;
+        try {
+            integratorService.addAction(actionDTO);
+            response = new ResponseDTO(true);
+        } catch (Exception ex) {
+            response = new ResponseDTO(new ErrorDTO(ex));
         }
         return response;
     }

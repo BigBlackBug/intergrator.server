@@ -2,11 +2,12 @@ package com.icl.integrator;
 
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.PacketProcessor;
 import com.icl.integrator.services.PacketProcessorFactory;
 import com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler;
-import com.icl.integrator.util.MyObjectMapper;
+import com.icl.integrator.util.IntegratorObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class IntegratorJmsController implements MessageListener, IntegratorAPI {
             DatabaseRetryLimitHandler.class);
 
     @Autowired
-    private MyObjectMapper mapper = new MyObjectMapper();
+    private IntegratorObjectMapper mapper = new IntegratorObjectMapper();
 
     @Autowired
     private PacketProcessorFactory processorFactory;
@@ -105,6 +106,12 @@ public class IntegratorJmsController implements MessageListener, IntegratorAPI {
     @Override
     public ResponseDTO<List<String>> getSupportedActions(
             ServiceDTOWithResponseHandler serviceDTO) {
+        //TODO implement
+        return null;
+    }
+
+    @Override
+    public ResponseDTO addAction(AddActionDTO actionDTO) {
         //TODO implement
         return null;
     }

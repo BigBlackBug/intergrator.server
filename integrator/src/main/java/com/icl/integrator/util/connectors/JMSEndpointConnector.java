@@ -6,7 +6,7 @@ import com.icl.integrator.dto.registration.QueueDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.JMSAction;
 import com.icl.integrator.model.JMSServiceEndpoint;
-import com.icl.integrator.util.MyObjectMapper;
+import com.icl.integrator.util.IntegratorObjectMapper;
 
 import javax.jms.*;
 import javax.naming.Context;
@@ -29,7 +29,7 @@ public class JMSEndpointConnector implements EndpointConnector {
 
     private final QueueDTO queueDescriptor;
 
-    private ObjectMapper serializer = new MyObjectMapper();
+    private ObjectMapper serializer = new IntegratorObjectMapper();
 
     JMSEndpointConnector(JMSEndpointDescriptorDTO connectionData,
                          QueueDTO queueDescriptor) {

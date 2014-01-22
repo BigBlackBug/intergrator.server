@@ -21,7 +21,6 @@ public class ServiceDTO {
 
     public ServiceDTO(String serviceName,
                       EndpointType endpointType) {
-
         this.serviceName = serviceName;
         this.endpointType = endpointType;
     }

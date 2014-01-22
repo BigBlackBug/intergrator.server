@@ -77,10 +77,6 @@ public class HttpServiceEndpoint {
         this.serviceName = serviceName;
     }
 
-    public void addActionMaping(HttpAction httpAction) {
-        httpActions.add(httpAction);
-    }
-
     public void addAction(HttpAction action) {
         httpActions.add(action);
     }

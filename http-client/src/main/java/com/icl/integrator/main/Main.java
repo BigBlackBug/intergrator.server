@@ -1,9 +1,7 @@
 package com.icl.integrator.main;
 
 import com.icl.integrator.dto.*;
-import com.icl.integrator.dto.registration.ActionEndpointDTO;
-import com.icl.integrator.dto.registration.HttpActionDTO;
-import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.httpclient.IntegratorHttpClient;
 import com.icl.integrator.util.EndpointType;
@@ -29,6 +27,16 @@ public class Main {
         if (serviceList.isSuccess()) {
             List<ServiceDTO> response = serviceList.responseValue();
             for (ServiceDTO service : response) {
+
+                AddActionDTO<ActionDescriptor> actionDTO =
+                        new AddActionDTO<>();
+                actionDTO.setService(service);
+                actionDTO.setAction(new ActionEndpointDTO<ActionDescriptor>
+                                            ("LOL_ACTION",
+                                             new HttpActionDTO
+                                                     ("/LOL_ACTION_PATH")));
+                ResponseDTO responseDTO = httpClient.addAction(actionDTO);
+                System.out.println(responseDTO);
                 System.out.println(service.getServiceName());
                 ResponseDTO<List<String>> supportedActions =
                         httpClient.getSupportedActions(service);
@@ -36,11 +44,12 @@ public class Main {
                         supportedActions.responseValue());
             }
         }
-        ResponseDTO<List<String>> new_service = httpClient.getSupportedActions(
-                new ServiceDTOWithResponseHandler(
-                        new ServiceDTO("NEW_SERVICE", EndpointType.HTTP)));
-        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
-        System.out.print(deliver);
+//        ResponseDTO<List<String>> new_service = httpClient.getSupportedActions(
+//                new ServiceDTOWithResponseHandler(
+//                        new ServiceDTO("NEW_SERVICE", EndpointType.HTTP)));
+//        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
+//        System.out.print(deliver);
+
     }
 
     public static ResponseDTO<Boolean> ping(IntegratorHttpClient httpClient) {

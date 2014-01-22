@@ -9,8 +9,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,6 +26,29 @@ public class PersistenceService {
 
     @PersistenceContext
     private EntityManager em;
+
+    @Transactional
+    public HttpServiceEndpoint getService(UUID id) {
+        return em.find(HttpServiceEndpoint.class, id);
+    }
+
+    @Transactional
+    public HttpServiceEndpoint getHttpService(String serviceName) throws
+            NoResultException {
+        String query = "select ep from HttpServiceEndpoint ep where " +
+                "ep.serviceName=:serviceName";
+        return em.createQuery(query, HttpServiceEndpoint.class).
+                setParameter("serviceName", serviceName).getSingleResult();
+    }
+
+    @Transactional
+    public JMSServiceEndpoint getJmsService(String serviceName) throws
+            NoResultException {
+        String query = "select ep from JMSServiceEndpoint ep where " +
+                "ep.serviceName=:serviceName";
+        return em.createQuery(query, JMSServiceEndpoint.class).
+                setParameter("serviceName", serviceName).getSingleResult();
+    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public HttpAction saveAction(HttpAction action) {
@@ -79,17 +104,20 @@ public class PersistenceService {
 
     @Transactional
     public List<String> getHttpActions(String serviceName) {
-        String query = "select action.actionName from HttpServiceEndpoint ep join " +
-                "ep.httpActions action where ep.serviceName=:serviceName";
+        String query =
+                "select action.actionName from HttpServiceEndpoint ep join " +
+                        "ep.httpActions action where ep.serviceName=:serviceName";
         return em.createQuery(query, String.class).
                 setParameter("serviceName", serviceName).getResultList();
     }
 
     @Transactional
     public List<String> getJmsActions(String serviceName) {
-        String query = "select action.actionName from JMSServiceEndpoint ep join " +
-                "ep.jmsActions action where ep.serviceName=:serviceName";
+        String query =
+                "select action.actionName from JMSServiceEndpoint ep join " +
+                        "ep.jmsActions action where ep.serviceName=:serviceName";
         return em.createQuery(query, String.class).
                 setParameter("serviceName", serviceName).getResultList();
     }
+
 }

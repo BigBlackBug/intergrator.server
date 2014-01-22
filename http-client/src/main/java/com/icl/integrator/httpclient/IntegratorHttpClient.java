@@ -1,12 +1,14 @@
 package com.icl.integrator.httpclient;
 
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestClientException;
@@ -160,6 +162,22 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
                     new ParameterizedTypeReference<ResponseDTO<List<String>>>() {
                     };
             return sendRequest(serviceDTO, type, methodPair);
+        } catch (MalformedURLException e) {
+            throw new IntegratorClientException(e);
+        }
+    }
+
+    @Override
+    public ResponseDTO addAction(@RequestBody(
+            required = true) AddActionDTO actionDTO) {
+        HttpMethodDescriptor methodPair = getMethodPath
+                ("addAction", AddActionDTO.class);
+        try {
+            ParameterizedTypeReference<ResponseDTO>
+                    type =
+                    new ParameterizedTypeReference<ResponseDTO>() {
+                    };
+            return sendRequest(actionDTO, type, methodPair);
         } catch (MalformedURLException e) {
             throw new IntegratorClientException(e);
         }

@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.RawDestinationDescriptorDTO;
-import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.dto.registration.HttpActionDTO;
-import com.icl.integrator.dto.registration.QueueDTO;
-import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.registration.*;
 
 import java.io.IOException;
 
@@ -20,11 +17,11 @@ import java.io.IOException;
  * Time: 17:37
  * To change this template use File | Settings | File Templates.
  */
-public class MyObjectMapper extends ObjectMapper {
+public class IntegratorObjectMapper extends ObjectMapper {
 
-    public static final String MODULE_NAME = "MyObjectMapper";
+    public static final String MODULE_NAME = "IntegratorObjectMapper";
 
-    public MyObjectMapper() {
+    public IntegratorObjectMapper() {
         super();
         SimpleModule testModule = new SimpleModule(MODULE_NAME);
         testModule.addDeserializer(RawDestinationDescriptorDTO.class,
@@ -33,6 +30,8 @@ public class MyObjectMapper extends ObjectMapper {
                                    new TargetRegistrationDTODeserializer());
         testModule.addDeserializer(EndpointDTO.class,
                                    new EndpointDTODeserializer());
+        testModule.addDeserializer(AddActionDTO.class,
+                                   new AddActionDTODeserializer());
         registerModule(testModule);
     }
 
@@ -62,6 +61,22 @@ public class MyObjectMapper extends ObjectMapper {
         }
 
         return descriptor;
+    }
+
+    public <T extends ActionDescriptor> ActionEndpointDTO<T>
+    parseActionEndpoint(JsonNode node, EndpointType endpointType)
+            throws IOException {
+        String actionName = node.get("actionName").asText();
+        boolean forceRegister = node.get("forceRegister").asBoolean();
+        ActionDescriptor actionDescriptor = parseActionDescriptor(
+                node.get("actionDescriptor"),
+                endpointType);
+        ActionEndpointDTO actionEndpoint = new
+                ActionEndpointDTO<>();
+        actionEndpoint.setActionDescriptor(actionDescriptor);
+        actionEndpoint.setActionName(actionName);
+        actionEndpoint.setForceRegister(forceRegister);
+        return actionEndpoint;
     }
 
 }
