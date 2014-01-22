@@ -33,9 +33,11 @@ public interface IntegratorAPI {
             ServiceDTOWithResponseHandler serviceDTO);
 
     public ResponseDTO addAction(AddActionDTO actionDTO);
-    //TODO add action to service
 
     //TODO get service info?
 
     //TODO складывать в базу входящие запросы
+
+    //TODO предусмотреть возможность пинга в клиентском апи.
+    //TODO или чё-нить в этом роде
 }
