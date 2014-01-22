@@ -25,31 +25,29 @@ public class Main {
     public static void main(String args[]) {
         IntegratorHttpClient httpClient = new IntegratorHttpClient
                 ("localhost", 8080);
-//        getServiceList(httpClient);
-//
-//        register(httpClient);
-//
-//        ping(httpClient);
-
-        process(httpClient);
-    }
-
-    public static void getServiceList(IntegratorHttpClient httpClient) {
         ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
-        System.out.println(serviceList);
+        if (serviceList.isSuccess()) {
+            List<ServiceDTO> response = serviceList.responseValue();
+            for (ServiceDTO service : response) {
+                System.out.println(service.getServiceName());
+                ResponseDTO<List<String>> supportedActions =
+                        httpClient.getSupportedActions(service);
+                System.out.println(
+                        supportedActions.responseValue());
+            }
+        }
+        deliver(httpClient);
     }
 
-    public static void ping(IntegratorHttpClient httpClient) {
+    public static ResponseDTO<Boolean> ping(IntegratorHttpClient httpClient) {
         PingDTO pingDTO = new PingDTO();
         pingDTO.setAction("ACTION");
         pingDTO.setServiceName("NEW_SERVICE");
         pingDTO.setEndpointType(EndpointType.HTTP);
-        ResponseDTO<Boolean> available =
-                httpClient.isAvailable(pingDTO);
-        System.out.println(available);
+        return httpClient.isAvailable(pingDTO);
     }
 
-    public static void process(IntegratorHttpClient httpClient) {
+    public static void deliver(IntegratorHttpClient httpClient) {
         DeliveryDTO deliveryDTO = new DeliveryDTO();
         SourceServiceDTO sourceServiceDTO = new SourceServiceDTO();
         HttpEndpointDescriptorDTO desr = new
@@ -72,7 +70,8 @@ public class Main {
         httpClient.deliver(deliveryDTO);
     }
 
-    public static void register(IntegratorHttpClient httpClient) {
+    public static ResponseDTO<Map<String, ResponseDTO<Void>>> register(
+            IntegratorHttpClient httpClient) {
         TargetRegistrationDTO<HttpActionDTO> regDTO =
                 new TargetRegistrationDTO<>();
         regDTO.setServiceName("NEW_SERVICE");
@@ -98,8 +97,6 @@ public class Main {
         actionDTO.setForceRegister(true);
         regDTO.setActions(Arrays.asList(actionDTO));
         //----------------------------------------------------------------------
-        ResponseDTO<Map<String, ResponseDTO<Void>>> response =
-                httpClient.registerService(regDTO);
-        System.out.println(response);
+        return httpClient.registerService(regDTO);
     }
 }

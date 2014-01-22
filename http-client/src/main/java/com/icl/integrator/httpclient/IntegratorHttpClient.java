@@ -135,7 +135,8 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     @Override
     public ResponseDTO<List<String>> getSupportedActions(
             ServiceDTO serviceDTO) {
-        HttpMethodDescriptor methodPair = getMethodPath("getSupportedList");
+        HttpMethodDescriptor methodPair = getMethodPath
+                ("getSupportedActions", ServiceDTO.class);
         try {
             ParameterizedTypeReference<ResponseDTO<List<String>>>
                     type =

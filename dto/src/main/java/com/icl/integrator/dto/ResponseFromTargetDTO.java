@@ -2,7 +2,7 @@ package com.icl.integrator.dto;
 
 import java.util.UUID;
 
-public class ResponseToSourceDTO {
+public class ResponseFromTargetDTO {
 
     private ResponseDTO result;
 
@@ -10,18 +10,18 @@ public class ResponseToSourceDTO {
 
     private String requestID;
 
-    public ResponseToSourceDTO(ResponseDTO result, String serviceName,
-                               String requestID) {
+    public ResponseFromTargetDTO(ResponseDTO result, String serviceName,
+                                 String requestID) {
         this.result = result;
         this.serviceName = serviceName;
         this.requestID = requestID;
     }
 
-    public ResponseToSourceDTO(ResponseDTO result) {
+    public ResponseFromTargetDTO(ResponseDTO result) {
         this(result, null, UUID.randomUUID().toString());
     }
 
-    public ResponseToSourceDTO() {
+    public ResponseFromTargetDTO() {
     }
 
     @Override
@@ -33,7 +33,7 @@ public class ResponseToSourceDTO {
             return false;
         }
 
-        ResponseToSourceDTO that = (ResponseToSourceDTO) o;
+        ResponseFromTargetDTO that = (ResponseFromTargetDTO) o;
 
         if (!requestID.equals(that.requestID)) {
             return false;

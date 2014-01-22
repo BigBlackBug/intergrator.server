@@ -1,9 +1,7 @@
 package com.icl.integrator.api;
 
-import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.ResponseToSourceDTO;
-
-import java.util.Map;
+import com.icl.integrator.dto.ResponseFromIntegratorDTO;
+import com.icl.integrator.dto.ResponseFromTargetDTO;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,10 +12,8 @@ import java.util.Map;
  */
 public interface SourceService {
 
-    //TODO probably refactor to something more meaningful
-    public void acceptSourceResponse(Map<String, ResponseDTO<String>>
-                                             responseDTO);
+    public void acceptSourceResponse(ResponseFromIntegratorDTO responseDTO);
 
-    public void acceptTargetResponse(ResponseToSourceDTO responseDTO);
+    public void acceptTargetResponse(ResponseFromTargetDTO responseDTO);
 
 }

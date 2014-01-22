@@ -18,7 +18,8 @@ public class ResponseDTO<T> {
     public ResponseDTO() {
     }
 
-    //TODO разобраться, а нужен ли нам вообще responseClass
+    //TODO разобраться, а нужен ли нам вообще responseClass.
+    // Да, нужен на сорсе, чтоб распарсить результат от таргета.
     public ResponseDTO(T response, Class<T> responseClass) {
         this(true);
         this.response = new SuccessDTO<>(responseClass, response);
@@ -73,6 +74,10 @@ public class ResponseDTO<T> {
 
     public SuccessDTO<T> getResponse() {
         return response;
+    }
+
+    public T responseValue(){
+        return response.getResponseValue();
     }
 
     public ErrorDTO getError() {

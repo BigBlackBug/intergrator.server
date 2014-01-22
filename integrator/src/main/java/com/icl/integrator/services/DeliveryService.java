@@ -50,7 +50,7 @@ public class DeliveryService {
     private ObjectMapper serializer;
 
     public void deliver(SourceServiceDTO sourceService,
-                        Map<String, ResponseDTO<String>> resultMap)
+                        Map<String, ResponseDTO<UUID>> resultMap)
             throws IntegratorException {
         logger.info("Scheduling a request back to service " +
                             "defined as source -> " +
@@ -59,9 +59,10 @@ public class DeliveryService {
         EndpointConnector sourceConnector = factory.createEndpointConnector
                 (sourceService.getEndpoint(),
                  sourceService.getSourceResponseAction());
-        DeliveryCallable<Map<String, ResponseDTO<String>>>
+        DeliveryCallable<ResponseFromIntegratorDTO>
                 deliveryCallable =
-                new DeliveryCallable<>(sourceConnector, resultMap);
+                new DeliveryCallable<>(sourceConnector,
+                                       new ResponseFromIntegratorDTO(resultMap));
         scheduler.schedule(new TaskCreator<>(deliveryCallable));
     }
 
@@ -187,8 +188,8 @@ public class DeliveryService {
                 Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        ResponseToSourceDTO data =
-                                new ResponseToSourceDTO(
+                        ResponseFromTargetDTO data =
+                                new ResponseFromTargetDTO(
                                         responseDTO,
                                         destination.getServiceName(),
                                         requestID.toString());

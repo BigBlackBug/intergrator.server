@@ -1,11 +1,9 @@
 package com.icl.integrator.springapi;
 
 import com.icl.integrator.api.SourceService;
-import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.ResponseToSourceDTO;
+import com.icl.integrator.dto.ResponseFromIntegratorDTO;
+import com.icl.integrator.dto.ResponseFromTargetDTO;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,10 +16,9 @@ public interface SourceSpringService extends SourceService {
 
     @Override
     public void
-    acceptSourceResponse(@RequestBody Map<String, ResponseDTO<String>>
-                                 responseDTO);
+    acceptSourceResponse(@RequestBody ResponseFromIntegratorDTO responseDTO);
 
     @Override
-    public void acceptTargetResponse(@RequestBody ResponseToSourceDTO
+    public void acceptTargetResponse(@RequestBody ResponseFromTargetDTO
                                              responseDTO);
 }

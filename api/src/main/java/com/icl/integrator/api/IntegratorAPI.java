@@ -33,5 +33,5 @@ public interface IntegratorAPI {
 
     //TODO add action to service
 
-    //TODO add an api for services
+    //TODO get service info?
 }

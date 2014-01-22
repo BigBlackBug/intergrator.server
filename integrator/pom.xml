@@ -10,7 +10,7 @@
 
     <artifactId>integrator</artifactId>
     <packaging>war</packaging>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.95-SNAPSHOT</version>
 
     <name>integrator</name>
 

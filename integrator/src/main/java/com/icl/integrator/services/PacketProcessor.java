@@ -25,14 +25,13 @@ public class PacketProcessor {
     private DeliveryService deliveryService;
 
     public void process(DeliveryDTO packet) {
-        Map<String, ResponseDTO<String>> serviceToRequestID = new
+        Map<String, ResponseDTO<UUID>> serviceToRequestID = new
                 HashMap<>();
         for (DestinationDTO destination : packet.getDestinations()) {
-            ResponseDTO<String> response;
+            ResponseDTO<UUID> response;
             try {
                 UUID requestID = deliveryService.deliver(destination, packet);
-                response = new ResponseDTO<>(requestID.toString(),
-                                                       String.class);
+                response = new ResponseDTO<>(requestID, UUID.class);
             } catch (IntegratorException ex) {
                 ErrorDTO error = new ErrorDTO(ex);
                 response = new ResponseDTO<>(error);
@@ -40,7 +39,6 @@ public class PacketProcessor {
             serviceToRequestID.put(destination.getServiceName(), response);
         }
         SourceServiceDTO sourceService = packet.getSourceService();
-        //TODO добавить лок, чтоб сначала выполнялся этот запрос
         if (sourceService != null) {
             deliveryService.deliver(sourceService, serviceToRequestID);
         }

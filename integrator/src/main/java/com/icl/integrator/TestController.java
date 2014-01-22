@@ -1,8 +1,9 @@
 package com.icl.integrator;
 
+import com.icl.integrator.dto.ResponseFromIntegratorDTO;
+import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.RequestDataDTO;
 import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.ResponseToSourceDTO;
 import com.icl.integrator.springapi.SourceSpringService;
 import com.icl.integrator.springapi.TargetSpringService;
 import org.apache.commons.logging.Log;
@@ -12,8 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,7 +33,7 @@ public class TestController
     @RequestMapping(value = "accept_source_response",
                     method = RequestMethod.POST)
     public void acceptSourceResponse(
-            @RequestBody Map<String, ResponseDTO<String>> responseDTO) {
+            @RequestBody ResponseFromIntegratorDTO responseDTO) {
         logger.info("received source response from integrator from " +
                             responseDTO);
     }
@@ -43,7 +42,7 @@ public class TestController
                     method = RequestMethod.POST)
     @Override
     public void acceptTargetResponse(
-            @RequestBody ResponseToSourceDTO responseDTO) {
+            @RequestBody ResponseFromTargetDTO responseDTO) {
         logger.info("received target response from integrator from " +
                             responseDTO.getServiceName());
     }
