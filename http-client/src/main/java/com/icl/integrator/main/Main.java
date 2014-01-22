@@ -8,10 +8,7 @@ import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.httpclient.IntegratorHttpClient;
 import com.icl.integrator.util.EndpointType;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,10 +19,13 @@ import java.util.Map;
  */
 public class Main {
 
+    //TODO in body is null client sends x-www-form-urlencoded
+    // and server can't respond
     public static void main(String args[]) {
         IntegratorHttpClient httpClient = new IntegratorHttpClient
                 ("localhost", 8080);
-        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
+        ResponseDTO<List<ServiceDTO>> serviceList =
+                httpClient.getServiceList(new RawDestinationDescriptorDTO());
         if (serviceList.isSuccess()) {
             List<ServiceDTO> response = serviceList.responseValue();
             for (ServiceDTO service : response) {
@@ -36,7 +36,11 @@ public class Main {
                         supportedActions.responseValue());
             }
         }
-        deliver(httpClient);
+        ResponseDTO<List<String>> new_service = httpClient.getSupportedActions(
+                new ServiceDTOWithResponseHandler(
+                        new ServiceDTO("NEW_SERVICE", EndpointType.HTTP)));
+        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
+        System.out.print(deliver);
     }
 
     public static ResponseDTO<Boolean> ping(IntegratorHttpClient httpClient) {
@@ -47,18 +51,22 @@ public class Main {
         return httpClient.isAvailable(pingDTO);
     }
 
-    public static void deliver(IntegratorHttpClient httpClient) {
+    public static Map<String, ResponseDTO<UUID>> deliver(
+            IntegratorHttpClient httpClient) {
         DeliveryDTO deliveryDTO = new DeliveryDTO();
-        SourceServiceDTO sourceServiceDTO = new SourceServiceDTO();
+        RawDestinationDescriptorDTO
+                destinationDescriptor = new RawDestinationDescriptorDTO();
         HttpEndpointDescriptorDTO desr = new
                 HttpEndpointDescriptorDTO("192.168.84.142", 8080);
-        sourceServiceDTO
+        destinationDescriptor
                 .setEndpoint(new EndpointDTO<>(EndpointType.HTTP, desr));
-        sourceServiceDTO.setSourceResponseAction(
+        destinationDescriptor.setActionDescriptor(
                 new HttpActionDTO("/api/accept_source_response"));
-        sourceServiceDTO.setTargetResponseAction(new HttpActionDTO
-                                                         ("/api/accept_target_response"));
-        deliveryDTO.setSourceService(sourceServiceDTO);
+        deliveryDTO.setTargetResponseHandler(
+                new RawDestinationDescriptorDTO(
+                        new EndpointDTO<>(EndpointType.HTTP, desr),
+                        new HttpActionDTO("/api/accept_target_response")));
+        deliveryDTO.setIntegratorResponseHandler(destinationDescriptor);
         deliveryDTO.setAction("ACTION");
         deliveryDTO.setData(new RequestDataDTO(
                 new HashMap<String, Object>() {{
@@ -67,7 +75,7 @@ public class Main {
         DestinationDTO destination = new DestinationDTO(
                 "NEW_SERVICE", EndpointType.HTTP);
         deliveryDTO.setDestinations(Arrays.asList(destination));
-        httpClient.deliver(deliveryDTO);
+        return httpClient.deliver(deliveryDTO);
     }
 
     public static ResponseDTO<Map<String, ResponseDTO<Void>>> register(

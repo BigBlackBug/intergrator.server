@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.SourceServiceDTO;
+import com.icl.integrator.dto.RawDestinationDescriptorDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.HttpActionDTO;
 import com.icl.integrator.dto.registration.QueueDTO;
@@ -27,8 +27,8 @@ public class MyObjectMapper extends ObjectMapper {
     public MyObjectMapper() {
         super();
         SimpleModule testModule = new SimpleModule(MODULE_NAME);
-        testModule.addDeserializer(SourceServiceDTO.class,
-                                   new SourceEndpointDeserializer());
+        testModule.addDeserializer(RawDestinationDescriptorDTO.class,
+                                   new RawDestinationDescriptorDTODeserializer());
         testModule.addDeserializer(TargetRegistrationDTO.class,
                                    new TargetRegistrationDTODeserializer());
         testModule.addDeserializer(EndpointDTO.class,

@@ -1,8 +1,5 @@
 package com.icl.integrator.dto;
 
-import java.util.Map;
-import java.util.UUID;
-
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -10,25 +7,23 @@ import java.util.UUID;
  * Time: 11:25
  * To change this template use File | Settings | File Templates.
  */
-public class ResponseFromIntegratorDTO {
+public class ResponseFromIntegratorDTO<T> {
 
-    private Map<String, ResponseDTO<UUID>> serviceToUUIDMap;
+    private T response;
 
     public ResponseFromIntegratorDTO() {
 
     }
 
-    public ResponseFromIntegratorDTO(
-            Map<String, ResponseDTO<UUID>> serviceToUUIDMap) {
-        this.serviceToUUIDMap = serviceToUUIDMap;
+    public ResponseFromIntegratorDTO(T response) {
+        this.response = response;
     }
 
-    public Map<String, ResponseDTO<UUID>> getServiceToUUIDMap() {
-        return serviceToUUIDMap;
+    public T getResponse() {
+        return response;
     }
 
-    public void setServiceToUUIDMap(
-            Map<String, ResponseDTO<UUID>> serviceToUUIDMap) {
-        this.serviceToUUIDMap = serviceToUUIDMap;
+    public void setResponse(T response) {
+        this.response = response;
     }
 }

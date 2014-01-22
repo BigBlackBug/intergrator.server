@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,19 +42,33 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
     @Autowired
     private IntegratorService integratorService;
 
+    @Autowired
+    private DeliveryService deliveryService;
+
     @Override
-    public void deliver(@RequestBody(required = true) DeliveryDTO packet) {
+    public Map<String, ResponseDTO<UUID>> deliver(
+            @RequestBody(required = true) DeliveryDTO packet) {
         logger.info("Received a delivery request");
         PacketProcessor processor = processorFactory.createProcessor();
-        processor.process(packet);
+        Map<String, ResponseDTO<UUID>> serviceToRequestID =
+                processor.process(packet);
+        RawDestinationDescriptorDTO sourceService =
+                packet.getIntegratorResponseHandler();
+        if (sourceService != null) {
+            deliveryService.deliver(sourceService, serviceToRequestID);
+        }
+        return serviceToRequestID;
     }
 
     @Override
-    public Boolean ping() {
+    public Boolean ping(@RequestBody(required = true)
+                        RawDestinationDescriptorDTO responseHandler) {
+        if (responseHandler != null && responseHandler.isInitialized()) {
+            deliveryService.deliver(responseHandler, Boolean.TRUE);
+        }
         return true;
     }
 
-    //TODO test
     @Override
     public ResponseDTO<Map<String, ResponseDTO<Void>>>
     registerService(@RequestBody(required = true)
@@ -67,6 +82,11 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         } catch (TargetRegistrationException ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
+        RawDestinationDescriptorDTO responseHandler =
+                registrationDTO.getIntegratorResponseHandler();
+        if (responseHandler != null) {
+            deliveryService.deliver(responseHandler, response);
+        }
         return response;
     }
 
@@ -79,17 +99,26 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
                         new DestinationDTO(pingDTO.getServiceName(),
                                            pingDTO.getEndpointType()),
                         pingDTO.getAction());
+        ResponseDTO<Boolean> responseDTO;
         try {
             connector.testConnection();
-            return new ResponseDTO<>(Boolean.TRUE, Boolean.class);
+            responseDTO =
+                    new ResponseDTO<>(Boolean.TRUE, Boolean.class);
         } catch (ConnectionException ex) {
-            return new ResponseDTO<>(new ErrorDTO(ex));
+            responseDTO = new ResponseDTO<>(new ErrorDTO(ex));
         }
+        RawDestinationDescriptorDTO responseHandler =
+                pingDTO.getIntegratorResponseHandler();
+        if (responseHandler != null) {
+            deliveryService.deliver(responseHandler, responseDTO);
+        }
+        return responseDTO;
     }
 
-    //TODO test
     @Override
-    public ResponseDTO<List<ServiceDTO>> getServiceList() {
+    public ResponseDTO<List<ServiceDTO>> getServiceList(
+            @RequestBody(required = false)
+            RawDestinationDescriptorDTO responseHandler) {
         ResponseDTO<List<ServiceDTO>> response;
         try {
             List<ServiceDTO> serviceList = integratorService.getServiceList();
@@ -97,21 +126,31 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
+        if (responseHandler != null && responseHandler.isInitialized()) {
+            deliveryService.deliver(responseHandler, response);
+        }
         return response;
     }
 
     @Override
     public ResponseDTO<List<String>> getSupportedActions(
-            @RequestBody(required = true) ServiceDTO serviceDTO) {
+            @RequestBody(required = true) ServiceDTOWithResponseHandler serviceDTO) {
         ResponseDTO<List<String>> response;
         try {
             List<String> actions =
-                    integratorService.getSupportedActions(serviceDTO);
+                    integratorService
+                            .getSupportedActions(serviceDTO.getServiceDTO());
             response = new ResponseDTO<>(actions);
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
+        RawDestinationDescriptorDTO responseHandler =
+                serviceDTO.getIntegratorResponseHandler();
+        if (responseHandler != null) {
+            deliveryService.deliver(responseHandler, response);
+        }
         return response;
     }
+
 
 }

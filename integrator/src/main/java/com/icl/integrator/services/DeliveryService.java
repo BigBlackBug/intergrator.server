@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.model.TaskLogEntry;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.Descriptor;
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -49,23 +49,25 @@ public class DeliveryService {
     @Autowired
     private ObjectMapper serializer;
 
-    public void deliver(SourceServiceDTO sourceService,
-                        Map<String, ResponseDTO<UUID>> resultMap)
+    //from cont
+    public <T> void deliver(
+            RawDestinationDescriptorDTO sourceService, T packet)
             throws IntegratorException {
         logger.info("Scheduling a request back to service " +
                             "defined as source -> " +
-                            sourceService.getSourceResponseAction());
-        //TODO sourceResponse may be null
+                            sourceService.getActionDescriptor());
         EndpointConnector sourceConnector = factory.createEndpointConnector
                 (sourceService.getEndpoint(),
-                 sourceService.getSourceResponseAction());
-        DeliveryCallable<ResponseFromIntegratorDTO>
+                 sourceService.getActionDescriptor());
+        DeliveryCallable<ResponseFromIntegratorDTO<T>>
                 deliveryCallable =
-                new DeliveryCallable<>(sourceConnector,
-                                       new ResponseFromIntegratorDTO(resultMap));
+                new DeliveryCallable<>(
+                        sourceConnector,
+                        new ResponseFromIntegratorDTO<>(packet));
         scheduler.schedule(new TaskCreator<>(deliveryCallable));
     }
 
+    //main
     public UUID deliver(DestinationDTO destination,
                         DeliveryDTO packet) throws IntegratorException {
         logger.info("Scheduling a request to target " +
@@ -73,17 +75,18 @@ public class DeliveryService {
         EndpointConnector destinationConnector =
                 factory.createEndpointConnector(destination,
                                                 packet.getAction());
-        //---
         DeliveryCallable<RequestDataDTO> deliveryCallable =
                 new DeliveryCallable<>(destinationConnector, packet.getData());
-        SourceServiceDTO sourceService = packet.getSourceService();
-        if (sourceService != null) {
-            //TODO targetResponse may be null
-            EndpointDTO endpoint = sourceService.getEndpoint();
-            EndpointConnector sourceConnector = factory
-                    .createEndpointConnector(endpoint,
-                                             sourceService.getTargetResponseAction());
-            return deliver(deliveryCallable, sourceConnector, destination);
+        RawDestinationDescriptorDTO targetResponseHandler =
+                packet.getTargetResponseHandler();
+        if (targetResponseHandler != null) {
+            EndpointDTO endpoint = targetResponseHandler.getEndpoint();
+            ActionDescriptor actionDescriptor = targetResponseHandler
+                    .getActionDescriptor();
+            EndpointConnector targetResponseConnector = factory
+                    .createEndpointConnector(endpoint, actionDescriptor);
+            return deliver(deliveryCallable, targetResponseConnector,
+                           destination);
         }
         return deliver(deliveryCallable, destination, packet);
     }
@@ -101,15 +104,14 @@ public class DeliveryService {
         TaskCreator<ResponseDTO> deliveryTaskCreator =
                 new TaskCreator<>(deliveryCallable);
         deliveryTaskCreator.setDescriptor(
-            new Descriptor<TaskCreator<ResponseDTO>>() {
-                @Override
-                public String describe(
-                        TaskCreator<ResponseDTO> creator) {
-                return "Отправка запроса: " +
-                        deliveryCallable.getConnector().toString();
-                }
-            });
-        //
+                new Descriptor<TaskCreator<ResponseDTO>>() {
+                    @Override
+                    public String describe(
+                            TaskCreator<ResponseDTO> creator) {
+                        return "Отправка запроса: " +
+                                deliveryCallable.getConnector().toString();
+                    }
+                });
         if (destinationDTO.scheduleRedelivery()) {
             scheduler.schedule(deliveryTaskCreator, handler);
         } else {
@@ -160,14 +162,14 @@ public class DeliveryService {
         TaskCreator<ResponseDTO> deliveryTaskCreator =
                 new TaskCreator<>(deliveryCallable);
         deliveryTaskCreator.setDescriptor(
-            new Descriptor<TaskCreator<ResponseDTO>>() {
-                @Override
-                public String describe(
-                        TaskCreator<ResponseDTO> creator) {
-                return "Отправка запроса: " +
-                        deliveryCallable.getConnector().toString();
-                }
-            });
+                new Descriptor<TaskCreator<ResponseDTO>>() {
+                    @Override
+                    public String describe(
+                            TaskCreator<ResponseDTO> creator) {
+                        return "Отправка запроса: " +
+                                deliveryCallable.getConnector().toString();
+                    }
+                });
         Callable<Void> deliveryFailedCallable = new DeliveryFailedCallable(
                 sourceConnector, destinationDTO, requestID);
         deliveryTaskCreator.setCallback(new DeliverySuccessCallback(

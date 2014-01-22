@@ -24,7 +24,7 @@ public class PacketProcessor {
     @Autowired
     private DeliveryService deliveryService;
 
-    public void process(DeliveryDTO packet) {
+    public Map<String, ResponseDTO<UUID>> process(DeliveryDTO packet) {
         Map<String, ResponseDTO<UUID>> serviceToRequestID = new
                 HashMap<>();
         for (DestinationDTO destination : packet.getDestinations()) {
@@ -38,10 +38,7 @@ public class PacketProcessor {
             }
             serviceToRequestID.put(destination.getServiceName(), response);
         }
-        SourceServiceDTO sourceService = packet.getSourceService();
-        if (sourceService != null) {
-            deliveryService.deliver(sourceService, serviceToRequestID);
-        }
+        return serviceToRequestID;
     }
 
 }

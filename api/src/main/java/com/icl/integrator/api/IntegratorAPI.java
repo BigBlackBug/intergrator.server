@@ -1,13 +1,11 @@
 package com.icl.integrator.api;
 
-import com.icl.integrator.dto.DeliveryDTO;
-import com.icl.integrator.dto.PingDTO;
-import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,20 +16,24 @@ import java.util.Map;
  */
 public interface IntegratorAPI {
 
-    public void deliver(DeliveryDTO packet);
+    public Map<String, ResponseDTO<UUID>> deliver(DeliveryDTO packet);
 
-    public Boolean ping();
+    public Boolean ping(RawDestinationDescriptorDTO responseHandler);
 
     public ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             TargetRegistrationDTO<?> registrationDTO);
 
     public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO);
 
-    public ResponseDTO<List<ServiceDTO>> getServiceList();
+    public ResponseDTO<List<ServiceDTO>> getServiceList
+            (RawDestinationDescriptorDTO responseHandler);
 
-    public ResponseDTO<List<String>> getSupportedActions(ServiceDTO serviceDTO);
+    public ResponseDTO<List<String>> getSupportedActions(
+            ServiceDTOWithResponseHandler serviceDTO);
 
     //TODO add action to service
 
     //TODO get service info?
+
+    //TODO складывать в базу входящие запросы
 }

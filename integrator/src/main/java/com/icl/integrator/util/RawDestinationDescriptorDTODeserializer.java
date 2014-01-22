@@ -5,36 +5,37 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.SourceServiceDTO;
+import com.icl.integrator.dto.RawDestinationDescriptorDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 
 import java.io.IOException;
 
-public final class SourceEndpointDeserializer extends
-        JsonDeserializer<SourceServiceDTO> {
+public final class RawDestinationDescriptorDTODeserializer extends
+        JsonDeserializer<RawDestinationDescriptorDTO> {
 
-    public SourceEndpointDeserializer() {
+    public RawDestinationDescriptorDTODeserializer() {
     }
 
     @Override
-    public SourceServiceDTO deserialize(JsonParser jp, DeserializationContext ctx)
+    public RawDestinationDescriptorDTO deserialize(JsonParser jp,
+                                                   DeserializationContext ctx)
             throws IOException {
         ObjectNode treeNode = jp.readValueAsTree();
         MyObjectMapper mapper = new MyObjectMapper();
         EndpointDTO endpointDTO = mapper.readValue
                 (treeNode.get("endpoint").toString(), EndpointDTO.class);
 
+        RawDestinationDescriptorDTO result = null;
+        if (endpointDTO == null) {
+            return result;
+        }
         ActionDescriptor sourceResponse = mapper.parseActionDescriptor(
-                treeNode.get("sourceResponseAction"),
+                treeNode.get("actionDescriptor"),
                 endpointDTO.getEndpointType());
-        ActionDescriptor targetResponse = mapper.parseActionDescriptor(
-                treeNode.get("targetResponseAction"),
-                endpointDTO.getEndpointType());
-        SourceServiceDTO serviceDTO = new SourceServiceDTO();
-        serviceDTO.setEndpoint(endpointDTO);
-        serviceDTO.setSourceResponseAction(sourceResponse);
-        serviceDTO.setTargetResponseAction(targetResponse);
-        return serviceDTO;
+        result = new RawDestinationDescriptorDTO();
+        result.setEndpoint(endpointDTO);
+        result.setActionDescriptor(sourceResponse);
+        return result;
     }
 
 }

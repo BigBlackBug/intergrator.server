@@ -1,10 +1,7 @@
 package com.icl.integrator;
 
 import com.icl.integrator.api.IntegratorAPI;
-import com.icl.integrator.dto.DeliveryDTO;
-import com.icl.integrator.dto.PingDTO;
-import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.PacketProcessor;
 import com.icl.integrator.services.PacketProcessorFactory;
@@ -20,6 +17,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class IntegratorJmsController implements MessageListener, IntegratorAPI {
@@ -67,17 +65,19 @@ public class IntegratorJmsController implements MessageListener, IntegratorAPI {
     }
 
     @Override
-    public void deliver(DeliveryDTO packet) {
+    public Map<String, ResponseDTO<UUID>> deliver(
+            DeliveryDTO packet) {
         try {
             PacketProcessor processor = processorFactory.createProcessor();
-            processor.process(packet);
+            return processor.process(packet);
         } catch (Exception ex) {
             logger.error("Ошибка отправки", ex);
+            return null;
         }
     }
 
     @Override
-    public Boolean ping() {
+    public Boolean ping(RawDestinationDescriptorDTO responseHandler) {
         //TODO implement
         return null;
     }
@@ -96,17 +96,16 @@ public class IntegratorJmsController implements MessageListener, IntegratorAPI {
     }
 
     @Override
-    public ResponseDTO<List<ServiceDTO>> getServiceList() {
+    public ResponseDTO<List<ServiceDTO>> getServiceList(
+            RawDestinationDescriptorDTO responseHandler) {
         //TODO implement
         return null;
     }
 
     @Override
     public ResponseDTO<List<String>> getSupportedActions(
-            ServiceDTO serviceDTO) {
+            ServiceDTOWithResponseHandler serviceDTO) {
         //TODO implement
         return null;
     }
-
-    //TODO добавить поддержку всех остальных функций
 }

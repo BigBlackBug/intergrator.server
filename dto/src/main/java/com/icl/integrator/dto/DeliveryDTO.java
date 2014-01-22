@@ -11,7 +11,9 @@ import java.util.List;
  */
 public class DeliveryDTO {
 
-    private SourceServiceDTO sourceService;
+    private RawDestinationDescriptorDTO integratorResponseHandler;
+
+    private RawDestinationDescriptorDTO targetResponseHandler;
 
     private List<DestinationDTO> destinations;
 
@@ -19,9 +21,11 @@ public class DeliveryDTO {
 
     private RequestDataDTO data;
 
-    public DeliveryDTO(SourceServiceDTO sourceService, String action,
+    public DeliveryDTO(RawDestinationDescriptorDTO integratorResponseHandler,
+                       RawDestinationDescriptorDTO targetResponseHandler,
+                       String action,
                        List<DestinationDTO> destinations) {
-        this.sourceService = sourceService;
+        this.integratorResponseHandler = integratorResponseHandler;
         this.action = action;
         this.destinations = destinations;
     }
@@ -43,14 +47,17 @@ public class DeliveryDTO {
         if (!action.equals(that.action)) {
             return false;
         }
-        if (!data.equals(that.data)) {
+        if (data != null ? !data.equals(that.data) : that.data != null) {
             return false;
         }
         if (!destinations.equals(that.destinations)) {
             return false;
         }
-        if (sourceService != null ? !sourceService
-                .equals(that.sourceService) : that.sourceService != null) {
+        if (integratorResponseHandler != null ? !integratorResponseHandler
+                .equals(that.integratorResponseHandler) : that.integratorResponseHandler != null) {
+            return false;
+        }
+        if (!targetResponseHandler.equals(that.targetResponseHandler)) {
             return false;
         }
 
@@ -59,19 +66,33 @@ public class DeliveryDTO {
 
     @Override
     public int hashCode() {
-        int result = sourceService != null ? sourceService.hashCode() : 0;
+        int result =
+                integratorResponseHandler != null ? integratorResponseHandler
+                        .hashCode() : 0;
+        result = 31 * result + targetResponseHandler.hashCode();
         result = 31 * result + destinations.hashCode();
         result = 31 * result + action.hashCode();
-        result = 31 * result + data.hashCode();
+        result = 31 * result + (data != null ? data.hashCode() : 0);
         return result;
     }
 
-    public SourceServiceDTO getSourceService() {
-        return sourceService;
+    public RawDestinationDescriptorDTO getTargetResponseHandler() {
+
+        return targetResponseHandler;
     }
 
-    public void setSourceService(SourceServiceDTO sourceService) {
-        this.sourceService = sourceService;
+    public void setTargetResponseHandler(
+            RawDestinationDescriptorDTO targetResponseHandler) {
+        this.targetResponseHandler = targetResponseHandler;
+    }
+
+    public RawDestinationDescriptorDTO getIntegratorResponseHandler() {
+        return integratorResponseHandler;
+    }
+
+    public void setIntegratorResponseHandler(
+            RawDestinationDescriptorDTO integratorResponseHandler) {
+        this.integratorResponseHandler = integratorResponseHandler;
     }
 
     public List<DestinationDTO> getDestinations() {

@@ -1,12 +1,12 @@
 package com.icl.integrator.util;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.dto.RawDestinationDescriptorDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
@@ -26,9 +26,8 @@ public class TargetRegistrationDTODeserializer extends
         JsonDeserializer<TargetRegistrationDTO> {
 
     @Override
-    public TargetRegistrationDTO deserialize(JsonParser jp,
-                                             DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
+    public TargetRegistrationDTO deserialize(
+            JsonParser jp, DeserializationContext ctxt) throws IOException {
         ObjectNode treeNode = jp.readValueAsTree();
         MyObjectMapper mapper = new MyObjectMapper();
         TargetRegistrationDTO dto = new TargetRegistrationDTO();
@@ -37,18 +36,20 @@ public class TargetRegistrationDTODeserializer extends
                 mapper.readValue(treeNode.get("endpoint").toString(),
                                  EndpointDTO.class);
         dto.setEndpoint(endpoint);
+        RawDestinationDescriptorDTO destinationDescriptorDTO = mapper
+                .readValue(treeNode.get("integratorResponseHandler").toString(),
+                           RawDestinationDescriptorDTO.class);
+        dto.setIntegratorResponseHandler(destinationDescriptorDTO);
+
         List<ActionEndpointDTO<ActionDescriptor>> actions =
-                getActions(treeNode.get
-                        ("actions"), endpoint.
-                        getEndpointType());
+                getActions(treeNode.get("actions"), endpoint.getEndpointType());
         dto.setActions(actions);
         return dto;
     }
 
     private <T extends ActionDescriptor>
-    List<ActionEndpointDTO<T>> getActions(JsonNode actions,
-                                          EndpointType endpointType)
-            throws IOException {
+    List<ActionEndpointDTO<T>> getActions(
+            JsonNode actions, EndpointType endpointType) throws IOException {
         MyObjectMapper mapper = new MyObjectMapper();
         List<ActionEndpointDTO<T>> result = new ArrayList<>();
         int size = actions.size();
