@@ -1,11 +1,6 @@
 package com.icl.integrator.api;
 
-import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.ResponseFromIntegratorDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
-
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,9 +12,6 @@ import java.util.UUID;
 public interface SourceService {
 
     //TODO тут будет поддержка всех методов.
-    public void handleResponseFromIntegrator(
-            ResponseFromIntegratorDTO<Map<String, ResponseDTO<UUID>>> responseDTO);
-
     public void handleResponseFromTarget(ResponseFromTargetDTO responseDTO);
 
 }
