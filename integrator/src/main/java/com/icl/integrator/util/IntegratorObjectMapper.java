@@ -67,7 +67,7 @@ public class IntegratorObjectMapper extends ObjectMapper {
     parseActionEndpoint(JsonNode node, EndpointType endpointType)
             throws IOException {
         String actionName = node.get("actionName").asText();
-        boolean forceRegister = node.get("forceRegister").asBoolean();
+//        boolean forceRegister = node.get("forceRegister").asBoolean();
         ActionDescriptor actionDescriptor = parseActionDescriptor(
                 node.get("actionDescriptor"),
                 endpointType);
@@ -75,7 +75,7 @@ public class IntegratorObjectMapper extends ObjectMapper {
                 ActionEndpointDTO<>();
         actionEndpoint.setActionDescriptor(actionDescriptor);
         actionEndpoint.setActionName(actionName);
-        actionEndpoint.setForceRegister(forceRegister);
+//        actionEndpoint.setForceRegister(forceRegister);
         return actionEndpoint;
     }
 

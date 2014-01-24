@@ -30,10 +30,12 @@ public class IntegratorService {
     @Transactional
     public <T extends ActionDescriptor> void addAction(
             AddActionDTO<T> actionDTO) {
-        ActionEndpointDTO<T> action = actionDTO.getAction();
+        ActionRegistrationDTO<T> actionReg =
+                actionDTO.getActionRegistrationDTO();
         ServiceDTO service = actionDTO.getService();
         EndpointType endpointType = service.getEndpointType();
 
+        ActionEndpointDTO<T> action = actionReg.getAction();
         String actionName = action.getActionName();
 
         if (endpointType == EndpointType.HTTP) {

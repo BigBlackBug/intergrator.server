@@ -168,4 +168,10 @@ public class AppTests {
                                "/api/destination");
         Assert.assertEquals(expected, serviceURL);
     }
+
+    @Test
+    public void testRegistrationDeserializer(){
+
+    }
+
 }

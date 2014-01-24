@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
+import com.icl.integrator.dto.registration.ActionRegistrationDTO;
 import com.icl.integrator.dto.registration.AddActionDTO;
 
 import java.io.IOException;
@@ -29,8 +31,14 @@ public final class AddActionDTODeserializer
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         ServiceDTO endpoint = mapper.readValue(
                 treeNode.get("service").toString(), ServiceDTO.class);
+        JsonNode actionRegistrationNode = treeNode.get("actionRegistrationDTO");
+        boolean forceRegister =
+                actionRegistrationNode.get("forceRegister").asBoolean();
         ActionEndpointDTO action = mapper.parseActionEndpoint(
-                treeNode.get("action"), endpoint.getEndpointType());
-        return new AddActionDTO(endpoint, action);
+                actionRegistrationNode.get("action"), endpoint.getEndpointType
+                ());
+        ActionRegistrationDTO actionRegistrationDTO =
+                new ActionRegistrationDTO(action, forceRegister);
+        return new AddActionDTO<>(endpoint, actionRegistrationDTO);
     }
 }

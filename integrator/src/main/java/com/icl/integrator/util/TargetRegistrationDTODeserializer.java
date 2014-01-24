@@ -9,6 +9,7 @@ import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.RawDestinationDescriptorDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
+import com.icl.integrator.dto.registration.ActionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 
 import java.io.IOException;
@@ -41,23 +42,25 @@ public class TargetRegistrationDTODeserializer extends
                            RawDestinationDescriptorDTO.class);
         dto.setIntegratorResponseHandler(destinationDescriptorDTO);
 
-        List<ActionEndpointDTO<ActionDescriptor>> actions =
-                getActions(treeNode.get("actions"), endpoint.getEndpointType());
-        dto.setActions(actions);
+        List<ActionRegistrationDTO<ActionDescriptor>> actions =
+                getActions(treeNode.get("actionRegistrations"), endpoint.getEndpointType());
+        dto.setActionRegistrations(actions);
         return dto;
     }
 
     private <T extends ActionDescriptor>
-    List<ActionEndpointDTO<T>> getActions(
+    List<ActionRegistrationDTO<T>> getActions(
             JsonNode actions, EndpointType endpointType) throws IOException {
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
-        List<ActionEndpointDTO<T>> result = new ArrayList<>();
+        List<ActionRegistrationDTO<T>> result = new ArrayList<>();
         int size = actions.size();
         for (int i = 0; i < size; i++) {
             JsonNode node = actions.get(i);
-            ActionEndpointDTO<T> actionEndpoint =
-                    mapper.parseActionEndpoint(node, endpointType);
-            result.add(actionEndpoint);
+            boolean forceRegister =
+                    node.get("forceRegister").asBoolean();
+            ActionEndpointDTO<T> action = mapper.parseActionEndpoint(
+                    node.get("action"), endpointType);
+            result.add(new ActionRegistrationDTO<T>(action, forceRegister));
         }
         return result;
     }

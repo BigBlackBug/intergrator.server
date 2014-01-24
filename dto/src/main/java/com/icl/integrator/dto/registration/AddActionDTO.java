@@ -11,7 +11,7 @@ import com.icl.integrator.dto.ServiceDTO;
  */
 public class AddActionDTO<T extends ActionDescriptor> {
 
-    private ActionEndpointDTO<T> action;
+    private ActionRegistrationDTO<T> actionRegistrationDTO;
 
     private ServiceDTO service;
 
@@ -19,17 +19,18 @@ public class AddActionDTO<T extends ActionDescriptor> {
     }
 
     public AddActionDTO(ServiceDTO service,
-                        ActionEndpointDTO<T> action) {
+                        ActionRegistrationDTO<T> action) {
         this.service = service;
-        this.action = action;
+        this.actionRegistrationDTO = action;
     }
 
-    public ActionEndpointDTO<T> getAction() {
-        return action;
+    public ActionRegistrationDTO<T> getActionRegistrationDTO() {
+        return actionRegistrationDTO;
     }
 
-    public void setAction(ActionEndpointDTO<T> action) {
-        this.action = action;
+    public void setActionRegistrationDTO(
+            ActionRegistrationDTO<T> actionRegistrationDTO) {
+        this.actionRegistrationDTO = actionRegistrationDTO;
     }
 
     public ServiceDTO getService() {

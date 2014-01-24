@@ -21,26 +21,26 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
 
     private EndpointDTO endpoint;
 
-    private List<ActionEndpointDTO<T>> actions;
+    private List<ActionRegistrationDTO<T>> actionRegistrations;
 
     public TargetRegistrationDTO() {
     }
 
     public TargetRegistrationDTO(String serviceName,
                                  EndpointDTO endpoint,
-                                 List<ActionEndpointDTO<T>> actions) {
+                                 List<ActionRegistrationDTO<T>> actions) {
         this.serviceName = serviceName;
         this.endpoint = endpoint;
-        this.actions = actions;
+        this.actionRegistrations = actions;
     }
 
     public TargetRegistrationDTO(String serviceName,
                                  EndpointDTO endpoint,
-                                 List<ActionEndpointDTO<T>> actions,
+                                 List<ActionRegistrationDTO<T>> actions,
                                  RawDestinationDescriptorDTO integratorResponseHandler) {
         this.serviceName = serviceName;
         this.endpoint = endpoint;
-        this.actions = actions;
+        this.actionRegistrations = actions;
         this.integratorResponseHandler = integratorResponseHandler;
     }
 
@@ -73,12 +73,8 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
         this.serviceName = serviceName;
     }
 
-    public List<ActionEndpointDTO<T>> getActions() {
-        return actions;
-    }
-
-    public void setActions(List<ActionEndpointDTO<T>> actions) {
-        this.actions = actions;
+    public List<ActionRegistrationDTO<T>> getActionRegistrations() {
+        return actionRegistrations;
     }
 
     @Override
@@ -92,7 +88,7 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
 
         TargetRegistrationDTO that = (TargetRegistrationDTO) o;
 
-        if (!actions.equals(that.actions)) {
+        if (!actionRegistrations.equals(that.actionRegistrations)) {
             return false;
         }
         if (!endpoint.equals(that.endpoint)) {
@@ -109,6 +105,11 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
         return true;
     }
 
+    public void setActionRegistrations(
+            List<ActionRegistrationDTO<T>> actionRegistrations) {
+        this.actionRegistrations = actionRegistrations;
+    }
+
     @Override
     public int hashCode() {
         int result =
@@ -116,7 +117,7 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
                         .hashCode() : 0;
         result = 31 * result + serviceName.hashCode();
         result = 31 * result + endpoint.hashCode();
-        result = 31 * result + actions.hashCode();
+        result = 31 * result + actionRegistrations.hashCode();
         return result;
     }
 

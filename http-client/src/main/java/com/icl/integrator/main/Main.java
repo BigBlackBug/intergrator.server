@@ -27,14 +27,16 @@ public class Main {
         if (serviceList.isSuccess()) {
             List<ServiceDTO> response = serviceList.responseValue();
             for (ServiceDTO service : response) {
-
-                AddActionDTO<ActionDescriptor> actionDTO =
+                AddActionDTO<HttpActionDTO> actionDTO =
                         new AddActionDTO<>();
                 actionDTO.setService(service);
-                actionDTO.setAction(new ActionEndpointDTO<ActionDescriptor>
-                                            ("LOL_ACTION",
-                                             new HttpActionDTO
-                                                     ("/LOL_ACTION_PATH")));
+                HttpActionDTO httpActionDTO =
+                        new HttpActionDTO("/LOL_ACTION_PATH");
+                ActionEndpointDTO<HttpActionDTO> actionEndpoint =
+                        new ActionEndpointDTO<>("LOL_ACTION", httpActionDTO);
+                ActionRegistrationDTO<HttpActionDTO> actionRegDTO =
+                        new ActionRegistrationDTO<>(actionEndpoint, true);
+                actionDTO.setActionRegistrationDTO(actionRegDTO);
                 ResponseDTO responseDTO = httpClient.addAction(actionDTO);
                 System.out.println(responseDTO);
                 System.out.println(service.getServiceName());
@@ -111,8 +113,8 @@ public class Main {
 
         actionDTO.setActionDescriptor(actionDescriptor);
         actionDTO.setActionName("ACTION");
-        actionDTO.setForceRegister(true);
-        regDTO.setActions(Arrays.asList(actionDTO));
+        regDTO.setActionRegistrations(
+                Arrays.asList(new ActionRegistrationDTO<>(actionDTO, true)));
         //----------------------------------------------------------------------
         return httpClient.registerService(regDTO);
     }
