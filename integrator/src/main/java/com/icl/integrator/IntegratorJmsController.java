@@ -6,7 +6,6 @@ import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.services.PacketProcessor;
 import com.icl.integrator.services.PacketProcessorFactory;
 import com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler;
 import com.icl.integrator.util.IntegratorObjectMapper;
@@ -64,65 +63,58 @@ public class IntegratorJmsController implements MessageListener, IntegratorAPI {
                     message.getClass()));
             return;
         }
-        deliver(packet);
+//        deliver(packet);
     }
 
     @Override
     public Map<String, ResponseDTO<UUID>> deliver(
-            DeliveryDTO packet) {
-        try {
-            PacketProcessor processor = processorFactory.createProcessor();
-            return processor.process(packet);
-        } catch (Exception ex) {
-            logger.error("Ошибка отправки", ex);
-            return null;
-        }
-    }
-
-    @Override
-    public Boolean ping(RawDestinationDescriptorDTO responseHandler) {
+            IntegratorPacket<DeliveryDTO> delivery) {
         //TODO implement
         return null;
     }
 
     @Override
-    public <T extends ActionDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            TargetRegistrationDTO<T> registrationDTO) {
+    public Boolean ping(IntegratorPacket<Void> responseHandlerDescriptor) {
         //TODO implement
         return null;
     }
 
     @Override
-    public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO) {
+    public <T extends ActionDescriptor> ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            IntegratorPacket<TargetRegistrationDTO<T>> registrationDTO) {
+        //TODO implement
+        return null;
+    }
+
+    @Override
+    public ResponseDTO<Boolean> isAvailable(IntegratorPacket<PingDTO> pingDTO) {
         //TODO implement
         return null;
     }
 
     @Override
     public ResponseDTO<List<ServiceDTO>> getServiceList(
-            RawDestinationDescriptorDTO responseHandler) {
+            IntegratorPacket<Void> responseHandlerDescriptor) {
         //TODO implement
         return null;
     }
 
     @Override
     public ResponseDTO<List<String>> getSupportedActions(
-            ServiceDTOWithResponseHandler serviceDTO) {
+            IntegratorPacket<ServiceDTO> serviceDTO) {
         //TODO implement
         return null;
     }
 
     @Override
-    public ResponseDTO addAction(AddActionDTO actionDTO) {
+    public ResponseDTO addAction(IntegratorPacket<AddActionDTO> actionDTO) {
         //TODO implement
         return null;
     }
 
     @Override
-    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
-    ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
-            ServiceDTOWithResponseHandler serviceDTO) {
+    public <T extends EndpointDescriptor, Y extends ActionDescriptor> ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
+            IntegratorPacket<ServiceDTO> serviceDTO) {
         //TODO implement
         return null;
     }

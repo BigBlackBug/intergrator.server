@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.RawDestinationDescriptorDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
 import com.icl.integrator.dto.registration.ActionRegistrationDTO;
@@ -37,10 +36,6 @@ public class TargetRegistrationDTODeserializer extends
                 mapper.readValue(treeNode.get("endpoint").toString(),
                                  EndpointDTO.class);
         dto.setEndpoint(endpoint);
-        RawDestinationDescriptorDTO destinationDescriptorDTO = mapper
-                .readValue(treeNode.get("integratorResponseHandler").toString(),
-                           RawDestinationDescriptorDTO.class);
-        dto.setIntegratorResponseHandler(destinationDescriptorDTO);
 
         List<ActionRegistrationDTO<ActionDescriptor>> actions =
                 getActions(treeNode.get("actionRegistrations"), endpoint.getEndpointType());

@@ -11,9 +11,9 @@ import java.util.List;
  */
 public class DeliveryDTO {
 
-    private RawDestinationDescriptorDTO integratorResponseHandler;
+    private DestinationDescriptorDTO integratorResponseHandler;
 
-    private RawDestinationDescriptorDTO targetResponseHandler;
+    private DestinationDescriptorDTO targetResponseHandler;
 
     private List<DestinationDTO> destinations;
 
@@ -21,8 +21,8 @@ public class DeliveryDTO {
 
     private RequestDataDTO data;
 
-    public DeliveryDTO(RawDestinationDescriptorDTO integratorResponseHandler,
-                       RawDestinationDescriptorDTO targetResponseHandler,
+    public DeliveryDTO(DestinationDescriptorDTO integratorResponseHandler,
+                       DestinationDescriptorDTO targetResponseHandler,
                        String action,
                        List<DestinationDTO> destinations) {
         this.integratorResponseHandler = integratorResponseHandler;
@@ -76,22 +76,22 @@ public class DeliveryDTO {
         return result;
     }
 
-    public RawDestinationDescriptorDTO getTargetResponseHandler() {
+    public DestinationDescriptorDTO getTargetResponseHandler() {
 
         return targetResponseHandler;
     }
 
     public void setTargetResponseHandler(
-            RawDestinationDescriptorDTO targetResponseHandler) {
+            DestinationDescriptorDTO targetResponseHandler) {
         this.targetResponseHandler = targetResponseHandler;
     }
 
-    public RawDestinationDescriptorDTO getIntegratorResponseHandler() {
+    public DestinationDescriptorDTO getIntegratorResponseHandler() {
         return integratorResponseHandler;
     }
 
     public void setIntegratorResponseHandler(
-            RawDestinationDescriptorDTO integratorResponseHandler) {
+            DestinationDescriptorDTO integratorResponseHandler) {
         this.integratorResponseHandler = integratorResponseHandler;
     }
 

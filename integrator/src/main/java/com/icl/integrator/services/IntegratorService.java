@@ -2,9 +2,7 @@ package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.FullServiceDTO;
-import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
@@ -15,6 +13,9 @@ import com.icl.integrator.model.JMSAction;
 import com.icl.integrator.model.JMSServiceEndpoint;
 import com.icl.integrator.util.EndpointType;
 import com.icl.integrator.util.IntegratorException;
+import com.icl.integrator.util.connectors.ConnectionException;
+import com.icl.integrator.util.connectors.EndpointConnector;
+import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,9 @@ import java.util.Map;
 public class IntegratorService {
 
     @Autowired
+    private EndpointConnectorFactory connectorFactory;
+
+    @Autowired
     private PersistenceService persistenceService;
 
     @Autowired
@@ -42,7 +46,7 @@ public class IntegratorService {
 
     @Transactional
     public <T extends ActionDescriptor> void addAction(
-            AddActionDTO<T> actionDTO) throws IntegratorException{
+            AddActionDTO<T> actionDTO) throws IntegratorException {
         ActionRegistrationDTO<T> actionReg =
                 actionDTO.getActionRegistrationDTO();
         ServiceDTO service = actionDTO.getService();
@@ -90,7 +94,23 @@ public class IntegratorService {
                 return null;
             }
         }
+    }
 
+    public ResponseDTO<Boolean> pingService(PingDTO pingDTO) {
+        EndpointConnector connector = connectorFactory
+                .createEndpointConnector(
+                        new DestinationDTO(pingDTO.getServiceName(),
+                                           pingDTO.getEndpointType()),
+                        pingDTO.getAction());
+        ResponseDTO<Boolean> responseDTO;
+        try {
+            connector.testConnection();
+            responseDTO =
+                    new ResponseDTO<>(Boolean.TRUE, Boolean.class);
+        } catch (ConnectionException ex) {
+            responseDTO = new ResponseDTO<>(new ErrorDTO(ex));
+        }
+        return responseDTO;
     }
 
     public List<ServiceDTO> getServiceList() {

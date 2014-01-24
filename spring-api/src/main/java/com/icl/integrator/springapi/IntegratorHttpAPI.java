@@ -33,14 +33,15 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public
     @ResponseBody
     Map<String, ResponseDTO<UUID>> deliver(
-            @RequestBody(required = true) DeliveryDTO packet);
+            @RequestBody(required = true)
+            IntegratorPacket<DeliveryDTO> delivery);
 
     @Override
     @RequestMapping(value = "ping", method = RequestMethod.POST)
     public
     @ResponseBody
     Boolean ping(@RequestBody(required = false)
-                 RawDestinationDescriptorDTO responseHandler);
+                 IntegratorPacket<Void> responseHandlerDescriptor);
 
     @Override
     @RequestMapping(value = "registerService", method = RequestMethod.POST)
@@ -49,14 +50,14 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     <T extends ActionDescriptor>
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             @RequestBody(required = true)
-            TargetRegistrationDTO<T> registrationDTO);
+            IntegratorPacket<TargetRegistrationDTO<T>> registrationDTO);
 
     @Override
     @RequestMapping(value = "checkAvailability", method = RequestMethod.POST)
     public
     @ResponseBody
     ResponseDTO<Boolean> isAvailable(@RequestBody(required = true)
-                                     PingDTO pingDTO);
+                                     IntegratorPacket<PingDTO> pingDTO);
 
     @Override
     @RequestMapping(value = "getServiceList", method = RequestMethod.POST)
@@ -64,7 +65,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @ResponseBody
     ResponseDTO<List<ServiceDTO>> getServiceList(
             @RequestBody(required = false)
-            RawDestinationDescriptorDTO responseHandler);
+            IntegratorPacket<Void> responseHandlerDescriptor);
 
     @Override
     @RequestMapping(value = "getSupportedActions", method = RequestMethod.POST)
@@ -72,17 +73,18 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @ResponseBody
     ResponseDTO<List<String>> getSupportedActions(
             @RequestBody(required = true)
-            ServiceDTOWithResponseHandler serviceDTO);
+            IntegratorPacket<ServiceDTO> serviceDTO);
 
     @Override
     @RequestMapping(value = "addAction", method = RequestMethod.POST)
     @ResponseBody
-    ResponseDTO addAction(@RequestBody(required = true) AddActionDTO actionDTO);
+    ResponseDTO addAction(@RequestBody(required = true)
+                          IntegratorPacket<AddActionDTO> actionDTO);
 
     @Override
     @RequestMapping(value = "getServiceInfo", method = RequestMethod.POST)
     public <T extends EndpointDescriptor, Y extends ActionDescriptor>
     ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
             @RequestBody(required = true)
-            ServiceDTOWithResponseHandler serviceDTO);
+            IntegratorPacket<ServiceDTO> serviceDTO);
 }

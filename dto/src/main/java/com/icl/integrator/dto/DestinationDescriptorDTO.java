@@ -9,18 +9,18 @@ import com.icl.integrator.dto.registration.ActionDescriptor;
  * Time: 11:31
  * To change this template use File | Settings | File Templates.
  */
-public class RawDestinationDescriptorDTO {
+public class DestinationDescriptorDTO {
 
     private EndpointDTO endpoint;
 
     private ActionDescriptor actionDescriptor;
 
-    public RawDestinationDescriptorDTO() {
+    public DestinationDescriptorDTO() {
 
     }
 
-    public RawDestinationDescriptorDTO(EndpointDTO endpoint,
-                                       ActionDescriptor actionDescriptor) {
+    public DestinationDescriptorDTO(EndpointDTO endpoint,
+                                    ActionDescriptor actionDescriptor) {
         this.endpoint = endpoint;
         this.actionDescriptor = actionDescriptor;
     }

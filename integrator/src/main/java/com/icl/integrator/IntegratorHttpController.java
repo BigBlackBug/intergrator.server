@@ -1,17 +1,14 @@
 package com.icl.integrator;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.services.*;
+import com.icl.integrator.services.IntegratorHttpService;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
-import com.icl.integrator.util.connectors.ConnectionException;
-import com.icl.integrator.util.connectors.EndpointConnector;
-import com.icl.integrator.util.connectors.EndpointConnectorFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,160 +27,97 @@ import java.util.UUID;
 @Controller
 public class IntegratorHttpController implements IntegratorHttpAPI {
 
-    private static Log logger =
-            LogFactory.getLog(IntegratorHttpController.class);
+    @Autowired
+    private IntegratorHttpService httpService;
 
     @Autowired
-    private RegistrationService registrationService;
+    private ObjectMapper objectMapper;
 
-    @Autowired
-    private EndpointConnectorFactory connectorFactory;
-
-    @Autowired
-    private PacketProcessorFactory processorFactory;
-
-    @Autowired
-    private IntegratorService integratorService;
-
-    @Autowired
-    private DeliveryService deliveryService;
+    private <Result, Arg> Result fixConversion(
+            Arg argument, TypeReference<Result> type) {
+        return objectMapper.convertValue(argument, type);
+    }
 
     @Override
     public Map<String, ResponseDTO<UUID>> deliver(
-            @RequestBody(required = true) DeliveryDTO packet) {
-        logger.info("Received a delivery request");
-        PacketProcessor processor = processorFactory.createProcessor();
-        Map<String, ResponseDTO<UUID>> serviceToRequestID =
-                processor.process(packet);
-        RawDestinationDescriptorDTO sourceService =
-                packet.getIntegratorResponseHandler();
-        if (sourceService != null) {
-            deliveryService.deliver(sourceService, serviceToRequestID);
-        }
-        return serviceToRequestID;
+            @RequestBody(required = true)
+            IntegratorPacket<DeliveryDTO> delivery) {
+        TypeReference<IntegratorPacket<DeliveryDTO>> type =
+                new TypeReference<IntegratorPacket<DeliveryDTO>>() {
+                };
+        return httpService.deliver(fixConversion(delivery, type));
     }
 
     @Override
     public Boolean ping(@RequestBody(required = true)
-                        RawDestinationDescriptorDTO responseHandler) {
-        if (responseHandler != null && responseHandler.isInitialized()) {
-            deliveryService.deliver(responseHandler, Boolean.TRUE);
-        }
-        return true;
+                        IntegratorPacket<Void> responseHandler) {
+        TypeReference<IntegratorPacket<Void>> type =
+                new TypeReference<IntegratorPacket<Void>>() {
+                };
+        return httpService.ping(fixConversion(responseHandler, type));
     }
 
     @Override
     public <T extends ActionDescriptor>
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             @RequestBody(required = true)
-            TargetRegistrationDTO<T> registrationDTO) {
-        logger.info("Received a service registration request");
-        ResponseDTO<Map<String, ResponseDTO<Void>>> response;
-        try {
-            Map<String, ResponseDTO<Void>> result =
-                    registrationService.register(registrationDTO);
-            response = new ResponseDTO<>(result);
-        } catch (TargetRegistrationException ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
-        }
-        RawDestinationDescriptorDTO responseHandler =
-                registrationDTO.getIntegratorResponseHandler();
-        if (responseHandler != null) {
-            deliveryService.deliver(responseHandler, response);
-        }
-        return response;
+            IntegratorPacket<TargetRegistrationDTO<T>> registrationDTO) {
+        TypeReference<IntegratorPacket<TargetRegistrationDTO<T>>> type =
+                new TypeReference<IntegratorPacket<TargetRegistrationDTO<T>>>() {
+                };
+        return httpService.registerService(fixConversion(
+                registrationDTO, type));
     }
 
     @Override
-    public ResponseDTO<Boolean> isAvailable(
-            @RequestBody(required = true) PingDTO pingDTO) {
-        logger.info("Received a ping request for " + pingDTO);
-        EndpointConnector connector = connectorFactory
-                .createEndpointConnector(
-                        new DestinationDTO(pingDTO.getServiceName(),
-                                           pingDTO.getEndpointType()),
-                        pingDTO.getAction());
-        ResponseDTO<Boolean> responseDTO;
-        try {
-            connector.testConnection();
-            responseDTO =
-                    new ResponseDTO<>(Boolean.TRUE, Boolean.class);
-        } catch (ConnectionException ex) {
-            responseDTO = new ResponseDTO<>(new ErrorDTO(ex));
-        }
-        RawDestinationDescriptorDTO responseHandler =
-                pingDTO.getIntegratorResponseHandler();
-        if (responseHandler != null) {
-            deliveryService.deliver(responseHandler, responseDTO);
-        }
-        return responseDTO;
+    public ResponseDTO<Boolean> isAvailable(@RequestBody(required = true)
+                                            IntegratorPacket<PingDTO> pingDTO) {
+        TypeReference<IntegratorPacket<PingDTO>> type =
+                new TypeReference<IntegratorPacket<PingDTO>>() {
+                };
+        return httpService.isAvailable(fixConversion(pingDTO, type));
     }
 
     @Override
     public ResponseDTO<List<ServiceDTO>> getServiceList(
             @RequestBody(required = false)
-            RawDestinationDescriptorDTO responseHandler) {
-        ResponseDTO<List<ServiceDTO>> response;
-        try {
-            List<ServiceDTO> serviceList = integratorService.getServiceList();
-            response = new ResponseDTO<>(serviceList);
-        } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
-        }
-        if (responseHandler != null && responseHandler.isInitialized()) {
-            deliveryService.deliver(responseHandler, response);
-        }
-        return response;
+            IntegratorPacket<Void> responseHandlerDescriptor) {
+        TypeReference<IntegratorPacket<Void>> type =
+                new TypeReference<IntegratorPacket<Void>>() {
+                };
+        return httpService.getServiceList(fixConversion(
+                responseHandlerDescriptor, type));
     }
 
     @Override
     public ResponseDTO<List<String>> getSupportedActions(
-            @RequestBody(
-                    required = true) ServiceDTOWithResponseHandler serviceDTO) {
-        ResponseDTO<List<String>> response;
-        try {
-            List<String> actions =
-                    integratorService
-                            .getSupportedActions(serviceDTO.getServiceDTO());
-            response = new ResponseDTO<>(actions);
-        } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
-        }
-        RawDestinationDescriptorDTO responseHandler =
-                serviceDTO.getIntegratorResponseHandler();
-        if (responseHandler != null) {
-            deliveryService.deliver(responseHandler, response);
-        }
-        return response;
+            @RequestBody(required = true)
+            IntegratorPacket<ServiceDTO> serviceDTO) {
+        TypeReference<IntegratorPacket<ServiceDTO>> type =
+                new TypeReference<IntegratorPacket<ServiceDTO>>() {
+                };
+
+        return httpService.getSupportedActions(fixConversion(
+                serviceDTO, type));
     }
 
     @Override
-    public ResponseDTO addAction(
-            @RequestBody(required = true) AddActionDTO actionDTO) {
-        ResponseDTO response;
-        try {
-            integratorService.addAction(actionDTO);
-            response = new ResponseDTO(true);
-        } catch (Exception ex) {
-            response = new ResponseDTO(new ErrorDTO(ex));
-        }
-        return response;
+    public ResponseDTO addAction(@RequestBody(required = true)
+                                 IntegratorPacket<AddActionDTO> actionDTO) {
+        TypeReference<IntegratorPacket<AddActionDTO>> type =
+                new TypeReference<IntegratorPacket<AddActionDTO>>() {
+                };
+        return httpService.addAction(fixConversion(actionDTO, type));
     }
 
     @Override
     public <T extends EndpointDescriptor, Y extends ActionDescriptor>
     ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
             @RequestBody(required = true)
-            ServiceDTOWithResponseHandler serviceDTO) {
-        ResponseDTO<FullServiceDTO<T, Y>> response;
-        try {
-            FullServiceDTO<T, Y> serviceInfo =
-                    integratorService
-                            .getServiceInfo(serviceDTO.getServiceDTO());
-            response = new ResponseDTO<>(serviceInfo);
-        } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
-        }
-        return response;
+            IntegratorPacket<ServiceDTO> serviceDTO) {
+        TypeReference<IntegratorPacket<ServiceDTO>> type =
+                new TypeReference<IntegratorPacket<ServiceDTO>>() {
+                };
+        return httpService.getServiceInfo(fixConversion(serviceDTO, type));
     }
 }

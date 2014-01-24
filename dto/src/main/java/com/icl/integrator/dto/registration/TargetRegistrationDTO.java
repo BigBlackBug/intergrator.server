@@ -1,7 +1,6 @@
 package com.icl.integrator.dto.registration;
 
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.RawDestinationDescriptorDTO;
 import com.icl.integrator.util.EndpointType;
 
 import java.util.List;
@@ -14,8 +13,6 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class TargetRegistrationDTO<T extends ActionDescriptor> {
-
-    private RawDestinationDescriptorDTO integratorResponseHandler;
 
     private String serviceName;
 
@@ -35,22 +32,9 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
     }
 
     public TargetRegistrationDTO(String serviceName,
-                                 EndpointDTO endpoint,
-                                 List<ActionRegistrationDTO<T>> actions,
-                                 RawDestinationDescriptorDTO integratorResponseHandler) {
+                                 EndpointDTO endpoint) {
         this.serviceName = serviceName;
         this.endpoint = endpoint;
-        this.actionRegistrations = actions;
-        this.integratorResponseHandler = integratorResponseHandler;
-    }
-
-    public RawDestinationDescriptorDTO getIntegratorResponseHandler() {
-        return integratorResponseHandler;
-    }
-
-    public void setIntegratorResponseHandler(
-            RawDestinationDescriptorDTO integratorResponseHandler) {
-        this.integratorResponseHandler = integratorResponseHandler;
     }
 
     public EndpointType getEndpointType() {
@@ -77,6 +61,11 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
         return actionRegistrations;
     }
 
+    public void setActionRegistrations(
+            List<ActionRegistrationDTO<T>> actionRegistrations) {
+        this.actionRegistrations = actionRegistrations;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -88,14 +77,11 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
 
         TargetRegistrationDTO that = (TargetRegistrationDTO) o;
 
-        if (!actionRegistrations.equals(that.actionRegistrations)) {
+        if (actionRegistrations != null ? !actionRegistrations
+                .equals(that.actionRegistrations) : that.actionRegistrations != null) {
             return false;
         }
         if (!endpoint.equals(that.endpoint)) {
-            return false;
-        }
-        if (integratorResponseHandler != null ? !integratorResponseHandler
-                .equals(that.integratorResponseHandler) : that.integratorResponseHandler != null) {
             return false;
         }
         if (!serviceName.equals(that.serviceName)) {
@@ -105,19 +91,13 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
         return true;
     }
 
-    public void setActionRegistrations(
-            List<ActionRegistrationDTO<T>> actionRegistrations) {
-        this.actionRegistrations = actionRegistrations;
-    }
-
     @Override
     public int hashCode() {
-        int result =
-                integratorResponseHandler != null ? integratorResponseHandler
-                        .hashCode() : 0;
-        result = 31 * result + serviceName.hashCode();
+        int result = serviceName.hashCode();
         result = 31 * result + endpoint.hashCode();
-        result = 31 * result + actionRegistrations.hashCode();
+        result =
+                31 * result + (actionRegistrations != null ? actionRegistrations
+                        .hashCode() : 0);
         return result;
     }
 

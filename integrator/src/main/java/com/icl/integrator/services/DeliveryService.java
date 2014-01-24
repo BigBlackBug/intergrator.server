@@ -51,7 +51,7 @@ public class DeliveryService {
 
     //from cont
     public <T> void deliver(
-            RawDestinationDescriptorDTO sourceService, T packet)
+            DestinationDescriptorDTO sourceService, T packet)
             throws IntegratorException {
         logger.info("Scheduling a request back to service " +
                             "defined as source -> " +
@@ -77,7 +77,7 @@ public class DeliveryService {
                                                 packet.getAction());
         DeliveryCallable<RequestDataDTO> deliveryCallable =
                 new DeliveryCallable<>(destinationConnector, packet.getData());
-        RawDestinationDescriptorDTO targetResponseHandler =
+        DestinationDescriptorDTO targetResponseHandler =
                 packet.getTargetResponseHandler();
         if (targetResponseHandler != null) {
             EndpointDTO endpoint = targetResponseHandler.getEndpoint();

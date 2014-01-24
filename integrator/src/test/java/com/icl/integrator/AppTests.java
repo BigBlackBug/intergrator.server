@@ -1,8 +1,8 @@
 package com.icl.integrator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.dto.DestinationDescriptorDTO;
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.RawDestinationDescriptorDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.HttpActionDTO;
 import com.icl.integrator.dto.registration.QueueDTO;
@@ -98,26 +98,26 @@ public class AppTests {
 
     @Test
     public void testHttpDeserializer() throws Exception {
-        RawDestinationDescriptorDTO
-                serviceDTO = new RawDestinationDescriptorDTO();
+        DestinationDescriptorDTO
+                serviceDTO = new DestinationDescriptorDTO();
         ActionDescriptor descriptor = new HttpActionDTO("PATH");
         serviceDTO.setActionDescriptor(descriptor);
         serviceDTO.setEndpoint(getHttpDTO());
         String s = mapper.writeValueAsString(serviceDTO);
-        RawDestinationDescriptorDTO
-                serviceDTO1 = mapper.readValue(s, RawDestinationDescriptorDTO.class);
+        DestinationDescriptorDTO
+                serviceDTO1 = mapper.readValue(s, DestinationDescriptorDTO.class);
         Assert.assertEquals(serviceDTO,serviceDTO1);
     }
     @Test
     public void testDeserializer() throws Exception {
-        RawDestinationDescriptorDTO
-                serviceDTO = new RawDestinationDescriptorDTO();
+        DestinationDescriptorDTO
+                serviceDTO = new DestinationDescriptorDTO();
         ActionDescriptor descriptor = getQueueDTO();
         serviceDTO.setActionDescriptor(descriptor);
         serviceDTO.setEndpoint(getJMSDTO());
         String s = mapper.writeValueAsString(serviceDTO);
-        RawDestinationDescriptorDTO
-                serviceDTO1 = mapper.readValue(s, RawDestinationDescriptorDTO.class);
+        DestinationDescriptorDTO
+                serviceDTO1 = mapper.readValue(s, DestinationDescriptorDTO.class);
         Assert.assertEquals(serviceDTO,serviceDTO1);
     }
     @Test

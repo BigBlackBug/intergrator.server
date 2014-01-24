@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.icl.integrator.dto.DestinationDescriptorDTO;
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.RawDestinationDescriptorDTO;
 import com.icl.integrator.dto.registration.*;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class IntegratorObjectMapper extends ObjectMapper {
     public IntegratorObjectMapper() {
         super();
         SimpleModule testModule = new SimpleModule(MODULE_NAME);
-        testModule.addDeserializer(RawDestinationDescriptorDTO.class,
+        testModule.addDeserializer(DestinationDescriptorDTO.class,
                                    new RawDestinationDescriptorDTODeserializer());
         testModule.addDeserializer(TargetRegistrationDTO.class,
                                    new TargetRegistrationDTODeserializer());

@@ -19,27 +19,29 @@ import java.util.UUID;
  */
 public interface IntegratorAPI {
 
-    public Map<String, ResponseDTO<UUID>> deliver(DeliveryDTO packet);
+    public Map<String, ResponseDTO<UUID>> deliver(
+            IntegratorPacket<DeliveryDTO> delivery);
 
-    public Boolean ping(RawDestinationDescriptorDTO responseHandler);
+    public Boolean ping(IntegratorPacket<Void> responseHandlerDescriptor);
 
     public <T extends ActionDescriptor>
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            TargetRegistrationDTO<T> registrationDTO);
+            IntegratorPacket<TargetRegistrationDTO<T>> registrationDTO);
 
-    public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO);
+    public ResponseDTO<Boolean> isAvailable(
+            IntegratorPacket<PingDTO> pingDTO);
 
-    public ResponseDTO<List<ServiceDTO>> getServiceList
-            (RawDestinationDescriptorDTO responseHandler);
+    public ResponseDTO<List<ServiceDTO>> getServiceList(
+            IntegratorPacket<Void> responseHandlerDescriptor);
 
     public ResponseDTO<List<String>> getSupportedActions(
-            ServiceDTOWithResponseHandler serviceDTO);
+            IntegratorPacket<ServiceDTO> serviceDTO);
 
-    public ResponseDTO addAction(AddActionDTO actionDTO);
+    public ResponseDTO addAction(IntegratorPacket<AddActionDTO> actionDTO);
 
     public <T extends EndpointDescriptor, Y extends ActionDescriptor>
     ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
-            ServiceDTOWithResponseHandler serviceDTO);
+            IntegratorPacket<ServiceDTO> serviceDTO);
 
     //TODO складывать в базу входящие запросы
 

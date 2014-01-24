@@ -11,7 +11,6 @@ import java.util.Map;
  */
 public class RequestDataDTO {
 
-    //TODO refactor to include class name.
     private Map<String, Object> data;
 
     private Map<String, Object> additionalData;

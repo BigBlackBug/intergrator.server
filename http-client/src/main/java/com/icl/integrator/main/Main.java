@@ -22,8 +22,8 @@ public class Main {
     public static void main(String args[]) {
         IntegratorHttpClient httpClient = new IntegratorHttpClient
                 ("localhost", 8080);
-        ResponseDTO<List<ServiceDTO>> serviceList =
-                httpClient.getServiceList(new RawDestinationDescriptorDTO());
+        register(httpClient);
+        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
         if (serviceList.isSuccess()) {
             List<ServiceDTO> response = serviceList.responseValue();
             for (ServiceDTO service : response) {
@@ -69,8 +69,8 @@ public class Main {
     public static Map<String, ResponseDTO<UUID>> deliver(
             IntegratorHttpClient httpClient) {
         DeliveryDTO deliveryDTO = new DeliveryDTO();
-        RawDestinationDescriptorDTO
-                destinationDescriptor = new RawDestinationDescriptorDTO();
+        DestinationDescriptorDTO
+                destinationDescriptor = new DestinationDescriptorDTO();
         HttpEndpointDescriptorDTO desr = new
                 HttpEndpointDescriptorDTO("192.168.84.142", 8080);
         destinationDescriptor
@@ -78,7 +78,7 @@ public class Main {
         destinationDescriptor.setActionDescriptor(
                 new HttpActionDTO("/api/accept_source_response"));
         deliveryDTO.setTargetResponseHandler(
-                new RawDestinationDescriptorDTO(
+                new DestinationDescriptorDTO(
                         new EndpointDTO<>(EndpointType.HTTP, desr),
                         new HttpActionDTO("/api/accept_target_response")));
         deliveryDTO.setIntegratorResponseHandler(destinationDescriptor);
