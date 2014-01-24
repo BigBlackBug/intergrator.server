@@ -1,18 +1,28 @@
 package com.icl.integrator.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.dto.FullServiceDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.dto.source.EndpointDescriptor;
+import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
+import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.HttpAction;
 import com.icl.integrator.model.HttpServiceEndpoint;
 import com.icl.integrator.model.JMSAction;
 import com.icl.integrator.model.JMSServiceEndpoint;
 import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.util.IntegratorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,9 +37,12 @@ public class IntegratorService {
     @Autowired
     private PersistenceService persistenceService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Transactional
     public <T extends ActionDescriptor> void addAction(
-            AddActionDTO<T> actionDTO) {
+            AddActionDTO<T> actionDTO) throws IntegratorException{
         ActionRegistrationDTO<T> actionReg =
                 actionDTO.getActionRegistrationDTO();
         ServiceDTO service = actionDTO.getService();
@@ -97,4 +110,74 @@ public class IntegratorService {
         return result;
     }
 
+    public <T extends EndpointDescriptor,
+            Y extends ActionDescriptor> FullServiceDTO<T, Y>
+    getServiceInfo(ServiceDTO serviceDTO) {
+        FullServiceDTO<T, Y> result = null;
+        EndpointType endpointType = serviceDTO.getEndpointType();
+        if (endpointType == EndpointType.HTTP) {
+            FullServiceDTO<HttpEndpointDescriptorDTO,
+                    HttpActionDTO> httpResult = new FullServiceDTO<>();
+            HttpServiceEndpoint httpService = persistenceService
+                    .getHttpService(serviceDTO.getServiceName());
+            HttpEndpointDescriptorDTO httpEndpointDescriptorDTO =
+                    new HttpEndpointDescriptorDTO(httpService.getServiceURL()
+                            , httpService.getServicePort());
+            EndpointDTO<HttpEndpointDescriptorDTO> endpointDTO =
+                    new EndpointDTO<>(endpointType, httpEndpointDescriptorDTO);
+            httpResult.setServiceEndpoint(endpointDTO);
+            httpResult.setActions(getHttpActionDTOs(httpService));
+            result = (FullServiceDTO<T, Y>) httpResult;
+        } else if (endpointType == EndpointType.JMS) {
+            FullServiceDTO<JMSEndpointDescriptorDTO,
+                    QueueDTO> jmsResult = new FullServiceDTO<>();
+            JMSServiceEndpoint jmsService = persistenceService
+                    .getJmsService(serviceDTO.getServiceName());
+            Map<String, String> props = null;
+            try {
+                TypeReference<Map<String, String>> typeReference =
+                        new TypeReference<Map<String, String>>() {
+                        };
+                props = objectMapper
+                        .readValue(jmsService.getJndiProperties(),
+                                   typeReference);
+            } catch (IOException e) {
+            }
+            JMSEndpointDescriptorDTO httpEndpointDescriptorDTO =
+                    new JMSEndpointDescriptorDTO(
+                            jmsService.getConnectionFactory(), props);
+            EndpointDTO<JMSEndpointDescriptorDTO> endpointDTO =
+                    new EndpointDTO<>(endpointType, httpEndpointDescriptorDTO);
+            jmsResult.setServiceEndpoint(endpointDTO);
+            jmsResult.setActions(getJmsActionDTOs(jmsService));
+            result = (FullServiceDTO<T, Y>) jmsResult;
+        }
+        result.setServiceName(serviceDTO.getServiceName());
+        return result;
+    }
+
+    public List<ActionEndpointDTO<HttpActionDTO>>
+    getHttpActionDTOs(HttpServiceEndpoint service) {
+        List<ActionEndpointDTO<HttpActionDTO>> result = new ArrayList<>();
+        for (HttpAction action : service.getHttpActions()) {
+            HttpActionDTO httpActionDTO = new HttpActionDTO(
+                    action.getActionURL());
+            result.add(new ActionEndpointDTO<>(
+                    action.getActionName(), httpActionDTO));
+        }
+        return result;
+    }
+
+    public List<ActionEndpointDTO<QueueDTO>>
+    getJmsActionDTOs(JMSServiceEndpoint service) {
+        List<ActionEndpointDTO<QueueDTO>> result = new ArrayList<>();
+        for (JMSAction action : service.getJmsActions()) {
+            QueueDTO actionDTO = new QueueDTO(action.getQueueName(),
+                                              action.getUsername(),
+                                              action.getPassword());
+            result.add(new ActionEndpointDTO<>(
+                    action.getActionName(), actionDTO));
+        }
+        return result;
+    }
 }

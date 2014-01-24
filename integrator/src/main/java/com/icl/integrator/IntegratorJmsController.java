@@ -2,8 +2,10 @@ package com.icl.integrator;
 
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.services.PacketProcessor;
 import com.icl.integrator.services.PacketProcessorFactory;
 import com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler;
@@ -84,8 +86,9 @@ public class IntegratorJmsController implements MessageListener, IntegratorAPI {
     }
 
     @Override
-    public ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            TargetRegistrationDTO<?> registrationDTO) {
+    public <T extends ActionDescriptor>
+    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            TargetRegistrationDTO<T> registrationDTO) {
         //TODO implement
         return null;
     }
@@ -112,6 +115,14 @@ public class IntegratorJmsController implements MessageListener, IntegratorAPI {
 
     @Override
     public ResponseDTO addAction(AddActionDTO actionDTO) {
+        //TODO implement
+        return null;
+    }
+
+    @Override
+    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
+    ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
+            ServiceDTOWithResponseHandler serviceDTO) {
         //TODO implement
         return null;
     }

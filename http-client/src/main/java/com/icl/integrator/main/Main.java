@@ -33,7 +33,7 @@ public class Main {
                 HttpActionDTO httpActionDTO =
                         new HttpActionDTO("/LOL_ACTION_PATH");
                 ActionEndpointDTO<HttpActionDTO> actionEndpoint =
-                        new ActionEndpointDTO<>("LOL_ACTION", httpActionDTO);
+                        new ActionEndpointDTO<>("LOL_ACTION2", httpActionDTO);
                 ActionRegistrationDTO<HttpActionDTO> actionRegDTO =
                         new ActionRegistrationDTO<>(actionEndpoint, true);
                 actionDTO.setActionRegistrationDTO(actionRegDTO);
@@ -44,8 +44,12 @@ public class Main {
                         httpClient.getSupportedActions(service);
                 System.out.println(
                         supportedActions.responseValue());
+                System.out.println("SERVICE_INFO");
+                System.out.println(httpClient.getServiceInfo(service));
+                System.out.println("SERVICE_INFO_END");
             }
         }
+
 //        ResponseDTO<List<String>> new_service = httpClient.getSupportedActions(
 //                new ServiceDTOWithResponseHandler(
 //                        new ServiceDTO("NEW_SERVICE", EndpointType.HTTP)));

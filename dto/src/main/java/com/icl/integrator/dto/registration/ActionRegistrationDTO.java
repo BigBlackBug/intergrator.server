@@ -13,6 +13,9 @@ public class ActionRegistrationDTO<T extends ActionDescriptor> {
 
     private boolean forceRegister;
 
+    public ActionRegistrationDTO() {
+    }
+
     public ActionRegistrationDTO(ActionEndpointDTO<T> action,
                                  boolean forceRegister) {
         this.action = action;

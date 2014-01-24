@@ -15,7 +15,9 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "HTTP_ACTION")
+@Table(name = "HTTP_ACTION", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"ACTION_NAME", "ENDPOINT_ID"})
+})
 public class HttpAction {
 
     @Column(nullable = false, length = 255, name = "ACTION_NAME")

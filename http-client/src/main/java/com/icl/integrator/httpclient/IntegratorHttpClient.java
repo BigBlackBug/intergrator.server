@@ -1,14 +1,15 @@
 package com.icl.integrator.httpclient;
 
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestClientException;
@@ -94,9 +95,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            TargetRegistrationDTO<?> registrationDTO) {
+    public
+    <T extends ActionDescriptor>
+    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            TargetRegistrationDTO<T> registrationDTO){
         HttpMethodDescriptor methodPair = getMethodPath(
                 "registerService", TargetRegistrationDTO.class);
         ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<Void>>>>
@@ -168,8 +170,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public ResponseDTO addAction(@RequestBody(
-            required = true) AddActionDTO actionDTO) {
+    public ResponseDTO addAction(AddActionDTO actionDTO) {
         HttpMethodDescriptor methodPair = getMethodPath
                 ("addAction", AddActionDTO.class);
         try {
@@ -178,6 +179,28 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
                     new ParameterizedTypeReference<ResponseDTO>() {
                     };
             return sendRequest(actionDTO, type, methodPair);
+        } catch (MalformedURLException e) {
+            throw new IntegratorClientException(e);
+        }
+    }
+
+    public ResponseDTO<FullServiceDTO<EndpointDescriptor, ActionDescriptor>>
+    getServiceInfo(ServiceDTO serviceDTO) {
+        return getServiceInfo(new ServiceDTOWithResponseHandler(serviceDTO));
+    }
+
+    @Override
+    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
+    ResponseDTO<FullServiceDTO<T, Y>>
+    getServiceInfo(ServiceDTOWithResponseHandler serviceDTO) {
+        HttpMethodDescriptor methodPair = getMethodPath
+                ("getServiceInfo", ServiceDTOWithResponseHandler.class);
+        try {
+            ParameterizedTypeReference<ResponseDTO<FullServiceDTO<T, Y>> >
+                    type =
+                    new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<T, Y>> >() {
+                    };
+            return sendRequest(serviceDTO, type, methodPair);
         } catch (MalformedURLException e) {
             throw new IntegratorClientException(e);
         }

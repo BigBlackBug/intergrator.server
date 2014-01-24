@@ -1,8 +1,10 @@
 package com.icl.integrator;
 
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.services.*;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
 import com.icl.integrator.util.connectors.ConnectionException;
@@ -71,9 +73,10 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
     }
 
     @Override
-    public ResponseDTO<Map<String, ResponseDTO<Void>>>
-    registerService(@RequestBody(required = true)
-                    TargetRegistrationDTO<?> registrationDTO) {
+    public <T extends ActionDescriptor>
+    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            @RequestBody(required = true)
+            TargetRegistrationDTO<T> registrationDTO) {
         logger.info("Received a service registration request");
         ResponseDTO<Map<String, ResponseDTO<Void>>> response;
         try {
@@ -167,5 +170,20 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         return response;
     }
 
-
+    @Override
+    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
+    ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
+            @RequestBody(required = true)
+            ServiceDTOWithResponseHandler serviceDTO) {
+        ResponseDTO<FullServiceDTO<T, Y>> response;
+        try {
+            FullServiceDTO<T, Y> serviceInfo =
+                    integratorService
+                            .getServiceInfo(serviceDTO.getServiceDTO());
+            response = new ResponseDTO<>(serviceInfo);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
+        return response;
+    }
 }

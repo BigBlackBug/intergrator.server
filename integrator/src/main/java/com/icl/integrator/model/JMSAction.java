@@ -14,8 +14,11 @@ import java.util.UUID;
  * Time: 10:49
  * To change this template use File | Settings | File Templates.
  */
+//TODO add abstractActionEntity and absatrctserviceentity
 @Entity
-@Table(name = "JMS_ACTION")
+@Table(name = "JMS_ACTION", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"ACTION_NAME", "ENDPOINT_ID"})
+})
 public class JMSAction {
 
     @Column(nullable = false, length = 255, name = "ACTION_NAME")

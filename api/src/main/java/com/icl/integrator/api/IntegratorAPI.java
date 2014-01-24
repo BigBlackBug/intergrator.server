@@ -1,8 +1,10 @@
 package com.icl.integrator.api;
 
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.util.List;
 import java.util.Map;
@@ -21,8 +23,9 @@ public interface IntegratorAPI {
 
     public Boolean ping(RawDestinationDescriptorDTO responseHandler);
 
-    public ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            TargetRegistrationDTO<?> registrationDTO);
+    public <T extends ActionDescriptor>
+    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            TargetRegistrationDTO<T> registrationDTO);
 
     public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO);
 
@@ -34,7 +37,9 @@ public interface IntegratorAPI {
 
     public ResponseDTO addAction(AddActionDTO actionDTO);
 
-    //TODO get service info?
+    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
+    ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
+            ServiceDTOWithResponseHandler serviceDTO);
 
     //TODO складывать в базу входящие запросы
 

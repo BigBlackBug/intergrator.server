@@ -9,6 +9,7 @@ import com.icl.integrator.dto.ServiceDTO;
  * Time: 16:13
  * To change this template use File | Settings | File Templates.
  */
+//TODO add response handler. AS A SEPARATE WRAPPERDTO SHIT
 public class AddActionDTO<T extends ActionDescriptor> {
 
     private ActionRegistrationDTO<T> actionRegistrationDTO;

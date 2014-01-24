@@ -28,11 +28,6 @@ public class PersistenceService {
     private EntityManager em;
 
     @Transactional
-    public HttpServiceEndpoint getService(UUID id) {
-        return em.find(HttpServiceEndpoint.class, id);
-    }
-
-    @Transactional
     public HttpServiceEndpoint getHttpService(String serviceName) throws
             NoResultException {
         String query = "select ep from HttpServiceEndpoint ep where " +
