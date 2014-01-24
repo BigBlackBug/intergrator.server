@@ -73,4 +73,9 @@ public class RequestDataDTO {
     public void setAdditionalData(Map<String, Object> additionalData) {
         this.additionalData = additionalData;
     }
+
+    public boolean empty() {
+        return data != null && data.isEmpty() && additionalData != null &&
+                additionalData.isEmpty();
+    }
 }

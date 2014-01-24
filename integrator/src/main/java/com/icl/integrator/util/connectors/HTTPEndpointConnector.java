@@ -1,6 +1,7 @@
 package com.icl.integrator.util.connectors;
 
 import com.icl.integrator.dto.RequestDataDTO;
+import com.icl.integrator.dto.ResponseDTO;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -30,13 +31,13 @@ public class HTTPEndpointConnector implements EndpointConnector {
         RestTemplate restTemplate = new RestTemplate();
         try {
             restTemplate.postForObject(url.toURI(), new RequestDataDTO(),
-                                       Object.class);
+                                       ResponseDTO.class);
             //игнорируем 500 ошибку, так как посылаем заведомо говнозапрос
         } catch (URISyntaxException e) {
             throw new ConnectionException("URL не валиден", e);
         } catch (HttpClientErrorException ex) {
             String message = MessageFormat.format(
-                    "Сервер вернул код {0}. Сообщение об ошибке:'{1}'",
+                    "Сервер вернул код {0}. Сообщение об ошибке:\'{1}\'",
                     ex.getStatusCode(),
                     ex.getStatusText());
             throw new ConnectionException(message, ex);

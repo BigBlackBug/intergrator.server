@@ -16,6 +16,7 @@ public class ResponseDTO<T> {
     protected ErrorDTO error;
 
     public ResponseDTO() {
+        this(true);
     }
 
     //TODO разобраться, а нужен ли нам вообще responseClass.

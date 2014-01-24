@@ -52,8 +52,12 @@ public class Main {
 
 //        ResponseDTO<List<String>> new_service = httpClient.getSupportedActions(
 //                new ServiceDTO("NEW_SERVICE", EndpointType.HTTP));
-        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
-        System.out.print(deliver);
+//        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
+//        System.out.print(deliver);
+        ResponseDTO<Boolean> available =
+                httpClient.isAvailable(new PingDTO("NEW_SERVICE", "ACTION",
+                                                   EndpointType.HTTP));
+        System.out.println(available.getResponse().getResponseValue());
 
     }
 
