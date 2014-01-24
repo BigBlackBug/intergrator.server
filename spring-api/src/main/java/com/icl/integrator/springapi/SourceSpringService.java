@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface SourceSpringService extends SourceService {
 
     @Override
-    @RequestMapping(value = "/handleResponse", method = RequestMethod.POST)
+    @RequestMapping(value = "/handleResponseFromTarget",
+                    method = RequestMethod.POST)
     public void handleResponseFromTarget(@RequestBody(required = true)
                                          ResponseFromTargetDTO responseDTO);
 }

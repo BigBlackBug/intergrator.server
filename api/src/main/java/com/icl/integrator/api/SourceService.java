@@ -11,7 +11,6 @@ import com.icl.integrator.dto.ResponseFromTargetDTO;
  */
 public interface SourceService {
 
-    //TODO тут будет поддержка всех методов.
     public void handleResponseFromTarget(ResponseFromTargetDTO responseDTO);
 
 }

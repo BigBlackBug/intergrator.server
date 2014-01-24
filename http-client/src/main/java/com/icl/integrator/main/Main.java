@@ -22,39 +22,38 @@ public class Main {
     public static void main(String args[]) {
         IntegratorHttpClient httpClient = new IntegratorHttpClient
                 ("localhost", 8080);
-        register(httpClient);
-        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
-        if (serviceList.isSuccess()) {
-            List<ServiceDTO> response = serviceList.responseValue();
-            for (ServiceDTO service : response) {
-                AddActionDTO<HttpActionDTO> actionDTO =
-                        new AddActionDTO<>();
-                actionDTO.setService(service);
-                HttpActionDTO httpActionDTO =
-                        new HttpActionDTO("/LOL_ACTION_PATH");
-                ActionEndpointDTO<HttpActionDTO> actionEndpoint =
-                        new ActionEndpointDTO<>("LOL_ACTION2", httpActionDTO);
-                ActionRegistrationDTO<HttpActionDTO> actionRegDTO =
-                        new ActionRegistrationDTO<>(actionEndpoint, true);
-                actionDTO.setActionRegistrationDTO(actionRegDTO);
-                ResponseDTO responseDTO = httpClient.addAction(actionDTO);
-                System.out.println(responseDTO);
-                System.out.println(service.getServiceName());
-                ResponseDTO<List<String>> supportedActions =
-                        httpClient.getSupportedActions(service);
-                System.out.println(
-                        supportedActions.responseValue());
-                System.out.println("SERVICE_INFO");
-                System.out.println(httpClient.getServiceInfo(service));
-                System.out.println("SERVICE_INFO_END");
-            }
-        }
+//        register(httpClient);
+//        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
+//        if (serviceList.isSuccess()) {
+//            List<ServiceDTO> response = serviceList.responseValue();
+//            for (ServiceDTO service : response) {
+//                AddActionDTO<HttpActionDTO> actionDTO =
+//                        new AddActionDTO<>();
+//                actionDTO.setService(service);
+//                HttpActionDTO httpActionDTO =
+//                        new HttpActionDTO("/LOL_ACTION_PATH");
+//                ActionEndpointDTO<HttpActionDTO> actionEndpoint =
+//                        new ActionEndpointDTO<>("LOL_ACTION2", httpActionDTO);
+//                ActionRegistrationDTO<HttpActionDTO> actionRegDTO =
+//                        new ActionRegistrationDTO<>(actionEndpoint, true);
+//                actionDTO.setActionRegistrationDTO(actionRegDTO);
+//                ResponseDTO responseDTO = httpClient.addAction(actionDTO);
+//                System.out.println(responseDTO);
+//                System.out.println(service.getServiceName());
+//                ResponseDTO<List<String>> supportedActions =
+//                        httpClient.getSupportedActions(service);
+//                System.out.println(
+//                        supportedActions.responseValue());
+//                System.out.println("SERVICE_INFO");
+//                System.out.println(httpClient.getServiceInfo(service));
+//                System.out.println("SERVICE_INFO_END");
+//            }
+//        }
 
 //        ResponseDTO<List<String>> new_service = httpClient.getSupportedActions(
-//                new ServiceDTOWithResponseHandler(
-//                        new ServiceDTO("NEW_SERVICE", EndpointType.HTTP)));
-//        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
-//        System.out.print(deliver);
+//                new ServiceDTO("NEW_SERVICE", EndpointType.HTTP));
+        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
+        System.out.print(deliver);
 
     }
 
@@ -69,19 +68,23 @@ public class Main {
     public static Map<String, ResponseDTO<UUID>> deliver(
             IntegratorHttpClient httpClient) {
         DeliveryDTO deliveryDTO = new DeliveryDTO();
-        DestinationDescriptorDTO
-                destinationDescriptor = new DestinationDescriptorDTO();
+
         HttpEndpointDescriptorDTO desr = new
                 HttpEndpointDescriptorDTO("192.168.84.142", 8080);
-        destinationDescriptor
-                .setEndpoint(new EndpointDTO<>(EndpointType.HTTP, desr));
-        destinationDescriptor.setActionDescriptor(
-                new HttpActionDTO("/api/accept_source_response"));
+        EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
+                new EndpointDTO<>(EndpointType.HTTP, desr);
+
         deliveryDTO.setTargetResponseHandler(
                 new DestinationDescriptorDTO(
-                        new EndpointDTO<>(EndpointType.HTTP, desr),
-                        new HttpActionDTO("/api/accept_target_response")));
-        deliveryDTO.setIntegratorResponseHandler(destinationDescriptor);
+                        endpoint,
+                        new HttpActionDTO("/source/handleResponseFromTarget")
+                ));
+        DestinationDescriptorDTO
+                destinationDescriptor = new DestinationDescriptorDTO();
+        destinationDescriptor
+                .setEndpoint(endpoint);
+        destinationDescriptor.setActionDescriptor(
+                new HttpActionDTO("/ext_source/handleDeliveryResponse_LOLZ"));
         deliveryDTO.setAction("ACTION");
         deliveryDTO.setData(new RequestDataDTO(
                 new HashMap<String, Object>() {{
@@ -90,7 +93,8 @@ public class Main {
         DestinationDTO destination = new DestinationDTO(
                 "NEW_SERVICE", EndpointType.HTTP);
         deliveryDTO.setDestinations(Arrays.asList(destination));
-        return httpClient.deliver(deliveryDTO);
+        return httpClient.deliver(
+                new IntegratorPacket<>(deliveryDTO, destinationDescriptor));
     }
 
     public static ResponseDTO<Map<String, ResponseDTO<Void>>> register(
@@ -113,7 +117,7 @@ public class Main {
         ActionEndpointDTO<HttpActionDTO> actionDTO = new ActionEndpointDTO<>();
 
         HttpActionDTO actionDescriptor = new HttpActionDTO();
-        actionDescriptor.setPath("/api/destination");
+        actionDescriptor.setPath("/destination/handleRequest");
 
         actionDTO.setActionDescriptor(actionDescriptor);
         actionDTO.setActionName("ACTION");

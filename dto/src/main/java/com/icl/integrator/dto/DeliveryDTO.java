@@ -11,8 +11,6 @@ import java.util.List;
  */
 public class DeliveryDTO {
 
-    private DestinationDescriptorDTO integratorResponseHandler;
-
     private DestinationDescriptorDTO targetResponseHandler;
 
     private List<DestinationDTO> destinations;
@@ -21,11 +19,9 @@ public class DeliveryDTO {
 
     private RequestDataDTO data;
 
-    public DeliveryDTO(DestinationDescriptorDTO integratorResponseHandler,
-                       DestinationDescriptorDTO targetResponseHandler,
+    public DeliveryDTO(DestinationDescriptorDTO targetResponseHandler,
                        String action,
                        List<DestinationDTO> destinations) {
-        this.integratorResponseHandler = integratorResponseHandler;
         this.action = action;
         this.destinations = destinations;
     }
@@ -53,10 +49,6 @@ public class DeliveryDTO {
         if (!destinations.equals(that.destinations)) {
             return false;
         }
-        if (integratorResponseHandler != null ? !integratorResponseHandler
-                .equals(that.integratorResponseHandler) : that.integratorResponseHandler != null) {
-            return false;
-        }
         if (!targetResponseHandler.equals(that.targetResponseHandler)) {
             return false;
         }
@@ -66,10 +58,7 @@ public class DeliveryDTO {
 
     @Override
     public int hashCode() {
-        int result =
-                integratorResponseHandler != null ? integratorResponseHandler
-                        .hashCode() : 0;
-        result = 31 * result + targetResponseHandler.hashCode();
+        int result = targetResponseHandler.hashCode();
         result = 31 * result + destinations.hashCode();
         result = 31 * result + action.hashCode();
         result = 31 * result + (data != null ? data.hashCode() : 0);
@@ -77,22 +66,12 @@ public class DeliveryDTO {
     }
 
     public DestinationDescriptorDTO getTargetResponseHandler() {
-
         return targetResponseHandler;
     }
 
     public void setTargetResponseHandler(
             DestinationDescriptorDTO targetResponseHandler) {
         this.targetResponseHandler = targetResponseHandler;
-    }
-
-    public DestinationDescriptorDTO getIntegratorResponseHandler() {
-        return integratorResponseHandler;
-    }
-
-    public void setIntegratorResponseHandler(
-            DestinationDescriptorDTO integratorResponseHandler) {
-        this.integratorResponseHandler = integratorResponseHandler;
     }
 
     public List<DestinationDTO> getDestinations() {
