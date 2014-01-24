@@ -49,16 +49,14 @@ public class DeliveryService {
     @Autowired
     private ObjectMapper serializer;
 
-    //from cont
-    public <T> void deliver(
-            DestinationDescriptorDTO sourceService, T packet)
+    public <T> void deliver(DestinationDescriptorDTO sourceService, T packet)
             throws IntegratorException {
-        logger.info("Scheduling a request back to service " +
+        logger.info("Scheduling a request to service " +
                             "defined as source -> " +
                             sourceService.getActionDescriptor());
-        EndpointConnector sourceConnector = factory.createEndpointConnector
-                (sourceService.getEndpoint(),
-                 sourceService.getActionDescriptor());
+        EndpointConnector sourceConnector = factory.createEndpointConnector(
+                sourceService.getEndpoint(),
+                sourceService.getActionDescriptor());
         DeliveryCallable<ResponseFromIntegratorDTO<T>>
                 deliveryCallable =
                 new DeliveryCallable<>(
@@ -67,7 +65,6 @@ public class DeliveryService {
         scheduler.schedule(new TaskCreator<>(deliveryCallable));
     }
 
-    //main
     public UUID deliver(DestinationDTO destination,
                         DeliveryDTO packet) throws IntegratorException {
         logger.info("Scheduling a request to target " +

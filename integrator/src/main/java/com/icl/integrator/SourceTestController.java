@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * Time: 12:43
  * To change this template use File | Settings | File Templates.
  */
-@RequestMapping(value = "/source/",
+@RequestMapping(value = "/source",
                 consumes = MediaType.APPLICATION_JSON_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE)
 @Controller
@@ -25,14 +24,11 @@ public class SourceTestController implements SourceSpringService {
 
     private final Log logger = LogFactory.getLog(SourceTestController.class);
 
-    @RequestMapping(value = "handleResponse",
-                    method = RequestMethod.POST)
     @Override
-    public void handleResponseFromTarget(
-            @RequestBody ResponseFromTargetDTO responseDTO) {
+    public void handleResponseFromTarget(@RequestBody(required = true)
+                                         ResponseFromTargetDTO responseDTO) {
         logger.info("received target response from integrator from " +
                             responseDTO.getServiceName());
     }
-
 
 }
