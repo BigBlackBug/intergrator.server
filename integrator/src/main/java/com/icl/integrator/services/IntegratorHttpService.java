@@ -103,14 +103,19 @@ public class IntegratorHttpService implements IntegratorAPI {
     @Override
     public ResponseDTO<Boolean> isAvailable(IntegratorPacket<PingDTO> pingDTO) {
         logger.info("Received a ping request for " + pingDTO);
-        ResponseDTO<Boolean> result =
-                integratorService.pingService(pingDTO.getPacket());
+        ResponseDTO<Boolean> response;
+        try {
+            integratorService.pingService(pingDTO.getPacket());
+            response = new ResponseDTO<>(Boolean.TRUE);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
         DestinationDescriptorDTO responseDesc =
                 pingDTO.getResponseDestinationDescriptor();
         if (responseDesc != null) {
-            deliveryService.deliver(responseDesc, result);
+            deliveryService.deliver(responseDesc, response);
         }
-        return result;
+        return response;
     }
 
     @Override

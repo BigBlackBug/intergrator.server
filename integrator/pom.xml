@@ -74,11 +74,11 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc14</artifactId>
-            <version>10.1.0.5</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.oracle</groupId>-->
+            <!--<artifactId>ojdbc14</artifactId>-->
+            <!--<version>10.1.0.5</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>

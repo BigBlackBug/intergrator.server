@@ -28,8 +28,7 @@ public interface IntegratorAPI {
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             IntegratorPacket<TargetRegistrationDTO<T>> registrationDTO);
 
-    public ResponseDTO<Boolean> isAvailable(
-            IntegratorPacket<PingDTO> pingDTO);
+    public ResponseDTO<Boolean> isAvailable(IntegratorPacket<PingDTO> pingDTO);
 
     public ResponseDTO<List<ServiceDTO>> getServiceList(
             IntegratorPacket<Void> responseHandlerDescriptor);

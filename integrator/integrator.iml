@@ -82,7 +82,6 @@
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.0.9" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.0.9" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.janino:janino:2.5.16" level="project" />
-    <orderEntry type="library" name="Maven: com.oracle:ojdbc14:10.1.0.5" level="project" />
     <orderEntry type="library" name="Maven: org.postgresql:postgresql:9.3-1100-jdbc41" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-core:3.6.9.Final" level="project" />
     <orderEntry type="library" name="Maven: antlr:antlr:2.7.6" level="project" />

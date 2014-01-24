@@ -13,7 +13,6 @@ import com.icl.integrator.model.JMSAction;
 import com.icl.integrator.model.JMSServiceEndpoint;
 import com.icl.integrator.util.EndpointType;
 import com.icl.integrator.util.IntegratorException;
-import com.icl.integrator.util.connectors.ConnectionException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,21 +95,14 @@ public class IntegratorService {
         }
     }
 
-    public ResponseDTO<Boolean> pingService(PingDTO pingDTO) {
+    public Boolean pingService(PingDTO pingDTO) {
         EndpointConnector connector = connectorFactory
                 .createEndpointConnector(
                         new DestinationDTO(pingDTO.getServiceName(),
                                            pingDTO.getEndpointType()),
                         pingDTO.getAction());
-        ResponseDTO<Boolean> responseDTO;
-        try {
-            connector.testConnection();
-            responseDTO =
-                    new ResponseDTO<>(Boolean.TRUE, Boolean.class);
-        } catch (ConnectionException ex) {
-            responseDTO = new ResponseDTO<>(new ErrorDTO(ex));
-        }
-        return responseDTO;
+        connector.testConnection();
+        return true;
     }
 
     public List<ServiceDTO> getServiceList() {
