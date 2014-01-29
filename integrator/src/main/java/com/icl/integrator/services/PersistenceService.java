@@ -1,18 +1,15 @@
 package com.icl.integrator.services;
 
-import com.icl.integrator.model.HttpAction;
+import com.icl.integrator.model.AbstractEntity;
 import com.icl.integrator.model.HttpServiceEndpoint;
-import com.icl.integrator.model.JMSAction;
 import com.icl.integrator.model.JMSServiceEndpoint;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,44 +42,14 @@ public class PersistenceService {
                 setParameter("serviceName", serviceName).getSingleResult();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public HttpAction saveAction(HttpAction action) {
-        if (action == null) {
-            em.persist(action);
-            return action;
-        } else {
-            return em.merge(action);
-        }
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public JMSAction saveAction(JMSAction action) {
-        if (action == null) {
-            em.persist(action);
-            return action;
-        } else {
-            return em.merge(action);
-        }
-    }
-
     @Transactional
-    public HttpServiceEndpoint saveService(HttpServiceEndpoint endpoint) {
-        if (endpoint == null) {
-            em.persist(endpoint);
-            return endpoint;
+    public <T extends AbstractEntity> T save(T entity) {
+        if (entity == null) {  //TODO WAIT WHAT?
+            em.persist(entity);
         } else {
-            return em.merge(endpoint);
+            entity = em.merge(entity);
         }
-    }
-
-    @Transactional
-    public JMSServiceEndpoint saveService(JMSServiceEndpoint endpoint) {
-        if (endpoint == null) {
-            em.persist(endpoint);
-            return endpoint;
-        } else {
-            return em.merge(endpoint);
-        }
+        return entity;
     }
 
     @Transactional

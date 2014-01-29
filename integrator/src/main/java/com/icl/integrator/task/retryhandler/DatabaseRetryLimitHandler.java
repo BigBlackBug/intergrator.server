@@ -21,7 +21,7 @@ public class DatabaseRetryLimitHandler implements DatabaseRetryHandler {
             DatabaseRetryLimitHandler.class);
 
     @PersistenceContext
-    public EntityManager em;
+    private EntityManager em;
 
     private TaskLogEntry logEntry;
 

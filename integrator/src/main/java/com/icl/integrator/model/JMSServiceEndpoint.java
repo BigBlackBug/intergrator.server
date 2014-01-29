@@ -1,13 +1,10 @@
 package com.icl.integrator.model;
 
 import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,29 +15,18 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "JMS_ENDPOINT")
-public class JMSServiceEndpoint {
-
-    @Column(unique = true, nullable = false, length = 255,
-            name = "SERVICE_NAME")
-    private String serviceName;
+public class JMSServiceEndpoint extends AbstractEndpointEntity {
 
     @OneToMany(fetch = FetchType.EAGER,
                mappedBy = "jmsServiceEndpoint")
     @Cascade(value = org.hibernate.annotations.CascadeType.ALL)
     private List<JMSAction> jmsActions = new ArrayList<>();
 
-    @Id
-    @Type(type = "com.icl.integrator.model.OracleGuidType")
-    @Column(name = "ENDPOINT_ID")
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
-    private UUID id;
+    @Column(nullable = false, length = 255, name = "CONNECTION_FACTORY")
+    private String connectionFactory;
 
     @Column(nullable = false, length = 255, name = "JNDI_PROPERTIES")
     private String jndiProperties;
-
-    @Column(nullable = false, length = 255, name = "CONNECTION_FACTORY")
-    private String connectionFactory;
 
     public List<JMSAction> getJmsActions() {
         return jmsActions;
@@ -48,18 +34,6 @@ public class JMSServiceEndpoint {
 
     public void setJmsActions(List<JMSAction> jmsActions) {
         this.jmsActions = jmsActions;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public String getJndiProperties() {

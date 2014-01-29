@@ -1,18 +1,22 @@
 package com.icl.integrator.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
+import com.icl.integrator.model.RequestLogEntry;
 import com.icl.integrator.util.IntegratorObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -42,13 +46,47 @@ public class IntegratorHttpService implements IntegratorAPI {
     @Autowired
     private DeliveryService deliveryService;
 
+    @Autowired
+    private PersistenceService persistenceService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private <Request, Response> RequestLogEntry createLogEntry(
+            RequestLogEntry.RequestType requestType, Date requestTime,
+            Request requestData, Response responseData) {
+        RequestLogEntry entry = new RequestLogEntry();
+        try {
+            entry.setRequestData(objectMapper.writeValueAsString(requestData));
+        } catch (JsonProcessingException e) {
+            logger.info("Unable to convert request entity to json");
+            return null;
+        }
+        entry.setRequestDate(requestTime);
+        entry.setRequestType(requestType);
+        try {
+            entry.setResponseData(
+                    objectMapper.writeValueAsString(responseData));
+        } catch (JsonProcessingException e) {
+            logger.info("Unable to convert request entity to json");
+            return null;
+        }
+        return entry;
+    }
+
     @Override
     public Map<String, ResponseDTO<UUID>> deliver(
             IntegratorPacket<DeliveryDTO> delivery) {
         logger.info("Received a delivery request");
+        Date requestTime = new Date();
         PacketProcessor processor = processorFactory.createProcessor();
         Map<String, ResponseDTO<UUID>> serviceToRequestID =
                 processor.process(delivery.getPacket());
+
+        RequestLogEntry logEntry =
+                createLogEntry(RequestLogEntry.RequestType.DELIVERY,
+                               requestTime, delivery, serviceToRequestID);
+        persistenceService.save(logEntry);
         DestinationDescriptorDTO responseDestDesc =
                 delivery.getResponseDestinationDescriptor();
         if (responseDestDesc != null) {
@@ -79,19 +117,20 @@ public class IntegratorHttpService implements IntegratorAPI {
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             IntegratorPacket<TargetRegistrationDTO<T>> registrationDTO) {
         logger.info("Received a service registration request");
+        Date requestTime = new Date();
         ResponseDTO<Map<String, ResponseDTO<Void>>> response;
-        TypeReference<IntegratorPacket<TargetRegistrationDTO<T>>> ref =
-                new TypeReference<IntegratorPacket<TargetRegistrationDTO<T>>>() {
-                };
-        IntegratorPacket<TargetRegistrationDTO<T>> o = des(registrationDTO,
-                                                           ref);
         try {
             Map<String, ResponseDTO<Void>> result =
                     registrationService.register(registrationDTO.getPacket());
             response = new ResponseDTO<>(result);
-        } catch (TargetRegistrationException ex) {
+        } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
+        RequestLogEntry logEntry =
+                createLogEntry(RequestLogEntry.RequestType.REGISTRATION,
+                               requestTime, registrationDTO, response);
+        persistenceService.save(logEntry);
+
         DestinationDescriptorDTO responseDestDesc =
                 registrationDTO.getResponseDestinationDescriptor();
         if (responseDestDesc != null) {

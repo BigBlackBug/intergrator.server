@@ -42,8 +42,4 @@ public interface IntegratorAPI {
     ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
             IntegratorPacket<ServiceDTO> serviceDTO);
 
-    //TODO складывать в базу входящие запросы
-
-    //TODO предусмотреть возможность пинга в клиентском апи.
-    //TODO или чё-нить в этом роде
 }

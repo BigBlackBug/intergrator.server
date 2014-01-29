@@ -1,11 +1,9 @@
 package com.icl.integrator.model;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,22 +14,20 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "TASK_LOG_ENTRY")
-public class TaskLogEntry {
+public class TaskLogEntry extends AbstractEntity {
 
-    @Id
-    @Type(type = "com.icl.integrator.model.OracleGuidType")
-    @Column(name = "TASK_LOG_ID")
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
-    private UUID id;
-
-    @Column(name = "LOG_MESSAGE", nullable = false)
+    @Column(name = "LOG_MESSAGE", nullable = false, length = 1024)
     private String message;
 
     @Column(name = "EXTRA_LOG_MESSAGE")
+    @Type(type = "org.hibernate.type.StringClobType")
+    @Lob
     private String additionalMessage;
 
     @Column(name = "ATTACHED_JSON")
+    @Basic(fetch = FetchType.LAZY)
+    @Type(type = "org.hibernate.type.StringClobType")
+    @Lob
     private String dataJson;
 
     public TaskLogEntry() {
@@ -56,10 +52,6 @@ public class TaskLogEntry {
 
     public TaskLogEntry(String message, ObjectNode data) {
         this(message, "", data);
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public String getDataJson() {

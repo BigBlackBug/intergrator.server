@@ -103,7 +103,7 @@ public class RegistrationService {
         JMSServiceEndpoint serviceEntity =
                 createJmsEntity(descriptor, serviceName);
         try {
-            serviceEntity = persistenceService.saveService(serviceEntity);
+            serviceEntity = persistenceService.save(serviceEntity);
         } catch (DataAccessException ex) {
             logger.error("GG", ex);
             throw new TargetRegistrationException("Ошибка регистрации", ex);
@@ -113,7 +113,7 @@ public class RegistrationService {
             try {
                 action.setJmsServiceEndpoint(serviceEntity);
                 serviceEntity.addAction(action);
-                persistenceService.saveAction(action);
+                persistenceService.save(action);
                 responseDTO = new ResponseDTO<>(true);
             } catch (DataAccessException ex) {
                 ErrorDTO errorDTO = new ErrorDTO();
@@ -139,7 +139,7 @@ public class RegistrationService {
         HttpServiceEndpoint serviceEntity =
                 createHttpEntity(descriptor, serviceName);
         try {
-            serviceEntity = persistenceService.saveService(serviceEntity);
+            serviceEntity = persistenceService.save(serviceEntity);
         } catch (DataAccessException ex) {
             logger.error("GG", ex);
             throw new TargetRegistrationException("Ошибка регистрации", ex);
@@ -149,7 +149,7 @@ public class RegistrationService {
             try {
                 action.setHttpServiceEndpoint(serviceEntity);
                 serviceEntity.addAction(action);
-                persistenceService.saveAction(action);
+                persistenceService.save(action);
                 responseDTO = new ResponseDTO<>(true);
             } catch (DataAccessException ex) {
                 ErrorDTO errorDTO = new ErrorDTO();

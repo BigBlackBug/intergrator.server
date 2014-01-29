@@ -22,7 +22,8 @@ public class Main {
     public static void main(String args[]) {
         IntegratorHttpClient httpClient = new IntegratorHttpClient
                 ("localhost", 8080);
-//        register(httpClient);
+//        ResponseDTO<Map<String, ResponseDTO<Void>>> register =
+//                register(httpClient);
 //        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
 //        if (serviceList.isSuccess()) {
 //            List<ServiceDTO> response = serviceList.responseValue();
@@ -52,12 +53,13 @@ public class Main {
 
 //        ResponseDTO<List<String>> new_service = httpClient.getSupportedActions(
 //                new ServiceDTO("NEW_SERVICE", EndpointType.HTTP));
-//        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
-//        System.out.print(deliver);
-        ResponseDTO<Boolean> available =
-                httpClient.isAvailable(new PingDTO("NEW_SERVICE", "ACTION",
-                                                   EndpointType.HTTP));
-        System.out.println(available.getResponse().getResponseValue());
+
+//        ResponseDTO<Boolean> available =
+//                httpClient.isAvailable(new PingDTO("NEW_SERVICE", "ACTION",
+//                                                   EndpointType.HTTP));
+        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
+        System.out.print(deliver);
+//        System.out.println(available.getResponse().getResponseValue());
 
     }
 
@@ -88,7 +90,7 @@ public class Main {
         destinationDescriptor
                 .setEndpoint(endpoint);
         destinationDescriptor.setActionDescriptor(
-                new HttpActionDTO("/ext_source/handleDeliveryResponse_LOLZ"));
+                new HttpActionDTO("/ext_source/handleDeliveryResponse"));
         deliveryDTO.setAction("ACTION");
         deliveryDTO.setData(new RequestDataDTO(
                 new HashMap<String, Object>() {{
