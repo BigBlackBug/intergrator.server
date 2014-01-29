@@ -11,6 +11,8 @@ public class IntegratorPacket<T> {
 
     private T packet;
 
+    private IntegratorMethod method;
+
     private DestinationDescriptorDTO responseDestinationDescriptor;
 
     public IntegratorPacket() {
@@ -30,6 +32,14 @@ public class IntegratorPacket<T> {
 
     public IntegratorPacket(T packet) {
         this.packet = packet;
+    }
+
+    public IntegratorMethod getMethod() {
+        return method;
+    }
+
+    public void setMethod(IntegratorMethod method) {
+        this.method = method;
     }
 
     public T getPacket() {

@@ -7,7 +7,7 @@ import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.services.IntegratorHttpService;
+import com.icl.integrator.services.IntegratorService;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,7 +28,7 @@ import java.util.UUID;
 public class IntegratorHttpController implements IntegratorHttpAPI {
 
     @Autowired
-    private IntegratorHttpService httpService;
+    private IntegratorService integratorService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -45,7 +45,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         TypeReference<IntegratorPacket<DeliveryDTO>> type =
                 new TypeReference<IntegratorPacket<DeliveryDTO>>() {
                 };
-        return httpService.deliver(fixConversion(delivery, type));
+        return integratorService.deliver(fixConversion(delivery, type));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         TypeReference<IntegratorPacket<Void>> type =
                 new TypeReference<IntegratorPacket<Void>>() {
                 };
-        return httpService.ping(fixConversion(responseHandler, type));
+        return integratorService.ping(fixConversion(responseHandler, type));
     }
 
     @Override
@@ -65,7 +65,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         TypeReference<IntegratorPacket<TargetRegistrationDTO<T>>> type =
                 new TypeReference<IntegratorPacket<TargetRegistrationDTO<T>>>() {
                 };
-        return httpService.registerService(fixConversion(
+        return integratorService.registerService(fixConversion(
                 registrationDTO, type));
     }
 
@@ -75,7 +75,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         TypeReference<IntegratorPacket<PingDTO>> type =
                 new TypeReference<IntegratorPacket<PingDTO>>() {
                 };
-        return httpService.isAvailable(fixConversion(pingDTO, type));
+        return integratorService.isAvailable(fixConversion(pingDTO, type));
     }
 
     @Override
@@ -85,7 +85,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         TypeReference<IntegratorPacket<Void>> type =
                 new TypeReference<IntegratorPacket<Void>>() {
                 };
-        return httpService.getServiceList(fixConversion(
+        return integratorService.getServiceList(fixConversion(
                 responseHandlerDescriptor, type));
     }
 
@@ -97,7 +97,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
                 new TypeReference<IntegratorPacket<ServiceDTO>>() {
                 };
 
-        return httpService.getSupportedActions(fixConversion(
+        return integratorService.getSupportedActions(fixConversion(
                 serviceDTO, type));
     }
 
@@ -107,7 +107,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         TypeReference<IntegratorPacket<AddActionDTO>> type =
                 new TypeReference<IntegratorPacket<AddActionDTO>>() {
                 };
-        return httpService.addAction(fixConversion(actionDTO, type));
+        return integratorService.addAction(fixConversion(actionDTO, type));
     }
 
     @Override
@@ -118,6 +118,6 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         TypeReference<IntegratorPacket<ServiceDTO>> type =
                 new TypeReference<IntegratorPacket<ServiceDTO>>() {
                 };
-        return httpService.getServiceInfo(fixConversion(serviceDTO, type));
+        return integratorService.getServiceInfo(fixConversion(serviceDTO, type));
     }
 }

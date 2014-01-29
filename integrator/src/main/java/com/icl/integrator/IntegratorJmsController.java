@@ -1,40 +1,40 @@
 package com.icl.integrator;
 
-import com.icl.integrator.api.IntegratorAPI;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
-import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.services.PacketProcessorFactory;
+import com.icl.integrator.services.IntegratorService;
 import com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler;
-import com.icl.integrator.util.IntegratorObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.jms.*;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.TextMessage;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Component
-public class IntegratorJmsController implements MessageListener, IntegratorAPI {
+public class IntegratorJmsController implements MessageListener {
 
     private final static Log logger = LogFactory.getLog(
             DatabaseRetryLimitHandler.class);
 
     @Autowired
-    private IntegratorObjectMapper mapper = new IntegratorObjectMapper();
+    private ObjectMapper mapper;
 
     @Autowired
-    private PacketProcessorFactory processorFactory;
+    private IntegratorService integratorService;
 
+    @Override
     public void onMessage(final Message message) {
-        DeliveryDTO packet;
+        IntegratorPacket<?> integratorPacket;
         if (message instanceof TextMessage) {
             String content;
             try {
@@ -44,18 +44,79 @@ public class IntegratorJmsController implements MessageListener, IntegratorAPI {
                 return;
             }
             try {
-                packet = mapper.readValue(content, DeliveryDTO.class);
+                integratorPacket =
+                        mapper.readValue(content, IntegratorPacket.class);
             } catch (IOException e) {
                 logger.error("Не могу десериализовать сообщение в объект", e);
                 return;
             }
-        } else if (message instanceof ObjectMessage) {
-            ObjectMessage objectMessage = (ObjectMessage) message;
-            try {
-                packet = (DeliveryDTO) objectMessage.getObject();
-            } catch (JMSException e) {
-                logger.error("Ошибка получения объекта из сообщения", e);
-                return;
+            switch (integratorPacket.getMethod()) {
+                case ADD_ACTION: {
+                    IntegratorPacket<AddActionDTO> packet = mapper.convertValue(
+                            integratorPacket,
+                            new TypeReference<IntegratorPacket<AddActionDTO>>() {
+                            });
+                    integratorService.addAction(packet);
+                    break;
+                }
+                case DELIVER: {
+                    IntegratorPacket<DeliveryDTO> packet = mapper.convertValue(
+                            integratorPacket,
+                            new TypeReference<IntegratorPacket<DeliveryDTO>>() {
+                            });
+                    integratorService.deliver(packet);
+                    break;
+                }
+                case GET_SERVICE_INFO: {
+                    IntegratorPacket<ServiceDTO> packet = mapper.convertValue(
+                            integratorPacket,
+                            new TypeReference<IntegratorPacket<ServiceDTO>>() {
+                            });
+                    integratorService.getServiceInfo(packet);
+                    break;
+                }
+                case GET_SERVICE_LIST: {
+                    IntegratorPacket<Void> packet = mapper.convertValue(
+                            integratorPacket,
+                            new TypeReference<IntegratorPacket<Void>>() {
+                            });
+                    integratorService.getServiceList(packet);
+                    break;
+                }
+                case GET_SUPPORTED_ACTIONS: {
+                    IntegratorPacket<ServiceDTO> packet = mapper.convertValue(
+                            integratorPacket,
+                            new TypeReference<IntegratorPacket<ServiceDTO>>() {
+                            });
+                    integratorService.getSupportedActions(packet);
+                    break;
+                }
+                case IS_AVAILABLE: {
+                    IntegratorPacket<PingDTO> packet = mapper.convertValue(
+                            integratorPacket,
+                            new TypeReference<IntegratorPacket<PingDTO>>() {
+                            });
+                    integratorService.isAvailable(packet);
+                    break;
+                }
+                case PING: {
+                    IntegratorPacket<Void> packet = mapper.convertValue(
+                            integratorPacket,
+                            new TypeReference<IntegratorPacket<Void>>() {
+                            });
+                    integratorService.ping(packet);
+                    break;
+                }
+                case REGISTER_SERVICE: {
+                    IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>>
+                            packet
+                            = mapper.convertValue(
+                            integratorPacket,
+                            new TypeReference<IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>>>() {
+                            });
+                    integratorService.registerService(packet);
+                    break;
+                }
             }
         } else {
             logger.error(MessageFormat.format(
@@ -63,59 +124,6 @@ public class IntegratorJmsController implements MessageListener, IntegratorAPI {
                     message.getClass()));
             return;
         }
-//        deliver(packet);
     }
 
-    @Override
-    public Map<String, ResponseDTO<UUID>> deliver(
-            IntegratorPacket<DeliveryDTO> delivery) {
-        //TODO implement
-        return null;
-    }
-
-    @Override
-    public Boolean ping(IntegratorPacket<Void> responseHandlerDescriptor) {
-        //TODO implement
-        return null;
-    }
-
-    @Override
-    public <T extends ActionDescriptor> ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            IntegratorPacket<TargetRegistrationDTO<T>> registrationDTO) {
-        //TODO implement
-        return null;
-    }
-
-    @Override
-    public ResponseDTO<Boolean> isAvailable(IntegratorPacket<PingDTO> pingDTO) {
-        //TODO implement
-        return null;
-    }
-
-    @Override
-    public ResponseDTO<List<ServiceDTO>> getServiceList(
-            IntegratorPacket<Void> responseHandlerDescriptor) {
-        //TODO implement
-        return null;
-    }
-
-    @Override
-    public ResponseDTO<List<String>> getSupportedActions(
-            IntegratorPacket<ServiceDTO> serviceDTO) {
-        //TODO implement
-        return null;
-    }
-
-    @Override
-    public ResponseDTO addAction(IntegratorPacket<AddActionDTO> actionDTO) {
-        //TODO implement
-        return null;
-    }
-
-    @Override
-    public <T extends EndpointDescriptor, Y extends ActionDescriptor> ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
-            IntegratorPacket<ServiceDTO> serviceDTO) {
-        //TODO implement
-        return null;
-    }
 }

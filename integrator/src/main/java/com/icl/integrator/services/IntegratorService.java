@@ -1,41 +1,50 @@
 package com.icl.integrator.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
-import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
-import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
-import com.icl.integrator.model.HttpAction;
-import com.icl.integrator.model.HttpServiceEndpoint;
-import com.icl.integrator.model.JMSAction;
-import com.icl.integrator.model.JMSServiceEndpoint;
-import com.icl.integrator.util.EndpointType;
-import com.icl.integrator.util.IntegratorException;
-import com.icl.integrator.util.connectors.EndpointConnector;
-import com.icl.integrator.util.connectors.EndpointConnectorFactory;
+import com.icl.integrator.model.RequestLogEntry;
+import com.icl.integrator.util.IntegratorObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
- * Date: 21.01.14
- * Time: 11:57
+ * Date: 24.01.14
+ * Time: 14:05
  * To change this template use File | Settings | File Templates.
  */
 @Service
-public class IntegratorService {
+public class IntegratorService implements IntegratorAPI {
+
+    private static Log logger =
+            LogFactory.getLog(IntegratorService.class);
 
     @Autowired
-    private EndpointConnectorFactory connectorFactory;
+    private RegistrationService registrationService;
+
+    @Autowired
+    private PacketProcessorFactory processorFactory;
+
+    @Autowired
+    private IntegratorWorkerService workerService;
+
+    @Autowired
+    private DeliveryService deliveryService;
 
     @Autowired
     private PersistenceService persistenceService;
@@ -43,153 +52,185 @@ public class IntegratorService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Transactional
-    public <T extends ActionDescriptor> void addAction(
-            AddActionDTO<T> actionDTO) throws IntegratorException {
-        ActionRegistrationDTO<T> actionReg =
-                actionDTO.getActionRegistrationDTO();
-        ServiceDTO service = actionDTO.getService();
-        EndpointType endpointType = service.getEndpointType();
-
-        ActionEndpointDTO<T> action = actionReg.getAction();
-        String actionName = action.getActionName();
-
-        if (endpointType == EndpointType.HTTP) {
-            HttpServiceEndpoint serviceEndpoint =
-                    persistenceService.getHttpService(service.getServiceName());
-            HttpActionDTO newActionDTO = (HttpActionDTO)
-                    action.getActionDescriptor();
-            HttpAction newAction = new HttpAction();
-            newAction.setActionName(actionName);
-            newAction.setActionURL(newActionDTO.getPath());
-            newAction.setHttpServiceEndpoint(serviceEndpoint);
-            serviceEndpoint.addAction(newAction);
-        } else if (endpointType == EndpointType.JMS) {
-            JMSServiceEndpoint serviceEndpoint =
-                    persistenceService.getJmsService(service.getServiceName());
-            QueueDTO queueDTO = (QueueDTO) action.getActionDescriptor();
-            JMSAction newAction = new JMSAction();
-            newAction.setActionName(actionName);
-            newAction.setPassword(queueDTO.getPassword());
-            newAction.setQueueName(queueDTO.getQueueName());
-            newAction.setUsername(queueDTO.getUsername());
-            newAction.setJmsServiceEndpoint(serviceEndpoint);
-            serviceEndpoint.addAction(newAction);
+    private <Request, Response> RequestLogEntry createLogEntry(
+            RequestLogEntry.RequestType requestType, Date requestTime,
+            Request requestData, Response responseData) {
+        RequestLogEntry entry = new RequestLogEntry();
+        try {
+            entry.setRequestData(objectMapper.writeValueAsString(requestData));
+        } catch (JsonProcessingException e) {
+            logger.info("Unable to convert request entity to json");
+            return null;
         }
+        entry.setRequestDate(requestTime);
+        entry.setRequestType(requestType);
+        try {
+            entry.setResponseData(
+                    objectMapper.writeValueAsString(responseData));
+        } catch (JsonProcessingException e) {
+            logger.info("Unable to convert request entity to json");
+            return null;
+        }
+        return entry;
     }
 
-    public List<String> getSupportedActions(ServiceDTO serviceDTO) {
-        EndpointType endpointType = serviceDTO.getEndpointType();
-        switch (endpointType) {
-            case HTTP: {
-                return persistenceService.getHttpActions(
-                        serviceDTO.getServiceName());
-            }
-            case JMS: {
-                return persistenceService.getJmsActions(
-                        serviceDTO.getServiceName());
-            }
-            default: {
-                return null;
-            }
+    @Override
+    public Map<String, ResponseDTO<UUID>> deliver(
+            IntegratorPacket<DeliveryDTO> delivery) {
+        logger.info("Received a delivery request");
+        Date requestTime = new Date();
+        PacketProcessor processor = processorFactory.createProcessor();
+        Map<String, ResponseDTO<UUID>> serviceToRequestID =
+                processor.process(delivery.getPacket());
+
+        RequestLogEntry logEntry =
+                createLogEntry(RequestLogEntry.RequestType.DELIVERY,
+                               requestTime, delivery, serviceToRequestID);
+        persistenceService.save(logEntry);
+        DestinationDescriptorDTO responseDestDesc =
+                delivery.getResponseDestinationDescriptor();
+        if (responseDestDesc != null) {
+            deliveryService.deliver(responseDestDesc, serviceToRequestID);
         }
+        return serviceToRequestID;
     }
 
-    public Boolean pingService(PingDTO pingDTO) {
-        EndpointConnector connector = connectorFactory
-                .createEndpointConnector(
-                        new DestinationDTO(pingDTO.getServiceName(),
-                                           pingDTO.getEndpointType()),
-                        pingDTO.getAction());
-        connector.testConnection();
+    @Override
+    public Boolean ping(IntegratorPacket<Void> responseHandler) {
+        DestinationDescriptorDTO descriptor =
+                responseHandler.getResponseDestinationDescriptor();
+        if (descriptor != null && descriptor.isInitialized()) {
+            deliveryService.deliver(descriptor, Boolean.TRUE);
+        }
         return true;
     }
 
-    public List<ServiceDTO> getServiceList() {
-        List<ServiceDTO> result = new ArrayList<>();
-        List<HttpServiceEndpoint> httpServices =
-                persistenceService.getHttpServices();
-        for (HttpServiceEndpoint service : httpServices) {
-            result.add(new ServiceDTO(service.getServiceName(),
-                                      EndpointType.HTTP));
-        }
-        List<JMSServiceEndpoint> jmsServices =
-                persistenceService.getJmsServices();
-        for (JMSServiceEndpoint service : jmsServices) {
-            result.add(new ServiceDTO(service.getServiceName(),
-                                      EndpointType.JMS));
-        }
-        return result;
+    private <Result, Req> Result des(Req value, TypeReference<Result> ref) {
+        IntegratorObjectMapper objectMapper =
+                new IntegratorObjectMapper();
+
+        return objectMapper.convertValue(value, ref);
     }
 
-    public <T extends EndpointDescriptor,
-            Y extends ActionDescriptor> FullServiceDTO<T, Y>
-    getServiceInfo(ServiceDTO serviceDTO) {
-        FullServiceDTO<T, Y> result = null;
-        EndpointType endpointType = serviceDTO.getEndpointType();
-        if (endpointType == EndpointType.HTTP) {
-            FullServiceDTO<HttpEndpointDescriptorDTO,
-                    HttpActionDTO> httpResult = new FullServiceDTO<>();
-            HttpServiceEndpoint httpService = persistenceService
-                    .getHttpService(serviceDTO.getServiceName());
-            HttpEndpointDescriptorDTO httpEndpointDescriptorDTO =
-                    new HttpEndpointDescriptorDTO(httpService.getServiceURL()
-                            , httpService.getServicePort());
-            EndpointDTO<HttpEndpointDescriptorDTO> endpointDTO =
-                    new EndpointDTO<>(endpointType, httpEndpointDescriptorDTO);
-            httpResult.setServiceEndpoint(endpointDTO);
-            httpResult.setActions(getHttpActionDTOs(httpService));
-            result = (FullServiceDTO<T, Y>) httpResult;
-        } else if (endpointType == EndpointType.JMS) {
-            FullServiceDTO<JMSEndpointDescriptorDTO,
-                    QueueDTO> jmsResult = new FullServiceDTO<>();
-            JMSServiceEndpoint jmsService = persistenceService
-                    .getJmsService(serviceDTO.getServiceName());
-            Map<String, String> props = null;
-            try {
-                TypeReference<Map<String, String>> typeReference =
-                        new TypeReference<Map<String, String>>() {
-                        };
-                props = objectMapper
-                        .readValue(jmsService.getJndiProperties(),
-                                   typeReference);
-            } catch (IOException e) {
-            }
-            JMSEndpointDescriptorDTO httpEndpointDescriptorDTO =
-                    new JMSEndpointDescriptorDTO(
-                            jmsService.getConnectionFactory(), props);
-            EndpointDTO<JMSEndpointDescriptorDTO> endpointDTO =
-                    new EndpointDTO<>(endpointType, httpEndpointDescriptorDTO);
-            jmsResult.setServiceEndpoint(endpointDTO);
-            jmsResult.setActions(getJmsActionDTOs(jmsService));
-            result = (FullServiceDTO<T, Y>) jmsResult;
+    @Override
+    public <T extends ActionDescriptor>
+    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            IntegratorPacket<TargetRegistrationDTO<T>> registrationDTO) {
+        logger.info("Received a service registration request");
+        Date requestTime = new Date();
+        ResponseDTO<Map<String, ResponseDTO<Void>>> response;
+        try {
+            Map<String, ResponseDTO<Void>> result =
+                    registrationService.register(registrationDTO.getPacket());
+            response = new ResponseDTO<>(result);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        result.setServiceName(serviceDTO.getServiceName());
-        return result;
+        RequestLogEntry logEntry =
+                createLogEntry(RequestLogEntry.RequestType.REGISTRATION,
+                               requestTime, registrationDTO, response);
+        persistenceService.save(logEntry);
+
+        DestinationDescriptorDTO responseDestDesc =
+                registrationDTO.getResponseDestinationDescriptor();
+        if (responseDestDesc != null) {
+            deliveryService.deliver(responseDestDesc, response);
+        }
+        return response;
     }
 
-    public List<ActionEndpointDTO<HttpActionDTO>>
-    getHttpActionDTOs(HttpServiceEndpoint service) {
-        List<ActionEndpointDTO<HttpActionDTO>> result = new ArrayList<>();
-        for (HttpAction action : service.getHttpActions()) {
-            HttpActionDTO httpActionDTO = new HttpActionDTO(
-                    action.getActionURL());
-            result.add(new ActionEndpointDTO<>(
-                    action.getActionName(), httpActionDTO));
+    @Override
+    public ResponseDTO<Boolean> isAvailable(IntegratorPacket<PingDTO> pingDTO) {
+        logger.info("Received a ping request for " + pingDTO);
+        ResponseDTO<Boolean> response;
+        try {
+            workerService.pingService(pingDTO.getPacket());
+            response = new ResponseDTO<>(Boolean.TRUE);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        return result;
+        DestinationDescriptorDTO responseDesc =
+                pingDTO.getResponseDestinationDescriptor();
+        if (responseDesc != null) {
+            deliveryService.deliver(responseDesc, response);
+        }
+        return response;
     }
 
-    public List<ActionEndpointDTO<QueueDTO>>
-    getJmsActionDTOs(JMSServiceEndpoint service) {
-        List<ActionEndpointDTO<QueueDTO>> result = new ArrayList<>();
-        for (JMSAction action : service.getJmsActions()) {
-            QueueDTO actionDTO = new QueueDTO(action.getQueueName(),
-                                              action.getUsername(),
-                                              action.getPassword());
-            result.add(new ActionEndpointDTO<>(
-                    action.getActionName(), actionDTO));
+    @Override
+    public ResponseDTO<List<ServiceDTO>> getServiceList(
+            IntegratorPacket<Void> responseHandlerDescriptor) {
+        ResponseDTO<List<ServiceDTO>> response;
+        try {
+            List<ServiceDTO> serviceList = workerService.getServiceList();
+            response = new ResponseDTO<>(serviceList);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        return result;
+
+        DestinationDescriptorDTO descriptor =
+                responseHandlerDescriptor.getResponseDestinationDescriptor();
+        if (descriptor != null && descriptor.isInitialized()) {
+            deliveryService.deliver(descriptor, response);
+        }
+        return response;
+    }
+
+    @Override
+    public ResponseDTO<List<String>> getSupportedActions(
+            IntegratorPacket<ServiceDTO> serviceDTO) {
+        ResponseDTO<List<String>> response;
+        try {
+            List<String> actions = workerService
+                    .getSupportedActions(serviceDTO.getPacket());
+            response = new ResponseDTO<>(actions);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
+        DestinationDescriptorDTO responseHandler =
+                serviceDTO.getResponseDestinationDescriptor();
+        if (responseHandler != null) {
+            deliveryService.deliver(responseHandler, response);
+        }
+        return response;
+    }
+
+    @Override
+    public ResponseDTO addAction(IntegratorPacket<AddActionDTO> actionDTO) {
+        ResponseDTO response;
+        try {
+            workerService.addAction(actionDTO.getPacket());
+            response = new ResponseDTO(true);
+        } catch (Exception ex) {
+            response = new ResponseDTO(new ErrorDTO(ex));
+        }
+        DestinationDescriptorDTO responseHandler =
+                actionDTO.getResponseDestinationDescriptor();
+        if (responseHandler != null) {
+            deliveryService.deliver(responseHandler, response);
+        }
+        return response;
+    }
+
+    @Override
+    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
+    ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
+            IntegratorPacket<ServiceDTO> serviceDTO) {
+        ResponseDTO<FullServiceDTO<T, Y>> response;
+        try {
+            FullServiceDTO<T, Y> serviceInfo =
+                    workerService
+                            .getServiceInfo(serviceDTO.getPacket());
+            response = new ResponseDTO<>(serviceInfo);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
+
+        DestinationDescriptorDTO responseHandler =
+                serviceDTO.getResponseDestinationDescriptor();
+        if (responseHandler != null) {
+            deliveryService.deliver(responseHandler, response);
+        }
+        return response;
     }
 }
