@@ -11,13 +11,13 @@ import java.util.List;
  */
 public class DeliveryDTO {
 
-    private DestinationDescriptorDTO targetResponseHandler;
+    private DestinationDescriptorDTO targetResponseHandlerDescriptor;
 
     private List<DestinationDTO> destinations;
 
     private String action;
 
-    private RequestDataDTO data;
+    private RequestDataDTO requestData;
 
     public DeliveryDTO(DestinationDescriptorDTO targetResponseHandler,
                        String action,
@@ -43,13 +43,15 @@ public class DeliveryDTO {
         if (!action.equals(that.action)) {
             return false;
         }
-        if (data != null ? !data.equals(that.data) : that.data != null) {
+        if (requestData != null ? !requestData
+                .equals(that.requestData) : that.requestData != null) {
             return false;
         }
         if (!destinations.equals(that.destinations)) {
             return false;
         }
-        if (!targetResponseHandler.equals(that.targetResponseHandler)) {
+        if (!targetResponseHandlerDescriptor
+                .equals(that.targetResponseHandlerDescriptor)) {
             return false;
         }
 
@@ -58,20 +60,21 @@ public class DeliveryDTO {
 
     @Override
     public int hashCode() {
-        int result = targetResponseHandler.hashCode();
+        int result = targetResponseHandlerDescriptor.hashCode();
         result = 31 * result + destinations.hashCode();
         result = 31 * result + action.hashCode();
-        result = 31 * result + (data != null ? data.hashCode() : 0);
+        result = 31 * result + (requestData != null ? requestData.hashCode() : 0);
         return result;
     }
 
-    public DestinationDescriptorDTO getTargetResponseHandler() {
-        return targetResponseHandler;
+    public DestinationDescriptorDTO getTargetResponseHandlerDescriptor() {
+        return targetResponseHandlerDescriptor;
     }
 
-    public void setTargetResponseHandler(
-            DestinationDescriptorDTO targetResponseHandler) {
-        this.targetResponseHandler = targetResponseHandler;
+    public void setTargetResponseHandlerDescriptor(
+            DestinationDescriptorDTO targetResponseHandlerDescriptor) {
+        this.targetResponseHandlerDescriptor =
+                targetResponseHandlerDescriptor;
     }
 
     public List<DestinationDTO> getDestinations() {
@@ -90,11 +93,11 @@ public class DeliveryDTO {
         this.action = action;
     }
 
-    public RequestDataDTO getData() {
-        return data;
+    public RequestDataDTO getRequestData() {
+        return requestData;
     }
 
-    public void setData(RequestDataDTO data) {
-        this.data = data;
+    public void setRequestData(RequestDataDTO requestData) {
+        this.requestData = requestData;
     }
 }

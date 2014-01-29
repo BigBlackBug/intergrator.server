@@ -73,9 +73,9 @@ public class DeliveryService {
                 factory.createEndpointConnector(destination,
                                                 packet.getAction());
         DeliveryCallable<RequestDataDTO> deliveryCallable =
-                new DeliveryCallable<>(destinationConnector, packet.getData());
+                new DeliveryCallable<>(destinationConnector, packet.getRequestData());
         DestinationDescriptorDTO targetResponseHandler =
-                packet.getTargetResponseHandler();
+                packet.getTargetResponseHandlerDescriptor();
         if (targetResponseHandler != null) {
             EndpointDTO endpoint = targetResponseHandler.getEndpoint();
             ActionDescriptor actionDescriptor = targetResponseHandler
@@ -123,7 +123,7 @@ public class DeliveryService {
         DatabaseRetryHandler handler =
                 databaseRetryHandlerFactory.createHandler();
         TaskLogEntry logEntry =
-                createTaskLogEntry(packet.getData(), destinationDTO, requestID);
+                createTaskLogEntry(packet.getRequestData(), destinationDTO, requestID);
         handler.setLogEntry(logEntry);
         return handler;
     }
@@ -151,7 +151,7 @@ public class DeliveryService {
     }
 
     private <T> UUID deliver(final DeliveryCallable<T> deliveryCallable,
-                             EndpointConnector sourceConnector,
+                             EndpointConnector targetResponseConnector,
                              DestinationDTO destinationDTO) {
         UUID requestID = UUID.randomUUID();
         logger.info("Generated an ID for the request: " + quote(
@@ -168,9 +168,9 @@ public class DeliveryService {
                     }
                 });
         Callable<Void> deliveryFailedCallable = new DeliveryFailedCallable(
-                sourceConnector, destinationDTO, requestID);
+                targetResponseConnector, destinationDTO, requestID);
         deliveryTaskCreator.setCallback(new DeliverySuccessCallback(
-                sourceConnector, destinationDTO, requestID));
+                targetResponseConnector, destinationDTO, requestID));
 
         if (destinationDTO.scheduleRedelivery()) {
             scheduler.schedule(deliveryTaskCreator, deliveryFailedCallable);
@@ -192,7 +192,7 @@ public class DeliveryService {
                                         responseDTO,
                                         destination.getServiceName(),
                                         requestID.toString());
-                        sourceConnector
+                        targetResponseConnector
                                 .sendRequest(data, ResponseDTO.class);
                         return null;
                     }
@@ -202,16 +202,16 @@ public class DeliveryService {
 
         private final UUID requestID;
 
-        private final EndpointConnector sourceConnector;
+        private final EndpointConnector targetResponseConnector;
 
         //  получаем после выполнения метода
         private ResponseDTO responseDTO;
 
-        private DeliverySuccessCallback(EndpointConnector sourceConnector,
+        private DeliverySuccessCallback(EndpointConnector targetResponseConnector,
                                         DestinationDTO
                                                 destination, UUID requestID) {
             this.destination = destination;
-            this.sourceConnector = sourceConnector;
+            this.targetResponseConnector = targetResponseConnector;
             this.requestID = requestID;
         }
 
@@ -227,7 +227,7 @@ public class DeliveryService {
             DatabaseRetryHandler handler =
                     databaseRetryHandlerFactory.createHandler();
             TaskLogEntry logEntry = new TaskLogEntry(
-                    MessageFormat.format(message, sourceConnector.toString()),
+                    MessageFormat.format(message, targetResponseConnector.toString()),
                     node);
             handler.setLogEntry(logEntry);
             TaskCreator<Void> taskCreator = new TaskCreator<>(successCallable);
@@ -236,7 +236,7 @@ public class DeliveryService {
                         @Override
                         public String describe(
                                 TaskCreator<Void> creator) {
-                            return "Отправка запроса: " + sourceConnector
+                            return "Отправка запроса: " + targetResponseConnector
                                     .toString();
                         }
                     });

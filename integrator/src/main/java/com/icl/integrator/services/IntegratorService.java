@@ -88,7 +88,7 @@ public class IntegratorService implements IntegratorAPI {
                                requestTime, delivery, serviceToRequestID);
         persistenceService.save(logEntry);
         DestinationDescriptorDTO responseDestDesc =
-                delivery.getResponseDestinationDescriptor();
+                delivery.getResponseHandlerDescriptor();
         if (responseDestDesc != null) {
             deliveryService.deliver(responseDestDesc, serviceToRequestID);
         }
@@ -98,7 +98,7 @@ public class IntegratorService implements IntegratorAPI {
     @Override
     public Boolean ping(IntegratorPacket<Void> responseHandler) {
         DestinationDescriptorDTO descriptor =
-                responseHandler.getResponseDestinationDescriptor();
+                responseHandler.getResponseHandlerDescriptor();
         if (descriptor != null && descriptor.isInitialized()) {
             deliveryService.deliver(descriptor, Boolean.TRUE);
         }
@@ -132,7 +132,7 @@ public class IntegratorService implements IntegratorAPI {
         persistenceService.save(logEntry);
 
         DestinationDescriptorDTO responseDestDesc =
-                registrationDTO.getResponseDestinationDescriptor();
+                registrationDTO.getResponseHandlerDescriptor();
         if (responseDestDesc != null) {
             deliveryService.deliver(responseDestDesc, response);
         }
@@ -150,7 +150,7 @@ public class IntegratorService implements IntegratorAPI {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         DestinationDescriptorDTO responseDesc =
-                pingDTO.getResponseDestinationDescriptor();
+                pingDTO.getResponseHandlerDescriptor();
         if (responseDesc != null) {
             deliveryService.deliver(responseDesc, response);
         }
@@ -169,7 +169,7 @@ public class IntegratorService implements IntegratorAPI {
         }
 
         DestinationDescriptorDTO descriptor =
-                responseHandlerDescriptor.getResponseDestinationDescriptor();
+                responseHandlerDescriptor.getResponseHandlerDescriptor();
         if (descriptor != null && descriptor.isInitialized()) {
             deliveryService.deliver(descriptor, response);
         }
@@ -188,7 +188,7 @@ public class IntegratorService implements IntegratorAPI {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         DestinationDescriptorDTO responseHandler =
-                serviceDTO.getResponseDestinationDescriptor();
+                serviceDTO.getResponseHandlerDescriptor();
         if (responseHandler != null) {
             deliveryService.deliver(responseHandler, response);
         }
@@ -205,7 +205,7 @@ public class IntegratorService implements IntegratorAPI {
             response = new ResponseDTO(new ErrorDTO(ex));
         }
         DestinationDescriptorDTO responseHandler =
-                actionDTO.getResponseDestinationDescriptor();
+                actionDTO.getResponseHandlerDescriptor();
         if (responseHandler != null) {
             deliveryService.deliver(responseHandler, response);
         }
@@ -227,7 +227,7 @@ public class IntegratorService implements IntegratorAPI {
         }
 
         DestinationDescriptorDTO responseHandler =
-                serviceDTO.getResponseDestinationDescriptor();
+                serviceDTO.getResponseHandlerDescriptor();
         if (responseHandler != null) {
             deliveryService.deliver(responseHandler, response);
         }

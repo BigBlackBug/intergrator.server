@@ -2,12 +2,14 @@ package com.icl.integrator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.DeliveryDTO;
+import com.icl.integrator.dto.IntegratorPacket;
+import com.icl.integrator.dto.PingDTO;
+import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.services.IntegratorService;
-import com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ import java.text.MessageFormat;
 public class IntegratorJmsController implements MessageListener {
 
     private final static Log logger = LogFactory.getLog(
-            DatabaseRetryLimitHandler.class);
+            IntegratorJmsController.class);
 
     @Autowired
     private ObjectMapper mapper;

@@ -13,21 +13,21 @@ public class IntegratorPacket<T> {
 
     private IntegratorMethod method;
 
-    private DestinationDescriptorDTO responseDestinationDescriptor;
+    private DestinationDescriptorDTO responseHandlerDescriptor;
 
     public IntegratorPacket() {
 
     }
 
     public IntegratorPacket(
-            DestinationDescriptorDTO responseDestinationDescriptor) {
-        this.responseDestinationDescriptor = responseDestinationDescriptor;
+            DestinationDescriptorDTO responseHandlerDescriptor) {
+        this.responseHandlerDescriptor = responseHandlerDescriptor;
     }
 
     public IntegratorPacket(T packet,
-                            DestinationDescriptorDTO responseDestinationDescriptor) {
+                            DestinationDescriptorDTO responseHandlerDescriptor) {
         this.packet = packet;
-        this.responseDestinationDescriptor = responseDestinationDescriptor;
+        this.responseHandlerDescriptor = responseHandlerDescriptor;
     }
 
     public IntegratorPacket(T packet) {
@@ -50,12 +50,12 @@ public class IntegratorPacket<T> {
         this.packet = packet;
     }
 
-    public DestinationDescriptorDTO getResponseDestinationDescriptor() {
-        return responseDestinationDescriptor;
+    public DestinationDescriptorDTO getResponseHandlerDescriptor() {
+        return responseHandlerDescriptor;
     }
 
-    public void setResponseDestinationDescriptor(
-            DestinationDescriptorDTO responseDestinationDescriptor) {
-        this.responseDestinationDescriptor = responseDestinationDescriptor;
+    public void setResponseHandlerDescriptor(
+            DestinationDescriptorDTO responseHandlerDescriptor) {
+        this.responseHandlerDescriptor = responseHandlerDescriptor;
     }
 }

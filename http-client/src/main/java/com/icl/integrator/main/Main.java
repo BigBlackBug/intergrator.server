@@ -3,6 +3,7 @@ package com.icl.integrator.main;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
+import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.httpclient.IntegratorHttpClient;
 import com.icl.integrator.util.EndpointType;
 
@@ -17,11 +18,13 @@ import java.util.*;
  */
 public class Main {
 
-    //TODO in body is null client sends x-www-form-urlencoded
+    //TODO if body is null client sends x-www-form-urlencoded
     // and server can't respond
     public static void main(String args[]) {
         IntegratorHttpClient httpClient = new IntegratorHttpClient
-                ("localhost", 8080);
+                ("192.168.83.91", "integrator", 18080);
+        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
+        System.out.println(serviceList);
 //        ResponseDTO<Map<String, ResponseDTO<Void>>> register =
 //                register(httpClient);
 //        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
@@ -80,19 +83,44 @@ public class Main {
         EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
                 new EndpointDTO<>(EndpointType.HTTP, desr);
 
-        deliveryDTO.setTargetResponseHandler(
-                new DestinationDescriptorDTO(
-                        endpoint,
-                        new HttpActionDTO("/source/handleResponseFromTarget")
+//        deliveryDTO.setTargetResponseHandlerDescriptor(
+//                new DestinationDescriptorDTO(
+//                        endpoint,
+//                        new HttpActionDTO("/source/handleResponseFromTarget")
+//                ));
+                HashMap<String, String> map = new HashMap<>();
+        map.put("java.naming.provider.url", "tcp://localhost:61616");
+        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
+                ".ActiveMQInitialContextFactory");
+        DestinationDescriptorDTO targetResponseHandler =
+                new DestinationDescriptorDTO();
+        targetResponseHandler.setEndpoint(
+                new EndpointDTO<>(EndpointType.JMS, new
+                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
                 ));
+        targetResponseHandler.setActionDescriptor(new QueueDTO
+                                                            ("SourceQueue"));
+        deliveryDTO.setTargetResponseHandlerDescriptor(targetResponseHandler);
         DestinationDescriptorDTO
-                destinationDescriptor = new DestinationDescriptorDTO();
-        destinationDescriptor
+                deliveryResponseHandler = new DestinationDescriptorDTO();
+
+
+//        HashMap<String, String> map = new HashMap<>();
+//        map.put("java.naming.provider.url", "tcp://localhost:61616");
+//        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
+//                ".ActiveMQInitialContextFactory");
+//        deliveryResponseHandler.setEndpoint(
+//                new EndpointDTO<>(EndpointType.JMS, new
+//                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
+//                ));
+//        deliveryResponseHandler.setActionDescriptor(new QueueDTO
+//                                                            ("SourceQueue"));
+        deliveryResponseHandler
                 .setEndpoint(endpoint);
-        destinationDescriptor.setActionDescriptor(
+        deliveryResponseHandler.setActionDescriptor(
                 new HttpActionDTO("/ext_source/handleDeliveryResponse"));
         deliveryDTO.setAction("ACTION");
-        deliveryDTO.setData(new RequestDataDTO(
+        deliveryDTO.setRequestData(new RequestDataDTO(
                 new HashMap<String, Object>() {{
                     put("a", "b");
                 }}));
@@ -100,7 +128,7 @@ public class Main {
                 "NEW_SERVICE", EndpointType.HTTP);
         deliveryDTO.setDestinations(Arrays.asList(destination));
         return httpClient.deliver(
-                new IntegratorPacket<>(deliveryDTO, destinationDescriptor));
+                new IntegratorPacket<>(deliveryDTO, deliveryResponseHandler));
     }
 
     public static ResponseDTO<Map<String, ResponseDTO<Void>>> register(
