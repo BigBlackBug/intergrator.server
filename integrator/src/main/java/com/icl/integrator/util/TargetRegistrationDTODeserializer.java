@@ -47,7 +47,7 @@ public class TargetRegistrationDTODeserializer extends
     List<ActionRegistrationDTO<T>> getActions(
             JsonNode actions, EndpointType endpointType) throws IOException {
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
-        List<ActionRegistrationDTO<T>> result = new ArrayList<>();
+        List<ActionRegistrationDTO<T>> result = new ArrayList<ActionRegistrationDTO<T>>();
         int size = actions.size();
         for (int i = 0; i < size; i++) {
             JsonNode node = actions.get(i);

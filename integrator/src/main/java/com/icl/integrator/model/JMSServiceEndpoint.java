@@ -20,7 +20,7 @@ public class JMSServiceEndpoint extends AbstractEndpointEntity {
     @OneToMany(fetch = FetchType.EAGER,
                mappedBy = "jmsServiceEndpoint")
     @Cascade(value = org.hibernate.annotations.CascadeType.ALL)
-    private List<JMSAction> jmsActions = new ArrayList<>();
+    private List<JMSAction> jmsActions = new ArrayList<JMSAction>();
 
     @Column(nullable = false, length = 255, name = "CONNECTION_FACTORY")
     private String connectionFactory;

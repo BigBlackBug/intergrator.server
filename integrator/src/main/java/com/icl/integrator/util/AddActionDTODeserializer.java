@@ -39,6 +39,6 @@ public final class AddActionDTODeserializer
                 ());
         ActionRegistrationDTO actionRegistrationDTO =
                 new ActionRegistrationDTO(action, forceRegister);
-        return new AddActionDTO<>(endpoint, actionRegistrationDTO);
+        return new AddActionDTO(endpoint, actionRegistrationDTO);
     }
 }

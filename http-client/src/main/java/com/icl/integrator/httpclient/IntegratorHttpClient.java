@@ -71,18 +71,18 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
 
     public ResponseDTO<List<String>> getSupportedActions(
             ServiceDTO serviceDTO) {
-        return getSupportedActions(new IntegratorPacket<>(serviceDTO));
+        return getSupportedActions(new IntegratorPacket<ServiceDTO>(serviceDTO));
     }
 
     public <T extends EndpointDescriptor, Y extends ActionDescriptor>
     ResponseDTO<FullServiceDTO<T, Y>>
     getServiceInfo(ServiceDTO serviceDTO) {
-        return getServiceInfo(new IntegratorPacket<>(serviceDTO));
+        return getServiceInfo(new IntegratorPacket<ServiceDTO>(serviceDTO));
     }
 
     public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             DeliveryDTO delivery) {
-        return deliver(new IntegratorPacket<>(delivery));
+        return deliver(new IntegratorPacket<DeliveryDTO>(delivery));
     }
 
     @Override
@@ -119,7 +119,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     public <T extends ActionDescriptor>
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             TargetRegistrationDTO<T> registrationDTO) {
-        return registerService(new IntegratorPacket<>(registrationDTO));
+        return registerService(new IntegratorPacket<TargetRegistrationDTO<T>>(registrationDTO));
     }
 
     @Override
@@ -141,7 +141,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO) {
-        return isAvailable(new IntegratorPacket<>(pingDTO));
+        return isAvailable(new IntegratorPacket<PingDTO>(pingDTO));
     }
 
     @Override
@@ -191,7 +191,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     public ResponseDTO addAction(AddActionDTO actionDTO) {
-        return addAction(new IntegratorPacket<>(actionDTO));
+        return addAction(new IntegratorPacket<AddActionDTO>(actionDTO));
     }
 
     @Override
@@ -253,7 +253,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
                           path + methodDescriptor.getMethodPath());
 
         String urlString = url.toString();
-        HttpEntity<Request> requestEntity = new HttpEntity<>(data);
+        HttpEntity<Request> requestEntity = new HttpEntity<Request>(data);
 
         if (methodType.equals(RequestMethod.GET)) {
             return restTemplate.

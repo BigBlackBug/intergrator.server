@@ -106,7 +106,7 @@ public class IntegratorWorkerService {
     }
 
     public List<ServiceDTO> getServiceList() {
-        List<ServiceDTO> result = new ArrayList<>();
+        List<ServiceDTO> result = new ArrayList<ServiceDTO>();
         List<HttpServiceEndpoint> httpServices =
                 persistenceService.getHttpServices();
         for (HttpServiceEndpoint service : httpServices) {
@@ -129,20 +129,23 @@ public class IntegratorWorkerService {
         EndpointType endpointType = serviceDTO.getEndpointType();
         if (endpointType == EndpointType.HTTP) {
             FullServiceDTO<HttpEndpointDescriptorDTO,
-                    HttpActionDTO> httpResult = new FullServiceDTO<>();
+                    HttpActionDTO> httpResult =
+                    new FullServiceDTO<HttpEndpointDescriptorDTO, HttpActionDTO>();
             HttpServiceEndpoint httpService = persistenceService
                     .getHttpService(serviceDTO.getServiceName());
             HttpEndpointDescriptorDTO httpEndpointDescriptorDTO =
                     new HttpEndpointDescriptorDTO(httpService.getServiceURL()
                             , httpService.getServicePort());
             EndpointDTO<HttpEndpointDescriptorDTO> endpointDTO =
-                    new EndpointDTO<>(endpointType, httpEndpointDescriptorDTO);
+                    new EndpointDTO<HttpEndpointDescriptorDTO>(
+                            endpointType, httpEndpointDescriptorDTO);
             httpResult.setServiceEndpoint(endpointDTO);
             httpResult.setActions(getHttpActionDTOs(httpService));
             result = (FullServiceDTO<T, Y>) httpResult;
         } else if (endpointType == EndpointType.JMS) {
             FullServiceDTO<JMSEndpointDescriptorDTO,
-                    QueueDTO> jmsResult = new FullServiceDTO<>();
+                    QueueDTO> jmsResult =
+                    new FullServiceDTO<JMSEndpointDescriptorDTO, QueueDTO>();
             JMSServiceEndpoint jmsService = persistenceService
                     .getJmsService(serviceDTO.getServiceName());
             Map<String, String> props = null;
@@ -159,7 +162,8 @@ public class IntegratorWorkerService {
                     new JMSEndpointDescriptorDTO(
                             jmsService.getConnectionFactory(), props);
             EndpointDTO<JMSEndpointDescriptorDTO> endpointDTO =
-                    new EndpointDTO<>(endpointType, httpEndpointDescriptorDTO);
+                    new EndpointDTO<JMSEndpointDescriptorDTO>(
+                            endpointType, httpEndpointDescriptorDTO);
             jmsResult.setServiceEndpoint(endpointDTO);
             jmsResult.setActions(getJmsActionDTOs(jmsService));
             result = (FullServiceDTO<T, Y>) jmsResult;
@@ -170,11 +174,12 @@ public class IntegratorWorkerService {
 
     public List<ActionEndpointDTO<HttpActionDTO>>
     getHttpActionDTOs(HttpServiceEndpoint service) {
-        List<ActionEndpointDTO<HttpActionDTO>> result = new ArrayList<>();
+        List<ActionEndpointDTO<HttpActionDTO>> result =
+                new ArrayList<ActionEndpointDTO<HttpActionDTO>>();
         for (HttpAction action : service.getHttpActions()) {
             HttpActionDTO httpActionDTO = new HttpActionDTO(
                     action.getActionURL());
-            result.add(new ActionEndpointDTO<>(
+            result.add(new ActionEndpointDTO<HttpActionDTO>(
                     action.getActionName(), httpActionDTO));
         }
         return result;
@@ -182,12 +187,13 @@ public class IntegratorWorkerService {
 
     public List<ActionEndpointDTO<QueueDTO>>
     getJmsActionDTOs(JMSServiceEndpoint service) {
-        List<ActionEndpointDTO<QueueDTO>> result = new ArrayList<>();
+        List<ActionEndpointDTO<QueueDTO>> result =
+                new ArrayList<ActionEndpointDTO<QueueDTO>>();
         for (JMSAction action : service.getJmsActions()) {
             QueueDTO actionDTO = new QueueDTO(action.getQueueName(),
                                               action.getUsername(),
                                               action.getPassword());
-            result.add(new ActionEndpointDTO<>(
+            result.add(new ActionEndpointDTO<QueueDTO>(
                     action.getActionName(), actionDTO));
         }
         return result;

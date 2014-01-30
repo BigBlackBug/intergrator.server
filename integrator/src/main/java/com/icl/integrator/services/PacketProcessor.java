@@ -26,15 +26,15 @@ public class PacketProcessor {
 
     public Map<String, ResponseDTO<UUID>> process(DeliveryDTO packet) {
         Map<String, ResponseDTO<UUID>> serviceToRequestID = new
-                HashMap<>();
+                HashMap<String, ResponseDTO<UUID>>();
         for (DestinationDTO destination : packet.getDestinations()) {
             ResponseDTO<UUID> response;
             try {
                 UUID requestID = deliveryService.deliver(destination, packet);
-                response = new ResponseDTO<>(requestID, UUID.class);
+                response = new ResponseDTO<UUID>(requestID, UUID.class);
             } catch (IntegratorException ex) {
                 ErrorDTO error = new ErrorDTO(ex);
-                response = new ResponseDTO<>(error);
+                response = new ResponseDTO<UUID>(error);
             }
             serviceToRequestID.put(destination.getServiceName(), response);
         }

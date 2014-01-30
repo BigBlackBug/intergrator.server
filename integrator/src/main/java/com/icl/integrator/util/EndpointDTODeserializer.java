@@ -79,7 +79,8 @@ public class EndpointDTODeserializer extends JsonDeserializer<EndpointDTO> {
                             "the descriptor is not specified", npe);
         }
 
-        EndpointDTO<EndpointDescriptor> endpointDTO = new EndpointDTO<>();
+        EndpointDTO<EndpointDescriptor> endpointDTO =
+                new EndpointDTO<EndpointDescriptor>();
         endpointDTO.setDescriptor(endpointDescriptor);
         endpointDTO.setEndpointType(type);
         return endpointDTO;

@@ -33,8 +33,7 @@ class DeliveryFailedCallable implements Callable<Void> {
         String targetServiceName = targetDestination.getServiceName();
         ErrorDTO errorDTO = new ErrorDTO(MessageFormat.format
                 (generalMessage, requestID, targetServiceName));
-        ResponseDTO<Object> responseFromTarget =
-                new ResponseDTO<>(errorDTO);
+        ResponseDTO responseFromTarget = new ResponseDTO(errorDTO);
         ResponseFromTargetDTO requestData = new ResponseFromTargetDTO(
                 responseFromTarget,
                 targetServiceName,

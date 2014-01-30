@@ -28,7 +28,7 @@ public class TaskCreator<T> {
     private Descriptor<TaskCreator<T>> descriptor;
 
     public TaskCreator(Callable<T> action) {
-        taskRunnable = new TaskRunnable<>(action);
+        taskRunnable = new TaskRunnable<T>(action);
     }
 
     public Callable<T> getAction() {
@@ -93,7 +93,8 @@ public class TaskCreator<T> {
         private Callable<T> action;
 
         private Map<Class<? extends Exception>, Callback<? extends Exception>>
-                exceptionHandlerMap = new HashMap<>();
+                exceptionHandlerMap =
+                new HashMap<Class<? extends Exception>, Callback<? extends Exception>>();
 
         TaskRunnable(Callable<T> action) {
             this.action = action;

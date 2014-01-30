@@ -72,7 +72,7 @@ public class IntegratorObjectMapper extends ObjectMapper {
                 node.get("actionDescriptor"),
                 endpointType);
         ActionEndpointDTO actionEndpoint = new
-                ActionEndpointDTO<>();
+                ActionEndpointDTO();
         actionEndpoint.setActionDescriptor(actionDescriptor);
         actionEndpoint.setActionName(actionName);
 //        actionEndpoint.setForceRegister(forceRegister);

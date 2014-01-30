@@ -31,13 +31,14 @@ public class Main {
 //                ("192.168.83.91", "integrator", 18080);
 //        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
 //        System.out.println(serviceList);
-        ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        ObjectWriter writer =
+                new ObjectMapper().writer().withDefaultPrettyPrinter();
         TargetRegistrationDTO<HttpActionDTO> regDTO =
-                new TargetRegistrationDTO<>();
+                new TargetRegistrationDTO<HttpActionDTO>();
         regDTO.setServiceName("NEW_SERVICE");
         //----------------------------------------------------------------------
         EndpointDTO<HttpEndpointDescriptorDTO>
-                endpointDTO = new EndpointDTO<>();
+                endpointDTO = new EndpointDTO<HttpEndpointDescriptorDTO>();
         endpointDTO.setEndpointType(EndpointType.HTTP);
 
         HttpEndpointDescriptorDTO descr = new HttpEndpointDescriptorDTO();
@@ -47,7 +48,8 @@ public class Main {
 
         regDTO.setEndpoint(endpointDTO);
         //----------------------------------------------------------------------
-        ActionEndpointDTO<HttpActionDTO> actionDTO = new ActionEndpointDTO<>();
+        ActionEndpointDTO<HttpActionDTO> actionDTO =
+                new ActionEndpointDTO<HttpActionDTO>();
 
         HttpActionDTO actionDescriptor = new HttpActionDTO();
         actionDescriptor.setPath("/destination/handleRequest");
@@ -55,7 +57,9 @@ public class Main {
         actionDTO.setActionDescriptor(actionDescriptor);
         actionDTO.setActionName("ACTION");
         regDTO.setActionRegistrations(
-                Arrays.asList(new ActionRegistrationDTO<>(actionDTO, true)));
+                Arrays.asList(
+                        new ActionRegistrationDTO<HttpActionDTO>(actionDTO,
+                                                                 true)));
         try {
             System.out.println(writer.writeValueAsString(regDTO));
         } catch (JsonProcessingException e) {
@@ -119,25 +123,26 @@ public class Main {
         HttpEndpointDescriptorDTO desr = new
                 HttpEndpointDescriptorDTO("192.168.84.142", 8080);
         EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-                new EndpointDTO<>(EndpointType.HTTP, desr);
+                new EndpointDTO<HttpEndpointDescriptorDTO>(EndpointType.HTTP,
+                                                           desr);
 
 //        deliveryDTO.setTargetResponseHandlerDescriptor(
 //                new DestinationDescriptorDTO(
 //                        endpoint,
 //                        new HttpActionDTO("/source/handleResponseFromTarget")
 //                ));
-                HashMap<String, String> map = new HashMap<>();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.put("java.naming.provider.url", "tcp://localhost:61616");
         map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
                 ".ActiveMQInitialContextFactory");
         DestinationDescriptorDTO targetResponseHandler =
                 new DestinationDescriptorDTO();
         targetResponseHandler.setEndpoint(
-                new EndpointDTO<>(EndpointType.JMS, new
+                new EndpointDTO<JMSEndpointDescriptorDTO>(EndpointType.JMS, new
                         JMSEndpointDescriptorDTO("ConnectionFactory", map)
                 ));
         targetResponseHandler.setActionDescriptor(new QueueDTO
-                                                            ("SourceQueue"));
+                                                          ("SourceQueue"));
         deliveryDTO.setTargetResponseHandlerDescriptor(targetResponseHandler);
         DestinationDescriptorDTO
                 deliveryResponseHandler = new DestinationDescriptorDTO();
@@ -166,17 +171,18 @@ public class Main {
                 "NEW_SERVICE", EndpointType.HTTP);
         deliveryDTO.setDestinations(Arrays.asList(destination));
         return httpClient.deliver(
-                new IntegratorPacket<>(deliveryDTO, deliveryResponseHandler));
+                new IntegratorPacket<DeliveryDTO>(deliveryDTO,
+                                                  deliveryResponseHandler));
     }
 
     public static ResponseDTO<Map<String, ResponseDTO<Void>>> register(
             IntegratorHttpClient httpClient) {
         TargetRegistrationDTO<HttpActionDTO> regDTO =
-                new TargetRegistrationDTO<>();
+                new TargetRegistrationDTO<HttpActionDTO>();
         regDTO.setServiceName("NEW_SERVICE");
         //----------------------------------------------------------------------
         EndpointDTO<HttpEndpointDescriptorDTO>
-                endpointDTO = new EndpointDTO<>();
+                endpointDTO = new EndpointDTO<HttpEndpointDescriptorDTO>();
         endpointDTO.setEndpointType(EndpointType.HTTP);
 
         HttpEndpointDescriptorDTO descr = new HttpEndpointDescriptorDTO();
@@ -186,7 +192,8 @@ public class Main {
 
         regDTO.setEndpoint(endpointDTO);
         //----------------------------------------------------------------------
-        ActionEndpointDTO<HttpActionDTO> actionDTO = new ActionEndpointDTO<>();
+        ActionEndpointDTO<HttpActionDTO> actionDTO =
+                new ActionEndpointDTO<HttpActionDTO>();
 
         HttpActionDTO actionDescriptor = new HttpActionDTO();
         actionDescriptor.setPath("/destination/handleRequest");
@@ -194,7 +201,9 @@ public class Main {
         actionDTO.setActionDescriptor(actionDescriptor);
         actionDTO.setActionName("ACTION");
         regDTO.setActionRegistrations(
-                Arrays.asList(new ActionRegistrationDTO<>(actionDTO, true)));
+                Arrays.asList(
+                        new ActionRegistrationDTO<HttpActionDTO>(actionDTO,
+                                                                 true)));
         //----------------------------------------------------------------------
         return httpClient.registerService(regDTO);
     }

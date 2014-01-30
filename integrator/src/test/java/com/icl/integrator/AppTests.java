@@ -77,7 +77,7 @@ public class AppTests {
         d.setJndiProperties(new HashMap<String,String>(){{
             put("a","1");
         }});
-        EndpointDTO<EndpointDescriptor> dto = new EndpointDTO<>();
+        EndpointDTO<EndpointDescriptor> dto = new EndpointDTO<EndpointDescriptor>();
         dto.setEndpointType(EndpointType.JMS);
         dto.setDescriptor(d);
         return dto;
@@ -87,7 +87,7 @@ public class AppTests {
         HttpEndpointDescriptorDTO d = new HttpEndpointDescriptorDTO();
         d.setHost("HOST");
         d.setPort(10001);
-        EndpointDTO<EndpointDescriptor> dto = new EndpointDTO<>();
+        EndpointDTO<EndpointDescriptor> dto = new EndpointDTO<EndpointDescriptor>();
         dto.setEndpointType(EndpointType.HTTP);
         dto.setDescriptor(d);
         return dto;

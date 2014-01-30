@@ -83,13 +83,13 @@ public class IntegratorService implements IntegratorAPI {
             Map<String, ResponseDTO<UUID>> serviceToRequestID =
                     processor.process(delivery.getPacket());
 
-            response = new ResponseDTO<>(serviceToRequestID);
+            response = new ResponseDTO<Map<String, ResponseDTO<UUID>>>(serviceToRequestID);
             RequestLogEntry logEntry =
                     createLogEntry(RequestLogEntry.RequestType.DELIVERY,
                                    requestTime, delivery, serviceToRequestID);
             persistenceService.merge(logEntry);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(ex);
+            response = new ResponseDTO<Map<String, ResponseDTO<UUID>>>(ex);
         }
         sendResponse(delivery.getResponseHandlerDescriptor(), response);
         return response;
@@ -115,9 +115,9 @@ public class IntegratorService implements IntegratorAPI {
         try {
             Map<String, ResponseDTO<Void>> result =
                     registrationService.register(registrationDTO.getPacket());
-            response = new ResponseDTO<>(result);
+            response = new ResponseDTO<Map<String, ResponseDTO<Void>>>(result);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
+            response = new ResponseDTO<Map<String, ResponseDTO<Void>>>(new ErrorDTO(ex));
         }
         RequestLogEntry logEntry =
                 createLogEntry(RequestLogEntry.RequestType.REGISTRATION,
@@ -134,9 +134,9 @@ public class IntegratorService implements IntegratorAPI {
         ResponseDTO<Boolean> response;
         try {
             workerService.pingService(pingDTO.getPacket());
-            response = new ResponseDTO<>(Boolean.TRUE, Boolean.class);
+            response = new ResponseDTO<Boolean>(Boolean.TRUE, Boolean.class);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
+            response = new ResponseDTO<Boolean>(new ErrorDTO(ex));
         }
         sendResponse(pingDTO.getResponseHandlerDescriptor(), response);
         return response;
@@ -148,9 +148,9 @@ public class IntegratorService implements IntegratorAPI {
         ResponseDTO<List<ServiceDTO>> response;
         try {
             List<ServiceDTO> serviceList = workerService.getServiceList();
-            response = new ResponseDTO<>(serviceList);
+            response = new ResponseDTO<List<ServiceDTO>>(serviceList);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
+            response = new ResponseDTO<List<ServiceDTO>>(new ErrorDTO(ex));
         }
 
         sendResponse(packet.getResponseHandlerDescriptor(), response);
@@ -164,9 +164,9 @@ public class IntegratorService implements IntegratorAPI {
         try {
             List<String> actions = workerService
                     .getSupportedActions(serviceDTO.getPacket());
-            response = new ResponseDTO<>(actions);
+            response = new ResponseDTO<List<String>>(actions);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
+            response = new ResponseDTO<List<String>>(new ErrorDTO(ex));
         }
         sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);
         return response;
@@ -178,9 +178,9 @@ public class IntegratorService implements IntegratorAPI {
         ResponseDTO<Void> response;
         try {
             workerService.addAction(actionDTO.getPacket());
-            response = new ResponseDTO<>(true);
+            response = new ResponseDTO<Void>(true);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
+            response = new ResponseDTO<Void>(new ErrorDTO(ex));
         }
         sendResponse(actionDTO.getResponseHandlerDescriptor(), response);
         return response;
@@ -195,9 +195,9 @@ public class IntegratorService implements IntegratorAPI {
             FullServiceDTO<T, Y> serviceInfo =
                     workerService
                             .getServiceInfo(serviceDTO.getPacket());
-            response = new ResponseDTO<>(serviceInfo);
+            response = new ResponseDTO<FullServiceDTO<T, Y>>(serviceInfo);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
+            response = new ResponseDTO<FullServiceDTO<T, Y>>(new ErrorDTO(ex));
         }
 
         sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);

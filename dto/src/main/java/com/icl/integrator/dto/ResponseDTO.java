@@ -23,12 +23,12 @@ public class ResponseDTO<T> {
     // Да, нужен на сорсе, чтоб распарсить результат от таргета.
     public ResponseDTO(T response, Class<T> responseClass) {
         this(true);
-        this.response = new SuccessDTO<>(responseClass, response);
+        this.response = new SuccessDTO<T>(responseClass, response);
     }
 
     public ResponseDTO(T response) {
         this(true);
-        this.response = new SuccessDTO<>(response);
+        this.response = new SuccessDTO<T>(response);
     }
 
     public ResponseDTO(boolean success) {

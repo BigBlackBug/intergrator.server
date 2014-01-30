@@ -31,9 +31,9 @@ public class TargetTestController implements TargetSpringService {
         logger.info("destination received a request from " +
                             "integrator " + requestDataDTO);
         if(requestDataDTO.empty()){
-            return new ResponseDTO<>();
+            return new ResponseDTO();
         }
-        return new ResponseDTO<>("RESPONSE", String.class);
+        return new ResponseDTO("RESPONSE", String.class);
     }
 
 }

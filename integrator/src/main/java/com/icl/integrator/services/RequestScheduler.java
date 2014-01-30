@@ -50,7 +50,7 @@ public class RequestScheduler {
     @Autowired
     private DatabaseRetryHandlerFactory retryHandlerFactory;
 
-    private final Map<Long, Integer> retryIndexMap = new HashMap<>();
+    private final Map<Long, Integer> retryIndexMap = new HashMap<Long, Integer>();
 
     public <T> void schedule(final TaskCreator<T> taskCreator,
                              final TaskCreator<Void> onRetryLimitExceeded) {
@@ -62,7 +62,7 @@ public class RequestScheduler {
 
     public <T> void schedule(final TaskCreator<T> taskCreator,
                              final Callable<Void> onRetryLimitExceeded) {
-        schedule(taskCreator, new TaskCreator<>(onRetryLimitExceeded),
+        schedule(taskCreator, new TaskCreator<Void>(onRetryLimitExceeded),
                  true,
                  DEFAULT_DELIVERY_ATTEMPT_NUMBER,
                  TimeUnit.SECONDS,

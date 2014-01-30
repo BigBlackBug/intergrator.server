@@ -63,7 +63,7 @@ public class JMSEndpointConnector implements EndpointConnector {
         Context ctx;
         try {
             ctx = new InitialContext(
-                    new Hashtable<>(connectionData.getJndiProperties()));
+                    new Hashtable<String, String>(connectionData.getJndiProperties()));
         } catch (NamingException e) {
             throw new ConnectionException("Неверно указаны параметры jndi", e);
         }
@@ -93,7 +93,7 @@ public class JMSEndpointConnector implements EndpointConnector {
                                                     Class<Response> responseClass)
             throws Exception {
         Context ctx = new InitialContext(
-                new Hashtable<>(connectionData.getJndiProperties()));
+                new Hashtable<String, String>(connectionData.getJndiProperties()));
         ConnectionFactory factory = (ConnectionFactory) ctx
                 .lookup(connectionData.getConnectionFactory());
         Connection connection = factory.createConnection(

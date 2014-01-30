@@ -25,7 +25,7 @@ public class HttpServiceEndpoint extends AbstractEndpointEntity{
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "httpServiceEndpoint")
     @Cascade(value = org.hibernate.annotations.CascadeType.ALL)
-    private List<HttpAction> httpActions = new ArrayList<>();
+    private List<HttpAction> httpActions = new ArrayList<HttpAction>();
 
     public HttpServiceEndpoint() {
     }
