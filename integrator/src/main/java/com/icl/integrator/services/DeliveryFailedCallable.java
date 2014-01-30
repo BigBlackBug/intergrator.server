@@ -39,7 +39,7 @@ class DeliveryFailedCallable implements Callable<Void> {
                 responseFromTarget,
                 targetServiceName,
                 requestID.toString());
-         /*TODO we're not expecting any response I guess*/
+         /*we're not expecting any response I guess*/
         sourceConnector.sendRequest(requestData, ResponseDTO.class);
         return null;
     }

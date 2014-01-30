@@ -1,7 +1,6 @@
 package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
@@ -10,7 +9,6 @@ import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.model.RequestLogEntry;
-import com.icl.integrator.util.IntegratorObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,25 +77,21 @@ public class IntegratorService implements IntegratorAPI {
             IntegratorPacket<DeliveryDTO> delivery) {
         logger.info("Received a delivery request");
         ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
-        try{
+        try {
             Date requestTime = new Date();
             PacketProcessor processor = processorFactory.createProcessor();
             Map<String, ResponseDTO<UUID>> serviceToRequestID =
                     processor.process(delivery.getPacket());
 
+            response = new ResponseDTO<>(serviceToRequestID);
             RequestLogEntry logEntry =
                     createLogEntry(RequestLogEntry.RequestType.DELIVERY,
                                    requestTime, delivery, serviceToRequestID);
-            persistenceService.save(logEntry);
-            DestinationDescriptorDTO responseDestDesc =
-                    delivery.getResponseHandlerDescriptor();
-            if (responseDestDesc != null) {
-                deliveryService.deliver(responseDestDesc, serviceToRequestID);
-            }
-            response = new ResponseDTO<>(serviceToRequestID);
-        }catch(Exception ex){
+            persistenceService.merge(logEntry);
+        } catch (Exception ex) {
             response = new ResponseDTO<>(ex);
         }
+        sendResponse(delivery.getResponseHandlerDescriptor(), response);
         return response;
     }
 
@@ -109,13 +103,6 @@ public class IntegratorService implements IntegratorAPI {
             deliveryService.deliver(descriptor, Boolean.TRUE);
         }
         return true;
-    }
-
-    private <Result, Req> Result des(Req value, TypeReference<Result> ref) {
-        IntegratorObjectMapper objectMapper =
-                new IntegratorObjectMapper();
-
-        return objectMapper.convertValue(value, ref);
     }
 
     @Override
@@ -135,13 +122,9 @@ public class IntegratorService implements IntegratorAPI {
         RequestLogEntry logEntry =
                 createLogEntry(RequestLogEntry.RequestType.REGISTRATION,
                                requestTime, registrationDTO, response);
-        persistenceService.save(logEntry);
+        persistenceService.merge(logEntry);
 
-        DestinationDescriptorDTO responseDestDesc =
-                registrationDTO.getResponseHandlerDescriptor();
-        if (responseDestDesc != null) {
-            deliveryService.deliver(responseDestDesc, response);
-        }
+        sendResponse(registrationDTO.getResponseHandlerDescriptor(), response);
         return response;
     }
 
@@ -155,17 +138,13 @@ public class IntegratorService implements IntegratorAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        DestinationDescriptorDTO responseDesc =
-                pingDTO.getResponseHandlerDescriptor();
-        if (responseDesc != null) {
-            deliveryService.deliver(responseDesc, response);
-        }
+        sendResponse(pingDTO.getResponseHandlerDescriptor(), response);
         return response;
     }
 
     @Override
     public ResponseDTO<List<ServiceDTO>> getServiceList(
-            IntegratorPacket<Void> responseHandlerDescriptor) {
+            IntegratorPacket<Void> packet) {
         ResponseDTO<List<ServiceDTO>> response;
         try {
             List<ServiceDTO> serviceList = workerService.getServiceList();
@@ -174,11 +153,7 @@ public class IntegratorService implements IntegratorAPI {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
-        DestinationDescriptorDTO descriptor =
-                responseHandlerDescriptor.getResponseHandlerDescriptor();
-        if (descriptor != null && descriptor.isInitialized()) {
-            deliveryService.deliver(descriptor, response);
-        }
+        sendResponse(packet.getResponseHandlerDescriptor(), response);
         return response;
     }
 
@@ -193,17 +168,13 @@ public class IntegratorService implements IntegratorAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        DestinationDescriptorDTO responseHandler =
-                serviceDTO.getResponseHandlerDescriptor();
-        if (responseHandler != null) {
-            deliveryService.deliver(responseHandler, response);
-        }
+        sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);
         return response;
     }
 
-    //TODO а ничё, что деливер тоже может кинть исключение?
     @Override
-    public ResponseDTO<Void> addAction(IntegratorPacket<AddActionDTO> actionDTO) {
+    public ResponseDTO<Void> addAction(
+            IntegratorPacket<AddActionDTO> actionDTO) {
         ResponseDTO<Void> response;
         try {
             workerService.addAction(actionDTO.getPacket());
@@ -211,11 +182,7 @@ public class IntegratorService implements IntegratorAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        DestinationDescriptorDTO responseHandler =
-                actionDTO.getResponseHandlerDescriptor();
-        if (responseHandler != null) {
-            deliveryService.deliver(responseHandler, response);
-        }
+        sendResponse(actionDTO.getResponseHandlerDescriptor(), response);
         return response;
     }
 
@@ -233,11 +200,20 @@ public class IntegratorService implements IntegratorAPI {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
-        DestinationDescriptorDTO responseHandler =
-                serviceDTO.getResponseHandlerDescriptor();
-        if (responseHandler != null) {
-            deliveryService.deliver(responseHandler, response);
-        }
+        sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);
         return response;
     }
+
+    private <T> void sendResponse(
+            DestinationDescriptorDTO responseHandler, T response) {
+        if (responseHandler != null) {
+            try {
+                deliveryService.deliver(responseHandler, response);
+            } catch (Exception ex) {
+                logger.error("Не могу отправить ответ на дополнительный " +
+                                     "эндпоинт", ex);
+            }
+        }
+    }
+
 }

@@ -43,13 +43,8 @@ public class PersistenceService {
     }
 
     @Transactional
-    public <T extends AbstractEntity> T save(T entity) {
-        if (entity == null) {  //TODO WAIT WHAT?
-            em.persist(entity);
-        } else {
-            entity = em.merge(entity);
-        }
-        return entity;
+    public <T extends AbstractEntity> T merge(T entity) {
+        return em.merge(entity);
     }
 
     @Transactional
