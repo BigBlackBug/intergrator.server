@@ -40,6 +40,11 @@ public class ResponseDTO<T> {
         this.error = error;
     }
 
+    public ResponseDTO(Throwable error) {
+        this(false);
+        this.error = new ErrorDTO(error);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

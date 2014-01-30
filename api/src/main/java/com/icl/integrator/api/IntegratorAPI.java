@@ -19,7 +19,7 @@ import java.util.UUID;
  */
 public interface IntegratorAPI {
 
-    public Map<String, ResponseDTO<UUID>> deliver(
+    public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             IntegratorPacket<DeliveryDTO> delivery);
 
     public Boolean ping(IntegratorPacket<Void> responseHandlerDescriptor);
@@ -36,10 +36,11 @@ public interface IntegratorAPI {
     public ResponseDTO<List<String>> getSupportedActions(
             IntegratorPacket<ServiceDTO> serviceDTO);
 
-    public ResponseDTO addAction(IntegratorPacket<AddActionDTO> actionDTO);
-
     public <T extends EndpointDescriptor, Y extends ActionDescriptor>
     ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
             IntegratorPacket<ServiceDTO> serviceDTO);
+
+    public ResponseDTO<Void> addAction(IntegratorPacket<AddActionDTO>
+                                               actionDTO);
 
 }

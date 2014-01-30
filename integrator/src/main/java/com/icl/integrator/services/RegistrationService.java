@@ -54,8 +54,8 @@ public class RegistrationService {
     private PersistenceService persistenceService;
 
     public <T extends ActionDescriptor>
-    Map<String, ResponseDTO<Void>> register
-            (TargetRegistrationDTO<T> registrationDTO)
+    Map<String, ResponseDTO<Void>> register(
+            TargetRegistrationDTO<T> registrationDTO)
             throws TargetRegistrationException {
         Map<String, ResponseDTO<Void>> result = new HashMap<>();
 
@@ -74,7 +74,6 @@ public class RegistrationService {
                         new ResponseDTO<>(new ErrorDTO(ex));
                 result.put(action.getActionName(), dto);
             }
-
         }
         switch (endpoint.getEndpointType()) {
             case HTTP: {

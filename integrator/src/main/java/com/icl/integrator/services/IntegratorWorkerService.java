@@ -47,7 +47,7 @@ public class IntegratorWorkerService {
     public <T extends ActionDescriptor> void addAction(
             AddActionDTO<T> actionDTO) throws IntegratorException {
         ActionRegistrationDTO<T> actionReg =
-                actionDTO.getActionRegistrationDTO();
+                actionDTO.getActionRegistration();
         ServiceDTO service = actionDTO.getService();
         EndpointType endpointType = service.getEndpointType();
 
