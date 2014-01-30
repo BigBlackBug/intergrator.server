@@ -24,6 +24,7 @@ public class DeliveryDTO {
                        List<DestinationDTO> destinations) {
         this.action = action;
         this.destinations = destinations;
+        this.targetResponseHandlerDescriptor = targetResponseHandler;
     }
 
     public DeliveryDTO() {
@@ -63,7 +64,8 @@ public class DeliveryDTO {
         int result = targetResponseHandlerDescriptor.hashCode();
         result = 31 * result + destinations.hashCode();
         result = 31 * result + action.hashCode();
-        result = 31 * result + (requestData != null ? requestData.hashCode() : 0);
+        result = 31 * result + (requestData != null ? requestData
+                .hashCode() : 0);
         return result;
     }
 
