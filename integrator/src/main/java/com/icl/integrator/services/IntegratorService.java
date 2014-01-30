@@ -75,24 +75,30 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public Map<String, ResponseDTO<UUID>> deliver(
+    public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             IntegratorPacket<DeliveryDTO> delivery) {
         logger.info("Received a delivery request");
-        Date requestTime = new Date();
-        PacketProcessor processor = processorFactory.createProcessor();
-        Map<String, ResponseDTO<UUID>> serviceToRequestID =
-                processor.process(delivery.getPacket());
+        ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
+        try{
+            Date requestTime = new Date();
+            PacketProcessor processor = processorFactory.createProcessor();
+            Map<String, ResponseDTO<UUID>> serviceToRequestID =
+                    processor.process(delivery.getPacket());
 
-        RequestLogEntry logEntry =
-                createLogEntry(RequestLogEntry.RequestType.DELIVERY,
-                               requestTime, delivery, serviceToRequestID);
-        persistenceService.save(logEntry);
-        DestinationDescriptorDTO responseDestDesc =
-                delivery.getResponseHandlerDescriptor();
-        if (responseDestDesc != null) {
-            deliveryService.deliver(responseDestDesc, serviceToRequestID);
+            RequestLogEntry logEntry =
+                    createLogEntry(RequestLogEntry.RequestType.DELIVERY,
+                                   requestTime, delivery, serviceToRequestID);
+            persistenceService.save(logEntry);
+            DestinationDescriptorDTO responseDestDesc =
+                    delivery.getResponseHandlerDescriptor();
+            if (responseDestDesc != null) {
+                deliveryService.deliver(responseDestDesc, serviceToRequestID);
+            }
+            response = new ResponseDTO<>(serviceToRequestID);
+        }catch(Exception ex){
+            response = new ResponseDTO<>(ex);
         }
-        return serviceToRequestID;
+        return response;
     }
 
     @Override
@@ -145,7 +151,7 @@ public class IntegratorService implements IntegratorAPI {
         ResponseDTO<Boolean> response;
         try {
             workerService.pingService(pingDTO.getPacket());
-            response = new ResponseDTO<>(Boolean.TRUE);
+            response = new ResponseDTO<>(Boolean.TRUE, Boolean.class);
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
@@ -195,14 +201,15 @@ public class IntegratorService implements IntegratorAPI {
         return response;
     }
 
+    //TODO а ничё, что деливер тоже может кинть исключение?
     @Override
-    public ResponseDTO addAction(IntegratorPacket<AddActionDTO> actionDTO) {
-        ResponseDTO response;
+    public ResponseDTO<Void> addAction(IntegratorPacket<AddActionDTO> actionDTO) {
+        ResponseDTO<Void> response;
         try {
             workerService.addAction(actionDTO.getPacket());
-            response = new ResponseDTO(true);
+            response = new ResponseDTO<>(true);
         } catch (Exception ex) {
-            response = new ResponseDTO(new ErrorDTO(ex));
+            response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         DestinationDescriptorDTO responseHandler =
                 actionDTO.getResponseHandlerDescriptor();

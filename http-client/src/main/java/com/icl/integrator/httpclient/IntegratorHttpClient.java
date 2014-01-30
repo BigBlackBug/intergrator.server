@@ -80,19 +80,20 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         return getServiceInfo(new IntegratorPacket<>(serviceDTO));
     }
 
-    public Map<String, ResponseDTO<UUID>> deliver(DeliveryDTO delivery) {
+    public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
+            DeliveryDTO delivery) {
         return deliver(new IntegratorPacket<>(delivery));
     }
 
     @Override
-    public Map<String, ResponseDTO<UUID>> deliver(
+    public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             IntegratorPacket<DeliveryDTO> delivery) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "deliver", IntegratorPacket.class);
-        ParameterizedTypeReference<Map<String, ResponseDTO<UUID>>>
+        ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<UUID>>>>
                 type =
-                new ParameterizedTypeReference<Map<String,
-                        ResponseDTO<UUID>>>() {
+                new ParameterizedTypeReference<ResponseDTO<Map<String,
+                        ResponseDTO<UUID>>>>() {
                 };
         try {
             return sendRequest(delivery, type, methodPair);
@@ -194,14 +195,14 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public ResponseDTO addAction(
+    public ResponseDTO<Void> addAction(
             IntegratorPacket<AddActionDTO> actionDTO) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "addAction", IntegratorPacket.class);
         try {
-            ParameterizedTypeReference<ResponseDTO>
+            ParameterizedTypeReference<ResponseDTO<Void>>
                     type =
-                    new ParameterizedTypeReference<ResponseDTO>() {
+                    new ParameterizedTypeReference<ResponseDTO<Void>>() {
                     };
             return sendRequest(actionDTO, type, methodPair);
         } catch (MalformedURLException e) {

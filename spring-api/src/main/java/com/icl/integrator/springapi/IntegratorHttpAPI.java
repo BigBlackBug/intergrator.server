@@ -32,7 +32,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @RequestMapping(value = "deliver", method = RequestMethod.POST)
     public
     @ResponseBody
-    Map<String, ResponseDTO<UUID>> deliver(
+    ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             @RequestBody(required = true)
             IntegratorPacket<DeliveryDTO> delivery);
 
@@ -53,7 +53,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
             IntegratorPacket<TargetRegistrationDTO<T>> registrationDTO);
 
     @Override
-    @RequestMapping(value = "checkAvailability", method = RequestMethod.POST)
+    @RequestMapping(value = "isAvailable", method = RequestMethod.POST)
     public
     @ResponseBody
     ResponseDTO<Boolean> isAvailable(@RequestBody(required = true)
@@ -78,7 +78,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @Override
     @RequestMapping(value = "addAction", method = RequestMethod.POST)
     @ResponseBody
-    ResponseDTO addAction(@RequestBody(required = true)
+    ResponseDTO<Void> addAction(@RequestBody(required = true)
                           IntegratorPacket<AddActionDTO> actionDTO);
 
     @Override

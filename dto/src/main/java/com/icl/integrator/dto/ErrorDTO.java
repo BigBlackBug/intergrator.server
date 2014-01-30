@@ -28,7 +28,7 @@ public class ErrorDTO {
         this(errorMessage, developerMessage, -1);
     }
 
-    public ErrorDTO(Exception ex) {
+    public ErrorDTO(Throwable ex) {
         this(ex.getMessage(), Utils.getStackTraceAsString(ex));
     }
 

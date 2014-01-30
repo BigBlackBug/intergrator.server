@@ -1,5 +1,8 @@
 package com.icl.integrator.main;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
@@ -7,7 +10,10 @@ import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.httpclient.IntegratorHttpClient;
 import com.icl.integrator.util.EndpointType;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,10 +27,42 @@ public class Main {
     //TODO if body is null client sends x-www-form-urlencoded
     // and server can't respond
     public static void main(String args[]) {
-        IntegratorHttpClient httpClient = new IntegratorHttpClient
-                ("192.168.83.91", "integrator", 18080);
-        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
-        System.out.println(serviceList);
+//        IntegratorHttpClient httpClient = new IntegratorHttpClient
+//                ("192.168.83.91", "integrator", 18080);
+//        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
+//        System.out.println(serviceList);
+        ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        TargetRegistrationDTO<HttpActionDTO> regDTO =
+                new TargetRegistrationDTO<>();
+        regDTO.setServiceName("NEW_SERVICE");
+        //----------------------------------------------------------------------
+        EndpointDTO<HttpEndpointDescriptorDTO>
+                endpointDTO = new EndpointDTO<>();
+        endpointDTO.setEndpointType(EndpointType.HTTP);
+
+        HttpEndpointDescriptorDTO descr = new HttpEndpointDescriptorDTO();
+        descr.setHost("192.168.84.142");
+        descr.setPort(8080);
+        endpointDTO.setDescriptor(descr);
+
+        regDTO.setEndpoint(endpointDTO);
+        //----------------------------------------------------------------------
+        ActionEndpointDTO<HttpActionDTO> actionDTO = new ActionEndpointDTO<>();
+
+        HttpActionDTO actionDescriptor = new HttpActionDTO();
+        actionDescriptor.setPath("/destination/handleRequest");
+
+        actionDTO.setActionDescriptor(actionDescriptor);
+        actionDTO.setActionName("ACTION");
+        regDTO.setActionRegistrations(
+                Arrays.asList(new ActionRegistrationDTO<>(actionDTO, true)));
+        try {
+            System.out.println(writer.writeValueAsString(regDTO));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+
 //        ResponseDTO<Map<String, ResponseDTO<Void>>> register =
 //                register(httpClient);
 //        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList();
@@ -59,9 +97,9 @@ public class Main {
 
 //        ResponseDTO<Boolean> available =
 //                httpClient.isAvailable(new PingDTO("NEW_SERVICE", "ACTION",
-//                                                   EndpointType.HTTP));
-        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
-        System.out.print(deliver);
+////                                                   EndpointType.HTTP));
+//        Map<String, ResponseDTO<UUID>> deliver = deliver(httpClient);
+//        System.out.print(deliver);
 //        System.out.println(available.getResponse().getResponseValue());
 
     }
@@ -74,7 +112,7 @@ public class Main {
         return httpClient.isAvailable(pingDTO);
     }
 
-    public static Map<String, ResponseDTO<UUID>> deliver(
+    public static ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             IntegratorHttpClient httpClient) {
         DeliveryDTO deliveryDTO = new DeliveryDTO();
 

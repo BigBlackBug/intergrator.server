@@ -39,7 +39,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
     }
 
     @Override
-    public Map<String, ResponseDTO<UUID>> deliver(
+    public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             @RequestBody(required = true)
             IntegratorPacket<DeliveryDTO> delivery) {
         TypeReference<IntegratorPacket<DeliveryDTO>> type =
@@ -102,7 +102,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
     }
 
     @Override
-    public ResponseDTO addAction(@RequestBody(required = true)
+    public ResponseDTO<Void> addAction(@RequestBody(required = true)
                                  IntegratorPacket<AddActionDTO> actionDTO) {
         TypeReference<IntegratorPacket<AddActionDTO>> type =
                 new TypeReference<IntegratorPacket<AddActionDTO>>() {
