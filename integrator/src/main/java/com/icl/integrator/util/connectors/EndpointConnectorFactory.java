@@ -30,6 +30,14 @@ public class EndpointConnectorFactory {
     @Autowired
     private EndpointResolverService endpointResolverService;
 
+    public EndpointConnector createEndpointConnector(String serviceName,
+                                                     EndpointType endpointType,
+                                                     String action) {
+        return createEndpointConnector(
+                new DestinationDTO(serviceName, endpointType),
+                action);
+    }
+
     public EndpointConnector createEndpointConnector(
             DestinationDTO destination, String action)
             throws IntegratorException {

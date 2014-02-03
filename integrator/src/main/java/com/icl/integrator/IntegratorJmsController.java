@@ -6,6 +6,7 @@ import com.icl.integrator.dto.DeliveryDTO;
 import com.icl.integrator.dto.IntegratorPacket;
 import com.icl.integrator.dto.PingDTO;
 import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
@@ -34,9 +35,10 @@ public class IntegratorJmsController implements MessageListener {
     @Autowired
     private IntegratorService integratorService;
 
+    //TODO format
     @Override
     public void onMessage(final Message message) {
-        IntegratorPacket<?> integratorPacket;
+        IntegratorPacket<?, ?> integratorPacket;
         if (message instanceof TextMessage) {
             String content;
             try {
@@ -54,67 +56,74 @@ public class IntegratorJmsController implements MessageListener {
             }
             switch (integratorPacket.getMethod()) {
                 case ADD_ACTION: {
-                    IntegratorPacket<AddActionDTO> packet = mapper.convertValue(
+                    IntegratorPacket<AddActionDTO, DestinationDescriptor
+                            > packet = mapper.convertValue(
                             integratorPacket,
-                            new TypeReference<IntegratorPacket<AddActionDTO>>() {
+                            new TypeReference<IntegratorPacket<AddActionDTO, DestinationDescriptor>>() {
                             });
                     integratorService.addAction(packet);
                     break;
                 }
                 case DELIVER: {
-                    IntegratorPacket<DeliveryDTO> packet = mapper.convertValue(
+                    IntegratorPacket<DeliveryDTO, DestinationDescriptor>
+                            packet = mapper.convertValue(
                             integratorPacket,
-                            new TypeReference<IntegratorPacket<DeliveryDTO>>() {
+                            new TypeReference<IntegratorPacket<DeliveryDTO, DestinationDescriptor>>() {
                             });
                     integratorService.deliver(packet);
                     break;
                 }
                 case GET_SERVICE_INFO: {
-                    IntegratorPacket<ServiceDTO> packet = mapper.convertValue(
-                            integratorPacket,
-                            new TypeReference<IntegratorPacket<ServiceDTO>>() {
-                            });
+                    IntegratorPacket<ServiceDTO, DestinationDescriptor> packet =
+                            mapper.convertValue(
+                                    integratorPacket,
+                                    new TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>() {
+                                    });
                     integratorService.getServiceInfo(packet);
                     break;
                 }
                 case GET_SERVICE_LIST: {
-                    IntegratorPacket<Void> packet = mapper.convertValue(
-                            integratorPacket,
-                            new TypeReference<IntegratorPacket<Void>>() {
-                            });
+                    IntegratorPacket<Void, DestinationDescriptor> packet =
+                            mapper.convertValue(
+                                    integratorPacket,
+                                    new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
+                                    });
                     integratorService.getServiceList(packet);
                     break;
                 }
                 case GET_SUPPORTED_ACTIONS: {
-                    IntegratorPacket<ServiceDTO> packet = mapper.convertValue(
-                            integratorPacket,
-                            new TypeReference<IntegratorPacket<ServiceDTO>>() {
-                            });
+                    IntegratorPacket<ServiceDTO, DestinationDescriptor> packet =
+                            mapper.convertValue(
+                                    integratorPacket,
+                                    new TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>() {
+                                    });
                     integratorService.getSupportedActions(packet);
                     break;
                 }
                 case IS_AVAILABLE: {
-                    IntegratorPacket<PingDTO> packet = mapper.convertValue(
-                            integratorPacket,
-                            new TypeReference<IntegratorPacket<PingDTO>>() {
-                            });
+                    IntegratorPacket<PingDTO, DestinationDescriptor> packet =
+                            mapper.convertValue(
+                                    integratorPacket,
+                                    new TypeReference<IntegratorPacket<PingDTO, DestinationDescriptor>>() {
+                                    });
                     integratorService.isAvailable(packet);
                     break;
                 }
                 case PING: {
-                    IntegratorPacket<Void> packet = mapper.convertValue(
-                            integratorPacket,
-                            new TypeReference<IntegratorPacket<Void>>() {
-                            });
+                    IntegratorPacket<Void, DestinationDescriptor> packet =
+                            mapper.convertValue(
+                                    integratorPacket,
+                                    new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
+                                    });
                     integratorService.ping(packet);
                     break;
                 }
                 case REGISTER_SERVICE: {
-                    IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>>
+                    IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>, DestinationDescriptor>
                             packet
                             = mapper.convertValue(
                             integratorPacket,
-                            new TypeReference<IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>>>() {
+                            new TypeReference<IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>, DestinationDescriptor>>() {
                             });
                     integratorService.registerService(packet);
                     break;

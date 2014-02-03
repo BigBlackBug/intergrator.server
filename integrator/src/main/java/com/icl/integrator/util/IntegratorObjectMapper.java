@@ -1,11 +1,13 @@
 package com.icl.integrator.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.icl.integrator.dto.DestinationDescriptorDTO;
 import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
 
 import java.io.IOException;
@@ -24,14 +26,17 @@ public class IntegratorObjectMapper extends ObjectMapper {
     public IntegratorObjectMapper() {
         super();
         SimpleModule testModule = new SimpleModule(MODULE_NAME);
-        testModule.addDeserializer(DestinationDescriptorDTO.class,
-                                   new RawDestinationDescriptorDTODeserializer());
+        testModule.addDeserializer(DestinationDescriptor.class,
+                                   new DestinationDescriptorDeserializer());
         testModule.addDeserializer(TargetRegistrationDTO.class,
                                    new TargetRegistrationDTODeserializer());
         testModule.addDeserializer(EndpointDTO.class,
                                    new EndpointDTODeserializer());
         testModule.addDeserializer(AddActionDTO.class,
                                    new AddActionDTODeserializer());
+        testModule.addDeserializer(RawDestinationDescriptor.class,
+                                   new RawDestinationDescriptorDeserializer());
+        setSerializationInclusion(JsonInclude.Include.NON_NULL);
         registerModule(testModule);
     }
 

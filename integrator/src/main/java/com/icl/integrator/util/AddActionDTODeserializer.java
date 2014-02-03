@@ -35,8 +35,8 @@ public final class AddActionDTODeserializer
         boolean forceRegister =
                 actionRegistrationNode.get("forceRegister").asBoolean();
         ActionEndpointDTO action = mapper.parseActionEndpoint(
-                actionRegistrationNode.get("action"), endpoint.getEndpointType
-                ());
+                actionRegistrationNode.get("action"),
+                endpoint.getEndpointType());
         ActionRegistrationDTO actionRegistrationDTO =
                 new ActionRegistrationDTO(action, forceRegister);
         return new AddActionDTO<>(endpoint, actionRegistrationDTO);
