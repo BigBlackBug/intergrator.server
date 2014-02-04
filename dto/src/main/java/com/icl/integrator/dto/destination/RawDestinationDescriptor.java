@@ -1,5 +1,6 @@
-package com.icl.integrator.dto;
+package com.icl.integrator.dto.destination;
 
+import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 
 /**
@@ -9,18 +10,19 @@ import com.icl.integrator.dto.registration.ActionDescriptor;
  * Time: 11:31
  * To change this template use File | Settings | File Templates.
  */
-public class DestinationDescriptorDTO {
+public class RawDestinationDescriptor extends DestinationDescriptor {
 
     private EndpointDTO endpoint;
 
     private ActionDescriptor actionDescriptor;
 
-    public DestinationDescriptorDTO() {
-
+    public RawDestinationDescriptor() {
+        super(DescriptorType.RAW);
     }
 
-    public DestinationDescriptorDTO(EndpointDTO endpoint,
+    public RawDestinationDescriptor(EndpointDTO endpoint,
                                     ActionDescriptor actionDescriptor) {
+        this();
         this.endpoint = endpoint;
         this.actionDescriptor = actionDescriptor;
     }
@@ -45,4 +47,31 @@ public class DestinationDescriptorDTO {
         return endpoint != null && actionDescriptor != null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        RawDestinationDescriptor that = (RawDestinationDescriptor) o;
+
+        if (!actionDescriptor.equals(that.actionDescriptor)) {
+            return false;
+        }
+        if (!endpoint.equals(that.endpoint)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = endpoint.hashCode();
+        result = 31 * result + actionDescriptor.hashCode();
+        return result;
+    }
 }

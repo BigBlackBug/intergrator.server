@@ -1,5 +1,7 @@
 package com.icl.integrator.dto;
 
+import com.icl.integrator.dto.destination.RawDestinationDescriptor;
+
 import java.util.List;
 
 /**
@@ -11,7 +13,7 @@ import java.util.List;
  */
 public class DeliveryDTO {
 
-    private DestinationDescriptorDTO targetResponseHandlerDescriptor;
+    private RawDestinationDescriptor targetResponseHandlerDescriptor;
 
     private List<DestinationDTO> destinations;
 
@@ -19,10 +21,11 @@ public class DeliveryDTO {
 
     private RequestDataDTO requestData;
 
-    public DeliveryDTO(DestinationDescriptorDTO targetResponseHandler,
+    public DeliveryDTO(RawDestinationDescriptor targetResponseHandler,
                        String action,
                        List<DestinationDTO> destinations) {
         this.action = action;
+        this.targetResponseHandlerDescriptor = targetResponseHandler;
         this.destinations = destinations;
         this.targetResponseHandlerDescriptor = targetResponseHandler;
     }
@@ -69,12 +72,12 @@ public class DeliveryDTO {
         return result;
     }
 
-    public DestinationDescriptorDTO getTargetResponseHandlerDescriptor() {
+    public RawDestinationDescriptor getTargetResponseHandlerDescriptor() {
         return targetResponseHandlerDescriptor;
     }
 
     public void setTargetResponseHandlerDescriptor(
-            DestinationDescriptorDTO targetResponseHandlerDescriptor) {
+            RawDestinationDescriptor targetResponseHandlerDescriptor) {
         this.targetResponseHandlerDescriptor =
                 targetResponseHandlerDescriptor;
     }

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.RawDestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.model.TaskLogEntry;
 import com.icl.integrator.task.Callback;
@@ -32,6 +35,7 @@ import static org.springframework.util.StringUtils.quote;
  * Time: 11:30
  * To change this template use File | Settings | File Templates.
  */
+//TODO Подумать, а нахера все эти дженерики?
 @Service
 public class DeliveryService {
 
@@ -49,19 +53,36 @@ public class DeliveryService {
     @Autowired
     private ObjectMapper serializer;
 
-    public <T> void deliver(DestinationDescriptorDTO sourceService, T packet)
+    public <T> void deliver(DestinationDescriptor sourceService, T packet)
             throws IntegratorException {
-        logger.info("Scheduling a request to service " +
-                            "defined as source -> " +
-                            sourceService.getActionDescriptor());
-        EndpointConnector sourceConnector = factory.createEndpointConnector(
-                sourceService.getEndpoint(),
-                sourceService.getActionDescriptor());
+        EndpointConnector sourceConnector;
+        DestinationDescriptor.DescriptorType descriptorType =
+                sourceService.getDescriptorType();
+        if (descriptorType == DestinationDescriptor.DescriptorType.RAW) {
+            RawDestinationDescriptor realSourceService =
+                    (RawDestinationDescriptor) sourceService;
+            logger.info("Scheduling a request to service " +
+                                "defined as source -> " +
+                                realSourceService.getActionDescriptor());
+            sourceConnector = factory.createEndpointConnector(
+                    realSourceService.getEndpoint(),
+                    realSourceService.getActionDescriptor());
+        } else if (descriptorType == DestinationDescriptor.DescriptorType.SERVICE) {
+            ServiceDestinationDescriptor realSourceService =
+                    (ServiceDestinationDescriptor) sourceService;
+            sourceConnector = factory.createEndpointConnector(
+                    realSourceService.getServiceName(),
+                    realSourceService.getEndpointType(),
+                    realSourceService.getActionName());
+        } else {
+            throw new IntegratorException("У DestinationDescriptor'а неверно " +
+                                                  "проставлен тип");
+        }
+
         DeliveryCallable<ResponseFromIntegratorDTO<T>>
                 deliveryCallable =
-                new DeliveryCallable<ResponseFromIntegratorDTO<T>>(
-                        sourceConnector,
-                        new ResponseFromIntegratorDTO<T>(packet));
+                new DeliveryCallable<ResponseFromIntegratorDTO<T>>(sourceConnector,
+                                       new ResponseFromIntegratorDTO<T>(packet));
         scheduler.schedule(new TaskCreator<ResponseDTO>(deliveryCallable));
     }
 
@@ -73,9 +94,9 @@ public class DeliveryService {
                 factory.createEndpointConnector(destination,
                                                 packet.getAction());
         DeliveryCallable<RequestDataDTO> deliveryCallable =
-                new DeliveryCallable<RequestDataDTO>(
-                        destinationConnector, packet.getRequestData());
-        DestinationDescriptorDTO targetResponseHandler =
+                new DeliveryCallable<RequestDataDTO>(destinationConnector,
+                                       packet.getRequestData());
+        RawDestinationDescriptor targetResponseHandler =
                 packet.getTargetResponseHandlerDescriptor();
         if (targetResponseHandler != null) {
             EndpointDTO endpoint = targetResponseHandler.getEndpoint();
