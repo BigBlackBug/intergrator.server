@@ -198,9 +198,9 @@ public class IntegratorService implements IntegratorAPI {
             FullServiceDTO<EDType, ADType> serviceInfo =
                     workerService
                             .getServiceInfo(serviceDTO.getPacket());
-            response = new ResponseDTO<FullServiceDTO<T, Y>>(serviceInfo);
+            response = new ResponseDTO<FullServiceDTO<EDType, ADType>>(serviceInfo);
         } catch (Exception ex) {
-            response = new ResponseDTO<FullServiceDTO<T, Y>>(new ErrorDTO(ex));
+            response = new ResponseDTO<FullServiceDTO<EDType, ADType>>(new ErrorDTO(ex));
         }
 
         sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);

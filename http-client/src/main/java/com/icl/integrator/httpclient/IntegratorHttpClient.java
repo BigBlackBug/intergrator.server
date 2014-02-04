@@ -34,9 +34,7 @@ import java.util.UUID;
 public class IntegratorHttpClient implements IntegratorHttpAPI {
 
     private final String host;
-
     private final String path;
-
     private final int port;
 
     public IntegratorHttpClient(String host, String deployPath, int port) {
@@ -78,28 +76,28 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
 
     public Boolean ping() {
         return ping(new IntegratorPacket<Void, DestinationDescriptor>
-                            (new RawDestinationDescriptor()));
+                (new RawDestinationDescriptor()));
     }
 
     public ResponseDTO<List<ServiceDTO>> getServiceList() {
         return getServiceList(new IntegratorPacket<Void, DestinationDescriptor>
-                                      (new RawDestinationDescriptor()));
+                (new RawDestinationDescriptor()));
     }
 
     public ResponseDTO<List<String>> getSupportedActions(
             ServiceDTO serviceDTO) {
-        return getSupportedActions(new IntegratorPacket<ServiceDTO>(serviceDTO));
+        return getSupportedActions(new IntegratorPacket<ServiceDTO, DestinationDescriptor>(serviceDTO));
     }
 
     public <T extends EndpointDescriptor, Y extends ActionDescriptor>
     ResponseDTO<FullServiceDTO<T, Y>>
     getServiceInfo(ServiceDTO serviceDTO) {
-        return getServiceInfo(new IntegratorPacket<ServiceDTO>(serviceDTO));
+        return getServiceInfo(new IntegratorPacket<ServiceDTO, DestinationDescriptor>(serviceDTO));
     }
 
     public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             DeliveryDTO delivery) {
-        return deliver(new IntegratorPacket<DeliveryDTO>(delivery));
+        return deliver(new IntegratorPacket<DeliveryDTO, DestinationDescriptor>(delivery));
     }
 
     //TODO format
@@ -123,7 +121,8 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     public <T extends ActionDescriptor>
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             TargetRegistrationDTO<T> registrationDTO) {
-        return registerService(new IntegratorPacket<TargetRegistrationDTO<T>>(registrationDTO));
+        return registerService(new IntegratorPacket<TargetRegistrationDTO<T>,
+                DestinationDescriptor>(registrationDTO));
     }
 
     @Override
@@ -143,7 +142,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO) {
-        return isAvailable(new IntegratorPacket<PingDTO>(pingDTO));
+        return isAvailable(new IntegratorPacket<PingDTO, DestinationDescriptor>(pingDTO));
     }
 
     @Override
@@ -194,7 +193,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     public ResponseDTO addAction(AddActionDTO actionDTO) {
-        return addAction(new IntegratorPacket<AddActionDTO>(actionDTO));
+        return addAction(new IntegratorPacket<AddActionDTO, DestinationDescriptor>(actionDTO));
     }
 
     @Override
@@ -239,7 +238,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
         RequestMapping annotation = m.getAnnotation(RequestMapping.class);
         return new HttpMethodDescriptor(annotation.value()[0],
-                                        annotation.method()[0]);
+                annotation.method()[0]);
     }
 
     private <Response, Request> Response sendRequest(
@@ -252,7 +251,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
                 new MappingJackson2HttpMessageConverter());
         RequestMethod methodType = methodDescriptor.getMethodType();
         URL url = new URL("HTTP", host, port,
-                          path + methodDescriptor.getMethodPath());
+                path + methodDescriptor.getMethodPath());
 
         String urlString = url.toString();
         HttpEntity<Request> requestEntity = new HttpEntity<Request>(data);
@@ -260,11 +259,11 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         if (methodType.equals(RequestMethod.GET)) {
             return restTemplate.
                     exchange(urlString, HttpMethod.GET,
-                             requestEntity, responseType).getBody();
+                            requestEntity, responseType).getBody();
         } else if (methodType.equals(RequestMethod.POST)) {
             return restTemplate.
                     exchange(urlString, HttpMethod.POST,
-                             requestEntity, responseType).getBody();
+                            requestEntity, responseType).getBody();
         } else {
             throw new MethodNotSupportedException();
         }
@@ -273,7 +272,6 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     private static class HttpMethodDescriptor {
 
         private final String methodPath;
-
         private final RequestMethod methodType;
 
         private HttpMethodDescriptor(String methodPath,

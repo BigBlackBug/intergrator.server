@@ -3,17 +3,19 @@ package com.icl.integrator.main;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.icl.integrator.dto.*;
-import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.dto.PingDTO;
+import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.dto.registration.ActionEndpointDTO;
+import com.icl.integrator.dto.registration.ActionRegistrationDTO;
+import com.icl.integrator.dto.registration.HttpActionDTO;
+import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
-import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.httpclient.IntegratorHttpClient;
 import com.icl.integrator.util.EndpointType;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -116,64 +118,48 @@ public class Main {
         return httpClient.isAvailable(pingDTO);
     }
 
-    public static ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
-            IntegratorHttpClient httpClient) {
-        DeliveryDTO deliveryDTO = new DeliveryDTO();
-
-        HttpEndpointDescriptorDTO desr = new
-                HttpEndpointDescriptorDTO("192.168.84.142", 8080);
-        EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-                new EndpointDTO<HttpEndpointDescriptorDTO>(EndpointType.HTTP,
-                                                           desr);
-
-//        deliveryDTO.setTargetResponseHandlerDescriptor(
-//                new DestinationDescriptorDTO(
-//                        endpoint,
-//                        new HttpActionDTO("/source/handleResponseFromTarget")
-//                ));
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("java.naming.provider.url", "tcp://localhost:61616");
-        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
-                ".ActiveMQInitialContextFactory");
-        DestinationDescriptorDTO targetResponseHandler =
-                new DestinationDescriptorDTO();
-        targetResponseHandler.setEndpoint(
-                new EndpointDTO<JMSEndpointDescriptorDTO>(EndpointType.JMS, new
-                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
-                ));
-        targetResponseHandler.setActionDescriptor(new QueueDTO
-                                                          ("SourceQueue"));
-        deliveryDTO.setTargetResponseHandlerDescriptor(targetResponseHandler);
-        DestinationDescriptorDTO
-                deliveryResponseHandler = new DestinationDescriptorDTO();
-
-
-//        HashMap<String, String> map = new HashMap<>();
+//    public static ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
+//            IntegratorHttpClient httpClient) {
+//        DeliveryDTO deliveryDTO = new DeliveryDTO();
+//
+//        HttpEndpointDescriptorDTO desr = new
+//                HttpEndpointDescriptorDTO("192.168.84.142", 8080);
+//        EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
+//                new EndpointDTO<HttpEndpointDescriptorDTO>(EndpointType.HTTP,
+//                                                           desr);
+//
+////        deliveryDTO.setTargetResponseHandlerDescriptor(
+////                new DestinationDescriptorDTO(
+////                        endpoint,
+////                        new HttpActionDTO("/source/handleResponseFromTarget")
+////                ));
+//        HashMap<String, String> map = new HashMap<String, String>();
 //        map.put("java.naming.provider.url", "tcp://localhost:61616");
 //        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
 //                ".ActiveMQInitialContextFactory");
-//        deliveryResponseHandler.setEndpoint(
-//                new EndpointDTO<>(EndpointType.JMS, new
-//                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
-//                ));
-//        deliveryResponseHandler.setActionDescriptor(new QueueDTO
-//                                                            ("SourceQueue"));
-        deliveryResponseHandler
-                .setEndpoint(endpoint);
-        deliveryResponseHandler.setActionDescriptor(
-                new HttpActionDTO("/ext_source/handleDeliveryResponse"));
-        deliveryDTO.setAction("ACTION");
-        deliveryDTO.setRequestData(new RequestDataDTO(
-                new HashMap<String, Object>() {{
-                    put("a", "b");
-                }}));
-        DestinationDTO destination = new DestinationDTO(
-                "NEW_SERVICE", EndpointType.HTTP);
-        deliveryDTO.setDestinations(Arrays.asList(destination));
-        return httpClient.deliver(
-                new IntegratorPacket<DeliveryDTO>(deliveryDTO,
-                                                  deliveryResponseHandler));
-    }
+//
+////        HashMap<String, String> map = new HashMap<>();
+////        map.put("java.naming.provider.url", "tcp://localhost:61616");
+////        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
+////                ".ActiveMQInitialContextFactory");
+////        deliveryResponseHandler.setEndpoint(
+////                new EndpointDTO<>(EndpointType.JMS, new
+////                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
+////                ));
+////        deliveryResponseHandler.setActionDescriptor(new QueueDTO
+////                                                            ("SourceQueue"));
+//        deliveryDTO.setAction("ACTION");
+//        deliveryDTO.setRequestData(new RequestDataDTO(
+//                new HashMap<String, Object>() {{
+//                    put("a", "b");
+//                }}));
+//        DestinationDTO destination = new DestinationDTO(
+//                "NEW_SERVICE", EndpointType.HTTP);
+//        deliveryDTO.setDestinations(Arrays.asList(destination));
+//        return httpClient.deliver(
+//                new IntegratorPacket<DeliveryDTO>(deliveryDTO,
+//                                                  deliveryResponseHandler));
+//    }
 
     public static ResponseDTO<Map<String, ResponseDTO<Void>>> register(
             IntegratorHttpClient httpClient) {

@@ -81,9 +81,9 @@ public class DeliveryService {
 
         DeliveryCallable<ResponseFromIntegratorDTO<T>>
                 deliveryCallable =
-                new DeliveryCallable<>(sourceConnector,
-                                       new ResponseFromIntegratorDTO<>(packet));
-        scheduler.schedule(new TaskCreator<>(deliveryCallable));
+                new DeliveryCallable<ResponseFromIntegratorDTO<T>>(sourceConnector,
+                                       new ResponseFromIntegratorDTO<T>(packet));
+        scheduler.schedule(new TaskCreator<ResponseDTO>(deliveryCallable));
     }
 
     public UUID deliver(DestinationDTO destination,
@@ -94,7 +94,7 @@ public class DeliveryService {
                 factory.createEndpointConnector(destination,
                                                 packet.getAction());
         DeliveryCallable<RequestDataDTO> deliveryCallable =
-                new DeliveryCallable<>(destinationConnector,
+                new DeliveryCallable<RequestDataDTO>(destinationConnector,
                                        packet.getRequestData());
         RawDestinationDescriptor targetResponseHandler =
                 packet.getTargetResponseHandlerDescriptor();
@@ -121,7 +121,7 @@ public class DeliveryService {
                 createRetryHandler(packet, destinationDTO, requestID);
 
         TaskCreator<ResponseDTO> deliveryTaskCreator =
-                new TaskCreator<>(deliveryCallable);
+                new TaskCreator<ResponseDTO>(deliveryCallable);
         deliveryTaskCreator.setDescriptor(
                 new Descriptor<TaskCreator<ResponseDTO>>() {
                     @Override
@@ -180,7 +180,7 @@ public class DeliveryService {
         logger.info("Generated an ID for the request: " + quote(
                 requestID.toString()));
         TaskCreator<ResponseDTO> deliveryTaskCreator =
-                new TaskCreator<>(deliveryCallable);
+                new TaskCreator<ResponseDTO>(deliveryCallable);
         deliveryTaskCreator.setDescriptor(
                 new Descriptor<TaskCreator<ResponseDTO>>() {
                     @Override
@@ -255,7 +255,7 @@ public class DeliveryService {
                                          targetResponseConnector.toString()),
                     node);
             handler.setLogEntry(logEntry);
-            TaskCreator<Void> taskCreator = new TaskCreator<>(successCallable);
+            TaskCreator<Void> taskCreator = new TaskCreator<Void>(successCallable);
             taskCreator.setDescriptor(
                     new Descriptor<TaskCreator<Void>>() {
                         @Override
