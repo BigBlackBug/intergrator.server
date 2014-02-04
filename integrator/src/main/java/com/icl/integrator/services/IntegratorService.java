@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
@@ -73,8 +74,9 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
-            IntegratorPacket<DeliveryDTO> delivery) {
+    public <T extends DestinationDescriptor> ResponseDTO<Map<String,
+            ResponseDTO<UUID>>> deliver(
+            IntegratorPacket<DeliveryDTO, T> delivery) {
         logger.info("Received a delivery request");
         ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
         try {
@@ -91,24 +93,23 @@ public class IntegratorService implements IntegratorAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<Map<String, ResponseDTO<UUID>>>(ex);
         }
+        //TODO стоп, а что если он пустой?
         sendResponse(delivery.getResponseHandlerDescriptor(), response);
         return response;
     }
 
     @Override
-    public Boolean ping(IntegratorPacket<Void> responseHandler) {
-        DestinationDescriptorDTO descriptor =
-                responseHandler.getResponseHandlerDescriptor();
-        if (descriptor != null && descriptor.isInitialized()) {
-            deliveryService.deliver(descriptor, Boolean.TRUE);
-        }
+    public <T extends DestinationDescriptor> Boolean ping(
+            IntegratorPacket<Void, T> responseHandler) {
+        sendResponse(responseHandler.getResponseHandlerDescriptor(),
+                     Boolean.TRUE);
         return true;
     }
 
     @Override
-    public <T extends ActionDescriptor>
+    public <T extends ActionDescriptor, Y extends DestinationDescriptor>
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            IntegratorPacket<TargetRegistrationDTO<T>> registrationDTO) {
+            IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
         logger.info("Received a service registration request");
         Date requestTime = new Date();
         ResponseDTO<Map<String, ResponseDTO<Void>>> response;
@@ -129,7 +130,8 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public ResponseDTO<Boolean> isAvailable(IntegratorPacket<PingDTO> pingDTO) {
+    public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
+            IntegratorPacket<PingDTO, T> pingDTO) {
         logger.info("Received a ping request for " + pingDTO);
         ResponseDTO<Boolean> response;
         try {
@@ -143,8 +145,8 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public ResponseDTO<List<ServiceDTO>> getServiceList(
-            IntegratorPacket<Void> packet) {
+    public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>> getServiceList(
+            IntegratorPacket<Void, T> packet) {
         ResponseDTO<List<ServiceDTO>> response;
         try {
             List<ServiceDTO> serviceList = workerService.getServiceList();
@@ -154,12 +156,12 @@ public class IntegratorService implements IntegratorAPI {
         }
 
         sendResponse(packet.getResponseHandlerDescriptor(), response);
-        return response;
+        return response;//TODO тут кагбэ ошибка вылетает
     }
 
     @Override
-    public ResponseDTO<List<String>> getSupportedActions(
-            IntegratorPacket<ServiceDTO> serviceDTO) {
+    public <T extends DestinationDescriptor> ResponseDTO<List<String>> getSupportedActions(
+            IntegratorPacket<ServiceDTO, T> serviceDTO) {
         ResponseDTO<List<String>> response;
         try {
             List<String> actions = workerService
@@ -173,8 +175,8 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public ResponseDTO<Void> addAction(
-            IntegratorPacket<AddActionDTO> actionDTO) {
+    public <T extends DestinationDescriptor> ResponseDTO<Void> addAction(
+            IntegratorPacket<AddActionDTO, T> actionDTO) {
         ResponseDTO<Void> response;
         try {
             workerService.addAction(actionDTO.getPacket());
@@ -187,12 +189,13 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
-    ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
-            IntegratorPacket<ServiceDTO> serviceDTO) {
-        ResponseDTO<FullServiceDTO<T, Y>> response;
+    public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,
+            DDType extends DestinationDescriptor> ResponseDTO<FullServiceDTO<EDType, ADType>>
+    getServiceInfo(
+            IntegratorPacket<ServiceDTO, DDType> serviceDTO) {
+        ResponseDTO<FullServiceDTO<EDType, ADType>> response;
         try {
-            FullServiceDTO<T, Y> serviceInfo =
+            FullServiceDTO<EDType, ADType> serviceInfo =
                     workerService
                             .getServiceInfo(serviceDTO.getPacket());
             response = new ResponseDTO<FullServiceDTO<T, Y>>(serviceInfo);
@@ -204,8 +207,8 @@ public class IntegratorService implements IntegratorAPI {
         return response;
     }
 
-    private <T> void sendResponse(
-            DestinationDescriptorDTO responseHandler, T response) {
+    private <T> void sendResponse(DestinationDescriptor responseHandler,
+                                  T response) {
         if (responseHandler != null) {
             try {
                 deliveryService.deliver(responseHandler, response);

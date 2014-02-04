@@ -64,13 +64,15 @@ public class QueueDTO implements ActionDescriptor {
 
         QueueDTO queueDTO = (QueueDTO) o;
 
-        if (!password.equals(queueDTO.password)) {
+        if (password != null ? !password
+                .equals(queueDTO.password) : queueDTO.password != null) {
             return false;
         }
         if (!queueName.equals(queueDTO.queueName)) {
             return false;
         }
-        if (!username.equals(queueDTO.username)) {
+        if (username != null ? !username
+                .equals(queueDTO.username) : queueDTO.username != null) {
             return false;
         }
 
@@ -79,8 +81,8 @@ public class QueueDTO implements ActionDescriptor {
 
     @Override
     public int hashCode() {
-        int result = username.hashCode();
-        result = 31 * result + password.hashCode();
+        int result = username != null ? username.hashCode() : 0;
+        result = 31 * result + (password != null ? password.hashCode() : 0);
         result = 31 * result + queueName.hashCode();
         return result;
     }
