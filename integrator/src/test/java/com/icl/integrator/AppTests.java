@@ -110,7 +110,7 @@ public class AppTests {
         RawDestinationDescriptor targetResponseHandler =
                 new RawDestinationDescriptor();
         targetResponseHandler.setEndpoint(
-                new EndpointDTO<>(EndpointType.JMS, new
+                new EndpointDTO<JMSEndpointDescriptorDTO>(EndpointType.JMS, new
                         JMSEndpointDescriptorDTO("ConnectionFactory", null)
                 ));
         targetResponseHandler.setActionDescriptor(new QueueDTO
@@ -130,7 +130,7 @@ public class AppTests {
         RawDestinationDescriptor targetResponseHandler =
                 new RawDestinationDescriptor();
         targetResponseHandler.setEndpoint(
-                new EndpointDTO<>(EndpointType.JMS, new
+                new EndpointDTO<JMSEndpointDescriptorDTO>(EndpointType.JMS, new
                         JMSEndpointDescriptorDTO("ConnectionFactory", null)
                 ));
         targetResponseHandler.setActionDescriptor(new QueueDTO
@@ -149,7 +149,7 @@ public class AppTests {
         RawDestinationDescriptor targetResponseHandler =
                 new RawDestinationDescriptor();
         targetResponseHandler.setEndpoint(
-                new EndpointDTO<>(EndpointType.JMS, new
+                new EndpointDTO<JMSEndpointDescriptorDTO>(EndpointType.JMS, new
                         JMSEndpointDescriptorDTO("ConnectionFactory",
                                                  Collections.<String,
                                                          String>emptyMap())
@@ -182,11 +182,11 @@ public class AppTests {
     @Test
     public void testRegDeserializer() throws Exception {
         TargetRegistrationDTO<HttpActionDTO> expected =
-                new TargetRegistrationDTO<>();
+                new TargetRegistrationDTO<HttpActionDTO>();
         expected.setServiceName("NEW_SERVICE");
         //----------------------------------------------------------------------
         EndpointDTO<HttpEndpointDescriptorDTO>
-                endpointDTO = new EndpointDTO<>();
+                endpointDTO = new EndpointDTO<HttpEndpointDescriptorDTO>();
         endpointDTO.setEndpointType(EndpointType.HTTP);
 
         HttpEndpointDescriptorDTO descr = new HttpEndpointDescriptorDTO();
@@ -196,7 +196,7 @@ public class AppTests {
 
         expected.setEndpoint(endpointDTO);
         //----------------------------------------------------------------------
-        ActionEndpointDTO<HttpActionDTO> actionDTO = new ActionEndpointDTO<>();
+        ActionEndpointDTO<HttpActionDTO> actionDTO = new ActionEndpointDTO<HttpActionDTO>();
 
         HttpActionDTO actionDescriptor = new HttpActionDTO();
         actionDescriptor.setPath("/destination/handleRequest");
@@ -204,7 +204,7 @@ public class AppTests {
         actionDTO.setActionDescriptor(actionDescriptor);
         actionDTO.setActionName("ACTION");
         expected.setActionRegistrations(
-                Arrays.asList(new ActionRegistrationDTO<>(actionDTO, true)));
+                Arrays.asList(new ActionRegistrationDTO<HttpActionDTO>(actionDTO, true)));
 
         String sstring = mapper.writeValueAsString(expected);
         TargetRegistrationDTO result =
