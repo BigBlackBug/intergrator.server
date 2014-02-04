@@ -51,7 +51,8 @@ public class EndpointConnectorFactory {
                 JMSServiceEndpoint jmsEndpoint = endpointResolverService
                         .getJmsEndpoint(destination.getServiceName());
                 return new JMSEndpointConnector(
-                        jmsEndpoint, jmsEndpoint.getActionByName(action));
+                        jmsEndpoint,
+                        jmsEndpoint.getActionByName(action));
             }
             default: {
                 return null;

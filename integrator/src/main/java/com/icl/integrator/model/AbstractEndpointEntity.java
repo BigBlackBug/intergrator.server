@@ -1,7 +1,11 @@
 package com.icl.integrator.model;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import com.icl.integrator.util.EndpointType;
+import org.hibernate.annotations.Cascade;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,19 +14,57 @@ import javax.persistence.MappedSuperclass;
  * Time: 12:03
  * To change this template use File | Settings | File Templates.
  */
-@MappedSuperclass
-public abstract class AbstractEndpointEntity extends AbstractEntity {
+@Entity
+@Table(name = "ENDPOINT")
+@Inheritance
+@DiscriminatorColumn(name = "ENDPOINT_TYPE",
+                     discriminatorType = DiscriminatorType.STRING)
+public abstract class AbstractEndpointEntity<T extends AbstractActionEntity> extends AbstractEntity {
 
-    @Column(unique = true, nullable = false, length = 255,
-            name = "SERVICE_NAME")
-    private String serviceName;
+	@Column(unique = true, nullable = false, length = 255,
+	        name = "SERVICE_NAME")
+	private String serviceName;
 
-    public String getServiceName() {
-        return serviceName;
-    }
+	@OneToMany(mappedBy = "endpoint")
+	@Cascade(value = org.hibernate.annotations.CascadeType.ALL)
+	protected List<AbstractActionEntity> actions = new ArrayList<>();
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
+	//TODO add references to delivery
+	@Enumerated(EnumType.STRING)
+	@Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
+	        insertable = false)
+	private EndpointType type;
+
+	protected AbstractEndpointEntity() {
+
+	}
+
+	protected AbstractEndpointEntity(EndpointType endpointType) {
+		this.type = endpointType;
+	}
+
+	public List<AbstractActionEntity> getActions() {
+		return actions;
+	}
+
+	public abstract void setActions(List<T> actions);
+
+	public abstract T getActionByName(String actionName);
+
+	public void addAction(T action){
+		this.actions.add(action);
+	}
+
+	public EndpointType getType() {
+		return type;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
 }
 

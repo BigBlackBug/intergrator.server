@@ -187,5 +187,8 @@
                       ref="integratorJmsController"/>
         <jms:listener id="TargetQueueListener" destination="SourceQueue"
                       ref="sourceJmsController"/>
+
+        <jms:listener id="InternalIntegratorQueue" destination="InternalIntegratorQueue"
+                      ref="sourceJmsController"/>
     </jms:listener-container>
 </beans>

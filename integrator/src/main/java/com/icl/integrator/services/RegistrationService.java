@@ -110,7 +110,7 @@ public class RegistrationService {
         for (JMSAction action : httpActions) {
             ResponseDTO<Void> responseDTO;
             try {
-                action.setJmsServiceEndpoint(serviceEntity);
+                action.setEndpoint(serviceEntity);
                 serviceEntity.addAction(action);
                 persistenceService.merge(action);
                 responseDTO = new ResponseDTO<>(true);
@@ -124,6 +124,7 @@ public class RegistrationService {
         }
     }
 
+	//TODO refactor
     @Transactional
     private <T extends ActionDescriptor>
     void processHttp(EndpointDTO endpoint,
@@ -146,7 +147,7 @@ public class RegistrationService {
         for (HttpAction action : httpActions) {
             ResponseDTO<Void> responseDTO;
             try {
-                action.setHttpServiceEndpoint(serviceEntity);
+                action.setEndpoint(serviceEntity);
                 serviceEntity.addAction(action);
                 persistenceService.merge(action);
                 responseDTO = new ResponseDTO<>(true);

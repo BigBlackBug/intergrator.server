@@ -1,6 +1,5 @@
 package com.icl.integrator.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
@@ -9,7 +8,6 @@ import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.model.RequestLogEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,28 +49,6 @@ public class IntegratorService implements IntegratorAPI {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private <Request, Response> RequestLogEntry createLogEntry(
-            RequestLogEntry.RequestType requestType, Date requestTime,
-            Request requestData, Response responseData) {
-        RequestLogEntry entry = new RequestLogEntry();
-        try {
-            entry.setRequestData(objectMapper.writeValueAsString(requestData));
-        } catch (JsonProcessingException e) {
-            logger.info("Unable to convert request entity to json");
-            return null;
-        }
-        entry.setRequestDate(requestTime);
-        entry.setRequestType(requestType);
-        try {
-            entry.setResponseData(
-                    objectMapper.writeValueAsString(responseData));
-        } catch (JsonProcessingException e) {
-            logger.info("Unable to convert request entity to json");
-            return null;
-        }
-        return entry;
-    }
-
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<Map<String,
             ResponseDTO<UUID>>> deliver(
@@ -86,10 +62,6 @@ public class IntegratorService implements IntegratorAPI {
                     processor.process(delivery.getPacket());
 
             response = new ResponseDTO<>(serviceToRequestID);
-            RequestLogEntry logEntry =
-                    createLogEntry(RequestLogEntry.RequestType.DELIVERY,
-                                   requestTime, delivery, serviceToRequestID);
-            persistenceService.merge(logEntry);
         } catch (Exception ex) {
             response = new ResponseDTO<>(ex);
         }
@@ -111,7 +83,6 @@ public class IntegratorService implements IntegratorAPI {
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
         logger.info("Received a service registration request");
-        Date requestTime = new Date();
         ResponseDTO<Map<String, ResponseDTO<Void>>> response;
         try {
             Map<String, ResponseDTO<Void>> result =
@@ -120,10 +91,6 @@ public class IntegratorService implements IntegratorAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        RequestLogEntry logEntry =
-                createLogEntry(RequestLogEntry.RequestType.REGISTRATION,
-                               requestTime, registrationDTO, response);
-        persistenceService.merge(logEntry);
 
         sendResponse(registrationDTO.getResponseHandlerDescriptor(), response);
         return response;
