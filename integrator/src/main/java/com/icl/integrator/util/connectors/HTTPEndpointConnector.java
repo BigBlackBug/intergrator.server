@@ -48,10 +48,15 @@ public class HTTPEndpointConnector implements EndpointConnector {
 
     @Override
     public <Request, Response> Response sendRequest(
-            Request data, Class<Response> responseClass) throws Exception {
+            Request data, Class<Response> responseClass) throws
+            EndpointConnectorExceptions.HttpIntegratorException {
         RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.postForObject(url.toURI(), data,
-                                          responseClass);
+        try {
+            return restTemplate.postForObject(url.toURI(), data,
+                                              responseClass);
+        } catch (Exception ex) {
+            throw new EndpointConnectorExceptions.HttpIntegratorException(ex);
+        }
     }
 
     @Override

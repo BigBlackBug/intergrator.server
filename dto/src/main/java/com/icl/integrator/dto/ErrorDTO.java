@@ -29,7 +29,13 @@ public class ErrorDTO {
     }
 
     public ErrorDTO(Throwable ex) {
-        this(ex.getMessage(), Utils.getStackTraceAsString(ex));
+        String message = ex.getMessage();
+        if (message == null) {
+            message = ex.getClass().getSimpleName();
+        }
+        this.errorMessage = message;
+        this.developerMessage = Utils.getStackTraceAsString(ex);
+        this.errorCode = -1;
     }
 
     public ErrorDTO(String errorMessage, int errorCode) {
@@ -58,7 +64,8 @@ public class ErrorDTO {
             return false;
         }
         if (developerMessage != null ? !developerMessage
-                .equals(errorDTO.developerMessage) : errorDTO.developerMessage != null) {
+                .equals(errorDTO.developerMessage) :
+                errorDTO.developerMessage != null) {
             return false;
         }
         return errorMessage.equals(errorDTO.errorMessage);

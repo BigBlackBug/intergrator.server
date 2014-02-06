@@ -51,7 +51,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = false)
+@TransactionConfiguration(transactionManager = "transactionManager",
+                          defaultRollback = false)
 @ContextConfiguration(locations = {"classpath:/integrator-servlet.xml"})
 public class AppTests {
 
@@ -73,85 +74,100 @@ public class AppTests {
     @Autowired
     private ObjectMapper mapper;
 
-	@PersistenceContext
-	private EntityManager em;
+    @Autowired
+    private PersistenceService persistenceService;
 
-	@Autowired
-	private PersistenceService persistenceService;
+    @Before
+    @Transactional
+    public void setup() throws Exception {
+        this.mockMvc = webAppContextSetup(this.wac).build();
+        HttpServiceEndpoint ep = new HttpServiceEndpoint();
+        ep.setServiceURL("URL");
+        ep.setServicePort(123);
+        ep.setServiceName("SERNAME");
+        HttpAction a = new HttpAction();
+        a.setActionURL("AURL");
+        a.setEndpoint(ep);
+        a.setActionName("ANAME");
+        ep.addAction(a);
+        persistenceService.persist(ep);
 
-	@Before
-	@Transactional
-	public void setup() throws Exception {
-		this.mockMvc = webAppContextSetup(this.wac).build();
-		HttpServiceEndpoint ep = new HttpServiceEndpoint();
-		ep.setServiceURL("URL");
-		ep.setServicePort(123);
-		ep.setServiceName("SERNAME");
-		HttpAction a = new HttpAction();
-		a.setActionURL("AURL");
-		a.setEndpoint(ep);
-		a.setActionName("ANAME");
-		ep.addAction(a);
-		em.persist(ep);
+        DeliveryDTO dto = getDelvieryDTO();
 
-		DeliveryDTO dto = getDelvieryDTO();
-		DeliveryPacket dp = new DeliveryPacket();
-		dp.setAction(dto.getAction());
-		dp.setDeliveryData(mapper.writeValueAsString(dto.getRequestData()));
-		dp.setDeliveryStatus(DeliveryPacket.DeliveryStatus.ACCEPTED);
-		dp.setRequestDate(new Date());
-		dp.setDestinations(Arrays.<AbstractEndpointEntity>asList(ep));
-		em.persist(dp);
-	}
-	@Test
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void testPers() throws Exception {
-		List<AbstractEndpointEntity> resultList =
-				em.createQuery("select e from AbstractEndpointEntity e",
-				               AbstractEndpointEntity.class).getResultList();
-		AbstractEndpointEntity abstractEndpointEntity = resultList.get(0);
-		if(abstractEndpointEntity.getType() == EndpointType.HTTP){
-			HttpServiceEndpoint ed =
-					(HttpServiceEndpoint) abstractEndpointEntity;
-			return;
-		}
-		Assert.fail();
-	}
+        DeliveryPacket dp = new DeliveryPacket();
 
-	@After
-	@Transactional
-	public void trunc() throws Exception {
-		em.createQuery("delete from AbstractEndpointEntity").executeUpdate();
-		em.createQuery("delete from DeliveryPacket").executeUpdate();
-	}
-	private DeliveryDTO getDelvieryDTO(){
-		DeliveryDTO deliveryDTO = new DeliveryDTO();
+        Delivery delivery = new Delivery();
+        delivery.setAction(a);
+        delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
+        delivery.setEndpoint(ep);
+        delivery.setDeliveryPacket(dp);
 
-		HttpEndpointDescriptorDTO desr = new
-				HttpEndpointDescriptorDTO("192.168.84.142", 8080);
-		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-				new EndpointDTO<>(EndpointType.HTTP, desr);
+        dp.setDeliveries(Arrays.asList(delivery));
+//		dp.setAction(dto.getAction());
+        dp.setDeliveryData(mapper.writeValueAsString(dto.getRequestData()));
+        dp.setRequestDate(new Date());
+//		dp.setDestinations(Arrays.<AbstractEndpointEntity>asList(ep));
+        persistenceService.persist(dp);
+    }
+
+    @PersistenceContext
+    EntityManager em;
+    @Test
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void testPers() throws Exception {
+        List<AbstractEndpointEntity> resultList =
+                em.createQuery("select e from AbstractEndpointEntity e",
+                               AbstractEndpointEntity.class).getResultList();
+        AbstractEndpointEntity abstractEndpointEntity = resultList.get(0);
+        if (abstractEndpointEntity.getType() == EndpointType.HTTP) {
+            HttpServiceEndpoint ed =
+                    (HttpServiceEndpoint) abstractEndpointEntity;
+            List<AbstractActionEntity> actions = ed.getActions();
+            AbstractActionEntity actionEntity = actions.get(0);
+            if (actionEntity.getType() == EndpointType.HTTP) {
+                HttpAction a = (HttpAction) actionEntity;
+            }
+            return;
+        }
+        Assert.fail();
+    }
+
+    @After
+    @Transactional
+    public void trunc() throws Exception {
+//		em.createQuery("delete from AbstractEndpointEntity").executeUpdate();
+//		em.createQuery("delete from AbstractActionEntity").executeUpdate();
+//		em.createQuery("delete from DeliveryPacket").executeUpdate();
+    }
+
+    private DeliveryDTO getDelvieryDTO() {
+        DeliveryDTO deliveryDTO = new DeliveryDTO();
+
+        HttpEndpointDescriptorDTO desr = new
+                HttpEndpointDescriptorDTO("192.168.84.142", 8080);
+        EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
+                new EndpointDTO<>(EndpointType.HTTP, desr);
 
 //        deliveryDTO.setTargetResponseHandlerDescriptor(
 //                new DestinationDescriptorDTO(
 //                        endpoint,
 //                        new HttpActionDTO("/source/handleResponseFromTarget")
 //                ));
-		HashMap<String, String> map = new HashMap<>();
-		map.put("java.naming.provider.url", "tcp://localhost:61616");
-		map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
-				".ActiveMQInitialContextFactory");
-		RawDestinationDescriptor targetResponseHandler =
-				new RawDestinationDescriptor();
-		targetResponseHandler.setEndpoint(
-				new EndpointDTO<>(EndpointType.JMS, new
-						JMSEndpointDescriptorDTO("ConnectionFactory", map)
-				));
-		targetResponseHandler.setActionDescriptor(new QueueDTO
-				                                          ("SourceQueue"));
-		deliveryDTO.setTargetResponseHandlerDescriptor(targetResponseHandler);
-		RawDestinationDescriptor
-				deliveryResponseHandler = new RawDestinationDescriptor();
+        HashMap<String, String> map = new HashMap<>();
+        map.put("java.naming.provider.url", "tcp://localhost:61616");
+        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
+                ".ActiveMQInitialContextFactory");
+        RawDestinationDescriptor targetResponseHandler =
+                new RawDestinationDescriptor();
+        targetResponseHandler.setEndpoint(
+                new EndpointDTO<>(EndpointType.JMS, new
+                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
+                ));
+        targetResponseHandler.setActionDescriptor(new QueueDTO
+                                                          ("SourceQueue"));
+        deliveryDTO.setTargetResponseHandlerDescriptor(targetResponseHandler);
+        RawDestinationDescriptor
+                deliveryResponseHandler = new RawDestinationDescriptor();
 
 
 //        HashMap<String, String> map = new HashMap<>();
@@ -164,20 +180,20 @@ public class AppTests {
 //                ));
 //        deliveryResponseHandler.setActionDescriptor(new QueueDTO
 //                                                            ("SourceQueue"));
-		deliveryResponseHandler
-				.setEndpoint(endpoint);
-		deliveryResponseHandler.setActionDescriptor(
-				new HttpActionDTO("/ext_source/handleDeliveryResponse"));
-		deliveryDTO.setAction("ACTION");
-		deliveryDTO.setRequestData(new RequestDataDTO(
-				new HashMap<String, Object>() {{
-					put("a", "b");
-				}}));
-		DestinationDTO destination = new DestinationDTO(
-				"NEW_SERVICE", EndpointType.HTTP);
-		deliveryDTO.setDestinations(Arrays.asList(destination));
-		return deliveryDTO;
-	}
+        deliveryResponseHandler
+                .setEndpoint(endpoint);
+        deliveryResponseHandler.setActionDescriptor(
+                new HttpActionDTO("/ext_source/handleDeliveryResponse"));
+        deliveryDTO.setAction("ACTION");
+        deliveryDTO.setRequestData(new RequestDataDTO(
+                new HashMap<String, Object>() {{
+                    put("a", "b");
+                }}));
+        DestinationDTO destination = new DestinationDTO(
+                "NEW_SERVICE", EndpointType.HTTP);
+        deliveryDTO.setDestinations(Arrays.asList(destination));
+        return deliveryDTO;
+    }
 
     private QueueDTO getQueueDTO() {
         QueueDTO dto = new QueueDTO();
@@ -363,27 +379,27 @@ public class AppTests {
     @Test
     public void testEx() throws Exception {
         Runnable runnable =
-                new TaskCreator<String>(new Callable<String>() {
+                new TaskCreator<>(new Callable<String>() {
                     @Override
                     public String call() throws Exception {
                         throw new HttpClientErrorException(
                                 HttpStatus.GATEWAY_TIMEOUT);
                     }
                 })
-                        .addExceptionHandler(
-                                new Callback<RestClientException>() {
-                                    @Override
-                                    public void execute(
-                                            RestClientException arg) {
-                                        Assert.assertTrue(true);
-                                    }
-                                }, RestClientException.class)
-//            .addExceptionHandler(new Callback<IllegalArgumentException>() {
-//                @Override
-//                public void execute(IllegalArgumentException arg) {
-//                    Assert.fail();
-//                }
-//            }, IllegalArgumentException.class)
+            .addExceptionHandler(
+                        new Callback<RestClientException>() {
+                            @Override
+                            public void execute(
+                                    RestClientException arg) {
+                                Assert.assertTrue(true);
+                            }
+                        }, RestClientException.class)
+            .addExceptionHandler(new Callback<IllegalArgumentException>() {
+                @Override
+                public void execute(IllegalArgumentException arg) {
+                    Assert.fail();
+                }
+            }, IllegalArgumentException.class)
                         .create();
         runnable.run();
 //        Assert.fail();

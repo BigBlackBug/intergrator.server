@@ -23,6 +23,7 @@ class DeliveryCallable<T> implements Callable<ResponseDTO> {
 
     @Override
     public ResponseDTO call() throws Exception {
+        connector.testConnection();
         return connector.sendRequest(packet, ResponseDTO.class);
     }
 }

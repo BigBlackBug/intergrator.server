@@ -24,15 +24,16 @@ public class EndpointResolverService {
     @PersistenceContext
     private EntityManager em;
 
+	///TODO crit. переписать к херам
     @Transactional
     public URL getServiceURL(String serviceName, String action)
             throws IntegratorException {
         Query query = em.createQuery(
                 "select " +
                         "address.serviceURL,address.servicePort," +
-                        "actions.actionURL " +
+                        "actions  " +
                         "from HttpServiceEndpoint address " +
-                        "join address.httpActions actions " +
+                        "join address.actions actions " +
                         "where address.serviceName=:serviceName " +
                         "and actions.actionName=:actionName")
                 .setParameter("actionName",

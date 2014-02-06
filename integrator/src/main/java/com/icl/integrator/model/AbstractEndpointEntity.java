@@ -19,52 +19,65 @@ import java.util.List;
 @Inheritance
 @DiscriminatorColumn(name = "ENDPOINT_TYPE",
                      discriminatorType = DiscriminatorType.STRING)
-public abstract class AbstractEndpointEntity<T extends AbstractActionEntity> extends AbstractEntity {
+public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
+        extends AbstractEntity {
 
-	@Column(unique = true, nullable = false, length = 255,
-	        name = "SERVICE_NAME")
-	private String serviceName;
+    @Column(unique = true, nullable = false, length = 255,
+            name = "SERVICE_NAME")
+    private String serviceName;
 
-	@OneToMany(mappedBy = "endpoint")
-	@Cascade(value = org.hibernate.annotations.CascadeType.ALL)
-	protected List<AbstractActionEntity> actions = new ArrayList<>();
+    @OneToMany(mappedBy = "endpoint",
+               fetch = FetchType.EAGER)
+    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
+    protected List<AbstractActionEntity> actions = new ArrayList<>();
 
-	//TODO add references to delivery
-	@Enumerated(EnumType.STRING)
-	@Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
-	        insertable = false)
-	private EndpointType type;
+    //TODO add references to delivery
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
+            insertable = false)
+    private EndpointType type;
 
-	protected AbstractEndpointEntity() {
+    @OneToOne
+    private DeliverySettings deliverySettings;
 
-	}
+    protected AbstractEndpointEntity() {
 
-	protected AbstractEndpointEntity(EndpointType endpointType) {
-		this.type = endpointType;
-	}
+    }
 
-	public List<AbstractActionEntity> getActions() {
-		return actions;
-	}
+    public DeliverySettings getDeliverySettings() {
+        return deliverySettings;
+    }
 
-	public abstract void setActions(List<T> actions);
+    public void setDeliverySettings(DeliverySettings deliverySettings) {
+        this.deliverySettings = deliverySettings;
+    }
 
-	public abstract T getActionByName(String actionName);
+    protected AbstractEndpointEntity(EndpointType endpointType) {
+        this.type = endpointType;
+    }
 
-	public void addAction(T action){
-		this.actions.add(action);
-	}
+    public List<AbstractActionEntity> getActions() {
+        return actions;
+    }
 
-	public EndpointType getType() {
-		return type;
-	}
+    public abstract void setActions(List<T> actions);
 
-	public String getServiceName() {
-		return serviceName;
-	}
+    public abstract T getActionByName(String actionName);
 
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
-	}
+    public void addAction(T action) {
+        this.actions.add(action);
+    }
+
+    public EndpointType getType() {
+        return type;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
 }
 

@@ -77,20 +77,7 @@ public class IntegratorWorkerService {
 	}
 
 	public List<String> getSupportedActions(ServiceDTO serviceDTO) {
-		EndpointType endpointType = serviceDTO.getEndpointType();
-		switch (endpointType) {
-			case HTTP: {
-				return persistenceService.getHttpActions(
-						serviceDTO.getServiceName());
-			}
-			case JMS: {
-				return persistenceService.getJmsActions(
-						serviceDTO.getServiceName());
-			}
-			default: {
-				return null;
-			}
-		}
+		return persistenceService.getActions(serviceDTO.getServiceName());
 	}
 
 	public Boolean pingService(PingDTO pingDTO) {

@@ -1,9 +1,11 @@
 package com.icl.integrator.model;
 
 import com.icl.integrator.util.EndpointType;
-import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,9 +33,9 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 	private EndpointType type;
 
 	@ManyToOne(fetch = FetchType.EAGER)
+    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
 	@JoinColumn(name = "ENDPOINT_ID", nullable = false,
 	            updatable = false)
-	@Cascade(value = org.hibernate.annotations.CascadeType.PERSIST)
 	private AbstractEndpointEntity endpoint;
 
 	protected AbstractActionEntity() {

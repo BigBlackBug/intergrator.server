@@ -7,7 +7,6 @@ package com.icl.integrator.dto.destination;
  * Time: 16:01
  * To change this template use File | Settings | File Templates.
  */
-//TODO test
 public abstract class DestinationDescriptor {
 
     private final DescriptorType descriptorType;

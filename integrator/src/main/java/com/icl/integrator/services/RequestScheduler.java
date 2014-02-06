@@ -82,6 +82,29 @@ public class RequestScheduler {
                              boolean scheduleRetries,
                              final int attemptNumber,
                              final TimeUnit timeUnit, final long delay){
+
+
+	    //пингуем, если не катит, то из настроек берём инфу и решедулим
+	    // если катит, то посылаем.
+	    //если исключение при посылке,
+	    //клиентское - возвращаем
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         retryIndexMap.put(taskCreator.getTaskID(), 1);
         if(scheduleRetries){
             taskCreator.addExceptionHandler(

@@ -22,8 +22,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,9 +38,6 @@ import java.util.Map;
 public class RegistrationService {
 
     private static Log logger = LogFactory.getLog(RegistrationService.class);
-
-    @PersistenceContext
-    private EntityManager em;
 
     @Autowired
     private ObjectMapper serializer;

@@ -1,8 +1,6 @@
 package com.icl.integrator.services;
 
-import com.icl.integrator.model.AbstractEntity;
-import com.icl.integrator.model.HttpServiceEndpoint;
-import com.icl.integrator.model.JMSServiceEndpoint;
+import com.icl.integrator.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,9 +47,35 @@ public class PersistenceService {
     }
 
     @Transactional
+    public <T extends AbstractEntity> void persist(T entity) {
+        em.persist(entity);
+    }
+
+    @Transactional
     public List<HttpServiceEndpoint> getHttpServices() {
         return em.createQuery("select ep from HttpServiceEndpoint ep",
                               HttpServiceEndpoint.class).getResultList();
+    }
+
+    @Transactional
+    public HttpAction getHttpAction(String actionName, UUID endpointID) {
+        return em.createQuery(
+                "select action from HttpAction action where " +
+                        "endpoint.id=:endpointID and actionName=:actionName",
+                HttpAction.class)
+                .setParameter("actionName", actionName)
+                .setParameter("endpointID", endpointID)
+                .getSingleResult();
+    }
+
+    @Transactional
+    public JMSAction getJmsAction(String actionName, UUID endpointID) {
+        return em.createQuery(
+                "select action from JMSAction action where " +
+                        "endpoint.id=:endpointID and actionName=:actionName",
+                JMSAction.class)
+                .setParameter("actionName", actionName)
+                .setParameter("endpointID", endpointID).getSingleResult();
     }
 
     @Transactional
@@ -59,20 +84,29 @@ public class PersistenceService {
                               JMSServiceEndpoint.class).getResultList();
     }
 
-    @Transactional
-    public List<String> getHttpActions(String serviceName) {
-        String query =
-                "select action.actionName from HttpServiceEndpoint ep join " +
-                        "ep.httpActions action where ep.serviceName=:serviceName";
-        return em.createQuery(query, String.class).
-                setParameter("serviceName", serviceName).getResultList();
-    }
+//    @Transactional
+//    public List<String> getHttpActions(String serviceName) {
+//        String query =
+//                "select action.actionName from HttpServiceEndpoint ep join " +
+//                        "ep.httpActions action where ep.serviceName=:serviceName";
+//        return em.createQuery(query, String.class).
+//                setParameter("serviceName", serviceName).getResultList();
+//    }
+//
+//    @Transactional
+//    public List<String> getJmsActions(String serviceName) {
+//        String query =
+//                "select action.actionName from JMSServiceEndpoint ep join " +
+//                        "ep.jmsActions action where ep.serviceName=:serviceName";
+//        return em.createQuery(query, String.class).
+//                setParameter("serviceName", serviceName).getResultList();
+//    }
 
     @Transactional
-    public List<String> getJmsActions(String serviceName) {
+    public List<String> getActions(String serviceName) {
         String query =
-                "select action.actionName from JMSServiceEndpoint ep join " +
-                        "ep.jmsActions action where ep.serviceName=:serviceName";
+                "select action.actionName from AbstractEndpointEntity ep join " +
+                        "ep.actions action where ep.serviceName=:serviceName";
         return em.createQuery(query, String.class).
                 setParameter("serviceName", serviceName).getResultList();
     }

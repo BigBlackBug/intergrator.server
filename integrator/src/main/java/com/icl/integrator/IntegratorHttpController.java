@@ -1,5 +1,7 @@
 package com.icl.integrator;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
@@ -29,42 +31,66 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
     @Autowired
     private IntegratorService integratorService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private <Result, Arg> Result fixConversion(
+            Arg argument, TypeReference<Result> type) {
+        return objectMapper.convertValue(argument, type);
+    }
+
     @Override
     public <T extends DestinationDescriptor>
     ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             @RequestBody(required = true)
             IntegratorPacket<DeliveryDTO, T> delivery) {
-        return integratorService.deliver(delivery);
+        TypeReference<IntegratorPacket<DeliveryDTO, T>> type =
+                new TypeReference<IntegratorPacket<DeliveryDTO, T>>() {
+                };
+        return integratorService.deliver(fixConversion(delivery, type));
     }
 
     //TODO format
     @Override
     public <T extends DestinationDescriptor> Boolean ping(@RequestBody(
             required = false) IntegratorPacket<Void, T> responseHandler) {
-        return integratorService.ping(responseHandler);
+        TypeReference<IntegratorPacket<Void, T>> type =
+                new TypeReference<IntegratorPacket<Void, T>>() {
+                };
+        return integratorService.ping(fixConversion(responseHandler, type));
     }
 
     @Override
     public <T extends ActionDescriptor, Y extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             @RequestBody(
                     required = true) IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
-        return integratorService
-                .registerService(registrationDTO);
+        TypeReference<IntegratorPacket<TargetRegistrationDTO<T>, Y>> type =
+                new TypeReference<IntegratorPacket<TargetRegistrationDTO<T>, Y
+                        >>() {
+                };
+        return integratorService.registerService(fixConversion(
+                registrationDTO, type));
     }
 
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
             @RequestBody(
                     required = true) IntegratorPacket<PingDTO, T> pingDTO) {
-        return integratorService.isAvailable(pingDTO);
+        TypeReference<IntegratorPacket<PingDTO, T>> type =
+                new TypeReference<IntegratorPacket<PingDTO, T>>() {
+                };
+        return integratorService.isAvailable(fixConversion(pingDTO, type));
     }
 
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>> getServiceList(
             @RequestBody(
                     required = false) IntegratorPacket<Void, T> responseHandlerDescriptor) {
-        return integratorService.getServiceList(
-                responseHandlerDescriptor);
+        TypeReference<IntegratorPacket<Void, T>> type =
+                new TypeReference<IntegratorPacket<Void, T>>() {
+                };
+        return integratorService.getServiceList(fixConversion(
+                responseHandlerDescriptor, type));
     }
 
     @Override
@@ -72,15 +98,22 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
             @RequestBody(
                     required = true) IntegratorPacket<ServiceDTO, T> serviceDTO) {
 
-        return integratorService.getSupportedActions(
-                serviceDTO);
+        TypeReference<IntegratorPacket<ServiceDTO, T>> type =
+                new TypeReference<IntegratorPacket<ServiceDTO, T>>() {
+                };
+
+        return integratorService.getSupportedActions(fixConversion(
+                serviceDTO, type));
     }
 
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<Void> addAction(
             @RequestBody(
                     required = true) IntegratorPacket<AddActionDTO, T> actionDTO) {
-        return integratorService.addAction(actionDTO);
+        TypeReference<IntegratorPacket<AddActionDTO, T>> type =
+                new TypeReference<IntegratorPacket<AddActionDTO, T>>() {
+                };
+        return integratorService.addAction(fixConversion(actionDTO, type));
     }
 
     @Override
@@ -90,7 +123,10 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
     ResponseDTO<FullServiceDTO<EDType, ADType>> getServiceInfo(
             @RequestBody(
                     required = true) IntegratorPacket<ServiceDTO, DDType> serviceDTO) {
+        TypeReference<IntegratorPacket<ServiceDTO, DDType>> type =
+                new TypeReference<IntegratorPacket<ServiceDTO, DDType>>() {
+                };
         return integratorService
-                .getServiceInfo(serviceDTO);
+                .getServiceInfo(fixConversion(serviceDTO, type));
     }
 }
