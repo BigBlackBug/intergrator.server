@@ -10,6 +10,8 @@ import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.httpclient.IntegratorHttpClient;
 import com.icl.integrator.util.EndpointType;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,11 +28,23 @@ public class Main {
 
     //TODO if body is null client sends x-www-form-urlencoded
     // and server can't respond
-    public static void main(String args[]) {
+    public static void main(String args[])
+		    throws MalformedURLException, URISyntaxException {
 //        IntegratorHttpClient httpClient = new IntegratorHttpClient
 //                ("192.168.83.91", "integrator", 18080);
         IntegratorHttpClient httpClient = new IntegratorHttpClient
                 ("localhost", 8080);
+//	    RestTemplate restTemplate = new RestTemplate();
+//	    HttpHeaders headers = new HttpHeaders();
+//	    headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+//	    HttpEntity<String> entity = new HttpEntity<>("{\"QWEQWE\":\"asdasd\"}",headers);
+//	    String aVoid = restTemplate.postForObject(
+//			    new URL("HTTP", "localhost", 8080, "/integrator/test").toURI(),
+//			    entity, String.class);
+//	    ResponseEntity<String> voidResponseEntity = restTemplate.postForEntity(
+//			    new URL("HTTP", "localhost", 8080, "/integrator/test").toURI(),
+//			    entity, String.class);
+//	    System.out.println(1);
 
 
 //        ResponseDTO<Map<String, ResponseDTO<Void>>> register =
@@ -154,7 +168,7 @@ public class Main {
                 new HashMap<String, Object>() {{
                     put("a", "b");
                 }}));
-        DestinationDTO destination = new DestinationDTO(
+	    ServiceDTO destination = new ServiceDTO(
                 "LOCALHOST", EndpointType.HTTP);
         deliveryDTO.setDestinations(Arrays.asList(destination));
         return httpClient.deliver(

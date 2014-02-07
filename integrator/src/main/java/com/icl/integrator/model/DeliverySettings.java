@@ -12,44 +12,53 @@ import javax.persistence.Table;
 @Table(name = "DELIVERY_SETTINGS")
 public class DeliverySettings extends AbstractEntity {
 
-    @Column(name = "RETRY_NUMBER", nullable = false)
-    private int retryNumber;
+	private static final int DEFAULT_DELIVERY_RETRY_DELAY_MILLIS = 15000;
 
-    @Column(name = "RETRY_DELAY", nullable = false)
-    private long retryDelay;
+	private static final int DEFAULT_DELIVERY_ATTEMPT_NUMBER = 10;
 
-    @OneToOne(mappedBy = "deliverySettings")
-    private AbstractEndpointEntity endpoint;
+	@Column(name = "RETRY_NUMBER", nullable = false)
+	private int retryNumber;
 
-    public DeliverySettings() {
-    }
+	@Column(name = "RETRY_DELAY", nullable = false)
+	private long retryDelay;
 
-    public DeliverySettings(long retryDelay, int retryNumber) {
-        this.retryDelay = retryDelay;
-        this.retryNumber = retryNumber;
-    }
+	@OneToOne(mappedBy = "deliverySettings")
+	private AbstractEndpointEntity endpoint;
 
-    public int getRetryNumber() {
-        return retryNumber;
-    }
+	public DeliverySettings() {
+	}
 
-    public void setRetryNumber(int retryNumber) {
-        this.retryNumber = retryNumber;
-    }
+	private DeliverySettings(long retryDelay, int retryNumber) {
+		this.retryDelay = retryDelay;
+		this.retryNumber = retryNumber;
+	}
 
-    public long getRetryDelay() {
-        return retryDelay;
-    }
+	public static DeliverySettings createDefaultSettings() {
+		return new DeliverySettings(DEFAULT_DELIVERY_RETRY_DELAY_MILLIS,
+		                            DEFAULT_DELIVERY_ATTEMPT_NUMBER);
+	}
 
-    public void setRetryDelay(int retryDelay) {
-        this.retryDelay = retryDelay;
-    }
+	public int getRetryNumber() {
+		return retryNumber;
+	}
 
-    public AbstractEndpointEntity getEndpoint() {
-        return endpoint;
-    }
+	public void setRetryNumber(int retryNumber) {
+		this.retryNumber = retryNumber;
+	}
 
-    public void setEndpoint(AbstractEndpointEntity endpoint) {
-        this.endpoint = endpoint;
-    }
+	public long getRetryDelay() {
+		return retryDelay;
+	}
+
+	public void setRetryDelay(int retryDelay) {
+		this.retryDelay = retryDelay;
+	}
+
+	public AbstractEndpointEntity getEndpoint() {
+		return endpoint;
+	}
+
+	public void setEndpoint(AbstractEndpointEntity endpoint) {
+		this.endpoint = endpoint;
+	}
 }

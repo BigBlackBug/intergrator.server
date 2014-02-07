@@ -26,64 +26,58 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class Scheduler {
 
-    private static final int THREAD_CORE_POOL_SIZE = 15;
+	private static final int THREAD_CORE_POOL_SIZE = 15;
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat
-            ("dd.MM.yyyy HH:mm:ss::SSS");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat
+			("dd.MM.yyyy HH:mm:ss::SSS");
 
-    private static final ScheduledExecutorService EXECUTOR = Executors
-            .newScheduledThreadPool(THREAD_CORE_POOL_SIZE);
+	private static final ScheduledExecutorService EXECUTOR = Executors
+			.newScheduledThreadPool(THREAD_CORE_POOL_SIZE);
 
-    private final static Log logger = LogFactory.getLog(
-            RequestScheduler.class);
+	private final static Log logger = LogFactory.getLog(
+			Scheduler.class);
 
-    private static final DeliverySettings DEFAULT_DELIVERY_SETTINGS =
-            new DeliverySettings();
 
-    private static final int DEFAULT_DELIVERY_RETRY_DELAY_MILLIS = 15000;
+	private Map<Long, Integer> scheduleMap = new HashMap<>();
 
-    private static final int DEFAULT_DELIVERY_ATTEMPT_NUMBER = 10;
+	@Autowired
+	private PersistenceService persistenceService;
 
-    static {
-        DEFAULT_DELIVERY_SETTINGS.setRetryDelay(
-                DEFAULT_DELIVERY_RETRY_DELAY_MILLIS);
-        DEFAULT_DELIVERY_SETTINGS
-                .setRetryNumber(DEFAULT_DELIVERY_ATTEMPT_NUMBER);
-    }
+	public <T> void schedule(final Schedulable<T> deliverySchedulable) {
+		schedule(deliverySchedulable, null);
+	}
 
-    private Map<Long, Integer> scheduleMap = new HashMap<>();
-
-    @Autowired
-    private PersistenceService persistenceService;
-
-    public <T> void schedule(final Schedulable<T> deliverySchedulable) {
-        schedule(deliverySchedulable, null);
-    }
-
-    public <T> void schedule(final Schedulable<T> deliverySchedulable,
-                             final Schedulable<T> retryLimitScheduleable) {
-        final TaskCreator<T> taskCreator = deliverySchedulable.getTaskCreator();
-        final Delivery delivery = deliverySchedulable.getDelivery();
-        final DeliverySettings deliverySettings =
-                deliverySchedulable.getDeliverySettings();
-        scheduleMap.put(taskCreator.getTaskID(), 0);
-        taskCreator.addExceptionHandler(new Callback<ConnectionException>() {
-            @Override
-            public void execute(
-                    ConnectionException exception) {
-                logger.info("Exception when sending request",
-                            exception);
-                int retryIndex =
-                        scheduleMap.get(taskCreator.getTaskID());
-                if (retryIndex == deliverySettings.getRetryNumber()) {
-                    logger.info("Too many retries to handle exception",
-                                exception);
-                    scheduleMap.remove(taskCreator.getTaskID());
-                    delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_FAILED);
-                    persistenceService.merge(delivery);
-                    //обычно посылатель домой
-                    if (retryLimitScheduleable != null) {
-                        schedule(retryLimitScheduleable, null/*TODO*/);
+	public <T> void schedule(final Schedulable<T> deliverySchedulable,
+	                         final Callback<Void> retryLimitHandler) {
+		final TaskCreator<T> taskCreator = deliverySchedulable.getTaskCreator();
+		final Delivery delivery = deliverySchedulable.getDelivery();
+		final DeliverySettings deliverySettings =
+				deliverySchedulable.getDeliverySettings();
+		scheduleMap.put(taskCreator.getTaskID(), 0);
+		//ен прошёл пинг
+		taskCreator.addExceptionHandler(new Callback<ConnectionException>() {
+			@Override
+			public void execute(
+					ConnectionException exception) {
+				logger.info("Exception when sending request",
+				            exception);
+				int retryIndex = scheduleMap.get(taskCreator.getTaskID());
+				if (retryIndex == deliverySettings.getRetryNumber()) {
+					logger.info("Too many retries to handle exception",
+					            exception);
+					scheduleMap.remove(taskCreator.getTaskID());
+					delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_FAILED);
+					persistenceService.merge(delivery);
+					//обычно посылатель домой
+					//но также мб просто сменщик статуса
+					//например когда мы шедулим реквест на исходник
+					//обрабочик облома
+					if (retryLimitHandler != null) {
+						//TODO всем ГГ
+						retryLimitHandler.execute(null);
+						//TODO запуск
+//						schedule(retryLimitScheduleable, null/*TODO*/);
+						return;
 //                        String originalTaskDescription = taskCreator
 //                                .getTaskDescription();
 //                        String retryTaskDescription =
@@ -105,57 +99,52 @@ public class Scheduler {
 //                                                "повторов таска",
 //                                        node));
 //                        schedule(onRetryLimitExceeded, handler);
-                    }
-                    return;
-                }
-                Date nextRequestDate = new Date(
-                        System.currentTimeMillis() +
-                                deliverySettings.getRetryDelay());
-                logger.info(
-                        "Rescheduling next request to " +
-                                DATE_FORMAT
-                                        .format(nextRequestDate));
-                delivery.setDeliveryStatus(DeliveryStatus.WAITING_FOR_DELIVERY);
-                persistenceService.merge(delivery);
-                EXECUTOR.schedule(taskCreator.create(),
-                                  deliverySettings.getRetryDelay(),
-                                  TimeUnit.MILLISECONDS);
-                scheduleMap.put(taskCreator.getTaskID(),
-                                retryIndex + 1);
-            }
-        }, ConnectionException.class);
+					}
 
-        taskCreator.addExceptionHandler(
-                new Callback<EndpointConnectorExceptions.JMSIntegratorException>() {
-                    @Override
-                    public void execute(
-                            EndpointConnectorExceptions.JMSIntegratorException exception) {
-                        Throwable cause = exception.getCause();
-                        //ошибка jms лалала
-                        //решедулим
-                        //hey
-                    }
-                },
-                EndpointConnectorExceptions.JMSIntegratorException.class);
+				}
+				Date nextRequestDate = new Date(System.currentTimeMillis() +
+								deliverySettings.getRetryDelay());
+				logger.info("Rescheduling next request to " +
+						            DATE_FORMAT.format(nextRequestDate));
+				delivery.setDeliveryStatus(DeliveryStatus.WAITING_FOR_DELIVERY);
+				persistenceService.merge(delivery);
+				EXECUTOR.schedule(taskCreator.create(),
+				                  deliverySettings.getRetryDelay(),
+				                  TimeUnit.MILLISECONDS);
+				scheduleMap.put(taskCreator.getTaskID(),
+				                retryIndex + 1);
+			}
+		}, ConnectionException.class);
 
-        taskCreator.addExceptionHandler(
-                new Callback<EndpointConnectorExceptions
-                        .HttpIntegratorException>() {
-                    @Override
-                    public void execute(
-                            EndpointConnectorExceptions
-                                    .HttpIntegratorException exception) {
-                        Throwable cause = exception.getCause();
-                        //ошибка http лалала
-                        //решедулим
-                        //hey
-                    }
-                },
-                EndpointConnectorExceptions.HttpIntegratorException.class);
+		taskCreator.addExceptionHandler(
+				new Callback<EndpointConnectorExceptions.JMSConnectorException>() {
+					@Override
+					public void execute(
+							EndpointConnectorExceptions.JMSConnectorException exception) {
+						Throwable cause = exception.getCause();
+						//ошибка jms лалала
+						//решедулим
+						//hey
+					}
+				},
+				EndpointConnectorExceptions.JMSConnectorException.class);
 
-        delivery.setDeliveryStatus(DeliveryStatus.IN_PROGRESS);
-        persistenceService.merge(delivery);
-        EXECUTOR.submit(taskCreator.create());
-    }
+		taskCreator.addExceptionHandler(
+				new Callback<EndpointConnectorExceptions.HttpConnectorException>() {
+					@Override
+					public void execute(
+							EndpointConnectorExceptions.HttpConnectorException exception) {
+						Throwable cause = exception.getCause();
+						//ошибка http лалала
+						//решедулим
+						//hey
+					}
+				},
+				EndpointConnectorExceptions.HttpConnectorException.class);
+
+		delivery.setDeliveryStatus(DeliveryStatus.IN_PROGRESS);
+		persistenceService.merge(delivery);
+		EXECUTOR.submit(taskCreator.create());
+	}
 
 }

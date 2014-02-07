@@ -1,19 +1,21 @@
 package com.icl.integrator.services;
 
-import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.util.connectors.EndpointConnector;
 
 import java.util.concurrent.Callable;
 
-class DeliveryCallable<T> implements Callable<ResponseDTO> {
+class DeliveryCallable<T,Response> implements Callable<Response> {
 
     private final T packet;
 
     private final EndpointConnector connector;
 
-    DeliveryCallable(EndpointConnector connector,
-                     T packet) {
+	private final Class<Response> responseClass;
+
+	DeliveryCallable(EndpointConnector connector,
+                     T packet,Class<Response> responseClass) {
         this.connector = connector;
+	    this.responseClass = responseClass;
         this.packet = packet;
     }
 
@@ -22,8 +24,8 @@ class DeliveryCallable<T> implements Callable<ResponseDTO> {
     }
 
     @Override
-    public ResponseDTO call() throws Exception {
+    public Response call() throws Exception {
         connector.testConnection();
-        return connector.sendRequest(packet, ResponseDTO.class);
+        return connector.sendRequest(packet, responseClass);
     }
 }

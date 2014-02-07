@@ -189,7 +189,7 @@ public class AppTests {
                 new HashMap<String, Object>() {{
                     put("a", "b");
                 }}));
-        DestinationDTO destination = new DestinationDTO(
+	    ServiceDTO destination = new ServiceDTO(
                 "NEW_SERVICE", EndpointType.HTTP);
         deliveryDTO.setDestinations(Arrays.asList(destination));
         return deliveryDTO;

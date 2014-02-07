@@ -39,7 +39,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         return objectMapper.convertValue(argument, type);
     }
 
-    @Override
+	@Override
     public <T extends DestinationDescriptor>
     ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             @RequestBody(required = true)

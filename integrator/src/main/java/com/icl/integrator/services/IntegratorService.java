@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -50,6 +51,8 @@ public class IntegratorService implements IntegratorAPI {
     @Autowired
     private ObjectMapper objectMapper;
 
+	@Autowired
+	private EndpointResolverService endpointResolverService;
     @Transactional
     private Holder createDeliveryPacket(DeliveryDTO deliveryDTO)
             throws JsonProcessingException {
@@ -58,10 +61,9 @@ public class IntegratorService implements IntegratorAPI {
         //TODO existence check
         deliveryPacket.setDeliveryData(
                 objectMapper.writeValueAsString(deliveryDTO.getRequestData()));
-        for (DestinationDTO destination : deliveryDTO.getDestinations()) {
+        for (ServiceDTO destination : deliveryDTO.getDestinations()) {
             Delivery delivery = new Delivery();
             delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-            delivery.setScheduleRedelivery(destination.scheduleRedelivery());
             delivery.setDeliveryPacket(deliveryPacket);
             try {
                 AbstractActionEntity actionEntity = null;
@@ -101,7 +103,9 @@ public class IntegratorService implements IntegratorAPI {
         logger.info("Received a delivery request");
         ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
         try {
-            DeliveryDTO packet = delivery.getPacket();
+	        URL serviceURL = endpointResolverService
+			        .getServiceURL("LOCALHOST", "ACTION");
+	        DeliveryDTO packet = delivery.getPacket();
             Holder holder = createDeliveryPacket(packet);
             DeliveryPacket deliveryPacket = holder.getPacket();
             deliveryPacket = persistenceService.merge(deliveryPacket);

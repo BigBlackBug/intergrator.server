@@ -15,7 +15,7 @@ public class DeliveryDTO {
 
     private RawDestinationDescriptor targetResponseHandlerDescriptor;
 
-    private List<DestinationDTO> destinations;
+    private List<ServiceDTO> destinations;
 
     private String action;
 
@@ -23,7 +23,7 @@ public class DeliveryDTO {
 
     public DeliveryDTO(RawDestinationDescriptor targetResponseHandler,
                        String action,
-                       List<DestinationDTO> destinations) {
+                       List<ServiceDTO> destinations) {
         this.action = action;
         this.targetResponseHandlerDescriptor = targetResponseHandler;
         this.destinations = destinations;
@@ -80,11 +80,11 @@ public class DeliveryDTO {
                 targetResponseHandlerDescriptor;
     }
 
-    public List<DestinationDTO> getDestinations() {
+    public List<ServiceDTO> getDestinations() {
         return destinations;
     }
 
-    public void setDestinations(List<DestinationDTO> destinations) {
+    public void setDestinations(List<ServiceDTO> destinations) {
         this.destinations = destinations;
     }
 

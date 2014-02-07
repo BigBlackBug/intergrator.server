@@ -256,7 +256,6 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
 
         String urlString = url.toString();
         HttpEntity<Request> requestEntity = new HttpEntity<>(data);
-
         if (methodType.equals(RequestMethod.GET)) {
             return restTemplate.
                     exchange(urlString, HttpMethod.GET,

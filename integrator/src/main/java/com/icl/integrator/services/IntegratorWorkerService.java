@@ -83,7 +83,7 @@ public class IntegratorWorkerService {
 	public Boolean pingService(PingDTO pingDTO) {
 		EndpointConnector connector = connectorFactory
 				.createEndpointConnector(
-						new DestinationDTO(pingDTO.getServiceName(),
+						new ServiceDTO(pingDTO.getServiceName(),
 						                   pingDTO.getEndpointType()),
 						pingDTO.getAction());
 		connector.testConnection();

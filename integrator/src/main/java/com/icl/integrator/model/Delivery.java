@@ -19,9 +19,6 @@ public class Delivery extends AbstractEntity {
                 updatable = false)
     private DeliveryPacket deliveryPacket;
 
-    @Column(name = "SCHEDULE_REDELIVERY")
-    private boolean scheduleRedelivery;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "DELIVERY_STATUS")
     private DeliveryStatus deliveryStatus;
@@ -53,14 +50,6 @@ public class Delivery extends AbstractEntity {
 
     public void setResponseDate(Date responseDate) {
         this.responseDate = responseDate;
-    }
-
-    public boolean scheduleRedelivery() {
-        return scheduleRedelivery;
-    }
-
-    public void setScheduleRedelivery(boolean scheduleRedelivery) {
-        this.scheduleRedelivery = scheduleRedelivery;
     }
 
     public DeliveryPacket getDeliveryPacket() {

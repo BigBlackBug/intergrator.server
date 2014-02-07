@@ -38,6 +38,7 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
     private EndpointType type;
 
     @OneToOne
+    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
     private DeliverySettings deliverySettings;
 
     protected AbstractEndpointEntity() {

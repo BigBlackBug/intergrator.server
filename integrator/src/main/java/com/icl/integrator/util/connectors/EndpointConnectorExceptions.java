@@ -5,32 +5,32 @@ package com.icl.integrator.util.connectors;
  */
 public final class EndpointConnectorExceptions {
 
-    public static class JMSIntegratorException extends Exception {
+    public static class JMSConnectorException extends Exception {
 
-        public JMSIntegratorException(Throwable cause) {
+        public JMSConnectorException(Throwable cause) {
             super(cause);
         }
 
-        public JMSIntegratorException(String message, Throwable cause) {
+        public JMSConnectorException(String message, Throwable cause) {
             super(message, cause);
         }
 
-        public JMSIntegratorException(String message) {
+        public JMSConnectorException(String message) {
             super(message);
         }
     }
 
-    public static class HttpIntegratorException extends Exception {
+    public static class HttpConnectorException extends Exception {
 
-        public HttpIntegratorException(Throwable cause) {
+        public HttpConnectorException(Throwable cause) {
             super(cause);
         }
 
-        public HttpIntegratorException(String message, Throwable cause) {
+        public HttpConnectorException(String message, Throwable cause) {
             super(message, cause);
         }
 
-        public HttpIntegratorException(String message) {
+        public HttpConnectorException(String message) {
             super(message);
         }
     }

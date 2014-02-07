@@ -91,7 +91,7 @@ public class JMSEndpointConnector implements EndpointConnector {
     @Override
     public <Request, Response> Response sendRequest(Request data,
                                                     Class<Response> responseClass)
-            throws EndpointConnectorExceptions.JMSIntegratorException {
+            throws EndpointConnectorExceptions.JMSConnectorException {
         try {
             Context ctx = new InitialContext(
                     new Hashtable<>(connectionData.getJndiProperties()));
@@ -110,7 +110,7 @@ public class JMSEndpointConnector implements EndpointConnector {
             session.close();
             connection.close();
         } catch (Exception ex) {
-            throw new EndpointConnectorExceptions.JMSIntegratorException(ex);
+            throw new EndpointConnectorExceptions.JMSConnectorException(ex);
         }
         return null;
     }

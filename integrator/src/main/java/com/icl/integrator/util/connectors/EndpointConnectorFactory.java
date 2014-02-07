@@ -1,7 +1,7 @@
 package com.icl.integrator.util.connectors;
 
-import com.icl.integrator.dto.DestinationDTO;
 import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.HttpActionDTO;
 import com.icl.integrator.dto.registration.QueueDTO;
@@ -34,12 +34,12 @@ public class EndpointConnectorFactory {
 	                                                 EndpointType endpointType,
 	                                                 String action) {
 		return createEndpointConnector(
-				new DestinationDTO(serviceName, endpointType),
+				new ServiceDTO(serviceName, endpointType),
 				action);
 	}
 
 	public EndpointConnector createEndpointConnector(
-			DestinationDTO destination, String action)
+			ServiceDTO destination, String action)
 			throws IntegratorException {
 		switch (destination.getEndpointType()) {
 			case HTTP: {
