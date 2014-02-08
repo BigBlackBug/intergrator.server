@@ -43,6 +43,10 @@ public class TaskCreator<T> {
         return this;
     }
 
+    public Callback<T> getCallback() {
+        return taskRunnable.getCallback();
+    }
+
     public TaskCreator setDescriptor(Descriptor<TaskCreator<T>> descriptor) {
         this.descriptor = descriptor;
         return this;
@@ -142,6 +146,10 @@ public class TaskCreator<T> {
 
         public void setCallback(Callback<T> callback) {
             this.callback = callback;
+        }
+
+        public Callback<T> getCallback() {
+            return callback;
         }
     }
 

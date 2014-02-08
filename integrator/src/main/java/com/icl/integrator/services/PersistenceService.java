@@ -20,69 +20,69 @@ import java.util.UUID;
 @Service
 public class PersistenceService {
 
-	@PersistenceContext
-	private EntityManager em;
+    @PersistenceContext
+    private EntityManager em;
 
-	@Transactional
-	public HttpServiceEndpoint getHttpService(String serviceName) throws
-			NoResultException {
-		String query = "select ep from HttpServiceEndpoint ep where " +
-				"ep.serviceName=:serviceName";
-		return em.createQuery(query, HttpServiceEndpoint.class).
-				setParameter("serviceName", serviceName).getSingleResult();
-	}
+    @Transactional
+    public HttpServiceEndpoint getHttpService(String serviceName) throws
+            NoResultException {
+        String query = "select ep from HttpServiceEndpoint ep where " +
+                "ep.serviceName=:serviceName";
+        return em.createQuery(query, HttpServiceEndpoint.class).
+                setParameter("serviceName", serviceName).getSingleResult();
+    }
 
-	@Transactional
-	public JMSServiceEndpoint getJmsService(String serviceName) throws
-			NoResultException {
-		String query = "select ep from JMSServiceEndpoint ep where " +
-				"ep.serviceName=:serviceName";
-		return em.createQuery(query, JMSServiceEndpoint.class).
-				setParameter("serviceName", serviceName).getSingleResult();
-	}
+    @Transactional
+    public JMSServiceEndpoint getJmsService(String serviceName) throws
+            NoResultException {
+        String query = "select ep from JMSServiceEndpoint ep where " +
+                "ep.serviceName=:serviceName";
+        return em.createQuery(query, JMSServiceEndpoint.class).
+                setParameter("serviceName", serviceName).getSingleResult();
+    }
 
-	@Transactional
-	public <T extends AbstractEntity> T merge(T entity) {
-		return em.merge(entity);
-	}
+    @Transactional
+    public <T extends AbstractEntity> T merge(T entity) {
+        return em.merge(entity);
+    }
 
-	@Transactional
-	public <T extends AbstractEntity> void persist(T entity) {
-		em.persist(entity);
-	}
+    @Transactional
+    public <T extends AbstractEntity> void persist(T entity) {
+        em.persist(entity);
+    }
 
-	@Transactional
-	public List<HttpServiceEndpoint> getHttpServices() {
-		return em.createQuery("select ep from HttpServiceEndpoint ep",
-		                      HttpServiceEndpoint.class).getResultList();
-	}
+    @Transactional
+    public List<HttpServiceEndpoint> getHttpServices() {
+        return em.createQuery("select ep from HttpServiceEndpoint ep",
+                              HttpServiceEndpoint.class).getResultList();
+    }
 
-	@Transactional
-	public HttpAction getHttpAction(String actionName, UUID endpointID) {
-		return em.createQuery(
-				"select action from HttpAction action where " +
-						"endpoint.id=:endpointID and actionName=:actionName",
-				HttpAction.class)
-				.setParameter("actionName", actionName)
-				.setParameter("endpointID", endpointID)
-				.getSingleResult();
-	}
+    @Transactional
+    public HttpAction getHttpAction(String actionName, UUID endpointID) {
+        return em.createQuery(
+                "select action from HttpAction action where " +
+                        "endpoint.id=:endpointID and action.actionName=:actionName",
+                HttpAction.class)
+                .setParameter("actionName", actionName)
+                .setParameter("endpointID", endpointID)
+                .getSingleResult();
+    }
 
-	@Transactional
-	public JMSAction getJmsAction(String actionName, UUID endpointID) {
-		return em.createQuery(
-				"select action from JMSAction action where " +
-						"endpoint.id=:endpointID and actionName=:actionName",
-				JMSAction.class)
-				.setParameter("actionName", actionName)
-				.setParameter("endpointID", endpointID).getSingleResult();
-	}
+    @Transactional
+    public JMSAction getJmsAction(String actionName, UUID endpointID) {
+        return em.createQuery(
+                "select action from JMSAction action where " +
+                        "endpoint.id=:endpointID and action.actionName=:actionName",
+                JMSAction.class)
+                .setParameter("actionName", actionName)
+                .setParameter("endpointID", endpointID).getSingleResult();
+    }
 
-	@Transactional
-	public List<JMSServiceEndpoint> getJmsServices() {
-		return em.createQuery("select ep from JMSServiceEndpoint ep",
-		                      JMSServiceEndpoint.class).getResultList();
-	}
+    @Transactional
+    public List<JMSServiceEndpoint> getJmsServices() {
+        return em.createQuery("select ep from JMSServiceEndpoint ep",
+                              JMSServiceEndpoint.class).getResultList();
+    }
 
 //    @Transactional
 //    public List<String> getHttpActions(String serviceName) {
@@ -102,58 +102,74 @@ public class PersistenceService {
 //                setParameter("serviceName", serviceName).getResultList();
 //    }
 
-	@Transactional
-	public List<String> getActions(String serviceName) {
-		String query =
-				"select action.actionName from AbstractEndpointEntity ep join " +
-						"ep.actions action where ep.serviceName=:serviceName";
-		return em.createQuery(query, String.class).
-				setParameter("serviceName", serviceName).getResultList();
-	}
+    @Transactional
+    public List<String> getActions(String serviceName) {
+        String query =
+                "select action.actionName from AbstractEndpointEntity ep join " +
+                        "ep.actions action where ep.serviceName=:serviceName";
+        return em.createQuery(query, String.class).
+                setParameter("serviceName", serviceName).getResultList();
+    }
 
-	@Transactional
-	public HttpServiceEndpoint findHttpService(String host, int port) {
-		String query = "select ep from HttpServiceEndpoint ep where " +
-				"ep.serviceURL=:serviceURL and ep.servicePort=:servicePort";
-		return em.createQuery(query, HttpServiceEndpoint.class).
-				setParameter("serviceURL", host).
-				setParameter("servicePort", port).
-				getSingleResult();
-	}
+    @Transactional
+    public HttpServiceEndpoint findHttpService(String host, int port) {
+        String query = "select ep from HttpServiceEndpoint ep where " +
+                "ep.serviceURL=:serviceURL and ep.servicePort=:servicePort";
+        try {
+            return em.createQuery(query, HttpServiceEndpoint.class).
+                    setParameter("serviceURL", host).
+                    setParameter("servicePort", port).
+                    getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
 
-	public HttpAction findHttpAction(UUID id, String path) {
-		String query =
-				"select action from HttpServiceEndpoint ep join " +
-						"ep.actions action where ep.id=:endpointId and action.actionURL=:actionURL";
-		return em.createQuery(query, HttpAction.class).
-				setParameter("endpointId", id).
-				setParameter("actionURL", path).
-				getSingleResult();
-	}
+    public HttpAction findHttpAction(UUID id, String path) {
+        try {
+            String query =
+                    "select action from HttpAction action join " +
+                            "action.endpoint ep where ep.id=:endpointId and action.actionURL=:actionURL";
+            return em.createQuery(query, HttpAction.class).
+                    setParameter("endpointId", id).
+                    setParameter("actionURL", path).
+                    getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
 
-	public JMSServiceEndpoint findJmsService(String connectionFactory,
-	                                         String jndiProperties) {
-		String query = "select ep from JMSServiceEndpoint ep where " +
-				"ep.connectionFactory=:connectionFactory and ep.jndiProperties=:jndiProperties";
-		return em.createQuery(query, JMSServiceEndpoint.class).
-				setParameter("connectionFactory", connectionFactory).
-				setParameter("jndiProperties", jndiProperties).
-				getSingleResult();
-	}
+    public JMSServiceEndpoint findJmsService(String connectionFactory,
+                                             String jndiProperties) {
+        try {
+            String query = "select ep from JMSServiceEndpoint ep where " +
+                    "ep.connectionFactory=:connectionFactory and ep.jndiProperties=:jndiProperties";
+            return em.createQuery(query, JMSServiceEndpoint.class).
+                    setParameter("connectionFactory", connectionFactory).
+                    setParameter("jndiProperties", jndiProperties).
+                    getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
 
-	public JMSAction findJmsAction(UUID id, String queueName, String username,
-	                               String password) {
-		String query =
-				"select action from JMSServiceEndpoint ep join " +
-						"ep.actions action where ep.id=:endpointId and " +
-						"action.queueName=:queueName and " +
-						"action.username=:username and " +
-						"action.password=:password";
-		return em.createQuery(query, JMSAction.class).
-				setParameter("endpointId", id).
-				setParameter("password", password).
-				setParameter("queueName", queueName).
-				setParameter("username", username).
-				getSingleResult();
-	}
+    public JMSAction findJmsAction(UUID id, String queueName, String username,
+                                   String password) {
+        try {
+            String query =
+                    "select action from JMSServiceEndpoint ep join " +
+                            "ep.actions action where ep.id=:endpointId and " +
+                            "action.queueName=:queueName and " +
+                            "action.username=:username and " +
+                            "action.password=:password";
+            return em.createQuery(query, JMSAction.class).
+                    setParameter("endpointId", id).
+                    setParameter("password", password).
+                    setParameter("queueName", queueName).
+                    setParameter("username", username).
+                    getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
 }

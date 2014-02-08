@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -51,14 +50,12 @@ public class IntegratorService implements IntegratorAPI {
     @Autowired
     private ObjectMapper objectMapper;
 
-	@Autowired
-	private EndpointResolverService endpointResolverService;
     @Transactional
     private Holder createDeliveryPacket(DeliveryDTO deliveryDTO)
             throws JsonProcessingException {
+        logger.info("Creating a delivery packet");
         Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
         DeliveryPacket deliveryPacket = new DeliveryPacket();
-        //TODO existence check
         deliveryPacket.setDeliveryData(
                 objectMapper.writeValueAsString(deliveryDTO.getRequestData()));
         for (ServiceDTO destination : deliveryDTO.getDestinations()) {
@@ -87,6 +84,8 @@ public class IntegratorService implements IntegratorAPI {
                 delivery.setEndpoint(endpointEntity);
                 deliveryPacket.addDelivery(delivery);
             } catch (Exception ex) {
+                logger.error("Error creating delivery packet for destination",
+                             ex);
                 ErrorDTO error = new ErrorDTO(ex);
                 serviceToRequestID.put(destination.getServiceName(),
                                        new ResponseDTO<UUID>(error));
@@ -103,8 +102,6 @@ public class IntegratorService implements IntegratorAPI {
         logger.info("Received a delivery request");
         ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
         try {
-	        URL serviceURL = endpointResolverService
-			        .getServiceURL("LOCALHOST", "ACTION");
 	        DeliveryDTO packet = delivery.getPacket();
             Holder holder = createDeliveryPacket(packet);
             DeliveryPacket deliveryPacket = holder.getPacket();
@@ -231,7 +228,11 @@ public class IntegratorService implements IntegratorAPI {
                                   T response) {
         if (responseHandler != null) {
             try {
-                deliveryService.deliverGeneral(responseHandler, response);
+                Delivery delivery = new Delivery();
+//                delivery.setAction();
+                delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
+//                delivery.setEndpoint();
+                deliveryService.deliver(delivery, null);
             } catch (Exception ex) {
                 logger.error("Не могу отправить ответ на дополнительный " +
                                      "эндпоинт", ex);

@@ -15,8 +15,7 @@ import java.util.Date;
 public class Delivery extends AbstractEntity {
 
     @ManyToOne
-    @JoinColumn(name = "DELIVERY_PACKET_ID", nullable = false,
-                updatable = false)
+    @JoinColumn(name = "DELIVERY_PACKET_ID", updatable = false)
     private DeliveryPacket deliveryPacket;
 
     @Enumerated(EnumType.STRING)
@@ -35,7 +34,7 @@ public class Delivery extends AbstractEntity {
     @JoinColumn(name = "ENDPOINT_ID", nullable = false, updatable = false)
     private AbstractEndpointEntity endpoint;
 
-    @Column(name = "RESPONSE_DATA")
+    @Column(name = "RESPONSE_DATA", updatable = false)
     @Type(type = "org.hibernate.type.StringClobType")
     @Lob
     private String responseData;
