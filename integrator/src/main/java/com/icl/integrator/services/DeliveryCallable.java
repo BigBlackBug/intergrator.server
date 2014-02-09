@@ -25,7 +25,7 @@ class DeliveryCallable<T,Response> implements Callable<Response> {
 
     @Override
     public Response call() throws Exception {
-        connector.testConnection();//TODO default packet
+        connector.testConnection();
         return connector.sendRequest(packet, responseClass);
     }
 }

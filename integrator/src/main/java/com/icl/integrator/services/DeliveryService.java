@@ -269,11 +269,10 @@ public class DeliveryService {
 				responseString = "Unable to serialize response from " +
 						"target";
 			}
-			Delivery merge = persistenceService.merge(delivery);
-			merge.setDeliveryStatus(DeliveryStatus.DELIVERY_OK);
-			merge.setResponseData(responseString); //TODO not set?
-			merge.setResponseDate(new Date());
-			persistenceService.merge(merge);
+			delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_OK);
+			delivery.setResponseData(responseString);
+			delivery.setResponseDate(new Date());
+			persistenceService.merge(delivery);
 			if (afterExecution != null) {
 				ResponseDTO<ResponseFromTargetDTO>
 						data =
@@ -351,12 +350,9 @@ public class DeliveryService {
             deliveryToSource.setCallback(new DeliveryStatusSetter(
 		            sourceDelivery, DeliveryStatus.DELIVERY_OK));
 
-            //тут шедуль, войд
             scheduler.scheduleGeneral(    //TODO remove settings
                     new Schedulable<>(deliveryToSource, sourceDelivery,
-                                      DeliverySettings.createDefaultSettings()),null/*
-                    new DeliveryStatusSetter(sourceDelivery,
-                                             DeliveryStatus.DELIVERY_FAILED)*/);
+                                      DeliverySettings.createDefaultSettings()),null);
         }
     }
 
@@ -372,7 +368,6 @@ public class DeliveryService {
 
 		@Override
 		public void execute(ResponseDTO responseToSource) {
-			//TODO поменять в интерфейсе
             deliver(responseToSource);
 		}
 	}

@@ -26,8 +26,6 @@ import java.util.UUID;
  */
 public class Main {
 
-    //TODO if body is null client sends x-www-form-urlencoded
-    // and server can't respond
     public static void main(String args[])
 		    throws MalformedURLException, URISyntaxException {
 //        IntegratorHttpClient httpClient = new IntegratorHttpClient

@@ -60,6 +60,7 @@ public class Scheduler {
         EXECUTOR.submit(taskCreator.create());
     }
 
+	//TODO add failure reason field
     public <T> void scheduleGeneral(final Schedulable<T> deliverySchedulable,
                                     final Callback<Void> retryLimitHandler) {
         final TaskCreator<T> taskCreator = deliverySchedulable.getTaskCreator();
@@ -214,7 +215,6 @@ public class Scheduler {
                                                             .getRetryDelay());
             logger.info("Rescheduling next request to " +
                                 DATE_FORMAT.format(nextRequestDate));
-	        //TODO схерали id null
             delivery.setDeliveryStatus(DeliveryStatus.WAITING_FOR_DELIVERY);
             persistenceService.merge(delivery);
             EXECUTOR.schedule(taskCreator.create(),
