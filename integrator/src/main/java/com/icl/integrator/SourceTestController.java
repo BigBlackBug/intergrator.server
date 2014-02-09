@@ -25,11 +25,10 @@ public class SourceTestController implements SourceSpringService {
 
     private final Log logger = LogFactory.getLog(SourceTestController.class);
 
-    @Override
+    @Override //TODO fix conversion
     public void handleResponseFromTarget(@RequestBody(required = false)
                                              ResponseDTO<ResponseFromTargetDTO> responseDTO) {
-        logger.info("received target response from integrator from " +
-                            responseDTO.getResponse().getResponseValue().getServiceName());
+        logger.info("received target response from integrator from ");
     }
 
 }

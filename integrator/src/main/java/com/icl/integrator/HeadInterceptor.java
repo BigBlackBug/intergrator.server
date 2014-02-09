@@ -18,7 +18,7 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest request,
 	                         HttpServletResponse response, Object handler)
 			throws Exception {
-		if (request.getMethod() == "HEAD") {
+		if (request.getMethod().equals("HEAD")) {
 			logger.info("Received a HEAD request. Ignoring");
 			return false;
 		} else {

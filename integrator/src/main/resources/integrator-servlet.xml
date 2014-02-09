@@ -95,7 +95,7 @@
             <!--</list>-->
         <!--</property>-->
     <!--</bean>-->
-    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+    <bean class="com.icl.integrator.util.patch.PatchedAnnotationMethodHandlerAdapter">
         <property name="messageConverters">
             <list>
                 <ref bean="jacksonMessageConverter"/>
