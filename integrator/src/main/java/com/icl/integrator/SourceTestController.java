@@ -1,5 +1,6 @@
 package com.icl.integrator;
 
+import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.springapi.SourceSpringService;
 import org.apache.commons.logging.Log;
@@ -25,10 +26,10 @@ public class SourceTestController implements SourceSpringService {
     private final Log logger = LogFactory.getLog(SourceTestController.class);
 
     @Override
-    public void handleResponseFromTarget(@RequestBody(required = true)
-                                         ResponseFromTargetDTO responseDTO) {
+    public void handleResponseFromTarget(@RequestBody(required = false)
+                                             ResponseDTO<ResponseFromTargetDTO> responseDTO) {
         logger.info("received target response from integrator from " +
-                            responseDTO.getServiceName());
+                            responseDTO.getResponse().getResponseValue().getServiceName());
     }
 
 }

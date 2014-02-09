@@ -194,30 +194,29 @@ public class DeliveryService {
         //accepts raw response. must be wrapped
         SourceDeliveryCallback<ResponseDTO> deliverySuccess = null;
 		if (responseDeliveryInfo != null) {
-            deliveryFailed = new SourceDeliveryFailedCallback(requestID,
-					responseDeliveryInfo, delivery);
+			String targetServiceName = delivery.getEndpoint().getServiceName();
+			deliveryFailed = new SourceDeliveryFailedCallback(requestID,
+					responseDeliveryInfo, targetServiceName);
 			deliverySuccess = new SourceDeliverySuccessCallback(requestID,
-					responseDeliveryInfo, delivery);
-		}else{
+					responseDeliveryInfo, targetServiceName);
+		}/*else{
             deliveryFailed = new Callback<ErrorDTO>() {
                 @Override
                 public void execute(ErrorDTO arg) {
-                    delivery.setDeliveryStatus(
-                            DeliveryStatus.DELIVERY_FAILED);
-                    persistenceService.merge(delivery);
+                delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_FAILED);
+                persistenceService.merge(delivery);
                 }
             };
-        }
-		deliveryTaskCreator.setCallback(
-				new DeliverySuccessCallback(delivery, requestID,
-				                            deliverySuccess));
+        }  */
+		deliveryTaskCreator.setCallback(new DeliverySuccessCallback(
+				delivery, requestID, deliverySuccess));
 
 		//статус деливери failed ставим в шедулере
         //тут шедуль принимающий ответ
+		//TODO remove default
 		scheduler.scheduleDelivery(new Schedulable<>(deliveryTaskCreator,
-		                                     delivery
-		                                     ),
-		                   deliveryFailed);
+		                                     delivery,DeliverySettings.createDefaultSettings()),
+		                           deliveryFailed);
 		return requestID;
 	}
 
@@ -239,10 +238,6 @@ public class DeliveryService {
 
 		return executeDelivery(deliveryCallable, responseDeliveryInfo,
 		                       delivery);
-		//тут пакет нужен для ретрайхендлера.
-		//при обломе доставки N раз пишет в базу
-//        executeDelivery(deliveryCallable, endpoint, delivery.getDeliveryPacket(),
-//                        requestID);
 	}
 
 	private class DeliverySuccessCallback implements Callback<ResponseDTO> {
@@ -274,10 +269,11 @@ public class DeliveryService {
 				responseString = "Unable to serialize response from " +
 						"target";
 			}
-			delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_OK);
-			delivery.setResponseData(responseString);
-			delivery.setResponseDate(new Date());
-			persistenceService.merge(delivery);
+			Delivery merge = persistenceService.merge(delivery);
+			merge.setDeliveryStatus(DeliveryStatus.DELIVERY_OK);
+			merge.setResponseData(responseString); //TODO not set?
+			merge.setResponseDate(new Date());
+			persistenceService.merge(merge);
 			if (afterExecution != null) {
 				ResponseDTO<ResponseFromTargetDTO>
 						data =
@@ -293,24 +289,23 @@ public class DeliveryService {
     private abstract class SourceDeliveryCallback<T> implements Callback<T>{
         protected final ResponseDeliveryInfo responseDeliveryInfo;
 
-        protected final Delivery delivery;
+        protected final String targetServiceName;
 
         protected final UUID requestID;
 
-        private Log logger = LogFactory.getLog(SourceDeliverySuccessCallback.class);
+        private Log logger = LogFactory.getLog(SourceDeliveryCallback.class);
 
         public SourceDeliveryCallback(UUID requestID,
                                       ResponseDeliveryInfo responseDeliveryInfo,
-                                      Delivery delivery) {
+                                      String targetServiceName) {
             this.requestID = requestID;
             this.responseDeliveryInfo = responseDeliveryInfo;
-            this.delivery = delivery;
+            this.targetServiceName = targetServiceName;
         }
 
         protected void deliver(ResponseDTO data){
             logger.info("Sending response to the source from " +
-                                delivery.getEndpoint()
-                                        .getServiceName());
+		                        targetServiceName);
 
             AbstractEndpointEntity sourceService =
                     responseDeliveryInfo.getSourceService();
@@ -325,16 +320,7 @@ public class DeliveryService {
             sourceDelivery.setAction(sourceAction);
             sourceDelivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
             sourceDelivery.setEndpoint(sourceService);
-            persistenceService.merge(sourceDelivery);
-
-            //в случае успеха
-            //TODO поменять в интерфейсе
-//			ResponseDTO<ResponseFromTargetDTO>
-//					data =
-//					new ResponseDTO<>(new ResponseFromTargetDTO(
-//							responseToSource,
-//							delivery.getEndpoint().getServiceName(),
-//							requestID.toString()));
+	        sourceDelivery = persistenceService.merge(sourceDelivery);
 
             DeliveryCallable<ResponseDTO, Void>
                     successCallable =
@@ -362,36 +348,32 @@ public class DeliveryService {
 //												.toString();
 //							}
 //						});
-            deliveryToSource.setCallback(new DeliveryStatusSetter(delivery,
-                                                                  DeliveryStatus.DELIVERY_OK));
+            deliveryToSource.setCallback(new DeliveryStatusSetter(
+		            sourceDelivery, DeliveryStatus.DELIVERY_OK));
 
             //тут шедуль, войд
-            scheduler.scheduleGeneral(
-                    new Schedulable<>(deliveryToSource, delivery),
-                    new DeliveryStatusSetter(delivery,
-                                             DeliveryStatus.DELIVERY_FAILED));
+            scheduler.scheduleGeneral(    //TODO remove settings
+                    new Schedulable<>(deliveryToSource, sourceDelivery,
+                                      DeliverySettings.createDefaultSettings()),null/*
+                    new DeliveryStatusSetter(sourceDelivery,
+                                             DeliveryStatus.DELIVERY_FAILED)*/);
         }
     }
+
+	//TODO убрать нафиг
 	private class SourceDeliverySuccessCallback extends
             SourceDeliveryCallback<ResponseDTO> {
 
         public SourceDeliverySuccessCallback(UUID requestID,
                                              ResponseDeliveryInfo responseDeliveryInfo,
-                                             Delivery delivery) {
-            super(requestID, responseDeliveryInfo, delivery);
+                                             String targetServiceName) {
+            super(requestID, responseDeliveryInfo, targetServiceName);
         }
 
 		@Override
 		public void execute(ResponseDTO responseToSource) {
-			//в случае успеха
 			//TODO поменять в интерфейсе
-			ResponseDTO<ResponseFromTargetDTO>
-					data =
-					new ResponseDTO<>(new ResponseFromTargetDTO(
-							responseToSource,
-							delivery.getEndpoint().getServiceName(),
-							requestID.toString()));
-            deliver(data);
+            deliver(responseToSource);
 		}
 	}
 
@@ -400,8 +382,8 @@ public class DeliveryService {
 
         public SourceDeliveryFailedCallback(UUID requestID,
                                             ResponseDeliveryInfo responseDeliveryInfo,
-                                            Delivery delivery) {
-            super(requestID, responseDeliveryInfo, delivery);
+                                            String targetServiceName) {
+            super(requestID, responseDeliveryInfo, targetServiceName);
         }
 
         @Override

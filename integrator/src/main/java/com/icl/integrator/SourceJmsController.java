@@ -2,6 +2,7 @@ package com.icl.integrator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.SourceService;
+import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,7 +32,7 @@ public class SourceJmsController implements SourceService, MessageListener {
     private ObjectMapper mapper;
 
     @Override
-    public void handleResponseFromTarget(ResponseFromTargetDTO responseDTO) {
+    public void handleResponseFromTarget(ResponseDTO<ResponseFromTargetDTO> responseDTO) {
         //TODO implement
 
     }

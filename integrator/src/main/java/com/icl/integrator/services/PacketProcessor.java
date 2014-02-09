@@ -83,7 +83,7 @@ public class PacketProcessor {
     }
 
     private String generateActionName(String serviceName) {
-        return "ACTION_GENERATED_FOR_'" + serviceName + "'AT_" +
+        return "ACTION_GENERATED_FOR_'" + serviceName + "'_AT_" +
                 System.currentTimeMillis();
     }
 

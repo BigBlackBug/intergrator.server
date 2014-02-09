@@ -124,7 +124,7 @@ public class PersistenceService {
             return null;
         }
     }
-
+	@Transactional
     public HttpAction findHttpAction(UUID id, String path) {
         try {
             String query =
@@ -138,7 +138,7 @@ public class PersistenceService {
             return null;
         }
     }
-
+	@Transactional
     public JMSServiceEndpoint findJmsService(String connectionFactory,
                                              String jndiProperties) {
         try {
@@ -152,7 +152,7 @@ public class PersistenceService {
             return null;
         }
     }
-
+	@Transactional
     public JMSAction findJmsAction(UUID id, String queueName, String username,
                                    String password) {
         try {

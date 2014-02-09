@@ -80,7 +80,7 @@ public class ExtendedSourceTestController implements
 
     @Override
     public void handleResponseFromTarget(@RequestBody(
-            required = true) ResponseFromTargetDTO responseDTO) {
+            required = true) ResponseDTO<ResponseFromTargetDTO> responseDTO) {
         logger.info("called handleResponseFromTarget");
     }
 }

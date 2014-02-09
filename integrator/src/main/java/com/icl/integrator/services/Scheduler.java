@@ -46,14 +46,15 @@ public class Scheduler {
 
     private <T> void schedule(final TaskCreator<T> taskCreator, Delivery delivery) {
         scheduleMap.put(taskCreator.getTaskID(), 0);
-        taskCreator.setCallback(new Callback<T>() {
-            @Override
-            public void execute(T arg) {
-                scheduleMap.remove(taskCreator.getTaskID());
-                Callback<T> callback = taskCreator.getCallback();
-                callback.execute(arg);
-            }
-        });
+	    final Callback<T> odlCallback = taskCreator.getCallback();
+	    Callback<T> newCallback = new Callback<T>() {
+		    @Override
+		    public void execute(T arg) {
+			    scheduleMap.remove(taskCreator.getTaskID());
+			    odlCallback.execute(arg);
+		    }
+	    };
+	    taskCreator.setCallback(newCallback);
         delivery.setDeliveryStatus(DeliveryStatus.IN_PROGRESS);
         persistenceService.merge(delivery);
         EXECUTOR.submit(taskCreator.create());
@@ -65,9 +66,9 @@ public class Scheduler {
         final Delivery delivery = deliverySchedulable.getDelivery();
         //не прошёл пинг
         taskCreator.addExceptionHandler(
-                new ExceptionHandlerGeneral<T, ConnectionException>
-                        (deliverySchedulable, retryLimitHandler),
-                ConnectionException.class);
+		        new ExceptionHandlerGeneral<T, ConnectionException>
+				        (deliverySchedulable, retryLimitHandler),
+		        ConnectionException.class);
 
         taskCreator.addExceptionHandler(
                 new ExceptionHandlerGeneral<T, EndpointConnectorExceptions.JMSConnectorException>
@@ -109,18 +110,24 @@ public class Scheduler {
     private class ExceptionHandlerGeneral<T, E extends Exception> extends
             ExceptionHandler<T, Void, E> {
 
-        public ExceptionHandlerGeneral(
-                Schedulable<T> deliverySchedulable,
+        public ExceptionHandlerGeneral(Schedulable<T> deliverySchedulable,
                 Callback<Void> retryLimitHandler) {
-            super(deliverySchedulable, retryLimitHandler);
-            setCallback(new CallbackGeneral());
+            super(deliverySchedulable);
+	        if(retryLimitHandler!=null){
+                setCallback(new CallbackGeneral(retryLimitHandler));
+	        }
         }
 
         protected class CallbackGeneral implements Callback<E> {
 
+	        private Callback <Void> callback;
+
+	        public CallbackGeneral(Callback<Void> callback) {
+		        this.callback = callback;
+	        }
             @Override
             public void execute(E arg) {
-                retryLimitHandler.execute(null);
+	            callback.execute(null);
             }
         }
     }
@@ -130,21 +137,28 @@ public class Scheduler {
 
         public ExceptionHandlerError(Schedulable<T> deliverySchedulable,
                                      Callback<ErrorDTO> retryLimitHandler) {
-            super(deliverySchedulable, retryLimitHandler);
-            setCallback(new CallbackError());
+            super(deliverySchedulable);
+	        if(retryLimitHandler!=null){
+                setCallback(new CallbackError(retryLimitHandler));
+	        }
         }
 
         protected class CallbackError implements Callback<E> {
 
-            @Override
+	        private Callback <ErrorDTO> callback;
+
+	        public CallbackError(Callback<ErrorDTO> callback) {
+		        this.callback = callback;
+	        }
+
+	        @Override
             public void execute(E exception) {
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setErrorMessage("Не могу доставить запрос на таргет");
                 errorDTO.setDeveloperMessage("Последнее исключение - \n" +
                                                      Utils.getStackTraceAsString(
                                                              exception));
-//                delivery - таргет деливери
-                retryLimitHandler.execute(errorDTO);
+		        callback.execute(errorDTO);
             }
         }
     }
@@ -158,14 +172,14 @@ public class Scheduler {
 
         protected final DeliverySettings deliverySettings;
 
-        protected final Callback<Y> retryLimitHandler;
+//        protected final Callback<Y> retryLimitHandler;
 
         private Callback<E> callback;
 
-        protected ExceptionHandler(Schedulable<T> deliverySchedulable,
-                                   Callback<Y> retryLimitHandler) {
+        protected ExceptionHandler(Schedulable<T> deliverySchedulable/*,
+                                   Callback<Y> retryLimitHandler*/) {
             taskCreator = deliverySchedulable.getTaskCreator();
-            this.retryLimitHandler = retryLimitHandler;
+//            this.retryLimitHandler = retryLimitHandler;
             delivery = deliverySchedulable.getDelivery();
             deliverySettings = deliverySchedulable.getDeliverySettings();
         }
@@ -184,11 +198,12 @@ public class Scheduler {
                 scheduleMap.remove(taskCreator.getTaskID());
                 delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_FAILED);
                 persistenceService.merge(delivery);
+	            //тут чё одинаковые деливери? и вкололбеке?
                 //обычно посылатель домой
                 //но также мб просто сменщик статуса
                 //например когда мы шедулим реквест на исходник
                 //обрабочик облома
-                if (retryLimitHandler != null) {
+                if (callback != null) {
                     callback.execute(exception);
                     return;
                 }
@@ -199,6 +214,7 @@ public class Scheduler {
                                                             .getRetryDelay());
             logger.info("Rescheduling next request to " +
                                 DATE_FORMAT.format(nextRequestDate));
+	        //TODO схерали id null
             delivery.setDeliveryStatus(DeliveryStatus.WAITING_FOR_DELIVERY);
             persistenceService.merge(delivery);
             EXECUTOR.schedule(taskCreator.create(),

@@ -26,13 +26,10 @@ public class TargetTestController implements TargetSpringService {
     private final Log logger = LogFactory.getLog(SourceTestController.class);
 
     @Override
-    public ResponseDTO handleRequest(@RequestBody(required = true)
+    public ResponseDTO handleRequest(@RequestBody(required = false)
                                      RequestDataDTO requestDataDTO) {
         logger.info("destination received a request from " +
                             "integrator " + requestDataDTO);
-        if(requestDataDTO.empty()){
-            return new ResponseDTO<>();
-        }
         return new ResponseDTO<>("RESPONSE", String.class);
     }
 

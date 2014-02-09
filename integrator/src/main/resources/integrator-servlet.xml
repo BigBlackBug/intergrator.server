@@ -5,6 +5,7 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
         http://activemq.apache.org/schema/core
@@ -14,7 +15,7 @@
         http://www.springframework.org/schema/jms
         http://www.springframework.org/schema/jms/spring-jms-2.5.xsd
         http://www.springframework.org/schema/tx
-        http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+        http://www.springframework.org/schema/tx/spring-tx-3.1.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
     <context:annotation-config/>
     <!--
        Turn on AspectJ @Configurable support. As a result, any time you
@@ -86,6 +87,14 @@
           class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
         <property name="objectMapper" ref="objectMapper"/>
     </bean>
+    <!--<mvc:annotation-driven />-->
+    <!--<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">-->
+        <!--<property name="messageConverters">-->
+            <!--<list>-->
+                <!--<ref bean="jacksonMessageConverter"/>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
     <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
         <property name="messageConverters">
             <list>
@@ -191,4 +200,13 @@
         <jms:listener id="InternalIntegratorQueue" destination="InternalIntegratorQueue"
                       ref="sourceJmsController"/>
     </jms:listener-container>
+
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/source/**"/>
+            <mvc:mapping path="/ext_source/**"/>
+            <bean class="com.icl.integrator.HeadInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors>
 </beans>

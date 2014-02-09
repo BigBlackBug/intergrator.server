@@ -96,9 +96,9 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public <T extends DestinationDescriptor> ResponseDTO<Map<String,
+    public ResponseDTO<Map<String,
             ResponseDTO<UUID>>> deliver(
-            IntegratorPacket<DeliveryDTO, T> delivery) {
+            IntegratorPacket<DeliveryDTO, DestinationDescriptor> delivery) {
         logger.info("Received a delivery request");
         ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
         try {

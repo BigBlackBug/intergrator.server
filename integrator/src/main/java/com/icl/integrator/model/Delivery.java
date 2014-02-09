@@ -34,13 +34,13 @@ public class Delivery extends AbstractEntity {
     @JoinColumn(name = "ENDPOINT_ID", nullable = false, updatable = false)
     private AbstractEndpointEntity endpoint;
 
-    @Column(name = "RESPONSE_DATA", updatable = false)
+    @Column(name = "RESPONSE_DATA")
     @Type(type = "org.hibernate.type.StringClobType")
     @Lob
     private String responseData;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "RESPONSE_DATE", updatable = false)
+    @Column(name = "RESPONSE_DATE")
     private Date responseDate;
 
     public Date getResponseDate() {

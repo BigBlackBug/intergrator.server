@@ -1,7 +1,5 @@
 package com.icl.integrator.util.connectors;
 
-import com.icl.integrator.dto.RequestDataDTO;
-import com.icl.integrator.dto.ResponseDTO;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -33,19 +31,23 @@ public class HTTPEndpointConnector implements EndpointConnector {
 	public void testConnection() throws ConnectionException {
 		RestTemplate restTemplate = new RestTemplate();
 		try {
-			restTemplate.postForObject(url.toURI(), new RequestDataDTO(),
-			                           ResponseDTO.class);
-			//игнорируем 500 ошибку, так как посылаем заведомо говнозапрос
+			HttpHeaders headers = new HttpHeaders();
+			headers.add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+			HttpEntity<String> entity = new HttpEntity<>(headers);
+			restTemplate.exchange(url.toURI(), HttpMethod.HEAD,
+			                      entity, Void.class);
 		} catch (URISyntaxException e) {
 			throw new ConnectionException("URL не валиден", e);
 		} catch (HttpClientErrorException ex) {
 			String message = MessageFormat.format(
-					"Сервер вернул код {0}. Сообщение об ошибке:\'{1}\'",
+					"Сервер вернул код {0}. Сообщение об ошибке: {1} ",
 					ex.getStatusCode(),
 					ex.getStatusText());
 			throw new ConnectionException(message, ex);
 		} catch (ResourceAccessException ex) {
 			throw new ConnectionException("Ошибка I/O", ex);
+		} catch (Exception ex) {
+			throw new ConnectionException("Необъяснимая ошибка", ex);
 		}
 	}
 
@@ -60,7 +62,6 @@ public class HTTPEndpointConnector implements EndpointConnector {
 		try {
 			ResponseEntity<Response> response = restTemplate
 					.postForEntity(url.toURI(), entity, responseClass);
-			HttpStatus statusCode = response.getStatusCode();
 			return response.getBody();
 		} catch (Exception ex) {
 			throw new EndpointConnectorExceptions.HttpConnectorException(ex);
@@ -70,7 +71,7 @@ public class HTTPEndpointConnector implements EndpointConnector {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Тип соединения: HTTP\n").
+		sb.append("Тип соединения: HTTP \n").
 				append("URL: ").append(url.toString());
 		return sb.toString();
 	}

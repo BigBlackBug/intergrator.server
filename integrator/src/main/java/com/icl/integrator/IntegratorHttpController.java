@@ -48,12 +48,12 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
     }
 
 	@Override
-    public <T extends DestinationDescriptor>
+    public
     ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             @RequestBody(required = true)
-            IntegratorPacket<DeliveryDTO, T> delivery) {
-        TypeReference<IntegratorPacket<DeliveryDTO, T>> type =
-                new TypeReference<IntegratorPacket<DeliveryDTO, T>>() {
+            IntegratorPacket<DeliveryDTO, DestinationDescriptor> delivery) {
+        TypeReference<IntegratorPacket<DeliveryDTO, DestinationDescriptor>> type =
+                new TypeReference<IntegratorPacket<DeliveryDTO, DestinationDescriptor>>() {
                 };
         return integratorService.deliver(fixConversion(delivery, type));
     }

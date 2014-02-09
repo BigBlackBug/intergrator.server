@@ -9,15 +9,9 @@ import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.httpclient.IntegratorHttpClient;
 import com.icl.integrator.util.EndpointType;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,17 +34,17 @@ public class Main {
 //                ("192.168.83.91", "integrator", 18080);
         IntegratorHttpClient httpClient = new IntegratorHttpClient
                 ("localhost", 8080);
-	    RestTemplate restTemplate = new RestTemplate();
-	    HttpHeaders headers = new HttpHeaders();
-	    headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-	    HttpEntity<String> entity = new HttpEntity<>("{\"QWEQWE\":\"asdasd\"}",headers);
-	    ResponseDTO aVoid = restTemplate.postForObject(
-			    new URL("HTTP", "localhost", 8080, "/integrator/test").toURI(),
-			    entity, ResponseDTO.class);
-	    ResponseEntity<ResponseDTO> voidResponseEntity = restTemplate.postForEntity(
-			    new URL("HTTP", "localhost", 8080, "/integrator/test").toURI(),
-			    entity, ResponseDTO.class);
-	    System.out.println(voidResponseEntity.getBody());
+//	    RestTemplate restTemplate = new RestTemplate();
+//	    HttpHeaders headers = new HttpHeaders();
+//	    headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+//	    HttpEntity<String> entity = new HttpEntity<>("{\"QWEQWE\":\"asdasd\"}",headers);
+//	    ResponseDTO aVoid = restTemplate.postForObject(
+//			    new URL("HTTP", "localhost", 8080, "/integrator/test").toURI(),
+//			    entity, ResponseDTO.class);
+//	    ResponseEntity<ResponseDTO> voidResponseEntity = restTemplate.postForEntity(
+//			    new URL("HTTP", "localhost", 8080, "/integrator/test").toURI(),
+//			    entity, ResponseDTO.class);
+//	    System.out.println(voidResponseEntity.getBody());
 
 
 //        ResponseDTO<Map<String, ResponseDTO<Void>>> register =
