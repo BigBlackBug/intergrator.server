@@ -22,13 +22,15 @@ public class Delivery extends AbstractEntity {
 	@Column(name = "DELIVERY_STATUS")
 	private DeliveryStatus deliveryStatus;
 
-	@ManyToOne
+	@ManyToOne(cascade = {javax.persistence.CascadeType.MERGE, javax.persistence.CascadeType.MERGE,
+			javax.persistence.CascadeType.MERGE})
 	@Cascade(value = {CascadeType.MERGE, CascadeType.PERSIST,
 			CascadeType.REFRESH})
 	@JoinColumn(name = "ACTION_ID", nullable = false, updatable = false)
 	private AbstractActionEntity action;
 
-	@ManyToOne
+	@ManyToOne(cascade = {javax.persistence.CascadeType.MERGE, javax.persistence.CascadeType.MERGE,
+			javax.persistence.CascadeType.MERGE})
 	@Cascade(value = {CascadeType.MERGE, CascadeType.PERSIST,
 			CascadeType.REFRESH})
 	@JoinColumn(name = "ENDPOINT_ID", nullable = false, updatable = false)

@@ -98,11 +98,9 @@ public class AppTests {
 
         Delivery delivery = new Delivery();
         delivery.setAction(a);
-	    a.addDelivery(delivery);
         delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
         delivery.setEndpoint(ep);
         delivery.setDeliveryPacket(dp);
-	    ep.addDelivery(delivery);
 
         dp.setDeliveries(new HashSet<>(Arrays.asList(delivery)));
 //		dp.setAction(dto.getAction());

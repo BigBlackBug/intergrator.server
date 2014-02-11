@@ -38,28 +38,12 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 	            updatable = false)
 	private AbstractEndpointEntity endpoint;
 
-	@OneToMany(mappedBy = "action", fetch = FetchType.EAGER)
-	@Cascade(value = {CascadeType.ALL})
-	private Set<Delivery> deliveries = new HashSet<>();
-
 	protected AbstractActionEntity() {
 
 	}
 
 	protected AbstractActionEntity(EndpointType endpointType) {
 		this.type = endpointType;
-	}
-
-	public void addDelivery(Delivery delivery) {
-		this.deliveries.add(delivery);
-	}
-
-	public Set<Delivery> getDeliveries() {
-		return deliveries;
-	}
-
-	public void setDeliveries(Set<Delivery> deliveries) {
-		this.deliveries = deliveries;
 	}
 
 	public AbstractEndpointEntity getEndpoint() {

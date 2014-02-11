@@ -193,10 +193,8 @@ public class DeliveryService {
 
             Delivery sourceDelivery = new Delivery();
             sourceDelivery.setAction(action);
-	        action.addDelivery(sourceDelivery);
             sourceDelivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
             sourceDelivery.setEndpoint(service);
-	        service.addDelivery(sourceDelivery);
 	        sourceDelivery = persistenceService.merge(sourceDelivery);
 
             DeliveryCallable<ResponseDTO, Void>

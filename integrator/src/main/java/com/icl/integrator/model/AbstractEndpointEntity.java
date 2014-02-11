@@ -32,10 +32,6 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
 	        name = "SERVICE_NAME")
 	private String serviceName;
 
-	@OneToMany(mappedBy = "endpoint",fetch = FetchType.EAGER)
-	@Cascade(value = {CascadeType.ALL})
-	private Set<Delivery> deliveries = new HashSet<>();
-
 	@Enumerated(EnumType.STRING)
 	@Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
 	        insertable = false)
@@ -51,14 +47,6 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
 
 	protected AbstractEndpointEntity(EndpointType endpointType) {
 		this.type = endpointType;
-	}
-
-	public Set<Delivery> getDeliveries() {
-		return deliveries;
-	}
-
-	public void setDeliveries(Set<Delivery> deliveries) {
-		this.deliveries = deliveries;
 	}
 
 	public DeliverySettings getDeliverySettings() {
@@ -79,10 +67,6 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
 
 	public void addAction(T action) {
 		this.actions.add(action);
-	}
-
-	public void addDelivery(Delivery delivery) {
-		this.deliveries.add(delivery);
 	}
 
 	public EndpointType getType() {
