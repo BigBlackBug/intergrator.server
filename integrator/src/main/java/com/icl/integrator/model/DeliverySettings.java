@@ -50,7 +50,7 @@ public class DeliverySettings extends AbstractEntity {
 		return retryDelay;
 	}
 
-	public void setRetryDelay(int retryDelay) {
+	public void setRetryDelay(long retryDelay) {
 		this.retryDelay = retryDelay;
 	}
 

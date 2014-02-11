@@ -60,15 +60,14 @@ public class Scheduler {
         EXECUTOR.submit(taskCreator.create());
     }
 
-	//TODO add failure reason field
     public <T> void scheduleGeneral(final Schedulable<T> deliverySchedulable,
                                     final Callback<Void> retryLimitHandler) {
         final TaskCreator<T> taskCreator = deliverySchedulable.getTaskCreator();
         final Delivery delivery = deliverySchedulable.getDelivery();
         //не прошёл пинг
         taskCreator.addExceptionHandler(
-		        new ExceptionHandlerGeneral<T, ConnectionException>
-				        (deliverySchedulable, retryLimitHandler),
+		        new ExceptionHandlerGeneral<T, ConnectionException>(
+				        deliverySchedulable, retryLimitHandler),
 		        ConnectionException.class);
 
         taskCreator.addExceptionHandler(
@@ -89,22 +88,21 @@ public class Scheduler {
         final Delivery delivery = deliverySchedulable.getDelivery();
         //не прошёл пинг
         taskCreator.addExceptionHandler(new ExceptionHandlerError<T,
-                ConnectionException>
-                                                (deliverySchedulable,
-                                                 retryLimitHandler),
+		        ConnectionException>(deliverySchedulable,
+                                     retryLimitHandler),
                                         ConnectionException.class);
 
-        taskCreator.addExceptionHandler(new ExceptionHandlerError<T,
-                EndpointConnectorExceptions.JMSConnectorException>
-                                                (deliverySchedulable,
-                                                 retryLimitHandler),
-                                        EndpointConnectorExceptions.JMSConnectorException.class);
+	    taskCreator.addExceptionHandler(new ExceptionHandlerError<T,
+			    EndpointConnectorExceptions.JMSConnectorException>
+			                                    (deliverySchedulable,
+			                                     retryLimitHandler),
+	                                    EndpointConnectorExceptions.JMSConnectorException.class);
 
-        taskCreator.addExceptionHandler(new ExceptionHandlerError<T,
-                EndpointConnectorExceptions.HttpConnectorException>
-                                                (deliverySchedulable,
-                                                 retryLimitHandler),
-                                        EndpointConnectorExceptions.HttpConnectorException.class);
+	    taskCreator.addExceptionHandler(new ExceptionHandlerError<T,
+			    EndpointConnectorExceptions.HttpConnectorException>
+			                                    (deliverySchedulable,
+			                                     retryLimitHandler),
+	                                    EndpointConnectorExceptions.HttpConnectorException.class);
         schedule(taskCreator, delivery);
     }
 
@@ -133,18 +131,18 @@ public class Scheduler {
         }
     }
 
-    private class ExceptionHandlerError<T, E extends Exception> extends
-            ExceptionHandler<T, ErrorDTO, E> {
+	private class ExceptionHandlerError<T, E extends Exception> extends
+			ExceptionHandler<T, ErrorDTO, E> {
 
-        public ExceptionHandlerError(Schedulable<T> deliverySchedulable,
-                                     Callback<ErrorDTO> retryLimitHandler) {
-            super(deliverySchedulable);
-	        if(retryLimitHandler!=null){
-                setCallback(new CallbackError(retryLimitHandler));
-	        }
-        }
+		public ExceptionHandlerError(Schedulable<T> deliverySchedulable,
+		                             Callback<ErrorDTO> retryLimitHandler) {
+			super(deliverySchedulable);
+			if (retryLimitHandler != null) {
+				setCallback(new CallbackError(retryLimitHandler));
+			}
+		}
 
-        protected class CallbackError implements Callback<E> {
+		protected class CallbackError implements Callback<E> {
 
 	        private Callback <ErrorDTO> callback;
 
@@ -198,6 +196,7 @@ public class Scheduler {
                             exception);
                 scheduleMap.remove(taskCreator.getTaskID());
                 delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_FAILED);
+	            delivery.setLastFailureReason(Utils.getStackTraceAsString(exception));
                 persistenceService.merge(delivery);
 	            //тут чё одинаковые деливери? и вкололбеке?
                 //обычно посылатель домой

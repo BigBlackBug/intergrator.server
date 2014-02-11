@@ -36,7 +36,6 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
 	@Cascade(value = {CascadeType.ALL})
 	private Set<Delivery> deliveries = new HashSet<>();
 
-	//TODO add references to delivery
 	@Enumerated(EnumType.STRING)
 	@Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
 	        insertable = false)

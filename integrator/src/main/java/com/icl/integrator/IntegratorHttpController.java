@@ -52,7 +52,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	public <T extends DestinationDescriptor>
 	ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
 			@RequestBody(required = true)
-			IntegratorPacket<DeliveryDTO, T> delivery) { //TODO fixConversion
+			IntegratorPacket<DeliveryDTO, T> delivery) {
 		TypeReference<IntegratorPacket<DeliveryDTO, DestinationDescriptor>>
 				type =
 				new TypeReference<IntegratorPacket<DeliveryDTO, DestinationDescriptor>>() {
