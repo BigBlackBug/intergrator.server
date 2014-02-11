@@ -21,8 +21,9 @@ import java.util.UUID;
 public interface IntegratorAPI {
 
     public
+    <T extends DestinationDescriptor>
     ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
-            IntegratorPacket<DeliveryDTO, DestinationDescriptor> delivery);
+            IntegratorPacket<DeliveryDTO, T> delivery);
 
     public <T extends DestinationDescriptor> Boolean
     ping(IntegratorPacket<Void, T> packet);

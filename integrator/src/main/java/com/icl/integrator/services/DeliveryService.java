@@ -263,9 +263,11 @@ public class DeliveryService {
 
 		@Override
 		public void execute(ResponseDTO responseDTO) {
-			String responseString;
+			String responseString = null;
 			try {
-				responseString = mapper.writeValueAsString(responseDTO);
+				if (responseDTO != null) {
+					responseString = mapper.writeValueAsString(responseDTO);
+				}
 			} catch (JsonProcessingException e) {
 				responseString = "Unable to serialize response from " +
 						"target";

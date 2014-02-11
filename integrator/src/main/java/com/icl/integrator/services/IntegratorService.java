@@ -99,9 +99,9 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public ResponseDTO<Map<String,
+    public  <T extends DestinationDescriptor> ResponseDTO<Map<String,
             ResponseDTO<UUID>>> deliver(
-            IntegratorPacket<DeliveryDTO, DestinationDescriptor> delivery) {
+            IntegratorPacket<DeliveryDTO, T> delivery) {
         logger.info("Received a delivery request");
         ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
         try {
@@ -238,6 +238,7 @@ public class IntegratorService implements IntegratorAPI {
                 delivery.setAction(destination.getAction());
                 delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
                 delivery.setEndpoint(destination.getService());
+	            delivery = persistenceService.merge(delivery);
                 deliveryService.deliver(delivery, objectMapper
 		                .writeValueAsString(response));
             } catch (Exception ex) {

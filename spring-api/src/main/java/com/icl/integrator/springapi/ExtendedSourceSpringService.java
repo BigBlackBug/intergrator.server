@@ -10,6 +10,7 @@ import com.icl.integrator.dto.source.EndpointDescriptor;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
     @Override
     @RequestMapping(value = "/handleGetServiceList", method = RequestMethod
             .POST)
-    public void handleGetServiceList(@RequestBody(required = true)
+    public @ResponseBody
+    void handleGetServiceList(@RequestBody(required = true)
                                      ResponseDTO<List<ServiceDTO>> response);
 
     @Override

@@ -32,10 +32,10 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @Override
     @RequestMapping(value = "deliver", method = RequestMethod.POST)
     public
-    @ResponseBody
+    @ResponseBody  <T extends DestinationDescriptor>
     ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             @RequestBody(required = true)
-            IntegratorPacket<DeliveryDTO, DestinationDescriptor> delivery);
+            IntegratorPacket<DeliveryDTO, T> delivery);
 
     @Override
     @RequestMapping(value = "ping", method = RequestMethod.POST)

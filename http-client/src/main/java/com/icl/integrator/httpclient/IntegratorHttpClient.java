@@ -104,8 +104,8 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
 
     //TODO format
     @Override
-    public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
-            IntegratorPacket<DeliveryDTO, DestinationDescriptor> delivery) {
+    public <T extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
+            IntegratorPacket<DeliveryDTO, T> delivery) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "deliver", IntegratorPacket.class);
         ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<UUID>>>>

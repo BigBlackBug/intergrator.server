@@ -5,22 +5,22 @@ import com.icl.integrator.model.AbstractEndpointEntity;
 
 class PersistentDestination {
 
-	private final AbstractActionEntity sourceAction;
+	private final AbstractActionEntity action;
 
-	private final AbstractEndpointEntity sourceService;
+	private final AbstractEndpointEntity service;
 
-	PersistentDestination(AbstractEndpointEntity sourceService,
-	                      AbstractActionEntity sourceAction) {
-		this.sourceAction = sourceAction;
-		this.sourceService = sourceService;
+	PersistentDestination(AbstractEndpointEntity service,
+	                      AbstractActionEntity action) {
+		this.action = action;
+		this.service = service;
 	}
 
 	public AbstractActionEntity getAction() {
-		return sourceAction;
+		return action;
 	}
 
 	public AbstractEndpointEntity getService() {
-		return sourceService;
+		return service;
 	}
 
 }
