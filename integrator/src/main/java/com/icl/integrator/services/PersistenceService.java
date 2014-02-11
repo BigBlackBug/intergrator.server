@@ -17,6 +17,8 @@ import java.util.UUID;
  * Time: 13:51
  * To change this template use File | Settings | File Templates.
  */
+//TODO обработчик на создание. проверять есть ли сгенеренный сервис или экшон
+	//также убрать getSingleResult
 @Service
 public class PersistenceService {
 

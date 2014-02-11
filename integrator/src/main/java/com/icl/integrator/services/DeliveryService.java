@@ -5,12 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.model.*;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
 import com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory;
-import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.apache.commons.logging.Log;
@@ -51,9 +49,9 @@ public class DeliveryService {
 	@Autowired
 	private PersistenceService persistenceService;
 
-	public <T> void deliverGeneral(DestinationDescriptor sourceService,
-	                               T packet)
-			throws IntegratorException {
+//	public <T> void deliverGeneral(DestinationDescriptor sourceService,
+//	                               T packet)
+//			throws IntegratorException {
 //		EndpointConnector sourceConnector;
 //		DestinationDescriptor.DescriptorType descriptorType =
 //				sourceService.getDescriptorType();
@@ -87,7 +85,7 @@ public class DeliveryService {
 		//TODO доделать.
 		// респонзфейлд
 //        scheduler.schedule(new TaskCreator<>(deliveryCallable));
-	}
+//	}
 
 	//	public UUID deliver(DestinationDTO destination,
 //	                    DeliveryDTO packet) throws IntegratorException {
@@ -173,7 +171,7 @@ public class DeliveryService {
 
 	private <T> UUID executeDelivery(
 			final DeliveryCallable<T, ResponseDTO> deliveryCallable,
-			ResponseDeliveryInfo responseDeliveryInfo,
+			PersistentDestination persistentDestination,
 			final Delivery delivery) {
 		UUID requestID = UUID.randomUUID();
 		logger.info("Generated an ID for the request: " + quote(
@@ -193,12 +191,12 @@ public class DeliveryService {
 		Callback<ErrorDTO> deliveryFailed = null;
         //accepts raw response. must be wrapped
         SourceDeliveryCallback<ResponseDTO> deliverySuccess = null;
-		if (responseDeliveryInfo != null) {
+		if (persistentDestination != null) {
 			String targetServiceName = delivery.getEndpoint().getServiceName();
 			deliveryFailed = new SourceDeliveryFailedCallback(requestID,
-					responseDeliveryInfo, targetServiceName);
+			                                                  persistentDestination, targetServiceName);
 			deliverySuccess = new SourceDeliverySuccessCallback(requestID,
-					responseDeliveryInfo, targetServiceName);
+			                                                    persistentDestination, targetServiceName);
 		}/*else{
             deliveryFailed = new Callback<ErrorDTO>() {
                 @Override
@@ -215,13 +213,18 @@ public class DeliveryService {
         //тут шедуль принимающий ответ
 		//TODO remove default
 		scheduler.scheduleDelivery(new Schedulable<>(deliveryTaskCreator,
-		                                     delivery,DeliverySettings.createDefaultSettings()),
+		                                     delivery,
+		                                     DeliverySettings.createDefaultSettings()),
 		                           deliveryFailed);
 		return requestID;
 	}
 
-	public UUID deliver(Delivery delivery,
-	                    ResponseDeliveryInfo responseDeliveryInfo) {
+	public UUID deliver(Delivery delivery, String data) {
+		return deliver(delivery, data, null);
+	}
+
+	public UUID deliver(Delivery delivery, String data,
+	                    PersistentDestination persistentDestination) {
 		//detached
 		AbstractEndpointEntity endpoint = delivery.getEndpoint();
 		AbstractActionEntity action = delivery.getAction();
@@ -231,12 +234,10 @@ public class DeliveryService {
 		EndpointConnector destinationConnector =
 				factory.createEndpointConnector(endpoint, action);
 		DeliveryCallable<String, ResponseDTO> deliveryCallable =
-				new DeliveryCallable<>(destinationConnector,
-				                       delivery.getDeliveryPacket()
-						                       .getDeliveryData(),
+				new DeliveryCallable<>(destinationConnector,data,
 				                       ResponseDTO.class);
 
-		return executeDelivery(deliveryCallable, responseDeliveryInfo,
+		return executeDelivery(deliveryCallable, persistentDestination,
 		                       delivery);
 	}
 
@@ -286,7 +287,7 @@ public class DeliveryService {
 	}
 
     private abstract class SourceDeliveryCallback<T> implements Callback<T>{
-        protected final ResponseDeliveryInfo responseDeliveryInfo;
+        protected final PersistentDestination persistentDestination;
 
         protected final String targetServiceName;
 
@@ -295,10 +296,10 @@ public class DeliveryService {
         private Log logger = LogFactory.getLog(SourceDeliveryCallback.class);
 
         public SourceDeliveryCallback(UUID requestID,
-                                      ResponseDeliveryInfo responseDeliveryInfo,
+                                      PersistentDestination persistentDestination,
                                       String targetServiceName) {
             this.requestID = requestID;
-            this.responseDeliveryInfo = responseDeliveryInfo;
+            this.persistentDestination = persistentDestination;
             this.targetServiceName = targetServiceName;
         }
 
@@ -306,19 +307,19 @@ public class DeliveryService {
             logger.info("Sending response to the source from " +
 		                        targetServiceName);
 
-            AbstractEndpointEntity sourceService =
-                    responseDeliveryInfo.getSourceService();
-            AbstractActionEntity sourceAction =
-                    responseDeliveryInfo.getSourceAction();
+            AbstractEndpointEntity service =
+                    persistentDestination.getService();
+            AbstractActionEntity action =
+                    persistentDestination.getAction();
             final EndpointConnector sourceConnector =
                     factory.createEndpointConnector(
-                            sourceService,
-                            sourceAction);
+                            service,
+                            action);
 
             Delivery sourceDelivery = new Delivery();
-            sourceDelivery.setAction(sourceAction);
+            sourceDelivery.setAction(action);
             sourceDelivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-            sourceDelivery.setEndpoint(sourceService);
+            sourceDelivery.setEndpoint(service);
 	        sourceDelivery = persistenceService.merge(sourceDelivery);
 
             DeliveryCallable<ResponseDTO, Void>
@@ -361,9 +362,9 @@ public class DeliveryService {
             SourceDeliveryCallback<ResponseDTO> {
 
         public SourceDeliverySuccessCallback(UUID requestID,
-                                             ResponseDeliveryInfo responseDeliveryInfo,
+                                             PersistentDestination persistentDestination,
                                              String targetServiceName) {
-            super(requestID, responseDeliveryInfo, targetServiceName);
+            super(requestID, persistentDestination, targetServiceName);
         }
 
 		@Override
@@ -376,9 +377,9 @@ public class DeliveryService {
             SourceDeliveryCallback<ErrorDTO> {
 
         public SourceDeliveryFailedCallback(UUID requestID,
-                                            ResponseDeliveryInfo responseDeliveryInfo,
+                                            PersistentDestination persistentDestination,
                                             String targetServiceName) {
-            super(requestID, responseDeliveryInfo, targetServiceName);
+            super(requestID, persistentDestination, targetServiceName);
         }
 
         @Override

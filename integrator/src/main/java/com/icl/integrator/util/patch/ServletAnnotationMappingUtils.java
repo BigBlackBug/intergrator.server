@@ -35,7 +35,6 @@ import java.util.List;
  * @deprecated in 3.2 together with {@link DefaultAnnotationHandlerMapping},
  * {@link PatchedAnnotationMethodHandlerAdapter}, and {@link AnnotationMethodHandlerExceptionResolver}.
  */
-@Deprecated
 abstract class ServletAnnotationMappingUtils {
 
 	/**

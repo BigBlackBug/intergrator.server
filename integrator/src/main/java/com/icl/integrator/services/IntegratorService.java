@@ -50,6 +50,9 @@ public class IntegratorService implements IntegratorAPI {
     @Autowired
     private ObjectMapper objectMapper;
 
+	@Autowired
+	private DestinationCreator destinationCreator;
+
     @Transactional
     private Holder createDeliveryPacket(DeliveryDTO deliveryDTO)
             throws JsonProcessingException {
@@ -224,18 +227,22 @@ public class IntegratorService implements IntegratorAPI {
         return response;
     }
 
-    private <T> void sendResponse(DestinationDescriptor responseHandler,
+	//TODO rename endpoint to service
+    private <T> void sendResponse(DestinationDescriptor destinationDescriptor,
                                   T response) {
-        if (responseHandler != null) {
+        if (destinationDescriptor != null) {
             try {
-                Delivery delivery = new Delivery();
-//                delivery.setAction();
+	            PersistentDestination destination = destinationCreator
+			            .getPersistentDestination(destinationDescriptor);
+	            Delivery delivery = new Delivery();
+                delivery.setAction(destination.getAction());
                 delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-//                delivery.setEndpoint();
-                deliveryService.deliver(delivery, null);
+                delivery.setEndpoint(destination.getService());
+                deliveryService.deliver(delivery, objectMapper
+		                .writeValueAsString(response));
             } catch (Exception ex) {
                 logger.error("Не могу отправить ответ на дополнительный " +
-                                     "эндпоинт", ex);
+                                     "сервис", ex);
             }
         }
     }

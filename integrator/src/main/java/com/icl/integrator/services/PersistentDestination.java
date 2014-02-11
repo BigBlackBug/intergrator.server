@@ -3,23 +3,23 @@ package com.icl.integrator.services;
 import com.icl.integrator.model.AbstractActionEntity;
 import com.icl.integrator.model.AbstractEndpointEntity;
 
-class ResponseDeliveryInfo {
+class PersistentDestination {
 
 	private final AbstractActionEntity sourceAction;
 
 	private final AbstractEndpointEntity sourceService;
 
-	ResponseDeliveryInfo(AbstractEndpointEntity sourceService,
-	                     AbstractActionEntity sourceAction) {
+	PersistentDestination(AbstractEndpointEntity sourceService,
+	                      AbstractActionEntity sourceAction) {
 		this.sourceAction = sourceAction;
 		this.sourceService = sourceService;
 	}
 
-	public AbstractActionEntity getSourceAction() {
+	public AbstractActionEntity getAction() {
 		return sourceAction;
 	}
 
-	public AbstractEndpointEntity getSourceService() {
+	public AbstractEndpointEntity getService() {
 		return sourceService;
 	}
 

@@ -1,6 +1,7 @@
 package com.icl.integrator.main;
 
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
 import com.icl.integrator.dto.registration.ActionRegistrationDTO;
@@ -12,10 +13,7 @@ import com.icl.integrator.util.EndpointType;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,6 +30,20 @@ public class Main {
 //                ("192.168.83.91", "integrator", 18080);
         IntegratorHttpClient httpClient = new IntegratorHttpClient
                 ("localhost", 8080);
+
+	    HttpEndpointDescriptorDTO desr = new
+			    HttpEndpointDescriptorDTO("localhost", 8080);
+	    EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
+			    new EndpointDTO<>(EndpointType.HTTP, desr);
+
+	    RawDestinationDescriptor dd =
+			    new RawDestinationDescriptor(
+					    endpoint,
+					    new HttpActionDTO("/ext_source/handleGetServiceList")
+			    );
+	    ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList(
+			    new IntegratorPacket<Void, DestinationDescriptor>(dd));
+	    System.out.println(serviceList.getResponse().getResponseValue());
 //	    RestTemplate restTemplate = new RestTemplate();
 //	    HttpHeaders headers = new HttpHeaders();
 //	    headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
@@ -48,7 +60,7 @@ public class Main {
 //        ResponseDTO<Map<String, ResponseDTO<Void>>> register =
 //                register(httpClient);
 //        System.out.println(register);
-        deliver(httpClient);
+//        deliver(httpClient);
 //        ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList
 //                (new IntegratorPacket<Void, DestinationDescriptor>(
 //                        new ServiceDestinationDescriptor(
