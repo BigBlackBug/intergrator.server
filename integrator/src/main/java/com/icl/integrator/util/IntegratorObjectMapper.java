@@ -1,6 +1,7 @@
 package com.icl.integrator.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,6 +37,7 @@ public class IntegratorObjectMapper extends ObjectMapper {
                                    new AddActionDTODeserializer());
         testModule.addDeserializer(RawDestinationDescriptor.class,
                                    new RawDestinationDescriptorDeserializer());
+	    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         setSerializationInclusion(JsonInclude.Include.NON_NULL);
         registerModule(testModule);
     }
