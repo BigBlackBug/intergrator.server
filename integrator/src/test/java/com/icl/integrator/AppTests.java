@@ -165,7 +165,7 @@ public class AppTests {
                 ));
         targetResponseHandler.setActionDescriptor(new QueueDTO
                                                           ("SourceQueue"));
-        deliveryDTO.setTargetResponseHandlerDescriptor(targetResponseHandler);
+        deliveryDTO.setResponseHandlerDescriptor(targetResponseHandler);
         RawDestinationDescriptor
                 deliveryResponseHandler = new RawDestinationDescriptor();
 

@@ -113,7 +113,7 @@ public class IntegratorService implements IntegratorAPI {
             PacketProcessor processor = processorFactory.createProcessor();
             Map<String, ResponseDTO<UUID>> serviceToRequestID =
                     processor.process(deliveryPacket,
-                                      packet.getTargetResponseHandlerDescriptor());
+                                      packet.getResponseHandlerDescriptor());
             serviceToRequestID.putAll(holder.getResponseMap());
             response = new ResponseDTO<>(serviceToRequestID);
         } catch (Exception ex) {

@@ -1,5 +1,6 @@
 package com.icl.integrator.dto;
 
+import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public class DeliveryDTO {
 
-    private RawDestinationDescriptor targetResponseHandlerDescriptor;
+    private DestinationDescriptor responseHandlerDescriptor;
 
     private List<ServiceDTO> destinations;
 
@@ -21,11 +22,11 @@ public class DeliveryDTO {
 
     private RequestDataDTO requestData;
 
-    public DeliveryDTO(RawDestinationDescriptor targetResponseHandler,
+    public DeliveryDTO(DestinationDescriptor responseHandlerDescriptor,
                        String action,
                        List<ServiceDTO> destinations) {
         this.action = action;
-        this.targetResponseHandlerDescriptor = targetResponseHandler;
+        this.responseHandlerDescriptor = responseHandlerDescriptor;
         this.destinations = destinations;
     }
 
@@ -53,8 +54,8 @@ public class DeliveryDTO {
         if (!destinations.equals(that.destinations)) {
             return false;
         }
-        if (!targetResponseHandlerDescriptor
-                .equals(that.targetResponseHandlerDescriptor)) {
+        if (!responseHandlerDescriptor
+                .equals(that.responseHandlerDescriptor)) {
             return false;
         }
 
@@ -63,21 +64,21 @@ public class DeliveryDTO {
 
     @Override
     public int hashCode() {
-        int result = targetResponseHandlerDescriptor.hashCode();
+        int result = responseHandlerDescriptor.hashCode();
         result = 31 * result + destinations.hashCode();
         result = 31 * result + action.hashCode();
         result = 31 * result + (requestData != null ? requestData.hashCode() : 0);
         return result;
     }
 
-    public RawDestinationDescriptor getTargetResponseHandlerDescriptor() {
-        return targetResponseHandlerDescriptor;
+    public DestinationDescriptor getResponseHandlerDescriptor() {
+        return responseHandlerDescriptor;
     }
 
-    public void setTargetResponseHandlerDescriptor(
-            RawDestinationDescriptor targetResponseHandlerDescriptor) {
-        this.targetResponseHandlerDescriptor =
-                targetResponseHandlerDescriptor;
+    public void setResponseHandlerDescriptor(
+		    RawDestinationDescriptor responseHandlerDescriptor) {
+        this.responseHandlerDescriptor =
+		        responseHandlerDescriptor;
     }
 
     public List<ServiceDTO> getDestinations() {

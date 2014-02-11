@@ -138,11 +138,11 @@ public class Main {
         EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
                 new EndpointDTO<>(EndpointType.HTTP, desr);
 
-        deliveryDTO.setTargetResponseHandlerDescriptor(
-                new RawDestinationDescriptor(
-                        endpoint,
-                        new HttpActionDTO("/source/handleResponseFromTarget")
-                ));
+        deliveryDTO.setResponseHandlerDescriptor(
+		        new RawDestinationDescriptor(
+				        endpoint,
+				        new HttpActionDTO("/source/handleResponseFromTarget")
+		        ));
 //        HashMap<String, String> map = new HashMap<>();
 //        map.put("java.naming.provider.url", "tcp://localhost:61616");
 //        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
