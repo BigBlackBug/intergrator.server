@@ -25,53 +25,69 @@ import java.util.UUID;
  */
 public interface ExtendedSourceSpringService extends ExtendedSourceService {
 
-    @Override
-    @RequestMapping(value = "/handleDeliveryResponse",
-                    method = {RequestMethod.POST, RequestMethod.HEAD})
-    public void handleDeliveryResponse(@RequestBody(required = true)
-                                       Map<String, ResponseDTO<UUID>> response);
+	@Override
+	@RequestMapping(value = "/handleDeliveryResponse",
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleDeliveryResponse(@RequestBody(required = true)
+	                            Map<String, ResponseDTO<UUID>> response);
 
-    @Override
-    @RequestMapping(value = "/handleServiceRegistrationResponse",
-                    method = {RequestMethod.POST, RequestMethod.HEAD})
-    public void handleServiceRegistrationResponse(
-            @RequestBody(required = true)
-            ResponseDTO<Map<String, ResponseDTO<Void>>> response);
+	@Override
+	@RequestMapping(value = "/handleServiceRegistrationResponse",
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleServiceRegistrationResponse(
+			@RequestBody(required = true)
+			ResponseDTO<Map<String, ResponseDTO<Void>>> response);
 
-    @Override
-    @RequestMapping(value = "/handleServiceIsAvailableResponse",
-                    method = {RequestMethod.POST, RequestMethod.HEAD})
-    public void handleServiceIsAvailableResponse(@RequestBody(required = true)
-                                                 ResponseDTO<Boolean> response);
+	@Override
+	@RequestMapping(value = "/handleServiceIsAvailableResponse",
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleServiceIsAvailableResponse(@RequestBody(required = true)
+	                                      ResponseDTO<Boolean> response);
 
-    @Override
-    @RequestMapping(value = "/handleGetServiceList", method = RequestMethod
-            .POST)
-    public @ResponseBody
-    void handleGetServiceList(@RequestBody(required = true)
-                                     ResponseDTO<List<ServiceDTO>> response);
+	@Override
+	@RequestMapping(value = "/handleGetServiceList", method = RequestMethod
+			.POST)
+	public
+	@ResponseBody
+	void handleGetServiceList(@RequestBody(required = true)
+	                          ResponseDTO<List<ServiceDTO>> response);
 
-    @Override
-    @RequestMapping(value = "/handleGetSupportedActions",
-                    method = {RequestMethod.POST, RequestMethod.HEAD})
-    public void handleGetSupportedActions(@RequestBody(required = true)
-                                          ResponseDTO<List<String>> response);
+	@Override
+	@RequestMapping(value = "/handleGetSupportedActions",
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleGetSupportedActions(@RequestBody(required = true)
+	                               ResponseDTO<List<String>> response);
 
-    @Override
-    @RequestMapping(value = "/handleAddAction", method = {RequestMethod.POST, RequestMethod.HEAD})
-    public void handleAddAction(@RequestBody(required = true) ResponseDTO
-                                        response);
+	@Override
+	@RequestMapping(value = "/handleAddAction",
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleAddAction(@RequestBody(required = true) ResponseDTO
+			                     response);
 
-    @Override
-    @RequestMapping(value = "/handleGetServiceInfo",
-                    method = {RequestMethod.POST, RequestMethod.HEAD})
-    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
-    void handleGetServiceInfo(@RequestBody(required = true)
-                              ResponseDTO<FullServiceDTO<T, Y>> response);
+	@Override
+	@RequestMapping(value = "/handleGetServiceInfo",
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	<T extends EndpointDescriptor, Y extends ActionDescriptor>
+	void handleGetServiceInfo(@RequestBody(required = true)
+	                          ResponseDTO<FullServiceDTO<T, Y>> response);
 
-    @Override
-    @RequestMapping(value = "/handleResponseFromTarget",
-                    method = {RequestMethod.POST, RequestMethod.HEAD})
-    public void handleResponseFromTarget(@RequestBody(required = true)
-                                         ResponseDTO<ResponseFromTargetDTO> responseDTO);
+	@Override
+	@RequestMapping(value = "/handleResponseFromTarget",
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleResponseFromTarget(@RequestBody(required = true)
+	                              ResponseDTO<ResponseFromTargetDTO> responseDTO);
 }

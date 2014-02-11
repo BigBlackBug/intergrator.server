@@ -6,6 +6,7 @@ import com.icl.integrator.dto.ResponseFromTargetDTO;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,6 +21,6 @@ public interface SourceSpringService extends SourceService {
     @Override
     @RequestMapping(value = "/handleResponseFromTarget",
                     method = {RequestMethod.POST, RequestMethod.HEAD})
-    public void handleResponseFromTarget(@RequestBody(required = false)
+    public @ResponseBody void handleResponseFromTarget(@RequestBody(required = false)
                                              ResponseDTO<ResponseFromTargetDTO> responseDTO);
 }
