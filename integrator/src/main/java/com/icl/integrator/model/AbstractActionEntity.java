@@ -1,11 +1,12 @@
 package com.icl.integrator.model;
 
 import com.icl.integrator.util.EndpointType;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,10 +34,14 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 	private EndpointType type;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
+	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
 	@JoinColumn(name = "ENDPOINT_ID", nullable = false,
 	            updatable = false)
 	private AbstractEndpointEntity endpoint;
+
+	@OneToMany(mappedBy = "action", fetch = FetchType.EAGER)
+	@Cascade(value = {CascadeType.ALL})
+	private Set<Delivery> deliveries = new HashSet<>();
 
 	protected AbstractActionEntity() {
 
@@ -44,6 +49,18 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 
 	protected AbstractActionEntity(EndpointType endpointType) {
 		this.type = endpointType;
+	}
+
+	public void addDelivery(Delivery delivery) {
+		this.deliveries.add(delivery);
+	}
+
+	public Set<Delivery> getDeliveries() {
+		return deliveries;
+	}
+
+	public void setDeliveries(Set<Delivery> deliveries) {
+		this.deliveries = deliveries;
 	}
 
 	public AbstractEndpointEntity getEndpoint() {

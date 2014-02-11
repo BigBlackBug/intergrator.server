@@ -2,10 +2,11 @@ package com.icl.integrator.model;
 
 import com.icl.integrator.util.EndpointType;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,65 +21,81 @@ import java.util.List;
 @DiscriminatorColumn(name = "ENDPOINT_TYPE",
                      discriminatorType = DiscriminatorType.STRING)
 public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
-        extends AbstractEntity {
+		extends AbstractEntity {
 
-    @Column(unique = true, nullable = false, length = 255,
-            name = "SERVICE_NAME")
-    private String serviceName;
+	@OneToMany(mappedBy = "endpoint",
+	           fetch = FetchType.EAGER)
+	@Cascade(value = {CascadeType.ALL})
+	protected Set<AbstractActionEntity> actions = new HashSet<>();
 
-    @OneToMany(mappedBy = "endpoint",
-               fetch = FetchType.EAGER)
-    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
-    protected List<AbstractActionEntity> actions = new ArrayList<>();
+	@Column(unique = true, nullable = false, length = 255,
+	        name = "SERVICE_NAME")
+	private String serviceName;
 
-    //TODO add references to delivery
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
-            insertable = false)
-    private EndpointType type;
+	@OneToMany(mappedBy = "endpoint",fetch = FetchType.EAGER)
+	@Cascade(value = {CascadeType.ALL})
+	private Set<Delivery> deliveries = new HashSet<>();
 
-    @OneToOne
-    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
-    private DeliverySettings deliverySettings;
+	//TODO add references to delivery
+	@Enumerated(EnumType.STRING)
+	@Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
+	        insertable = false)
+	private EndpointType type;
 
-    protected AbstractEndpointEntity() {
+	@OneToOne
+	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
+	private DeliverySettings deliverySettings = DeliverySettings.createDefaultSettings();
 
-    }
+	protected AbstractEndpointEntity() {
 
-    public DeliverySettings getDeliverySettings() {
-        return deliverySettings;
-    }
+	}
 
-    public void setDeliverySettings(DeliverySettings deliverySettings) {
-        this.deliverySettings = deliverySettings;
-    }
+	protected AbstractEndpointEntity(EndpointType endpointType) {
+		this.type = endpointType;
+	}
 
-    protected AbstractEndpointEntity(EndpointType endpointType) {
-        this.type = endpointType;
-    }
+	public Set<Delivery> getDeliveries() {
+		return deliveries;
+	}
 
-    public List<AbstractActionEntity> getActions() {
-        return actions;
-    }
+	public void setDeliveries(Set<Delivery> deliveries) {
+		this.deliveries = deliveries;
+	}
 
-    public abstract void setActions(List<T> actions);
+	public DeliverySettings getDeliverySettings() {
+		return deliverySettings;
+	}
 
-    public abstract T getActionByName(String actionName);
+	public void setDeliverySettings(DeliverySettings deliverySettings) {
+		this.deliverySettings = deliverySettings;
+	}
 
-    public void addAction(T action) {
-        this.actions.add(action);
-    }
+	public Set<AbstractActionEntity> getActions() {
+		return actions;
+	}
 
-    public EndpointType getType() {
-        return type;
-    }
+	public abstract void setActions(Set<T> actions);
 
-    public String getServiceName() {
-        return serviceName;
-    }
+	public abstract T getActionByName(String actionName);
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
+	public void addAction(T action) {
+		this.actions.add(action);
+	}
+
+	public void addDelivery(Delivery delivery) {
+		this.deliveries.add(delivery);
+	}
+
+	public EndpointType getType() {
+		return type;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
 }
 

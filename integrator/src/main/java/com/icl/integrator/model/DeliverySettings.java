@@ -12,9 +12,9 @@ import javax.persistence.Table;
 @Table(name = "DELIVERY_SETTINGS")
 public class DeliverySettings extends AbstractEntity {
 
-	private static final int DEFAULT_DELIVERY_RETRY_DELAY_MILLIS = 5000;
+	private static final int DEFAULT_DELIVERY_RETRY_DELAY_MILLIS = 15000;
 
-	private static final int DEFAULT_DELIVERY_ATTEMPT_NUMBER = 1;
+	private static final int DEFAULT_DELIVERY_ATTEMPT_NUMBER = 10;
 
 	@Column(name = "RETRY_NUMBER", nullable = false)
 	private int retryNumber;

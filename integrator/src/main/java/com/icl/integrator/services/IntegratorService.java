@@ -84,8 +84,10 @@ public class IntegratorService implements IntegratorAPI {
                             deliveryDTO.getAction(), endpointEntity.getId());
                 }
                 delivery.setAction(actionEntity);
+	            actionEntity.addDelivery(delivery);
                 delivery.setEndpoint(endpointEntity);
                 deliveryPacket.addDelivery(delivery);
+				endpointEntity.addDelivery(delivery);
             } catch (Exception ex) {
                 logger.error("Error creating delivery packet for destination",
                              ex);
@@ -235,9 +237,13 @@ public class IntegratorService implements IntegratorAPI {
 	            PersistentDestination destination = destinationCreator
 			            .getPersistentDestination(destinationDescriptor);
 	            Delivery delivery = new Delivery();
-                delivery.setAction(destination.getAction());
+	            AbstractActionEntity action = destination.getAction();
+	            delivery.setAction(action);
+	            action.addDelivery(delivery);
                 delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-                delivery.setEndpoint(destination.getService());
+	            AbstractEndpointEntity service = destination.getService();
+	            delivery.setEndpoint(service);
+	            service.addDelivery(delivery);
 	            delivery = persistenceService.merge(delivery);
                 deliveryService.deliver(delivery, objectMapper
 		                .writeValueAsString(response));

@@ -98,11 +98,13 @@ public class AppTests {
 
         Delivery delivery = new Delivery();
         delivery.setAction(a);
+	    a.addDelivery(delivery);
         delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
         delivery.setEndpoint(ep);
         delivery.setDeliveryPacket(dp);
+	    ep.addDelivery(delivery);
 
-        dp.setDeliveries(Arrays.asList(delivery));
+        dp.setDeliveries(new HashSet<>(Arrays.asList(delivery)));
 //		dp.setAction(dto.getAction());
         dp.setDeliveryData(mapper.writeValueAsString(dto.getRequestData()));
         dp.setRequestDate(new Date());
@@ -112,6 +114,8 @@ public class AppTests {
 
     @PersistenceContext
     EntityManager em;
+
+	@Ignore
     @Test
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void testPers() throws Exception {
@@ -122,8 +126,8 @@ public class AppTests {
         if (abstractEndpointEntity.getType() == EndpointType.HTTP) {
             HttpServiceEndpoint ed =
                     (HttpServiceEndpoint) abstractEndpointEntity;
-            List<AbstractActionEntity> actions = ed.getActions();
-            AbstractActionEntity actionEntity = actions.get(0);
+            Set<AbstractActionEntity> actions = ed.getActions();
+            AbstractActionEntity actionEntity = actions.iterator().next();
             if (actionEntity.getType() == EndpointType.HTTP) {
                 HttpAction a = (HttpAction) actionEntity;
             }

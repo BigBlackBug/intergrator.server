@@ -4,9 +4,9 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by BigBlackBug on 2/4/14.
@@ -15,9 +15,9 @@ import java.util.List;
 @Table(name = "DELIVERY_PACKET")
 public class DeliveryPacket extends AbstractEntity {
 
-    @OneToMany(mappedBy = "deliveryPacket")
+    @OneToMany(mappedBy = "deliveryPacket",fetch = FetchType.EAGER)
     @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
-    private List<Delivery> deliveries = new ArrayList<>();
+    private Set<Delivery> deliveries = new HashSet<>();
 
     @Column(name = "DELIVERY_DATA", nullable = false, updatable = false)
     @Basic(fetch = FetchType.LAZY)
@@ -32,11 +32,11 @@ public class DeliveryPacket extends AbstractEntity {
     public DeliveryPacket() {
     }
 
-    public List<Delivery> getDeliveries() {
+    public Set<Delivery> getDeliveries() {
         return deliveries;
     }
 
-    public void setDeliveries(List<Delivery> deliveries) {
+    public void setDeliveries(Set<Delivery> deliveries) {
         this.deliveries = deliveries;
     }
 

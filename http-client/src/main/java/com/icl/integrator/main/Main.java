@@ -41,7 +41,10 @@ public class Main {
 					    endpoint,
 					    new HttpActionDTO("/ext_source/handleGetServiceList")
 			    );
-//	    deliver(httpClient);
+	    ResponseDTO<Map<String, ResponseDTO<Void>>> register =
+			    register(httpClient);
+	    ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver =
+			    deliver(httpClient);
 	    ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList(
 			    new IntegratorPacket<Void, DestinationDescriptor>(dd));
 	    System.out.println(serviceList.getResponse().getResponseValue());
