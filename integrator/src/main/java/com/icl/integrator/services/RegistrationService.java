@@ -8,10 +8,7 @@ import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
-import com.icl.integrator.model.HttpAction;
-import com.icl.integrator.model.HttpServiceEndpoint;
-import com.icl.integrator.model.JMSAction;
-import com.icl.integrator.model.JMSServiceEndpoint;
+import com.icl.integrator.model.*;
 import com.icl.integrator.util.connectors.ConnectionException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
@@ -94,8 +91,9 @@ public class RegistrationService {
         JMSEndpointDescriptorDTO descriptor =
                 (JMSEndpointDescriptorDTO) endpoint.getDescriptor();
         List<JMSAction> httpActions = getJmsActions(actions);
-        JMSServiceEndpoint serviceEntity =
-                createJmsEntity(descriptor, serviceName);
+	    JMSServiceEndpoint serviceEntity =
+			    createJmsEntity(descriptor, serviceName,
+			                    registrationDTO.getDeliverySettings());
         try {
             serviceEntity = persistenceService.merge(serviceEntity);
         } catch (DataAccessException ex) {
@@ -131,8 +129,11 @@ public class RegistrationService {
         HttpEndpointDescriptorDTO descriptor =
                 (HttpEndpointDescriptorDTO) endpoint.getDescriptor();
         List<HttpAction> httpActions = getHttpActions(actions);
-        HttpServiceEndpoint serviceEntity =
-                createHttpEntity(descriptor, serviceName);
+	    DeliverySettingsDTO deliverySettings =
+			    registrationDTO.getDeliverySettings();
+	    HttpServiceEndpoint serviceEntity =
+			    createHttpEntity(descriptor, serviceName,
+			                     deliverySettings);
         try {
             serviceEntity = persistenceService.merge(serviceEntity);
         } catch (DataAccessException ex) {
@@ -188,40 +189,52 @@ public class RegistrationService {
         return httpActions;
     }
 
-    private <T extends ActionDescriptor> HttpServiceEndpoint createHttpEntity(
-            HttpEndpointDescriptorDTO descriptor,
-            String serviceName) {
-        HttpServiceEndpoint endpoint = new HttpServiceEndpoint();
-        endpoint.setServiceName(serviceName);
-        endpoint.setServiceURL(descriptor.getHost());
-        endpoint.setServicePort(descriptor.getPort());
-//        endpoint.setHttpActions(actions);
-//        for (HttpAction action : actions) {
-//            action.setHttpServiceEndpoint(endpoint);
-//        }
-        return endpoint;
-    }
+	private HttpServiceEndpoint createHttpEntity(
+			HttpEndpointDescriptorDTO descriptor,
+			String serviceName, DeliverySettingsDTO deliverySettings) {
+		HttpServiceEndpoint endpoint = new HttpServiceEndpoint();
+		endpoint.setServiceName(serviceName);
+		endpoint.setServiceURL(descriptor.getHost());
+		endpoint.setServicePort(descriptor.getPort());
+		DeliverySettings settings;
+		if (deliverySettings == null) {
+			settings = DeliverySettings.createDefaultSettings();
+		} else {
+			settings = new DeliverySettings();
+			settings.setRetryDelay(deliverySettings.getRetryDelay());
+			settings.setRetryNumber(deliverySettings.getRetryNumber());
+		}
+		settings.setEndpoint(endpoint);
+		endpoint.setDeliverySettings(settings);
+		return endpoint;
+	}
 
-    private JMSServiceEndpoint createJmsEntity(
-            JMSEndpointDescriptorDTO descriptor,
-            String serviceName) {
-        JMSServiceEndpoint endpoint = new JMSServiceEndpoint();
-        endpoint.setConnectionFactory(descriptor.getConnectionFactory());
-        String jndiProperties = null;
-        try {
-            jndiProperties = serializer.
-                    writeValueAsString(descriptor.getJndiProperties());
-        } catch (JsonProcessingException e) {
-            //never happens
-        }
-        endpoint.setJndiProperties(jndiProperties);
-        endpoint.setServiceName(serviceName);
-//        endpoint.setJmsActions(actions);
-//        for (JMSAction action : actions) {
-//            action.setJmsServiceEndpoint(endpoint);
-//        }
-        return endpoint;
-    }
+	private JMSServiceEndpoint createJmsEntity(
+			JMSEndpointDescriptorDTO descriptor,
+			String serviceName, DeliverySettingsDTO deliverySettings) {
+		JMSServiceEndpoint endpoint = new JMSServiceEndpoint();
+		endpoint.setConnectionFactory(descriptor.getConnectionFactory());
+		String jndiProperties = null;
+		try {
+			jndiProperties = serializer.
+					writeValueAsString(descriptor.getJndiProperties());
+		} catch (JsonProcessingException e) {
+			//never happens
+		}
+		endpoint.setJndiProperties(jndiProperties);
+		endpoint.setServiceName(serviceName);
+		DeliverySettings settings;
+		if (deliverySettings == null) {
+			settings = DeliverySettings.createDefaultSettings();
+		} else {
+			settings = new DeliverySettings();
+			settings.setRetryDelay(deliverySettings.getRetryDelay());
+			settings.setRetryNumber(deliverySettings.getRetryNumber());
+		}
+		settings.setEndpoint(endpoint);
+		endpoint.setDeliverySettings(settings);
+		return endpoint;
+	}
 
     private <T extends ActionDescriptor>
     void testConnection(EndpointDTO endpoint, ActionEndpointDTO<T> action)

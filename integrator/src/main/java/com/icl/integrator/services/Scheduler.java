@@ -198,6 +198,7 @@ public class Scheduler {
                             exception);
                 scheduleMap.remove(taskCreator.getTaskID());
                 delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_FAILED);
+	            delivery.setLastFailureReason(Utils.getStackTraceAsString(exception));
                 persistenceService.merge(delivery);
 	            //тут чё одинаковые деливери? и вкололбеке?
                 //обычно посылатель домой
@@ -206,10 +207,10 @@ public class Scheduler {
                 //обрабочик облома
                 if (callback != null) {
                     callback.execute(exception);
-                    return;
                 }
-
+	            return;
             }
+
             Date nextRequestDate = new Date(System.currentTimeMillis() +
                                                     deliverySettings
                                                             .getRetryDelay());

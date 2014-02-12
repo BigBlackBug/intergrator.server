@@ -211,10 +211,8 @@ public class DeliveryService {
 
 		//статус деливери failed ставим в шедулере
         //тут шедуль принимающий ответ
-		//TODO remove default
 		scheduler.scheduleDelivery(new Schedulable<>(deliveryTaskCreator,
-		                                     delivery,
-		                                     DeliverySettings.createDefaultSettings()),
+		                                             delivery),
 		                           deliveryFailed);
 		return requestID;
 	}
@@ -353,9 +351,8 @@ public class DeliveryService {
             deliveryToSource.setCallback(new DeliveryStatusSetter(
 		            sourceDelivery, DeliveryStatus.DELIVERY_OK));
 
-            scheduler.scheduleGeneral(    //TODO remove settings
-                    new Schedulable<>(deliveryToSource, sourceDelivery,
-                                      DeliverySettings.createDefaultSettings()),null);
+	        scheduler.scheduleGeneral(
+			        new Schedulable<>(deliveryToSource, sourceDelivery),null);
         }
     }
 

@@ -14,80 +14,93 @@ import java.util.Date;
 @Table(name = "DELIVERY")
 public class Delivery extends AbstractEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "DELIVERY_PACKET_ID", updatable = false)
-    private DeliveryPacket deliveryPacket;
+	@ManyToOne
+	@JoinColumn(name = "DELIVERY_PACKET_ID", updatable = false)
+	private DeliveryPacket deliveryPacket;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "DELIVERY_STATUS")
-    private DeliveryStatus deliveryStatus;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "DELIVERY_STATUS")
+	private DeliveryStatus deliveryStatus;
 
-    @ManyToOne
-    @Cascade(value = {CascadeType.MERGE, CascadeType.PERSIST,
-            CascadeType.REFRESH})
-    @JoinColumn(name = "ACTION_ID", nullable = false, updatable = false)
-    private AbstractActionEntity action;
+	@ManyToOne
+	@Cascade(value = {CascadeType.MERGE, CascadeType.PERSIST,
+			CascadeType.REFRESH})
+	@JoinColumn(name = "ACTION_ID", nullable = false, updatable = false)
+	private AbstractActionEntity action;
 
-    @ManyToOne
-    @Cascade(value = {CascadeType.MERGE, CascadeType.PERSIST,
-            CascadeType.REFRESH})
-    @JoinColumn(name = "ENDPOINT_ID", nullable = false, updatable = false)
-    private AbstractEndpointEntity endpoint;
+	@ManyToOne
+	@Cascade(value = {CascadeType.MERGE, CascadeType.PERSIST,
+			CascadeType.REFRESH})
+	@JoinColumn(name = "ENDPOINT_ID", nullable = false, updatable = false)
+	private AbstractEndpointEntity endpoint;
 
-    @Column(name = "RESPONSE_DATA")
-    @Type(type = "org.hibernate.type.StringClobType")
-    @Lob
-    private String responseData;
+	@Column(name = "RESPONSE_DATA")
+	@Type(type = "org.hibernate.type.StringClobType")
+	@Lob
+	private String responseData;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "RESPONSE_DATE")
-    private Date responseDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "RESPONSE_DATE")
+	private Date responseDate;
 
-    public Date getResponseDate() {
-        return responseDate;
-    }
+	@Column(name = "LAST_FAILURE_REASON")
+	@Type(type = "org.hibernate.type.StringClobType")
+	@Lob
+	private String lastFailureReason;
 
-    public void setResponseDate(Date responseDate) {
-        this.responseDate = responseDate;
-    }
+	public Date getResponseDate() {
+		return responseDate;
+	}
 
-    public DeliveryPacket getDeliveryPacket() {
-        return deliveryPacket;
-    }
+	public String getLastFailureReason() {
+		return lastFailureReason;
+	}
 
-    public void setDeliveryPacket(DeliveryPacket deliveryPacket) {
-        this.deliveryPacket = deliveryPacket;
-    }
+	public void setLastFailureReason(String lastFailureReason) {
+		this.lastFailureReason = lastFailureReason;
+	}
 
-    public String getResponseData() {
-        return responseData;
-    }
+	public void setResponseDate(Date responseDate) {
+		this.responseDate = responseDate;
+	}
 
-    public void setResponseData(String responseData) {
-        this.responseData = responseData;
-    }
+	public DeliveryPacket getDeliveryPacket() {
+		return deliveryPacket;
+	}
 
-    public DeliveryStatus getDeliveryStatus() {
-        return deliveryStatus;
-    }
+	public void setDeliveryPacket(DeliveryPacket deliveryPacket) {
+		this.deliveryPacket = deliveryPacket;
+	}
 
-    public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
-        this.deliveryStatus = deliveryStatus;
-    }
+	public String getResponseData() {
+		return responseData;
+	}
 
-    public AbstractActionEntity getAction() {
-        return action;
-    }
+	public void setResponseData(String responseData) {
+		this.responseData = responseData;
+	}
 
-    public void setAction(AbstractActionEntity action) {
-        this.action = action;
-    }
+	public DeliveryStatus getDeliveryStatus() {
+		return deliveryStatus;
+	}
 
-    public AbstractEndpointEntity getEndpoint() {
-        return endpoint;
-    }
+	public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
+		this.deliveryStatus = deliveryStatus;
+	}
 
-    public void setEndpoint(AbstractEndpointEntity endpoint) {
-        this.endpoint = endpoint;
-    }
+	public AbstractActionEntity getAction() {
+		return action;
+	}
+
+	public void setAction(AbstractActionEntity action) {
+		this.action = action;
+	}
+
+	public AbstractEndpointEntity getEndpoint() {
+		return endpoint;
+	}
+
+	public void setEndpoint(AbstractEndpointEntity endpoint) {
+		this.endpoint = endpoint;
+	}
 }
