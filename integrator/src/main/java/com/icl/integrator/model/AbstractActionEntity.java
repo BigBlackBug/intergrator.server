@@ -34,8 +34,7 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 
 	@ManyToOne(fetch = FetchType.EAGER)
     @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
-	@JoinColumn(name = "ENDPOINT_ID", nullable = false,
-	            updatable = false)
+	@JoinColumn(name = "ENDPOINT_ID", nullable = false)
 	private AbstractEndpointEntity endpoint;
 
 	protected AbstractActionEntity() {

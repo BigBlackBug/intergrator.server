@@ -48,10 +48,22 @@ public class PersistenceService {
         return em.merge(entity);
     }
 
+	@Transactional
+	public <T extends AbstractEntity> T refresh(T entity) {
+		em.refresh(entity);
+		return entity;
+	}
+
     @Transactional
-    public <T extends AbstractEntity> void persist(T entity) {
+    public <T extends AbstractEntity> T persist(T entity) {
         em.persist(entity);
+	    return entity;
     }
+
+	@Transactional
+	public <T extends AbstractEntity> T find(Class<T> entityClass,UUID id) {
+		return em.find(entityClass,id);
+	}
 
     @Transactional
     public List<HttpServiceEndpoint> getHttpServices() {

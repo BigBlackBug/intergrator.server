@@ -25,13 +25,13 @@ public class Delivery extends AbstractEntity {
 	@ManyToOne
 	@Cascade(value = {CascadeType.MERGE, CascadeType.PERSIST,
 			CascadeType.REFRESH})
-	@JoinColumn(name = "ACTION_ID", nullable = false, updatable = false)
+	@JoinColumn(name = "ACTION_ID", nullable = false)
 	private AbstractActionEntity action;
 
 	@ManyToOne
 	@Cascade(value = {CascadeType.MERGE, CascadeType.PERSIST,
 			CascadeType.REFRESH})
-	@JoinColumn(name = "ENDPOINT_ID", nullable = false, updatable = false)
+	@JoinColumn(name = "ENDPOINT_ID", nullable = false)
 	private AbstractEndpointEntity endpoint;
 
 	@Column(name = "RESPONSE_DATA")
@@ -47,6 +47,10 @@ public class Delivery extends AbstractEntity {
 	@Type(type = "org.hibernate.type.StringClobType")
 	@Lob
 	private String lastFailureReason;
+
+	public Delivery(){
+
+	}
 
 	public Date getResponseDate() {
 		return responseDate;

@@ -1,7 +1,6 @@
 package com.icl.integrator.main;
 
 import com.icl.integrator.dto.*;
-import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
 import com.icl.integrator.dto.registration.ActionRegistrationDTO;
@@ -13,7 +12,10 @@ import com.icl.integrator.util.EndpointType;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,10 +43,11 @@ public class Main {
 					    endpoint,
 					    new HttpActionDTO("/ext_source/handleGetServiceList")
 			    );
-//	    deliver(httpClient);
-	    ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList(
-			    new IntegratorPacket<Void, DestinationDescriptor>(dd));
-	    System.out.println(serviceList.getResponse().getResponseValue());
+	    register(httpClient);
+	    deliver(httpClient);
+//	    ResponseDTO<List<ServiceDTO>> serviceList = httpClient.getServiceList(
+//			    new IntegratorPacket<Void, DestinationDescriptor>(dd));
+//	    System.out.println(serviceList.getResponse().getResponseValue());
 //	    RestTemplate restTemplate = new RestTemplate();
 //	    HttpHeaders headers = new HttpHeaders();
 //	    headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);

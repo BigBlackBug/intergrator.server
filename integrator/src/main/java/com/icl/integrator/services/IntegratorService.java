@@ -1,6 +1,5 @@
 package com.icl.integrator.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
@@ -9,15 +8,18 @@ import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.model.*;
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.model.AbstractActionEntity;
+import com.icl.integrator.model.AbstractEndpointEntity;
+import com.icl.integrator.model.Delivery;
+import com.icl.integrator.model.DeliveryPacket;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -53,51 +55,6 @@ public class IntegratorService implements IntegratorAPI {
 	@Autowired
 	private DestinationCreator destinationCreator;
 
-    @Transactional
-    private Holder createDeliveryPacket(DeliveryDTO deliveryDTO)
-            throws JsonProcessingException {
-        logger.info("Creating a delivery packet");
-        Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
-        DeliveryPacket deliveryPacket = new DeliveryPacket();
-        deliveryPacket.setDeliveryData(
-                objectMapper.writeValueAsString(deliveryDTO.getRequestData()));
-        for (ServiceDTO destination : deliveryDTO.getDestinations()) {
-            Delivery delivery = new Delivery();
-            delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-            delivery.setDeliveryPacket(deliveryPacket);
-            try {
-                AbstractActionEntity actionEntity = null;
-                AbstractEndpointEntity endpointEntity = null;
-                EndpointType endpointType = destination.getEndpointType();
-                if (endpointType == EndpointType.HTTP) {
-                    endpointEntity =
-                            persistenceService.getHttpService(
-                                    destination.getServiceName());
-                    actionEntity = persistenceService
-                            .getHttpAction(deliveryDTO.getAction(),
-                                           endpointEntity.getId());
-                } else if (endpointType == EndpointType.JMS) {
-                    endpointEntity =
-                            persistenceService.getJmsService(
-                                    destination.getServiceName());
-                    actionEntity = persistenceService.getJmsAction(
-                            deliveryDTO.getAction(), endpointEntity.getId());
-                }
-                delivery.setAction(actionEntity);
-                delivery.setEndpoint(endpointEntity);
-                deliveryPacket.addDelivery(delivery);
-            } catch (Exception ex) {
-                logger.error("Error creating delivery packet for destination",
-                             ex);
-                ErrorDTO error = new ErrorDTO(ex);
-                serviceToRequestID.put(destination.getServiceName(),
-                                       new ResponseDTO<UUID>(error));
-            }
-        }
-        deliveryPacket.setRequestDate(new Date());
-        return new Holder(serviceToRequestID, deliveryPacket);
-    }
-
     @Override
     public  <T extends DestinationDescriptor> ResponseDTO<Map<String,
             ResponseDTO<UUID>>> deliver(
@@ -106,9 +63,8 @@ public class IntegratorService implements IntegratorAPI {
         ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
         try {
 	        DeliveryDTO packet = delivery.getPacket();
-            Holder holder = createDeliveryPacket(packet);
+            DestinationCreator.Holder holder = destinationCreator.createDeliveryPacket(packet);
             DeliveryPacket deliveryPacket = holder.getPacket();
-            deliveryPacket = persistenceService.merge(deliveryPacket);
             //посылаем в шыну
             PacketProcessor processor = processorFactory.createProcessor();
             Map<String, ResponseDTO<UUID>> serviceToRequestID =
@@ -228,46 +184,30 @@ public class IntegratorService implements IntegratorAPI {
     }
 
 	//TODO rename endpoint to service
-    private <T> void sendResponse(DestinationDescriptor destinationDescriptor,
-                                  T response) {
-        if (destinationDescriptor != null) {
-            try {
-	            PersistentDestination destination = destinationCreator
-			            .getPersistentDestination(destinationDescriptor);
-	            Delivery delivery = new Delivery();
-                delivery.setAction(destination.getAction());
-                delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-                delivery.setEndpoint(destination.getService());
-	            delivery = persistenceService.merge(delivery);
-                deliveryService.deliver(delivery, objectMapper
-		                .writeValueAsString(response));
-            } catch (Exception ex) {
-                logger.error("Не могу отправить ответ на дополнительный " +
-                                     "сервис", ex);
-            }
-        }
-    }
-
-    private static class Holder {
-
-        private final Map<String, ResponseDTO<UUID>> responseMap;
-
-        private final DeliveryPacket packet;
-
-        private Holder(
-                Map<String, ResponseDTO<UUID>> responseMap,
-                DeliveryPacket packet) {
-            this.responseMap = responseMap;
-            this.packet = packet;
-        }
-
-        public Map<String, ResponseDTO<UUID>> getResponseMap() {
-            return responseMap;
-        }
-
-        public DeliveryPacket getPacket() {
-            return packet;
-        }
-    }
+	private <T> void sendResponse(DestinationDescriptor destinationDescriptor,
+	                              T response) {
+		if (destinationDescriptor != null) {
+			Delivery delivery;
+			String data;
+			try {
+				PersistentDestination destination = destinationCreator
+						.getPersistentDestination(destinationDescriptor);
+				AbstractActionEntity action = destination.getAction();
+				AbstractEndpointEntity service = destination.getService();
+				delivery = destinationCreator.createDelivery(service,action);
+				data = objectMapper.writeValueAsString(response);
+			} catch (Exception ex) {
+				logger.error("Ошибка создания конечной точки доставки", ex);
+				return;
+			}
+			try {
+				deliveryService.deliver(delivery, data);
+			} catch (Exception ex) {
+				logger.error("Не могу отправить ответ на дополнительный " +
+						             "сервис", ex);
+				return;
+			}
+		}
+	}
 
 }

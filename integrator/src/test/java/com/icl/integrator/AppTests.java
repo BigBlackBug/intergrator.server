@@ -102,7 +102,7 @@ public class AppTests {
         delivery.setEndpoint(ep);
         delivery.setDeliveryPacket(dp);
 
-        dp.setDeliveries(Arrays.asList(delivery));
+        dp.setDeliveries(new HashSet<>(Arrays.asList(delivery)));
 //		dp.setAction(dto.getAction());
         dp.setDeliveryData(mapper.writeValueAsString(dto.getRequestData()));
         dp.setRequestDate(new Date());
@@ -114,6 +114,7 @@ public class AppTests {
     EntityManager em;
     @Test
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Ignore
     public void testPers() throws Exception {
         List<AbstractEndpointEntity> resultList =
                 em.createQuery("select e from AbstractEndpointEntity e",
@@ -122,8 +123,8 @@ public class AppTests {
         if (abstractEndpointEntity.getType() == EndpointType.HTTP) {
             HttpServiceEndpoint ed =
                     (HttpServiceEndpoint) abstractEndpointEntity;
-            List<AbstractActionEntity> actions = ed.getActions();
-            AbstractActionEntity actionEntity = actions.get(0);
+            Set<AbstractActionEntity> actions = ed.getActions();
+            AbstractActionEntity actionEntity = actions.iterator().next();
             if (actionEntity.getType() == EndpointType.HTTP) {
                 HttpAction a = (HttpAction) actionEntity;
             }

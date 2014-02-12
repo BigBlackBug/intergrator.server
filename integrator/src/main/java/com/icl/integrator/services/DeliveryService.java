@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.model.*;
+import com.icl.integrator.model.AbstractActionEntity;
+import com.icl.integrator.model.AbstractEndpointEntity;
+import com.icl.integrator.model.Delivery;
+import com.icl.integrator.model.DeliveryStatus;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
-import com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.apache.commons.logging.Log;
@@ -41,7 +43,7 @@ public class DeliveryService {
 	private EndpointConnectorFactory factory;
 
 	@Autowired
-	private DatabaseRetryHandlerFactory databaseRetryHandlerFactory;
+	private DestinationCreator destinationCreator;
 
 	@Autowired
 	private ObjectMapper mapper;
@@ -303,6 +305,7 @@ public class DeliveryService {
             this.targetServiceName = targetServiceName;
         }
 
+//	    @Transactional
         protected void deliver(ResponseDTO data){
             logger.info("Sending response to the source from " +
 		                        targetServiceName);
@@ -315,12 +318,13 @@ public class DeliveryService {
                     factory.createEndpointConnector(
                             service,
                             action);
-
-            Delivery sourceDelivery = new Delivery();
+	        Delivery sourceDelivery =
+				        destinationCreator.createDelivery(service, action);
+		            /*= new Delivery();
             sourceDelivery.setAction(action);
             sourceDelivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
             sourceDelivery.setEndpoint(service);
-	        sourceDelivery = persistenceService.merge(sourceDelivery);
+	        sourceDelivery = persistenceService.merge(sourceDelivery);  */
 
             DeliveryCallable<ResponseDTO, Void>
                     successCallable =
