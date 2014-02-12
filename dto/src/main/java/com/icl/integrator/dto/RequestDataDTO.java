@@ -9,24 +9,24 @@ package com.icl.integrator.dto;
  */
 public class RequestDataDTO {
 
-	private PacketType packetType;
+	private DeliveryType deliveryType;
 
 	private Object data;
 
 	public RequestDataDTO() {
 	}
 
-	public RequestDataDTO(PacketType packetType, Object data) {
-		this.packetType = packetType;
+	public RequestDataDTO(DeliveryType deliveryType, Object data) {
+		this.deliveryType = deliveryType;
 		this.data = data;
 	}
 
-	public PacketType getPacketType() {
-		return packetType;
+	public DeliveryType getDeliveryType() {
+		return deliveryType;
 	}
 
-	public void setPacketType(PacketType packetType) {
-		this.packetType = packetType;
+	public void setDeliveryType(DeliveryType deliveryType) {
+		this.deliveryType = deliveryType;
 	}
 
 	public Object getData() {
@@ -51,7 +51,7 @@ public class RequestDataDTO {
 		if (data != null ? !data.equals(that.data) : that.data != null) {
 			return false;
 		}
-		if (packetType != that.packetType) {
+		if (deliveryType != that.deliveryType) {
 			return false;
 		}
 
@@ -60,7 +60,7 @@ public class RequestDataDTO {
 
 	@Override
 	public int hashCode() {
-		int result = packetType.hashCode();
+		int result = deliveryType.hashCode();
 		result = 31 * result + (data != null ? data.hashCode() : 0);
 		return result;
 	}

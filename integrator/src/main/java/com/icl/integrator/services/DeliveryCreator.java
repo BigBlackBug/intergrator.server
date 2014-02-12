@@ -1,6 +1,7 @@
 package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
@@ -13,24 +14,31 @@ import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
 import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.util.IntegratorException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by BigBlackBug on 2/11/14.
  */
 @Service
-public class DestinationCreator {
+public class DeliveryCreator {
 
-	private static Log logger = LogFactory.getLog(DestinationCreator.class);
+	private static Log logger = LogFactory.getLog(DeliveryCreator.class);
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private JsonMatcher jsonMatcher;
 
 	@Autowired
 	private PersistenceService persistenceService;
@@ -67,7 +75,7 @@ public class DestinationCreator {
 	}
 
 	@Transactional
-	public PersistentDestination getPersistentDestination(
+	public PersistentDestination createPersistentDestination(
 			DestinationDescriptor destination) {
 		if (destination == null) {
 			return null;
@@ -190,8 +198,8 @@ public class DestinationCreator {
 
 	@Transactional
 	public <T> Delivery createDelivery(AbstractEndpointEntity service,
-	                               AbstractActionEntity action,
-	                               T data) throws JsonProcessingException {
+	                                   AbstractActionEntity action,
+	                                   T data) throws JsonProcessingException {
 		service = persistenceService
 				.find(AbstractEndpointEntity.class, service.getId());
 		action = persistenceService
@@ -206,9 +214,8 @@ public class DestinationCreator {
 		return sourceDelivery;
 	}
 
-	private <T> Deliveries createDeliveries(DeliveryDTO deliveryDTO, T data){
-		Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
-		List<Delivery> deliveries = new ArrayList<>();
+	private <T> Deliveries createDeliveries(DeliveryDTO deliveryDTO, T data) {
+		Deliveries deliveries = new Deliveries();
 		for (ServiceDTO destination : deliveryDTO.getDestinations()) {
 			try {
 				AbstractActionEntity actionEntity = null;
@@ -229,18 +236,16 @@ public class DestinationCreator {
 							deliveryDTO.getAction(), endpointEntity.getId());
 				}
 				Delivery delivery = createDelivery(
-						endpointEntity, actionEntity,data);
+						endpointEntity, actionEntity, data);
 				persistenceService.persist(delivery);
-				deliveries.add(delivery);
+				deliveries.addDelivery(delivery);
 			} catch (Exception ex) {
 				logger.error("Error creating delivery packet for destination",
 				             ex);
-				ErrorDTO error = new ErrorDTO(ex);
-				serviceToRequestID.put(destination.getServiceName(),
-				                       new ResponseDTO<UUID>(error));
+				deliveries.addError(destination.getServiceName(), ex);
 			}
 		}
-		return new Deliveries(serviceToRequestID, deliveries);
+		return deliveries;
 	}
 
 	@Transactional
@@ -250,44 +255,52 @@ public class DestinationCreator {
 
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
 		Deliveries deliveries;
-		if(requestData.getPacketType() == PacketType.UNDEFINED){
+		if (requestData.getDeliveryType() == DeliveryType.UNDEFINED) {
 			deliveries = createDeliveries(deliveryDTO, requestData.getData());
-		}else{
+		} else {
 			if (deliveryDTO.getDestinations() != null) {
-				deliveries = createDeliveries(deliveryDTO, requestData.getData());
+				deliveries =
+						createDeliveries(deliveryDTO, requestData.getData());
 			} else {
-				deliveries = analyzePacket(deliveryDTO);
+				deliveries = createAutoDetectedDeliveries(deliveryDTO);
 			}
 		}
 		return deliveries;
 	}
 
-	private Deliveries analyzePacket(DeliveryDTO deliveryDTO) {
-		//TODO impl
-		return null;
+	@Transactional
+	public Deliveries createAutoDetectedDeliveries(DeliveryDTO deliveryDTO) {
+		RequestDataDTO requestData = deliveryDTO.getRequestData();
+		DeliveryType deliveryType = requestData.getDeliveryType();
+		List<AutoDetectionPacket> autoDetectionPackets =
+				persistenceService.findAutoDetectionPackets(deliveryType);
+		Deliveries deliveries = new Deliveries();
+		for (AutoDetectionPacket packet : autoDetectionPackets) {
+			Object data = requestData.getData();
+			JsonNode dataJson = objectMapper.valueToTree(data);
+			String referenceObject = packet.getReferenceObject();
+			JsonNode referenceJson;
+			try {
+				referenceJson = objectMapper.readTree(referenceObject);
+			} catch (IOException e) {
+				throw new IntegratorException(e);
+			}
+			if (jsonMatcher.matches(dataJson, referenceJson)) {
+				List<DestinationEntity> destinations = packet.getDestinations();
+				for (DestinationEntity destination : destinations) {
+					try {
+						Delivery delivery = createDelivery(
+								destination.getService(),
+								destination.getAction(), data);
+						deliveries.addDelivery(delivery);
+					} catch (JsonProcessingException e) {
+						throw new IntegratorException(e);
+					}
+				}
+
+			}
+		}
+		return deliveries;
 	}
-
-	public static class Deliveries {
-
-		private final Map<String, ResponseDTO<UUID>> responseMap;
-
-		private final List<Delivery> deliveries;
-
-		private Deliveries(
-				Map<String, ResponseDTO<UUID>> responseMap,
-				List<Delivery> deliveries) {
-			this.responseMap = responseMap;
-			this.deliveries = deliveries;
-		}
-
-		public Map<String, ResponseDTO<UUID>> getResponseMap() {
-			return responseMap;
-		}
-
-		public List<Delivery> getDeliveries() {
-			return deliveries;
-		}
-	}
-
 
 }

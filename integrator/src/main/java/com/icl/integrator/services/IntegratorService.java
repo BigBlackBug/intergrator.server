@@ -6,11 +6,10 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.model.AbstractActionEntity;
-import com.icl.integrator.model.AbstractEndpointEntity;
-import com.icl.integrator.model.Delivery;
+import com.icl.integrator.model.*;
 import com.icl.integrator.services.validation.ValidationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,13 +45,14 @@ public class IntegratorService implements IntegratorAPI {
     @Autowired
     private DeliveryService deliveryService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+	@Autowired
+	private DeliveryCreator deliveryCreator;
 
 	@Autowired
-	private DestinationCreator destinationCreator;
-
 	private ValidationService validationService;
+
+	@Autowired
+	private ObjectMapper mapper;
 
 	@Override
     public  <T extends DestinationDescriptor> ResponseDTO<Map<String,
@@ -63,14 +63,14 @@ public class IntegratorService implements IntegratorAPI {
         try {
 	        DeliveryDTO packet = delivery.getPacket();
 	        validationService.validate(packet);
-            DestinationCreator.Deliveries deliveries = destinationCreator.createDeliveries(
-		            packet);
+            Deliveries deliveries =
+		            deliveryCreator.createDeliveries(packet);
             //посылаем в шыну
             PacketProcessor processor = processorFactory.createProcessor();
             Map<String, ResponseDTO<UUID>> serviceToRequestID =
                     processor.process(deliveries.getDeliveries(),
                                       packet.getResponseHandlerDescriptor());
-            serviceToRequestID.putAll(deliveries.getResponseMap());
+            serviceToRequestID.putAll(deliveries.getErrorMap());
             response = new ResponseDTO<>(serviceToRequestID);
         } catch (Exception ex) {
             response = new ResponseDTO<>(ex);
@@ -189,11 +189,11 @@ public class IntegratorService implements IntegratorAPI {
 		if (destinationDescriptor != null) {
 			Delivery delivery;
 			try {
-				PersistentDestination destination = destinationCreator
-						.getPersistentDestination(destinationDescriptor);
+				PersistentDestination destination = deliveryCreator
+						.createPersistentDestination(destinationDescriptor);
 				AbstractActionEntity action = destination.getAction();
 				AbstractEndpointEntity service = destination.getService();
-				delivery = destinationCreator.createDelivery(service,action,response);
+				delivery = deliveryCreator.createDelivery(service,action,response);
 			} catch (Exception ex) {
 				logger.error("Ошибка создания конечной точки доставки", ex);
 				return;
@@ -206,6 +206,37 @@ public class IntegratorService implements IntegratorAPI {
 				return;
 			}
 		}
+	}
+
+	public <T extends DestinationDescriptor> ResponseDTO<Void> registerAutoDetection(
+			IntegratorPacket<AutoDetectionRegistrationDTO, T> autoDetectionDTO) {
+		ResponseDTO<Void> response;
+		AutoDetectionPacket autoDetectionPacket = new AutoDetectionPacket();
+		AutoDetectionRegistrationDTO packet = autoDetectionDTO.getPacket();
+		autoDetectionPacket.setDeliveryType(packet.getDeliveryType());
+		String referenceObject;
+		try {
+			referenceObject =
+					mapper.writeValueAsString(packet.getReferenceObject());
+
+			autoDetectionPacket.setReferenceObject(referenceObject);
+			List<T> destinationDescriptors = packet.getDestinationDescriptors();
+			for (T destinationDescriptor : destinationDescriptors) {
+				PersistentDestination persistentDestination = deliveryCreator
+						.createPersistentDestination(destinationDescriptor);
+				autoDetectionPacket.addDestination(
+						new DestinationEntity(
+								persistentDestination.getService(),
+								persistentDestination.getAction()));
+
+			}
+			response = new ResponseDTO<>(true);
+		} catch (Exception ex) {
+			response = new ResponseDTO<>(new ErrorDTO(ex));
+		}
+
+		sendResponse(autoDetectionDTO.getResponseHandlerDescriptor(), response);
+		return response;
 	}
 
 }

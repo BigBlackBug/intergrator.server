@@ -178,7 +178,7 @@ public class Main {
 //        deliveryResponseHandler.setActionDescriptor(
 //                new HttpActionDTO("/ext_source/handleDeliveryResponse"));
         deliveryDTO.setAction("ACTION");
-        deliveryDTO.setRequestData(new RequestDataDTO(PacketType.UNDEFINED,
+        deliveryDTO.setRequestData(new RequestDataDTO(DeliveryType.UNDEFINED,
                 new HashMap<String, Object>() {{
                     put("a", "b");
                 }}));

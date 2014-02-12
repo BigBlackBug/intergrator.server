@@ -219,7 +219,7 @@ public class RegistrationService {
 			jndiProperties = serializer.
 					writeValueAsString(descriptor.getJndiProperties());
 		} catch (JsonProcessingException e) {
-			//never happens
+			throw new TargetRegistrationException(e);
 		}
 		endpoint.setJndiProperties(jndiProperties);
 		endpoint.setServiceName(serviceName);

@@ -42,7 +42,7 @@ public class DeliveryService {
 	private EndpointConnectorFactory factory;
 
 	@Autowired
-	private DestinationCreator destinationCreator;
+	private DeliveryCreator deliveryCreator;
 
 	@Autowired
 	private ObjectMapper mapper;
@@ -198,7 +198,7 @@ public class DeliveryService {
 	        Delivery sourceDelivery;
 	        try {
 		        sourceDelivery =
-				        destinationCreator.createDelivery(service, action, data);
+				        deliveryCreator.createDelivery(service, action, data);
 	        } catch (JsonProcessingException e) {
 		        //will never happen
 		        return;

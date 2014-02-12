@@ -28,13 +28,13 @@ public class PacketProcessor {
     private DeliveryService deliveryService;
 
 	@Autowired
-	private DestinationCreator destinationCreator;
+	private DeliveryCreator deliveryCreator;
 
     public Map<String, ResponseDTO<UUID>> process(List<Delivery> deliveries,
                                                   DestinationDescriptor destinationDescriptor) {
         //mb null
         PersistentDestination persistentDestination =
-		        destinationCreator.getPersistentDestination(
+		        deliveryCreator.createPersistentDestination(
 				        destinationDescriptor);
         Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
         for (Delivery delivery : deliveries) {

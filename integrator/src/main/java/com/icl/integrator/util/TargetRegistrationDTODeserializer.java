@@ -28,7 +28,7 @@ public class TargetRegistrationDTODeserializer extends
         ObjectNode treeNode = jp.readValueAsTree();
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         TargetRegistrationDTO dto = new TargetRegistrationDTO();
-	    dto.setDeliverySettings(
+	    dto.setDeliverySettings(    //TODO mb null
 			    mapper.readValue(treeNode.get("deliverySettings").toString(),
 			                     DeliverySettingsDTO.class));
 	    dto.setServiceName(treeNode.get("serviceName").asText());

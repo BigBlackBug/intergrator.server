@@ -1,6 +1,7 @@
 package com.icl.integrator;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
@@ -12,6 +13,7 @@ import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
 import com.icl.integrator.services.EndpointResolverService;
+import com.icl.integrator.services.JsonMatcher;
 import com.icl.integrator.services.PersistenceService;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
@@ -81,18 +83,18 @@ public class AppTests {
     @Transactional
     public void setup() throws Exception {
         this.mockMvc = webAppContextSetup(this.wac).build();
-        HttpServiceEndpoint ep = new HttpServiceEndpoint();
-        ep.setServiceURL("URL");
-        ep.setServicePort(123);
-        ep.setServiceName("SERNAME");
-        HttpAction a = new HttpAction();
-        a.setActionURL("AURL");
-        a.setEndpoint(ep);
-        a.setActionName("ANAME");
-        ep.addAction(a);
-        persistenceService.persist(ep);
-
-        DeliveryDTO dto = getDelvieryDTO();
+//        HttpServiceEndpoint ep = new HttpServiceEndpoint();
+//        ep.setServiceURL("URL");
+//        ep.setServicePort(123);
+//        ep.setServiceName("SERNAME");
+//        HttpAction a = new HttpAction();
+//        a.setActionURL("AURL");
+//        a.setEndpoint(ep);
+//        a.setActionName("ANAME");
+//        ep.addAction(a);
+//        persistenceService.persist(ep);
+//
+//        DeliveryDTO dto = getDelvieryDTO();
 
 //        DeliveryPacket dp = new DeliveryPacket();
 //
@@ -110,9 +112,161 @@ public class AppTests {
 //        persistenceService.persist(dp);
     }
 
+	@Autowired
+	private JsonMatcher jsonMatcher;
     @PersistenceContext
     EntityManager em;
-    @Test
+
+	@Test
+	public void testPAGeneral() throws Exception {
+		TestClass reference =new TestClass();
+		reference.string="STRING";
+		JsonNode referenceJson = mapper.valueToTree(reference);
+
+		TestClass data =new TestClass();
+		data.integer=5;
+		data.string="STRING";
+		data.nested = new Nested();
+		JsonNode dataJson = mapper.valueToTree(data);
+
+		Assert.assertTrue(jsonMatcher.matches(dataJson, referenceJson));
+
+		data.string="!F#";
+		dataJson = mapper.valueToTree(data);
+		Assert.assertFalse(jsonMatcher.matches(dataJson, referenceJson));
+	}
+
+	@Test
+	public void testPANested() throws Exception {
+		TestClass reference =new TestClass();
+		reference.integer=415;
+
+		Nested nested = new Nested();
+		nested.integer = 100;
+		reference.nested = nested;
+		JsonNode referenceJson = mapper.valueToTree(reference);
+
+		TestClass data =new TestClass();
+		data.integer=415;
+		data.string="STRING";
+		Nested nested2 = new Nested();
+		nested2.integer = 100;
+		nested2.string="WHATEVER";
+		data.nested = nested2;
+		JsonNode dataJson = mapper.valueToTree(data);
+
+		Assert.assertTrue(jsonMatcher.matches(dataJson, referenceJson));
+
+		data.integer=150;
+		dataJson = mapper.valueToTree(data);
+
+		Assert.assertFalse(jsonMatcher.matches(dataJson, referenceJson));
+	}
+
+	@Test
+	public void testPAList() throws Exception {
+		Nested nested = new Nested();
+		nested.integer = 100;
+
+		TestClass reference =new TestClass();
+		reference.string="STRING";
+		reference.nestedList =  new ArrayList<>();
+		reference.nestedList.add(nested);
+		JsonNode referenceJson = mapper.valueToTree(reference);
+
+		TestClass data =new TestClass();
+		data.integer=500;
+		data.string="STRING";
+		data.nested = new Nested();
+		data.nestedList =  new ArrayList<>();
+		data.nestedList.add(nested);
+		JsonNode dataJson = mapper.valueToTree(data);
+
+		Assert.assertTrue(jsonMatcher.matches(dataJson, referenceJson));
+
+		Nested nested2 = new Nested();
+		nested2.integer = 100;
+		nested2.string="WHATEVER";
+		data.nestedList.add(nested2);
+
+		dataJson = mapper.valueToTree(data);
+
+		Assert.assertFalse(jsonMatcher.matches(dataJson, referenceJson));
+	}
+
+	private static class Nested {
+
+		private Nested() {
+		}
+
+		public Integer getInteger() {
+			return integer;
+		}
+
+		public void setInteger(Integer integer) {
+			this.integer = integer;
+		}
+
+		private String string;
+
+		public String getString() {
+			return string;
+		}
+
+		public void setString(String string) {
+			this.string = string;
+		}
+
+		private Integer integer;
+	}
+
+	private static class TestClass {
+
+		private TestClass() {
+		}
+
+		public Integer getInteger() {
+			return integer;
+		}
+
+		public void setInteger(Integer integer) {
+			this.integer = integer;
+		}
+
+		public String getString() {
+			return string;
+		}
+
+		public void setString(String string) {
+			this.string = string;
+		}
+
+		public Nested getNested() {
+			return nested;
+		}
+
+		public void setNested(Nested nested) {
+			this.nested = nested;
+		}
+
+		public List<Nested> getNestedList() {
+			return nestedList;
+		}
+
+		public void setNestedList(List<Nested> nestedList) {
+			this.nestedList = nestedList;
+		}
+
+		private Integer integer;
+
+		private String string;
+
+		private Nested nested;
+
+		private List<Nested> nestedList;
+	}
+
+	@Test
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Ignore
     public void testPers() throws Exception {
@@ -186,7 +340,7 @@ public class AppTests {
         deliveryResponseHandler.setActionDescriptor(
                 new HttpActionDTO("/ext_source/handleDeliveryResponse"));
         deliveryDTO.setAction("ACTION");
-        deliveryDTO.setRequestData(new RequestDataDTO(PacketType.UNDEFINED,
+        deliveryDTO.setRequestData(new RequestDataDTO(DeliveryType.UNDEFINED,
                 new HashMap<String, Object>() {{
                     put("a", "b");
                 }}));
@@ -328,7 +482,7 @@ public class AppTests {
         actionDTO.setActionName("ACTION");
         expected.setActionRegistrations(
                 Arrays.asList(new ActionRegistrationDTO<>(actionDTO, true)));
-
+		expected.setDeliverySettings(new DeliverySettingsDTO());
         String sstring = mapper.writeValueAsString(expected);
         TargetRegistrationDTO result =
                 mapper.readValue(sstring, TargetRegistrationDTO.class);
