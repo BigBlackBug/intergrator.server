@@ -5,7 +5,7 @@ import com.icl.integrator.util.EndpointType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,7 +29,7 @@ public class HttpServiceEndpoint extends AbstractEndpointEntity<HttpAction> {
 	}
 
 	@Override
-	public void setActions(List<HttpAction> actions) {
+	public void setActions(Set<HttpAction> actions) {
 		this.actions.clear();
 		this.actions.addAll(actions);
 	}

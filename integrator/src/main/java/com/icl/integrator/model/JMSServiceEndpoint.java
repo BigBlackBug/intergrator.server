@@ -5,7 +5,7 @@ import com.icl.integrator.util.EndpointType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,7 +29,7 @@ public class JMSServiceEndpoint extends AbstractEndpointEntity<JMSAction> {
 	}
 
 	@Override
-	public void setActions(List<JMSAction> actions) {
+	public void setActions(Set<JMSAction> actions) {
 		this.actions.clear();
 		this.actions.addAll(actions);
 	}

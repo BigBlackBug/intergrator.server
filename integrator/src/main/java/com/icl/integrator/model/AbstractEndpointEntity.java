@@ -4,8 +4,8 @@ import com.icl.integrator.util.EndpointType;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,10 +26,10 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
             name = "SERVICE_NAME")
     private String serviceName;
 
-    @OneToMany(mappedBy = "endpoint",
-               fetch = FetchType.EAGER)
-    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
-    protected List<AbstractActionEntity> actions = new ArrayList<>();
+	@OneToMany(mappedBy = "endpoint",
+	           fetch = FetchType.EAGER)
+	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
+	protected Set<AbstractActionEntity> actions = new HashSet<>();
 
     //TODO add references to delivery
     @Enumerated(EnumType.STRING)
@@ -37,9 +37,9 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
             insertable = false)
     private EndpointType type;
 
-    @OneToOne
-    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
-    private DeliverySettings deliverySettings;
+	@OneToOne
+	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
+	private DeliverySettings deliverySettings = DeliverySettings.createDefaultSettings();
 
     protected AbstractEndpointEntity() {
 
@@ -57,11 +57,11 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
         this.type = endpointType;
     }
 
-    public List<AbstractActionEntity> getActions() {
+    public Set<AbstractActionEntity> getActions() {
         return actions;
     }
 
-    public abstract void setActions(List<T> actions);
+    public abstract void setActions(Set<T> actions);
 
     public abstract T getActionByName(String actionName);
 
