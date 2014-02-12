@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by BigBlackBug on 2/11/14.
@@ -82,7 +79,6 @@ public class DestinationCreator {
 		DestinationDescriptor.DescriptorType descriptorType =
 				destination.getDescriptorType();
 		if (descriptorType == DestinationDescriptor.DescriptorType.RAW) {
-			//TODO rethink. maybe delete instead of doing fullscan?
 			RawDestinationDescriptor realSourceService =
 					(RawDestinationDescriptor) destination;
 			EndpointDTO endpoint = realSourceService.getEndpoint();
@@ -193,29 +189,26 @@ public class DestinationCreator {
 	}
 
 	@Transactional
-	public Delivery createDelivery(AbstractEndpointEntity service,
-	                               AbstractActionEntity action){
+	public <T> Delivery createDelivery(AbstractEndpointEntity service,
+	                               AbstractActionEntity action,
+	                               T data) throws JsonProcessingException {
 		service = persistenceService
 				.find(AbstractEndpointEntity.class, service.getId());
 		action = persistenceService
 				.find(AbstractActionEntity.class, action.getId());
 		Delivery sourceDelivery = new Delivery();
 		sourceDelivery.setAction(action);
+		sourceDelivery.setDeliveryData(objectMapper.writeValueAsString(data));
+		sourceDelivery.setRequestDate(new Date());
 		sourceDelivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
 		sourceDelivery.setEndpoint(service);
 		persistenceService.persist(sourceDelivery);
 		return sourceDelivery;
 	}
 
-	@Transactional
-	public Holder createDeliveryPacket(DeliveryDTO deliveryDTO)
-			throws JsonProcessingException {
-		logger.info("Creating a delivery packet");
+	private <T> Deliveries createDeliveries(DeliveryDTO deliveryDTO, T data){
 		Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
-		DeliveryPacket deliveryPacket = new DeliveryPacket();
-		deliveryPacket.setDeliveryData(
-				objectMapper.writeValueAsString(deliveryDTO.getRequestData()));
-		deliveryPacket.setRequestDate(new Date());
+		List<Delivery> deliveries = new ArrayList<>();
 		for (ServiceDTO destination : deliveryDTO.getDestinations()) {
 			try {
 				AbstractActionEntity actionEntity = null;
@@ -236,11 +229,9 @@ public class DestinationCreator {
 							deliveryDTO.getAction(), endpointEntity.getId());
 				}
 				Delivery delivery = createDelivery(
-						endpointEntity,actionEntity);
-
-				delivery.setDeliveryPacket(deliveryPacket);
-				deliveryPacket.addDelivery(delivery);
-				persistenceService.persist(deliveryPacket);
+						endpointEntity, actionEntity,data);
+				persistenceService.persist(delivery);
+				deliveries.add(delivery);
 			} catch (Exception ex) {
 				logger.error("Error creating delivery packet for destination",
 				             ex);
@@ -249,28 +240,52 @@ public class DestinationCreator {
 				                       new ResponseDTO<UUID>(error));
 			}
 		}
-		return new Holder(serviceToRequestID, deliveryPacket);
+		return new Deliveries(serviceToRequestID, deliveries);
 	}
 
-	public static class Holder {
+	@Transactional
+	public Deliveries createDeliveries(DeliveryDTO deliveryDTO)
+			throws JsonProcessingException {       //TODO exc handle
+		logger.info("Creating a delivery packet");
+
+		RequestDataDTO requestData = deliveryDTO.getRequestData();
+		Deliveries deliveries;
+		if(requestData.getPacketType() == PacketType.UNDEFINED){
+			deliveries = createDeliveries(deliveryDTO, requestData.getData());
+		}else{
+			if (deliveryDTO.getDestinations() != null) {
+				deliveries = createDeliveries(deliveryDTO, requestData.getData());
+			} else {
+				deliveries = analyzePacket(deliveryDTO);
+			}
+		}
+		return deliveries;
+	}
+
+	private Deliveries analyzePacket(DeliveryDTO deliveryDTO) {
+		//TODO impl
+		return null;
+	}
+
+	public static class Deliveries {
 
 		private final Map<String, ResponseDTO<UUID>> responseMap;
 
-		private final DeliveryPacket packet;
+		private final List<Delivery> deliveries;
 
-		private Holder(
+		private Deliveries(
 				Map<String, ResponseDTO<UUID>> responseMap,
-				DeliveryPacket packet) {
+				List<Delivery> deliveries) {
 			this.responseMap = responseMap;
-			this.packet = packet;
+			this.deliveries = deliveries;
 		}
 
 		public Map<String, ResponseDTO<UUID>> getResponseMap() {
 			return responseMap;
 		}
 
-		public DeliveryPacket getPacket() {
-			return packet;
+		public List<Delivery> getDeliveries() {
+			return deliveries;
 		}
 	}
 

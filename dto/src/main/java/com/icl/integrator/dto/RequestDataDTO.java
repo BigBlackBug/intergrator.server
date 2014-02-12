@@ -1,7 +1,5 @@
 package com.icl.integrator.dto;
 
-import java.util.Map;
-
 /**
  * Created with IntelliJ IDEA.
  * User: BigBlackBug
@@ -11,71 +9,59 @@ import java.util.Map;
  */
 public class RequestDataDTO {
 
-    private Map<String, Object> data;
+	private PacketType packetType;
 
-    private Map<String, Object> additionalData;
+	private Object data;
 
-    public RequestDataDTO() {
-    }
+	public RequestDataDTO() {
+	}
 
-    public RequestDataDTO(Map<String, Object> data) {
-        this.data = data;
-    }
+	public RequestDataDTO(PacketType packetType, Object data) {
+		this.packetType = packetType;
+		this.data = data;
+	}
 
-    public RequestDataDTO(Map<String, Object> data,
-                          Map<String, Object> additionalData) {
-        this.data = data;
-        this.additionalData = additionalData;
-    }
+	public PacketType getPacketType() {
+		return packetType;
+	}
 
-    public Map<String, Object> getData() {
-        return data;
-    }
+	public void setPacketType(PacketType packetType) {
+		this.packetType = packetType;
+	}
 
-    public void setData(Map<String, Object> data) {
-        this.data = data;
-    }
+	public Object getData() {
+		return data;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	public void setData(Object data) {
+		this.data = data;
+	}
 
-        RequestDataDTO that = (RequestDataDTO) o;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
-        if (additionalData != null ? !additionalData
-                .equals(that.additionalData) : that.additionalData != null) {
-            return false;
-        }
-        if (data != null ? !data.equals(that.data) : that.data != null) {
-            return false;
-        }
+		RequestDataDTO that = (RequestDataDTO) o;
 
-        return true;
-    }
+		if (data != null ? !data.equals(that.data) : that.data != null) {
+			return false;
+		}
+		if (packetType != that.packetType) {
+			return false;
+		}
 
-    @Override
-    public int hashCode() {
-        int result = data != null ? data.hashCode() : 0;
-        result = 31 * result + (additionalData != null ? additionalData
-                .hashCode() : 0);
-        return result;
-    }
+		return true;
+	}
 
-    public Map<String, Object> getAdditionalData() {
-        return additionalData;
-    }
-
-    public void setAdditionalData(Map<String, Object> additionalData) {
-        this.additionalData = additionalData;
-    }
-
-    public boolean empty() {
-        return data != null && data.isEmpty() && additionalData != null &&
-                additionalData.isEmpty();
-    }
+	@Override
+	public int hashCode() {
+		int result = packetType.hashCode();
+		result = 31 * result + (data != null ? data.hashCode() : 0);
+		return result;
+	}
 }

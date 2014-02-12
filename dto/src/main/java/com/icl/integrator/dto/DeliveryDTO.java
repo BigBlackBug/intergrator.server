@@ -22,56 +22,76 @@ public class DeliveryDTO {
 
     private RequestDataDTO requestData;
 
-    public DeliveryDTO(DestinationDescriptor responseHandlerDescriptor,
-                       String action,
-                       List<ServiceDTO> destinations) {
-        this.action = action;
-        this.responseHandlerDescriptor = responseHandlerDescriptor;
-        this.destinations = destinations;
+	public DeliveryDTO(String action,
+	                   RequestDataDTO requestData) {
+		this.action = action;
+		this.requestData = requestData;
+	}
+
+	public DeliveryDTO(String action,
+	                   RequestDataDTO requestData,
+	                   DestinationDescriptor responseHandlerDescriptor) {
+		this.action = action;
+		this.requestData = requestData;
+		this.responseHandlerDescriptor = responseHandlerDescriptor;
+	}
+
+	public DeliveryDTO(
+			List<ServiceDTO> destinations,
+			RequestDataDTO requestData, String action,
+			DestinationDescriptor responseHandlerDescriptor) {
+		this.destinations = destinations;
+		this.requestData = requestData;
+		this.action = action;
+		this.responseHandlerDescriptor = responseHandlerDescriptor;
+	}
+
+	public DeliveryDTO() {
     }
 
-    public DeliveryDTO() {
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+		DeliveryDTO that = (DeliveryDTO) o;
 
-        DeliveryDTO that = (DeliveryDTO) o;
+		if (!action.equals(that.action)) {
+			return false;
+		}
+		if (destinations != null ? !destinations.equals(that.destinations) :
+				that.destinations != null) {
+			return false;
+		}
+		if (!requestData.equals(that.requestData)) {
+			return false;
+		}
+		if (responseHandlerDescriptor != null ?
+				!responseHandlerDescriptor
+						.equals(that.responseHandlerDescriptor) :
+				that.responseHandlerDescriptor != null) {
+			return false;
+		}
 
-        if (!action.equals(that.action)) {
-            return false;
-        }
-        if (requestData != null ? !requestData
-                .equals(that.requestData) : that.requestData != null) {
-            return false;
-        }
-        if (!destinations.equals(that.destinations)) {
-            return false;
-        }
-        if (!responseHandlerDescriptor
-                .equals(that.responseHandlerDescriptor)) {
-            return false;
-        }
+		return true;
+	}
 
-        return true;
-    }
+	@Override
+	public int hashCode() {
+		int result = responseHandlerDescriptor != null ?
+				responseHandlerDescriptor.hashCode() : 0;
+		result = 31 * result +
+				(destinations != null ? destinations.hashCode() : 0);
+		result = 31 * result + action.hashCode();
+		result = 31 * result + requestData.hashCode();
+		return result;
+	}
 
-    @Override
-    public int hashCode() {
-        int result = responseHandlerDescriptor.hashCode();
-        result = 31 * result + destinations.hashCode();
-        result = 31 * result + action.hashCode();
-        result = 31 * result + (requestData != null ? requestData.hashCode() : 0);
-        return result;
-    }
-
-    public DestinationDescriptor getResponseHandlerDescriptor() {
+	public DestinationDescriptor getResponseHandlerDescriptor() {
         return responseHandlerDescriptor;
     }
 

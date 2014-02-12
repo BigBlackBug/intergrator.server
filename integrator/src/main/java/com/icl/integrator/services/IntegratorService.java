@@ -11,7 +11,7 @@ import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.model.AbstractActionEntity;
 import com.icl.integrator.model.AbstractEndpointEntity;
 import com.icl.integrator.model.Delivery;
-import com.icl.integrator.model.DeliveryPacket;
+import com.icl.integrator.services.validation.ValidationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,15 +47,14 @@ public class IntegratorService implements IntegratorAPI {
     private DeliveryService deliveryService;
 
     @Autowired
-    private PersistenceService persistenceService;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
 	@Autowired
 	private DestinationCreator destinationCreator;
 
-    @Override
+	private ValidationService validationService;
+
+	@Override
     public  <T extends DestinationDescriptor> ResponseDTO<Map<String,
             ResponseDTO<UUID>>> deliver(
             IntegratorPacket<DeliveryDTO, T> delivery) {
@@ -63,14 +62,15 @@ public class IntegratorService implements IntegratorAPI {
         ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
         try {
 	        DeliveryDTO packet = delivery.getPacket();
-            DestinationCreator.Holder holder = destinationCreator.createDeliveryPacket(packet);
-            DeliveryPacket deliveryPacket = holder.getPacket();
+	        validationService.validate(packet);
+            DestinationCreator.Deliveries deliveries = destinationCreator.createDeliveries(
+		            packet);
             //посылаем в шыну
             PacketProcessor processor = processorFactory.createProcessor();
             Map<String, ResponseDTO<UUID>> serviceToRequestID =
-                    processor.process(deliveryPacket,
+                    processor.process(deliveries.getDeliveries(),
                                       packet.getResponseHandlerDescriptor());
-            serviceToRequestID.putAll(holder.getResponseMap());
+            serviceToRequestID.putAll(deliveries.getResponseMap());
             response = new ResponseDTO<>(serviceToRequestID);
         } catch (Exception ex) {
             response = new ResponseDTO<>(ex);
@@ -188,20 +188,18 @@ public class IntegratorService implements IntegratorAPI {
 	                              T response) {
 		if (destinationDescriptor != null) {
 			Delivery delivery;
-			String data;
 			try {
 				PersistentDestination destination = destinationCreator
 						.getPersistentDestination(destinationDescriptor);
 				AbstractActionEntity action = destination.getAction();
 				AbstractEndpointEntity service = destination.getService();
-				delivery = destinationCreator.createDelivery(service,action);
-				data = objectMapper.writeValueAsString(response);
+				delivery = destinationCreator.createDelivery(service,action,response);
 			} catch (Exception ex) {
 				logger.error("Ошибка создания конечной точки доставки", ex);
 				return;
 			}
 			try {
-				deliveryService.deliver(delivery, data);
+				deliveryService.deliver(delivery);
 			} catch (Exception ex) {
 				logger.error("Не могу отправить ответ на дополнительный " +
 						             "сервис", ex);

@@ -60,7 +60,6 @@ public class Scheduler {
         EXECUTOR.submit(taskCreator.create());
     }
 
-	//TODO add failure reason field
     public <T> void scheduleGeneral(final Schedulable<T> deliverySchedulable,
                                     final Callback<Void> retryLimitHandler) {
         final TaskCreator<T> taskCreator = deliverySchedulable.getTaskCreator();

@@ -94,20 +94,20 @@ public class AppTests {
 
         DeliveryDTO dto = getDelvieryDTO();
 
-        DeliveryPacket dp = new DeliveryPacket();
-
-        Delivery delivery = new Delivery();
-        delivery.setAction(a);
-        delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-        delivery.setEndpoint(ep);
-        delivery.setDeliveryPacket(dp);
-
-        dp.setDeliveries(new HashSet<>(Arrays.asList(delivery)));
-//		dp.setAction(dto.getAction());
-        dp.setDeliveryData(mapper.writeValueAsString(dto.getRequestData()));
-        dp.setRequestDate(new Date());
-//		dp.setDestinations(Arrays.<AbstractEndpointEntity>asList(ep));
-        persistenceService.persist(dp);
+//        DeliveryPacket dp = new DeliveryPacket();
+//
+//        Delivery delivery = new Delivery();
+//        delivery.setAction(a);
+//        delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
+//        delivery.setEndpoint(ep);
+//        delivery.setDeliveryPacket(dp);
+//
+//        dp.setDeliveries(new HashSet<>(Arrays.asList(delivery)));
+////		dp.setAction(dto.getAction());
+//        dp.setDeliveryData(mapper.writeValueAsString(dto.getRequestData()));
+//        dp.setRequestDate(new Date());
+////		dp.setDestinations(Arrays.<AbstractEndpointEntity>asList(ep));
+//        persistenceService.persist(dp);
     }
 
     @PersistenceContext
@@ -186,7 +186,7 @@ public class AppTests {
         deliveryResponseHandler.setActionDescriptor(
                 new HttpActionDTO("/ext_source/handleDeliveryResponse"));
         deliveryDTO.setAction("ACTION");
-        deliveryDTO.setRequestData(new RequestDataDTO(
+        deliveryDTO.setRequestData(new RequestDataDTO(PacketType.UNDEFINED,
                 new HashMap<String, Object>() {{
                     put("a", "b");
                 }}));

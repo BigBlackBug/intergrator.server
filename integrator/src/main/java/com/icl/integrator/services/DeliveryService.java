@@ -30,7 +30,6 @@ import static org.springframework.util.StringUtils.quote;
  * Time: 11:30
  * To change this template use File | Settings | File Templates.
  */
-//TODO Подумать, а нахера все эти дженерики?
 @Service
 public class DeliveryService {
 
@@ -50,126 +49,6 @@ public class DeliveryService {
 
 	@Autowired
 	private PersistenceService persistenceService;
-
-//	public <T> void deliverGeneral(DestinationDescriptor sourceService,
-//	                               T packet)
-//			throws IntegratorException {
-//		EndpointConnector sourceConnector;
-//		DestinationDescriptor.DescriptorType descriptorType =
-//				sourceService.getDescriptorType();
-//		if (descriptorType == DestinationDescriptor.DescriptorType.RAW) {
-//			RawDestinationDescriptor realSourceService =
-//					(RawDestinationDescriptor) sourceService;
-//			logger.info("Scheduling a request to service " +
-//					            "defined as source -> " +
-//					            realSourceService.getActionDescriptor());
-//			sourceConnector = factory.createEndpointConnector(
-//					realSourceService.getEndpoint(),
-//					realSourceService.getActionDescriptor());
-//		} else if (descriptorType ==
-//				DestinationDescriptor.DescriptorType.SERVICE) {
-//			ServiceDestinationDescriptor realSourceService =
-//					(ServiceDestinationDescriptor) sourceService;
-//			sourceConnector = factory.createEndpointConnector(
-//					realSourceService.getServiceName(),
-//					realSourceService.getEndpointType(),
-//					realSourceService.getActionName());
-//		} else {
-//			throw new IntegratorException("У DestinationDescriptor'а неверно " +
-//					                              "проставлен тип");
-//		}
-
-//		DeliveryCallable<ResponseFromIntegratorDTO<T>>
-//				deliveryCallable =
-//				new DeliveryCallable<ResponseFromIntegratorDTO<T>, Object>(
-//						sourceConnector,
-//						new ResponseFromIntegratorDTO<>(packet));
-		//TODO доделать.
-		// респонзфейлд
-//        scheduler.schedule(new TaskCreator<>(deliveryCallable));
-//	}
-
-	//	public UUID deliver(DestinationDTO destination,
-//	                    DeliveryDTO packet) throws IntegratorException {
-//		logger.info("Scheduling a request to target " +
-//				            destination.getServiceName());
-//		EndpointConnector destinationConnector =
-//				factory.createEndpointConnector(destination,
-//				                                packet.getAction());
-//		DeliveryCallable<RequestDataDTO> deliveryCallable =
-//				new DeliveryCallable<>(destinationConnector,
-//				                       packet.getRequestData());
-//		RawDestinationDescriptor targetResponseHandler =
-//				packet.getTargetResponseHandlerDescriptor();
-//		if (targetResponseHandler != null) {
-//			EndpointDTO endpoint = targetResponseHandler.getEndpoint();
-//			ActionDescriptor actionDescriptor = targetResponseHandler
-//					.getActionDescriptor();
-//			EndpointConnector targetResponseConnector = factory
-//					.createEndpointConnector(endpoint, actionDescriptor);
-//			return deliver(deliveryCallable, targetResponseConnector,
-//			               destination);
-//		}
-//		return deliver(deliveryCallable, destination, packet);
-//	}
-//    private <T> void executeDelivery(final DeliveryCallable<T>
-//                                             deliveryCallable,
-//                                     AbstractEndpointEntity destinationDTO,
-//                                     DeliveryPacket packet, UUID requestID) {
-//        DatabaseRetryHandler handler =
-//                createRetryHandler(packet, destinationDTO, requestID);
-//
-//        TaskCreator<ResponseDTO> deliveryTaskCreator =
-//                new TaskCreator<>(deliveryCallable);
-//        deliveryTaskCreator.setDescriptor(
-//                new Descriptor<TaskCreator<ResponseDTO>>() {
-//                    @Override
-//                    public String describe(
-//                            TaskCreator<ResponseDTO> creator) {
-//                        return "Отправка запроса: " +
-//                                deliveryCallable.getConnector().toString();
-//                    }
-//                });
-//        if (destinationDTO.scheduleRedelivery()) {
-//            scheduler.schedule(deliveryTaskCreator, handler);
-//        } else {
-//            scheduler.schedule(deliveryTaskCreator);
-//        }
-//    }
-
-//    private DatabaseRetryHandler createRetryHandler(
-//            DeliveryPacket packet, DestinationDTO destinationDTO,
-//            UUID requestID) {
-//        DatabaseRetryHandler handler =
-//                databaseRetryHandlerFactory.createHandler();
-//        TaskLogEntry logEntry =
-//                createTaskLogEntry(packet.getDeliveryData(), destinationDTO,
-//                                   requestID);
-//        handler.setLogEntry(logEntry);
-//        return handler;
-//    }
-
-//    private TaskLogEntry createTaskLogEntry(String packet,
-//                                            DestinationDTO destinationDTO,
-//                                            UUID requestID) {
-//        TaskLogEntry logEntry = new TaskLogEntry();
-//        String generalMessage = "Не могу доставить запрос {0} " +
-//                "на сервис {1}";
-//        String targetServiceName = destinationDTO.getServiceName();
-//        generalMessage = MessageFormat.format(generalMessage, requestID,
-//                                              targetServiceName);
-//        logEntry.setMessage(generalMessage);
-//
-//        String dataJson = null;
-//        try {
-//            dataJson = serializer.writeValueAsString(packet);
-//        } catch (JsonProcessingException e) {
-//            logEntry.setAdditionalMessage(e.getMessage());
-//            logger.info("Unable to serialize incoming json data");
-//        }
-//        logEntry.setDataJson(dataJson);
-//        return logEntry;
-//    }
 
 	private <T> UUID executeDelivery(
 			final DeliveryCallable<T, ResponseDTO> deliveryCallable,
@@ -219,11 +98,11 @@ public class DeliveryService {
 		return requestID;
 	}
 
-	public UUID deliver(Delivery delivery, String data) {
-		return deliver(delivery, data, null);
+	public UUID deliver(Delivery delivery) {
+		return deliver(delivery, null);
 	}
 
-	public UUID deliver(Delivery delivery, String data,
+	public UUID deliver(Delivery delivery,
 	                    PersistentDestination persistentDestination) {
 		//detached
 		AbstractEndpointEntity endpoint = delivery.getEndpoint();
@@ -234,7 +113,7 @@ public class DeliveryService {
 		EndpointConnector destinationConnector =
 				factory.createEndpointConnector(endpoint, action);
 		DeliveryCallable<String, ResponseDTO> deliveryCallable =
-				new DeliveryCallable<>(destinationConnector,data,
+				new DeliveryCallable<>(destinationConnector,delivery.getDeliveryData(),
 				                       ResponseDTO.class);
 
 		return executeDelivery(deliveryCallable, persistentDestination,
@@ -315,17 +194,15 @@ public class DeliveryService {
             AbstractActionEntity action =
                     persistentDestination.getAction();
             final EndpointConnector sourceConnector =
-                    factory.createEndpointConnector(
-                            service,
-                            action);
-	        Delivery sourceDelivery =
-				        destinationCreator.createDelivery(service, action);
-		            /*= new Delivery();
-            sourceDelivery.setAction(action);
-            sourceDelivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-            sourceDelivery.setEndpoint(service);
-	        sourceDelivery = persistenceService.merge(sourceDelivery);  */
-
+                    factory.createEndpointConnector(service,action);
+	        Delivery sourceDelivery;
+	        try {
+		        sourceDelivery =
+				        destinationCreator.createDelivery(service, action, data);
+	        } catch (JsonProcessingException e) {
+		        //will never happen
+		        return;
+	        }
             DeliveryCallable<ResponseDTO, Void>
                     successCallable =
                     new DeliveryCallable<>(sourceConnector, data,
@@ -356,7 +233,7 @@ public class DeliveryService {
 		            sourceDelivery, DeliveryStatus.DELIVERY_OK));
 
 	        scheduler.scheduleGeneral(
-			        new Schedulable<>(deliveryToSource, sourceDelivery),null);
+			        new Schedulable<>(deliveryToSource, sourceDelivery), null);
         }
     }
 
