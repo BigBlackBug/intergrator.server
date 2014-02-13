@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
@@ -37,13 +38,16 @@ public class RegistrationService {
     private static Log logger = LogFactory.getLog(RegistrationService.class);
 
     @Autowired
-    private ObjectMapper serializer;
+    private ObjectMapper mapper;
 
     @Autowired
     private EndpointConnectorFactory connectorFactory;
 
     @Autowired
     private PersistenceService persistenceService;
+
+	@Autowired
+	private DeliveryCreator deliveryCreator;
 
     public <T extends ActionDescriptor>
     Map<String, ResponseDTO<Void>> register(
@@ -174,7 +178,7 @@ public class RegistrationService {
 
     private <T extends ActionDescriptor> List<JMSAction> getJmsActions(
             List<ActionEndpointDTO<T>> actions) {
-        List<JMSAction> httpActions = new ArrayList<>();
+        List<JMSAction> jmsActions = new ArrayList<>();
         for (ActionEndpointDTO<T> actionDescriptor : actions) {
             QueueDTO queueDTO =
                     (QueueDTO) actionDescriptor.getActionDescriptor();
@@ -184,9 +188,9 @@ public class RegistrationService {
             actionMapping.setActionName(actionName);
             actionMapping.setPassword(queueDTO.getPassword());
             actionMapping.setQueueName(queueDTO.getQueueName());
-            httpActions.add(actionMapping);
+            jmsActions.add(actionMapping);
         }
-        return httpActions;
+        return jmsActions;
     }
 
 	private HttpServiceEndpoint createHttpEntity(
@@ -216,7 +220,7 @@ public class RegistrationService {
 		endpoint.setConnectionFactory(descriptor.getConnectionFactory());
 		String jndiProperties = null;
 		try {
-			jndiProperties = serializer.
+			jndiProperties = mapper.
 					writeValueAsString(descriptor.getJndiProperties());
 		} catch (JsonProcessingException e) {
 			throw new TargetRegistrationException(e);
@@ -245,4 +249,45 @@ public class RegistrationService {
         connector.testConnection();
     }
 
+	private void testConnection(DestinationDescriptor destinationDescriptor)
+			throws ConnectionException {
+		EndpointConnector connector =
+				connectorFactory.createEndpointConnector(destinationDescriptor);
+		connector.testConnection();
+	}
+
+	public <Y> List<ResponseDTO<Void>> register(AutoDetectionRegistrationDTO<Y> packet)
+			throws Exception {
+		AutoDetectionPacket autoDetectionPacket = new AutoDetectionPacket();
+		autoDetectionPacket.setDeliveryType(packet.getDeliveryType());
+		List<ResponseDTO<Void>> result = new ArrayList<>();
+		String referenceObject =
+				mapper.writeValueAsString(packet.getReferenceObject());
+
+		autoDetectionPacket.setReferenceObject(referenceObject);
+		List<RegistrationDestinationDescriptor> destinationDescriptors =
+				packet.getDestinationDescriptors();
+		for (RegistrationDestinationDescriptor regDD : destinationDescriptors) {
+			DestinationDescriptor destinationDescriptor =
+					regDD.getDestinationDescriptor();
+			PersistentDestination persistentDestination;
+			try {
+				if (!regDD.isForceRegister()) {
+					testConnection(destinationDescriptor);
+				}
+
+				persistentDestination = deliveryCreator
+						.persistDestination(destinationDescriptor);
+				autoDetectionPacket.addDestination(
+						new DestinationEntity(
+								persistentDestination.getService(),
+								persistentDestination.getAction()));
+				result.add(new ResponseDTO<Void>(true));
+			} catch (Exception ex) {
+				result.add(new ResponseDTO<Void>(new ErrorDTO(ex)));
+			}
+		}
+		persistenceService.persist(autoDetectionPacket);
+		return result;
+	}
 }

@@ -34,7 +34,7 @@ public class PacketProcessor {
                                                   DestinationDescriptor destinationDescriptor) {
         //mb null
         PersistentDestination persistentDestination =
-		        deliveryCreator.createPersistentDestination(
+		        deliveryCreator.persistDestination(
 				        destinationDescriptor);
         Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
         for (Delivery delivery : deliveries) {

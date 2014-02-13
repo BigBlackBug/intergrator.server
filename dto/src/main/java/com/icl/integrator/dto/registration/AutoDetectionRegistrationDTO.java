@@ -1,7 +1,6 @@
 package com.icl.integrator.dto.registration;
 
 import com.icl.integrator.dto.DeliveryType;
-import com.icl.integrator.dto.destination.DestinationDescriptor;
 
 import java.util.List;
 
@@ -14,11 +13,11 @@ public class AutoDetectionRegistrationDTO<T> {
 
 	private T referenceObject;
 
-	private List<DestinationDescriptor> destinationDescriptors;
+	private List<RegistrationDestinationDescriptor> destinationDescriptors;
 
 	public AutoDetectionRegistrationDTO(
 			DeliveryType deliveryType, T referenceObject,
-			List<DestinationDescriptor> destinationDescriptors) {
+			List<RegistrationDestinationDescriptor> destinationDescriptors) {
 		this.deliveryType = deliveryType;
 		this.referenceObject = referenceObject;
 		this.destinationDescriptors = destinationDescriptors;
@@ -28,12 +27,12 @@ public class AutoDetectionRegistrationDTO<T> {
 
 	}
 
-	public List<DestinationDescriptor> getDestinationDescriptors() {
+	public List<RegistrationDestinationDescriptor> getDestinationDescriptors() {
 		return destinationDescriptors;
 	}
 
 	public void setDestinationDescriptors(
-			List<DestinationDescriptor> destinationDescriptors) {
+			List<RegistrationDestinationDescriptor> destinationDescriptors) {
 		this.destinationDescriptors = destinationDescriptors;
 	}
 

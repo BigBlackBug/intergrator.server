@@ -75,7 +75,7 @@ public class DeliveryCreator {
 	}
 
 	@Transactional
-	public PersistentDestination createPersistentDestination(
+	public PersistentDestination persistDestination(
 			DestinationDescriptor destination) {
 		if (destination == null) {
 			return null;
@@ -269,7 +269,7 @@ public class DeliveryCreator {
 	}
 
 	@Transactional
-	public Deliveries createAutoDetectedDeliveries(DeliveryDTO deliveryDTO) {
+	private Deliveries createAutoDetectedDeliveries(DeliveryDTO deliveryDTO) {
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
 		DeliveryType deliveryType = requestData.getDeliveryType();
 		List<AutoDetectionPacket> autoDetectionPackets =

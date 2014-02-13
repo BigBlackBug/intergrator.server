@@ -4,6 +4,7 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 
@@ -49,4 +50,6 @@ public interface IntegratorAPI {
     public <T extends DestinationDescriptor> ResponseDTO<Void>
     addAction(IntegratorPacket<AddActionDTO, T> actionDTO);
 
+	public <T extends DestinationDescriptor,Y> ResponseDTO<List<ResponseDTO<Void>>> registerAutoDetection(
+			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);
 }

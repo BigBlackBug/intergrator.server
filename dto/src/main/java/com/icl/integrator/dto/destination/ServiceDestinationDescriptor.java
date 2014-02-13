@@ -21,13 +21,13 @@ public class ServiceDestinationDescriptor extends DestinationDescriptor {
         super(DescriptorType.SERVICE);
     }
 
-    public ServiceDestinationDescriptor(String serviceName,
-                                        EndpointType endpointType,
-                                        String actionName) {
-        this();
-        this.serviceName = serviceName;
-        this.actionName = actionName;
-        this.endpointType = endpointType;
+	public ServiceDestinationDescriptor(String serviceName,
+	                                    String actionName,
+	                                    EndpointType endpointType) {
+		this();
+		this.serviceName = serviceName;
+		this.actionName = actionName;
+		this.endpointType = endpointType;
     }
 
     public String getServiceName() {

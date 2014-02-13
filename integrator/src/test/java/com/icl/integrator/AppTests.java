@@ -449,7 +449,7 @@ public class AppTests {
                 packet =
                 new IntegratorPacket<Void, DestinationDescriptor>(
                         new ServiceDestinationDescriptor(
-                                "ser", EndpointType.HTTP, "actuin"));
+                                "ser", "actuin", EndpointType.HTTP));
         String expected = mapper.writeValueAsString(packet);
         IntegratorPacket integratorPacket =
                 mapper.readValue(expected, IntegratorPacket.class);

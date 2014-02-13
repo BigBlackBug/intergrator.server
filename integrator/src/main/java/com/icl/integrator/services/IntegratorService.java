@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
-import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.dto.registration.AddActionDTO;
-import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
-import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.model.*;
 import com.icl.integrator.services.validation.ValidationService;
@@ -190,7 +187,7 @@ public class IntegratorService implements IntegratorAPI {
 			Delivery delivery;
 			try {
 				PersistentDestination destination = deliveryCreator
-						.createPersistentDestination(destinationDescriptor);
+						.persistDestination(destinationDescriptor);
 				AbstractActionEntity action = destination.getAction();
 				AbstractEndpointEntity service = destination.getService();
 				delivery = deliveryCreator.createDelivery(service,action,response);
@@ -208,29 +205,16 @@ public class IntegratorService implements IntegratorAPI {
 		}
 	}
 
-	public <T extends DestinationDescriptor> ResponseDTO<Void> registerAutoDetection(
-			IntegratorPacket<AutoDetectionRegistrationDTO, T> autoDetectionDTO) {
-		ResponseDTO<Void> response;
-		AutoDetectionPacket autoDetectionPacket = new AutoDetectionPacket();
-		AutoDetectionRegistrationDTO packet = autoDetectionDTO.getPacket();
-		autoDetectionPacket.setDeliveryType(packet.getDeliveryType());
-		String referenceObject;
+	@Override
+	public <T extends DestinationDescriptor,Y> ResponseDTO<List<ResponseDTO<Void>>>
+	registerAutoDetection(
+			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO) {
+		logger.info("Received an autodetection registration request");
+		ResponseDTO<List<ResponseDTO<Void>>> response;
 		try {
-			referenceObject =
-					mapper.writeValueAsString(packet.getReferenceObject());
-
-			autoDetectionPacket.setReferenceObject(referenceObject);
-			List<T> destinationDescriptors = packet.getDestinationDescriptors();
-			for (T destinationDescriptor : destinationDescriptors) {
-				PersistentDestination persistentDestination = deliveryCreator
-						.createPersistentDestination(destinationDescriptor);
-				autoDetectionPacket.addDestination(
-						new DestinationEntity(
-								persistentDestination.getService(),
-								persistentDestination.getAction()));
-
-			}
-			response = new ResponseDTO<>(true);
+			List<ResponseDTO<Void>> result =
+					registrationService.register(autoDetectionDTO.getPacket());
+			response = new ResponseDTO<>(result);
 		} catch (Exception ex) {
 			response = new ResponseDTO<>(new ErrorDTO(ex));
 		}
