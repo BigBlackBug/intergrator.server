@@ -36,7 +36,9 @@ public class Main {
 //		ResponseDTO<Map<String, ResponseDTO<UUID>>> mapResponseDTO =
 //				sendAuto(httpClient);
 //		System.out.println(mapResponseDTO);
-	    register(httpClient);
+//	    register(httpClient);
+		ResponseDTO<Boolean> ping = ping(httpClient);
+		System.out.println(ping);
 //	    deliver(httpClient);
 
 	}
@@ -103,7 +105,7 @@ public class Main {
 	public static ResponseDTO<Boolean> ping(IntegratorHttpClient httpClient) {
 		ServiceDestinationDescriptor pingDTO = new ServiceDestinationDescriptor();
 		pingDTO.setAction("ACTION");
-		pingDTO.setService("NEW_SERVICE");
+		pingDTO.setService("LOCALHOST");
 		pingDTO.setEndpointType(EndpointType.HTTP);
 		return httpClient.isAvailable(pingDTO);
 	}

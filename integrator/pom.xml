@@ -19,11 +19,11 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.icl.ios.dispengine</groupId>
-            <artifactId>police-model-source</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.icl.ios.dispengine</groupId>-->
+            <!--<artifactId>police-model-source</artifactId>-->
+            <!--<version>1.0-SNAPSHOT</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.icl.integrator</groupId>
