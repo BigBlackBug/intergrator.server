@@ -115,7 +115,7 @@ public class DeliveryCreator {
 					HttpAction action =
 							createNewAction(service, httpActionDTO);
 					endpointEntity = persistenceService.persist(service);
-					actionEntity = persistenceService.refresh(action);
+					actionEntity =action;
 				} else {
 					endpointEntity = service;
 					HttpAction action = persistenceService.findHttpAction(
@@ -158,7 +158,7 @@ public class DeliveryCreator {
 					JMSAction action =
 							createJmsAction(service, queueDTO);
 					endpointEntity = persistenceService.persist(service);
-					actionEntity = persistenceService.refresh(action);
+					actionEntity = action;
 				} else {
 					endpointEntity = service;
 					JMSAction action = persistenceService.findJmsAction(
@@ -256,11 +256,11 @@ public class DeliveryCreator {
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
 		Deliveries deliveries;
 		if (requestData.getDeliveryType() == DeliveryType.UNDEFINED) {
-			deliveries = createDeliveries(deliveryDTO, requestData.getData());
+			deliveries = createDeliveries(deliveryDTO, requestData);
 		} else {
 			if (deliveryDTO.getDestinations() != null) {
 				deliveries =
-						createDeliveries(deliveryDTO, requestData.getData());
+						createDeliveries(deliveryDTO, requestData);
 			} else {
 				deliveries = createAutoDetectedDeliveries(deliveryDTO);
 			}
@@ -291,7 +291,7 @@ public class DeliveryCreator {
 					try {
 						Delivery delivery = createDelivery(
 								destination.getService(),
-								destination.getAction(), data);
+								destination.getAction(), requestData);
 						deliveries.addDelivery(delivery);
 					} catch (JsonProcessingException e) {
 						throw new IntegratorException(e);

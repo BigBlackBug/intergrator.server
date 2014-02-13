@@ -287,7 +287,9 @@ public class RegistrationService {
 				result.add(new ResponseDTO<Void>(new ErrorDTO(ex)));
 			}
 		}
-		persistenceService.persist(autoDetectionPacket);
+		if(!autoDetectionPacket.getDestinations().isEmpty()){
+			persistenceService.persist(autoDetectionPacket);
+		}
 		return result;
 	}
 }

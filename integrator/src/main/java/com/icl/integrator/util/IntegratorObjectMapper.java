@@ -35,7 +35,7 @@ public class IntegratorObjectMapper extends ObjectMapper {
         testModule.addDeserializer(RawDestinationDescriptor.class,
                                    new RawDestinationDescriptorDeserializer());
 	    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//	    configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+	    configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
         setSerializationInclusion(JsonInclude.Include.NON_NULL);
         registerModule(testModule);
     }

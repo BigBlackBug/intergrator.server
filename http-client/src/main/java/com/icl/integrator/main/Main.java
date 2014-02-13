@@ -2,7 +2,6 @@ package com.icl.integrator.main;
 
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
-import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.httpclient.IntegratorHttpClient;
@@ -32,23 +31,72 @@ public class Main {
 				HttpEndpointDescriptorDTO("localhost", 8080);
 		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
 				new EndpointDTO<>(EndpointType.HTTP, desr);
-
-		RawDestinationDescriptor dd =
-				new RawDestinationDescriptor(
-						endpoint,
-						new HttpActionDTO("/ext_source/handleGetServiceList")
-				);
+//		autoRegister(httpClient);//TODO handle dups
+		ResponseDTO<Map<String, ResponseDTO<UUID>>> mapResponseDTO =
+				sendAuto(httpClient);
+		System.out.println(mapResponseDTO);
 //	    register(httpClient);
 //	    deliver(httpClient);
-		AutoDetectionRegistrationDTO<TestClass> dto = new AutoDetectionRegistrationDTO<>();
+
+	}
+
+	public static ResponseDTO<Map<String, ResponseDTO<UUID>>> sendAuto(
+			IntegratorHttpClient httpClient) {
+		DeliveryDTO deliveryDTO = new DeliveryDTO();
+
+		HttpEndpointDescriptorDTO desr = new
+				HttpEndpointDescriptorDTO("localhost", 8080);
+		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
+				new EndpointDTO<>(EndpointType.HTTP, desr);
+
+		deliveryDTO.setResponseHandlerDescriptor(
+				new RawDestinationDescriptor(
+						endpoint,
+						new HttpActionDTO("/source/handleResponseFromTarget")
+				));
+
+		TestClass testClass = new TestClass();
+		testClass.setString("AYAYAY");
+		testClass.setInteger(100500);
+
+		deliveryDTO.setRequestData(
+				new RequestDataDTO(DeliveryType.INCIDENT, testClass));
+		return httpClient.deliver(
+				new IntegratorPacket<>(deliveryDTO));
+	}
+
+	public static ResponseDTO<List<ResponseDTO<Void>>> autoRegister(
+			IntegratorHttpClient httpClient) {
+		AutoDetectionRegistrationDTO<TestClass> dto =
+				new AutoDetectionRegistrationDTO<>();
 		dto.setDeliveryType(DeliveryType.INCIDENT);
 		TestClass testClass = new TestClass();
 		testClass.setString("AYAYAY");
 		dto.setReferenceObject(testClass);
+		RawDestinationDescriptor radd = new RawDestinationDescriptor();
+		//----------------------------------------------------------------------
+		EndpointDTO<HttpEndpointDescriptorDTO>
+				endpointDTO = new EndpointDTO<>();
+		endpointDTO.setEndpointType(EndpointType.HTTP);
+
+		HttpEndpointDescriptorDTO descr = new HttpEndpointDescriptorDTO();
+		descr.setHost("localhost");
+		descr.setPort(8080);
+		endpointDTO.setDescriptor(descr);
+
+		radd.setEndpoint(endpointDTO);
+		//----------------------------------------------------------------------
+		HttpActionDTO actionDescriptor = new HttpActionDTO();
+		actionDescriptor.setPath("/destination/handleRequest");
+
+		radd.setActionDescriptor(actionDescriptor);
 		RegistrationDestinationDescriptor rdd =
-				new RegistrationDestinationDescriptor(new ServiceDestinationDescriptor("LOCALHOST","ACTION",EndpointType.HTTP),false);
+				new RegistrationDestinationDescriptor(radd,
+						false);
+
 		dto.setDestinationDescriptors(Arrays.asList(rdd));
-		httpClient.registerAutoDetection(dto);
+		return httpClient.registerAutoDetection(dto);
+
 	}
 
 	public static ResponseDTO<Boolean> ping(IntegratorHttpClient httpClient) {
