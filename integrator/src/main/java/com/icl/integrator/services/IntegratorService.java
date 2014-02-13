@@ -65,7 +65,11 @@ public class IntegratorService implements IntegratorAPI {
         ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
         try {
 	        DeliveryDTO packet = delivery.getPacket();
-	        validationService.validate(packet);
+//	        try{
+//	            validationService.validate(packet);
+//	        }catch(ValidationException ex){
+//
+//	        }
             Deliveries deliveries =
 		            deliveryCreator.createDeliveries(packet);
             //посылаем в шыну

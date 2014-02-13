@@ -203,4 +203,17 @@ public class PersistenceService {
 				"select packet from AutoDetectionPacket packet where packet.deliveryType=:deliveryType",AutoDetectionPacket.class)
 				.setParameter("deliveryType", deliveryType).getResultList();
 	}
+
+	@Transactional
+	public List<Delivery> findAllUnfinishedDeliveries() {
+		return em.createQuery(
+				"select delivery from Delivery delivery where " +
+						"delivery.deliveryStatus!=:deliveryOK and" +
+						" delivery.deliveryStatus!=:deliveryFailed",
+				Delivery.class)
+				.setParameter("deliveryOK", DeliveryStatus.DELIVERY_OK)
+				.setParameter("deliveryFailed", DeliveryStatus.DELIVERY_FAILED)
+				.getResultList();
+
+	}
 }

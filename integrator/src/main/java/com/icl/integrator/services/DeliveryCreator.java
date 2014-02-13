@@ -204,14 +204,14 @@ public class DeliveryCreator {
 				.find(AbstractEndpointEntity.class, service.getId());
 		action = persistenceService
 				.find(AbstractActionEntity.class, action.getId());
-		Delivery sourceDelivery = new Delivery();
-		sourceDelivery.setAction(action);
-		sourceDelivery.setDeliveryData(objectMapper.writeValueAsString(data));
-		sourceDelivery.setRequestDate(new Date());
-		sourceDelivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-		sourceDelivery.setEndpoint(service);
-		persistenceService.persist(sourceDelivery);
-		return sourceDelivery;
+		Delivery delivery = new Delivery();
+		delivery.setAction(action);
+		delivery.setDeliveryData(objectMapper.writeValueAsString(data));
+		delivery.setRequestDate(new Date());
+		delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
+		delivery.setEndpoint(service);
+		persistenceService.persist(delivery);
+		return delivery;
 	}
 
 	private <T> Deliveries createDeliveries(DeliveryDTO deliveryDTO, T data) {

@@ -6,6 +6,7 @@ import com.icl.integrator.dto.RequestDataDTO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.validation.ValidationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class ValidationService {
 	}
 
 	//	private Map<>
-	public boolean validate(DeliveryDTO packet) {
+	public boolean validate(DeliveryDTO packet) throws ValidationException{
 		return true;  //TODO
 	}
 
