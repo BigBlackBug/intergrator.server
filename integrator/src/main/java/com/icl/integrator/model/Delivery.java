@@ -14,26 +14,30 @@ import java.util.Date;
 @Table(name = "DELIVERY")
 public class Delivery extends AbstractEntity {
 
-	@ManyToOne
-	@JoinColumn(name = "DELIVERY_PACKET_ID", updatable = false)
-	private DeliveryPacket deliveryPacket;
+	@Column(name = "DELIVERY_DATA", nullable = false, updatable = false)
+	@Basic(fetch = FetchType.LAZY)
+	@Type(type = "org.hibernate.type.StringClobType")
+	@Lob
+	private String deliveryData;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "REQUEST_DATE", nullable = false, updatable = false)
+	private Date requestDate;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "DELIVERY_STATUS")
 	private DeliveryStatus deliveryStatus;
 
-	@ManyToOne(cascade = {javax.persistence.CascadeType.MERGE, javax.persistence.CascadeType.MERGE,
-			javax.persistence.CascadeType.MERGE})
+	@ManyToOne
 	@Cascade(value = {CascadeType.MERGE, CascadeType.PERSIST,
 			CascadeType.REFRESH})
-	@JoinColumn(name = "ACTION_ID", nullable = false, updatable = false)
+	@JoinColumn(name = "ACTION_ID", nullable = false)
 	private AbstractActionEntity action;
 
-	@ManyToOne(cascade = {javax.persistence.CascadeType.MERGE, javax.persistence.CascadeType.MERGE,
-			javax.persistence.CascadeType.MERGE})
+	@ManyToOne
 	@Cascade(value = {CascadeType.MERGE, CascadeType.PERSIST,
 			CascadeType.REFRESH})
-	@JoinColumn(name = "ENDPOINT_ID", nullable = false, updatable = false)
+	@JoinColumn(name = "ENDPOINT_ID", nullable = false)
 	private AbstractEndpointEntity endpoint;
 
 	@Column(name = "RESPONSE_DATA")
@@ -41,14 +45,38 @@ public class Delivery extends AbstractEntity {
 	@Lob
 	private String responseData;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "RESPONSE_DATE")
+	private Date responseDate;
+
 	@Column(name = "LAST_FAILURE_REASON")
 	@Type(type = "org.hibernate.type.StringClobType")
 	@Lob
 	private String lastFailureReason;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "RESPONSE_DATE")
-	private Date responseDate;
+	public Delivery() {
+
+	}
+
+	public String getDeliveryData() {
+		return deliveryData;
+	}
+
+	public void setDeliveryData(String deliveryData) {
+		this.deliveryData = deliveryData;
+	}
+
+	public Date getRequestDate() {
+		return requestDate;
+	}
+
+	public void setRequestDate(Date requestDate) {
+		this.requestDate = requestDate;
+	}
+
+	public Date getResponseDate() {
+		return responseDate;
+	}
 
 	public String getLastFailureReason() {
 		return lastFailureReason;
@@ -58,20 +86,8 @@ public class Delivery extends AbstractEntity {
 		this.lastFailureReason = lastFailureReason;
 	}
 
-	public Date getResponseDate() {
-		return responseDate;
-	}
-
 	public void setResponseDate(Date responseDate) {
 		this.responseDate = responseDate;
-	}
-
-	public DeliveryPacket getDeliveryPacket() {
-		return deliveryPacket;
-	}
-
-	public void setDeliveryPacket(DeliveryPacket deliveryPacket) {
-		this.deliveryPacket = deliveryPacket;
 	}
 
 	public String getResponseData() {

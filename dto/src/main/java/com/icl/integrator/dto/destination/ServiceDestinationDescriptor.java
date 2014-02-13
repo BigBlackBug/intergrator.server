@@ -11,66 +11,78 @@ import com.icl.integrator.util.EndpointType;
  */
 public class ServiceDestinationDescriptor extends DestinationDescriptor {
 
-    private String serviceName;
+	private String service;
 
-    private String actionName;
+	private String action;
 
-    private EndpointType endpointType;
+	private EndpointType endpointType;
 
-    public ServiceDestinationDescriptor() {
-        super(DescriptorType.SERVICE);
-    }
+	public ServiceDestinationDescriptor() {
+		super(DescriptorType.SERVICE);
+	}
 
-    public ServiceDestinationDescriptor(String serviceName,
-                                        EndpointType endpointType,
-                                        String actionName) {
-        this();
-        this.serviceName = serviceName;
-        this.actionName = actionName;
-        this.endpointType = endpointType;
-    }
+	public ServiceDestinationDescriptor(String service,
+	                                    String action,
+	                                    EndpointType endpointType) {
+		this();
+		this.service = service;
+		this.action = action;
+		this.endpointType = endpointType;
+	}
 
-    public String getServiceName() {
-        return serviceName;
-    }
+	public String getService() {
+		return service;
+	}
 
-    public String getActionName() {
-        return actionName;
-    }
+	public void setService(String service) {
+		this.service = service;
+	}
 
-    public EndpointType getEndpointType() {
-        return endpointType;
-    }
+	public String getAction() {
+		return action;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	public void setAction(String action) {
+		this.action = action;
+	}
 
-        ServiceDestinationDescriptor that = (ServiceDestinationDescriptor) o;
+	public EndpointType getEndpointType() {
+		return endpointType;
+	}
 
-        if (!actionName.equals(that.actionName)) {
-            return false;
-        }
-        if (endpointType != that.endpointType) {
-            return false;
-        }
-        if (!serviceName.equals(that.serviceName)) {
-            return false;
-        }
+	public void setEndpointType(EndpointType endpointType) {
+		this.endpointType = endpointType;
+	}
 
-        return true;
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
-    @Override
-    public int hashCode() {
-        int result = serviceName.hashCode();
-        result = 31 * result + actionName.hashCode();
-        result = 31 * result + endpointType.hashCode();
-        return result;
-    }
+		ServiceDestinationDescriptor that = (ServiceDestinationDescriptor) o;
+
+		if (!action.equals(that.action)) {
+			return false;
+		}
+		if (endpointType != that.endpointType) {
+			return false;
+		}
+		if (!service.equals(that.service)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = service.hashCode();
+		result = 31 * result + action.hashCode();
+		result = 31 * result + endpointType.hashCode();
+		return result;
+	}
 }

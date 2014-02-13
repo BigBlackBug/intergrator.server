@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.model.*;
+import com.icl.integrator.model.AbstractActionEntity;
+import com.icl.integrator.model.AbstractEndpointEntity;
+import com.icl.integrator.model.Delivery;
+import com.icl.integrator.model.DeliveryStatus;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
 import com.icl.integrator.util.connectors.EndpointConnector;
@@ -37,6 +40,9 @@ public class DeliveryService {
 
 	@Autowired
 	private EndpointConnectorFactory factory;
+
+	@Autowired
+	private DeliveryCreator deliveryCreator;
 
 	@Autowired
 	private ObjectMapper mapper;
@@ -87,16 +93,16 @@ public class DeliveryService {
 		//статус деливери failed ставим в шедулере
         //тут шедуль принимающий ответ
 		scheduler.scheduleDelivery(new Schedulable<>(deliveryTaskCreator,
-		                                     delivery),
+		                                             delivery),
 		                           deliveryFailed);
 		return requestID;
 	}
 
-	public UUID deliver(Delivery delivery, String data) {
-		return deliver(delivery, data, null);
+	public UUID deliver(Delivery delivery) {
+		return deliver(delivery, null);
 	}
 
-	public UUID deliver(Delivery delivery, String data,
+	public UUID deliver(Delivery delivery,
 	                    PersistentDestination persistentDestination) {
 		//detached
 		AbstractEndpointEntity endpoint = delivery.getEndpoint();
@@ -107,7 +113,7 @@ public class DeliveryService {
 		EndpointConnector destinationConnector =
 				factory.createEndpointConnector(endpoint, action);
 		DeliveryCallable<String, ResponseDTO> deliveryCallable =
-				new DeliveryCallable<>(destinationConnector,data,
+				new DeliveryCallable<>(destinationConnector,delivery.getDeliveryData(),
 				                       ResponseDTO.class);
 
 		return executeDelivery(deliveryCallable, persistentDestination,
@@ -178,6 +184,7 @@ public class DeliveryService {
             this.targetServiceName = targetServiceName;
         }
 
+//	    @Transactional
         protected void deliver(ResponseDTO data){
             logger.info("Sending response to the source from " +
 		                        targetServiceName);
@@ -187,16 +194,15 @@ public class DeliveryService {
             AbstractActionEntity action =
                     persistentDestination.getAction();
             final EndpointConnector sourceConnector =
-                    factory.createEndpointConnector(
-                            service,
-                            action);
-
-            Delivery sourceDelivery = new Delivery();
-            sourceDelivery.setAction(action);
-            sourceDelivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-            sourceDelivery.setEndpoint(service);
-	        sourceDelivery = persistenceService.merge(sourceDelivery);
-
+                    factory.createEndpointConnector(service,action);
+	        Delivery sourceDelivery;
+	        try {
+		        sourceDelivery =
+				        deliveryCreator.createDelivery(service, action, data);
+	        } catch (JsonProcessingException e) {
+		        //will never happen
+		        return;
+	        }
             DeliveryCallable<ResponseDTO, Void>
                     successCallable =
                     new DeliveryCallable<>(sourceConnector, data,
@@ -226,8 +232,8 @@ public class DeliveryService {
             deliveryToSource.setCallback(new DeliveryStatusSetter(
 		            sourceDelivery, DeliveryStatus.DELIVERY_OK));
 
-            scheduler.scheduleGeneral(
-                    new Schedulable<>(deliveryToSource, sourceDelivery),null);
+	        scheduler.scheduleGeneral(
+			        new Schedulable<>(deliveryToSource, sourceDelivery), null);
         }
     }
 

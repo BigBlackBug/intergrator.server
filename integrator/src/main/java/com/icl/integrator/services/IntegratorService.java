@@ -1,23 +1,27 @@
 package com.icl.integrator.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.model.*;
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.model.AbstractActionEntity;
+import com.icl.integrator.model.AbstractEndpointEntity;
+import com.icl.integrator.model.Delivery;
+import com.icl.integrator.services.validation.ValidationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,227 +33,180 @@ import java.util.*;
 @Service
 public class IntegratorService implements IntegratorAPI {
 
-	private static Log logger =
-			LogFactory.getLog(IntegratorService.class);
+    private static Log logger =
+            LogFactory.getLog(IntegratorService.class);
+
+    @Autowired
+    private RegistrationService registrationService;
+
+    @Autowired
+    private PacketProcessorFactory processorFactory;
+
+    @Autowired
+    private IntegratorWorkerService workerService;
+
+    @Autowired
+    private DeliveryService deliveryService;
 
 	@Autowired
-	private RegistrationService registrationService;
+	private DeliveryCreator deliveryCreator;
 
 	@Autowired
-	private PacketProcessorFactory processorFactory;
+	private ValidationService validationService;
 
 	@Autowired
-	private IntegratorWorkerService workerService;
-
-	@Autowired
-	private DeliveryService deliveryService;
-
-	@Autowired
-	private PersistenceService persistenceService;
-
-	@Autowired
-	private ObjectMapper objectMapper;
-
-	@Autowired
-	private DestinationCreator destinationCreator;
-
-	@Transactional
-	private Holder createDeliveryPacket(DeliveryDTO deliveryDTO)
-			throws JsonProcessingException {
-		logger.info("Creating a delivery packet");
-		Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
-		DeliveryPacket deliveryPacket = new DeliveryPacket();
-		deliveryPacket.setDeliveryData(
-				objectMapper.writeValueAsString(deliveryDTO.getRequestData()));
-		for (ServiceDTO destination : deliveryDTO.getDestinations()) {
-			Delivery delivery = new Delivery();
-			delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-			delivery.setDeliveryPacket(deliveryPacket);
-			try {
-				AbstractActionEntity actionEntity = null;
-				AbstractEndpointEntity endpointEntity = null;
-				EndpointType endpointType = destination.getEndpointType();
-				if (endpointType == EndpointType.HTTP) {
-					endpointEntity =
-							persistenceService.getHttpService(
-									destination.getServiceName());
-					actionEntity = persistenceService
-							.getHttpAction(deliveryDTO.getAction(),
-							               endpointEntity.getId());
-				} else if (endpointType == EndpointType.JMS) {
-					endpointEntity =
-							persistenceService.getJmsService(
-									destination.getServiceName());
-					actionEntity = persistenceService.getJmsAction(
-							deliveryDTO.getAction(), endpointEntity.getId());
-				}
-				delivery.setAction(actionEntity);
-				delivery.setEndpoint(endpointEntity);
-				deliveryPacket.addDelivery(delivery);
-			} catch (Exception ex) {
-				logger.error("Error creating delivery packet for destination",
-				             ex);
-				ErrorDTO error = new ErrorDTO(ex);
-				serviceToRequestID.put(destination.getServiceName(),
-				                       new ResponseDTO<UUID>(error));
-			}
-		}
-		deliveryPacket.setRequestDate(new Date());
-		return new Holder(serviceToRequestID, deliveryPacket);
-	}
+	private ObjectMapper mapper;
 
 	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<Map<String,
-			ResponseDTO<UUID>>> deliver(
-			IntegratorPacket<DeliveryDTO, T> delivery) {
-		logger.info("Received a delivery request");
-		ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
-		try {
-			DeliveryDTO packet = delivery.getPacket();
-			Holder holder = createDeliveryPacket(packet);
-			DeliveryPacket deliveryPacket = holder.getPacket();
-			deliveryPacket = persistenceService.merge(deliveryPacket);
-			//посылаем в шыну
-			PacketProcessor processor = processorFactory.createProcessor();
-			Map<String, ResponseDTO<UUID>> serviceToRequestID =
-					processor.process(deliveryPacket,
-					                  packet.getResponseHandlerDescriptor());
-			serviceToRequestID.putAll(holder.getResponseMap());
-			response = new ResponseDTO<>(serviceToRequestID);
-		} catch (Exception ex) {
-			response = new ResponseDTO<>(ex);
-		}
-		sendResponse(delivery.getResponseHandlerDescriptor(), response);
-		return response;
-	}
+    public  <T extends DestinationDescriptor> ResponseDTO<Map<String,
+            ResponseDTO<UUID>>> deliver(
+            IntegratorPacket<DeliveryDTO, T> delivery) {
+        logger.info("Received a delivery request");
+        ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
+        try {
+	        DeliveryDTO packet = delivery.getPacket();
+//	        try{
+//	            validationService.validate(packet);
+//	        }catch(ValidationException ex){
+//
+//	        }
+            Deliveries deliveries =
+		            deliveryCreator.createDeliveries(packet);
+            //посылаем в шыну
+            PacketProcessor processor = processorFactory.createProcessor();
+            Map<String, ResponseDTO<UUID>> serviceToRequestID =
+                    processor.process(deliveries.getDeliveries(),
+                                      packet.getResponseHandlerDescriptor());
+            serviceToRequestID.putAll(deliveries.getErrorMap());
+            response = new ResponseDTO<>(serviceToRequestID);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(ex);
+        }
+        sendResponse(delivery.getResponseHandlerDescriptor(), response);
+        return response;
+    }
 
-	@Override
-	public <T extends DestinationDescriptor> Boolean ping(
-			IntegratorPacket<Void, T> responseHandler) {
-		sendResponse(responseHandler.getResponseHandlerDescriptor(),
-		             Boolean.TRUE);
-		return true;
-	}
+    @Override
+    public <T extends DestinationDescriptor> Boolean ping(
+            IntegratorPacket<Void, T> responseHandler) {
+        sendResponse(responseHandler.getResponseHandlerDescriptor(),
+                     Boolean.TRUE);
+        return true;
+    }
 
-	@Override
-	public <T extends ActionDescriptor, Y extends DestinationDescriptor>
-	ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-			IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
-		logger.info("Received a service registration request");
-		ResponseDTO<Map<String, ResponseDTO<Void>>> response;
-		try {
-			Map<String, ResponseDTO<Void>> result =
-					registrationService.register(registrationDTO.getPacket());
-			response = new ResponseDTO<>(result);
-		} catch (Exception ex) {
-			response = new ResponseDTO<>(new ErrorDTO(ex));
-		}
+    @Override
+    public <T extends ActionDescriptor, Y extends DestinationDescriptor>
+    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
+        logger.info("Received a service registration request");
+        ResponseDTO<Map<String, ResponseDTO<Void>>> response;
+        try {
+            Map<String, ResponseDTO<Void>> result =
+                    registrationService.register(registrationDTO.getPacket());
+            response = new ResponseDTO<>(result);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
 
-		sendResponse(registrationDTO.getResponseHandlerDescriptor(), response);
-		return response;
-	}
+        sendResponse(registrationDTO.getResponseHandlerDescriptor(), response);
+        return response;
+    }
 
-	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
-			IntegratorPacket<PingDTO, T> pingDTO) {
-		logger.info("Received a ping request for " + pingDTO);
-		ResponseDTO<Boolean> response;
-		try {
-			workerService.pingService(pingDTO.getPacket());
-			response = new ResponseDTO<>(Boolean.TRUE, Boolean.class);
-		} catch (Exception ex) {
-			response = new ResponseDTO<>(new ErrorDTO(ex));
-		}
-		sendResponse(pingDTO.getResponseHandlerDescriptor(), response);
-		return response;
-	}
+    @Override
+    public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
+            IntegratorPacket<ServiceDestinationDescriptor, T> serviceDescriptor) {
+        logger.info("Received a ping request for " + serviceDescriptor);
+        ResponseDTO<Boolean> response;
+        try {
+            workerService.pingService(serviceDescriptor.getPacket());
+            response = new ResponseDTO<>(Boolean.TRUE, Boolean.class);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
+        sendResponse(serviceDescriptor.getResponseHandlerDescriptor(), response);
+        return response;
+    }
 
-	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>> getServiceList(
-			IntegratorPacket<Void, T> packet) {
-		ResponseDTO<List<ServiceDTO>> response;
-		try {
-			List<ServiceDTO> serviceList = workerService.getServiceList();
-			response = new ResponseDTO<>(serviceList);
-		} catch (Exception ex) {
-			response = new ResponseDTO<>(new ErrorDTO(ex));
-		}
+    @Override
+    public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>> getServiceList(
+            IntegratorPacket<Void, T> packet) {
+        ResponseDTO<List<ServiceDTO>> response;
+        try {
+            List<ServiceDTO> serviceList = workerService.getServiceList();
+            response = new ResponseDTO<>(serviceList);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
 
-		sendResponse(packet.getResponseHandlerDescriptor(), response);
-		return response;
-	}
+        sendResponse(packet.getResponseHandlerDescriptor(), response);
+        return response;
+    }
 
-	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<List<String>> getSupportedActions(
-			IntegratorPacket<ServiceDTO, T> serviceDTO) {
-		ResponseDTO<List<String>> response;
-		try {
-			List<String> actions = workerService
-					.getSupportedActions(serviceDTO.getPacket());
-			response = new ResponseDTO<>(actions);
-		} catch (Exception ex) {
-			response = new ResponseDTO<>(new ErrorDTO(ex));
-		}
-		sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);
-		return response;
-	}
+    @Override
+    public <T extends DestinationDescriptor> ResponseDTO<List<String>> getSupportedActions(
+            IntegratorPacket<ServiceDTO, T> serviceDTO) {
+        ResponseDTO<List<String>> response;
+        try {
+            List<String> actions = workerService
+                    .getSupportedActions(serviceDTO.getPacket());
+            response = new ResponseDTO<>(actions);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
+        sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);
+        return response;
+    }
 
-	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<Void> addAction(
-			IntegratorPacket<AddActionDTO, T> actionDTO) {
-		ResponseDTO<Void> response;
-		try {
-			workerService.addAction(actionDTO.getPacket());
-			response = new ResponseDTO<>(true);
-		} catch (Exception ex) {
-			response = new ResponseDTO<>(new ErrorDTO(ex));
-		}
-		sendResponse(actionDTO.getResponseHandlerDescriptor(), response);
-		return response;
-	}
+    @Override
+    public <T extends DestinationDescriptor> ResponseDTO<Void> addAction(
+            IntegratorPacket<AddActionDTO, T> actionDTO) {
+        ResponseDTO<Void> response;
+        try {
+            workerService.addAction(actionDTO.getPacket());
+            response = new ResponseDTO<>(true);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
+        sendResponse(actionDTO.getResponseHandlerDescriptor(), response);
+        return response;
+    }
 
-	@Override
-	public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,
-			DDType extends DestinationDescriptor> ResponseDTO<FullServiceDTO<EDType, ADType>>
-	getServiceInfo(
-			IntegratorPacket<ServiceDTO, DDType> serviceDTO) {
-		ResponseDTO<FullServiceDTO<EDType, ADType>> response;
-		try {
-			FullServiceDTO<EDType, ADType> serviceInfo =
-					workerService
-							.getServiceInfo(serviceDTO.getPacket());
-			response = new ResponseDTO<>(serviceInfo);
-		} catch (Exception ex) {
-			response = new ResponseDTO<>(new ErrorDTO(ex));
-		}
+    @Override
+    public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,
+            DDType extends DestinationDescriptor> ResponseDTO<FullServiceDTO<EDType, ADType>>
+    getServiceInfo(
+            IntegratorPacket<ServiceDTO, DDType> serviceDTO) {
+        ResponseDTO<FullServiceDTO<EDType, ADType>> response;
+        try {
+            FullServiceDTO<EDType, ADType> serviceInfo =
+                    workerService
+                            .getServiceInfo(serviceDTO.getPacket());
+            response = new ResponseDTO<>(serviceInfo);
+        } catch (Exception ex) {
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
 
-		sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);
-		return response;
-	}
+        sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);
+        return response;
+    }
 
 	//TODO rename endpoint to service
 	private <T> void sendResponse(DestinationDescriptor destinationDescriptor,
 	                              T response) {
 		if (destinationDescriptor != null) {
-			Delivery delivery = new Delivery();
-			String data;
+			Delivery delivery;
 			try {
-				PersistentDestination destination = destinationCreator
-						.getPersistentDestination(destinationDescriptor);
+				PersistentDestination destination = deliveryCreator
+						.persistDestination(destinationDescriptor);
 				AbstractActionEntity action = destination.getAction();
 				AbstractEndpointEntity service = destination.getService();
-				delivery.setAction(action);
-				delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
-				delivery.setEndpoint(service);
-
-				delivery = persistenceService.merge(delivery);
-				data = objectMapper.writeValueAsString(response);
+				delivery = deliveryCreator.createDelivery(service,action,response);
 			} catch (Exception ex) {
 				logger.error("Ошибка создания конечной точки доставки", ex);
 				return;
 			}
 			try {
-				deliveryService.deliver(delivery, data);
+				deliveryService.deliver(delivery);
 			} catch (Exception ex) {
 				logger.error("Не могу отправить ответ на дополнительный " +
 						             "сервис", ex);
@@ -258,26 +215,22 @@ public class IntegratorService implements IntegratorAPI {
 		}
 	}
 
-	private static class Holder {
-
-		private final Map<String, ResponseDTO<UUID>> responseMap;
-
-		private final DeliveryPacket packet;
-
-		private Holder(
-				Map<String, ResponseDTO<UUID>> responseMap,
-				DeliveryPacket packet) {
-			this.responseMap = responseMap;
-			this.packet = packet;
+	@Override
+	public <T extends DestinationDescriptor,Y> ResponseDTO<List<ResponseDTO<Void>>>
+	registerAutoDetection(
+			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO) {
+		logger.info("Received an autodetection registration request");
+		ResponseDTO<List<ResponseDTO<Void>>> response;
+		try {
+			List<ResponseDTO<Void>> result =
+					registrationService.register(autoDetectionDTO.getPacket());
+			response = new ResponseDTO<>(result);
+		} catch (Exception ex) {
+			response = new ResponseDTO<>(new ErrorDTO(ex));
 		}
 
-		public Map<String, ResponseDTO<UUID>> getResponseMap() {
-			return responseMap;
-		}
-
-		public DeliveryPacket getPacket() {
-			return packet;
-		}
+		sendResponse(autoDetectionDTO.getResponseHandlerDescriptor(), response);
+		return response;
 	}
 
 }

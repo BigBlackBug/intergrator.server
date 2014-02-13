@@ -205,10 +205,10 @@ public class Scheduler {
                 //обрабочик облома
                 if (callback != null) {
                     callback.execute(exception);
-                    return;
                 }
-
+	            return;
             }
+
             Date nextRequestDate = new Date(System.currentTimeMillis() +
                                                     deliverySettings
                                                             .getRetryDelay());

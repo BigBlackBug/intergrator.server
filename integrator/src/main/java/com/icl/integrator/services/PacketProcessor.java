@@ -4,12 +4,12 @@ import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.model.Delivery;
-import com.icl.integrator.model.DeliveryPacket;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,20 +28,19 @@ public class PacketProcessor {
     private DeliveryService deliveryService;
 
 	@Autowired
-	private DestinationCreator destinationCreator;
+	private DeliveryCreator deliveryCreator;
 
-    public Map<String, ResponseDTO<UUID>> process(DeliveryPacket deliveryPacket,
+    public Map<String, ResponseDTO<UUID>> process(List<Delivery> deliveries,
                                                   DestinationDescriptor destinationDescriptor) {
         //mb null
         PersistentDestination persistentDestination =
-		        destinationCreator.getPersistentDestination(
+		        deliveryCreator.persistDestination(
 				        destinationDescriptor);
         Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
-        for (Delivery delivery : deliveryPacket.getDeliveries()) {
+        for (Delivery delivery : deliveries) {
             ResponseDTO<UUID> response;
             try {
-	            UUID requestID = deliveryService.deliver(
-			            delivery, deliveryPacket.getDeliveryData(),
+	            UUID requestID = deliveryService.deliver(delivery,
 			            persistentDestination);
 	            response = new ResponseDTO<>(requestID, UUID.class);
             } catch (Exception ex) {

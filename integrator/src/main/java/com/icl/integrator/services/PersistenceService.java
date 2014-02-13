@@ -1,5 +1,6 @@
 package com.icl.integrator.services;
 
+import com.icl.integrator.dto.DeliveryType;
 import com.icl.integrator.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +18,6 @@ import java.util.UUID;
  * Time: 13:51
  * To change this template use File | Settings | File Templates.
  */
-//TODO обработчик на создание. проверять есть ли сгенеренный сервис или экшон
-	//также убрать getSingleResult
 @Service
 public class PersistenceService {
 
@@ -48,10 +47,32 @@ public class PersistenceService {
         return em.merge(entity);
     }
 
+	@Transactional
+	public <T extends AbstractEntity> T saveOrUpdate(T entity) {
+		if(entity.getId() == null){
+			em.persist(entity);
+			return entity;
+		} else {
+			return em.merge(entity);
+		}
+	}
+
+	@Transactional
+	public <T extends AbstractEntity> T refresh(T entity) {
+		em.refresh(entity);
+		return entity;
+	}
+
     @Transactional
-    public <T extends AbstractEntity> void persist(T entity) {
+    public <T extends AbstractEntity> T persist(T entity) {
         em.persist(entity);
+	    return entity;
     }
+
+	@Transactional
+	public <T extends AbstractEntity> T find(Class<T> entityClass,UUID id) {
+		return em.find(entityClass,id);
+	}
 
     @Transactional
     public List<HttpServiceEndpoint> getHttpServices() {
@@ -174,4 +195,25 @@ public class PersistenceService {
             return null;
         }
     }
+
+	@Transactional
+	public List<AutoDetectionPacket> findAutoDetectionPackets(
+			DeliveryType deliveryType) {
+		return em.createQuery(
+				"select packet from AutoDetectionPacket packet where packet.deliveryType=:deliveryType",AutoDetectionPacket.class)
+				.setParameter("deliveryType", deliveryType).getResultList();
+	}
+
+	@Transactional
+	public List<Delivery> findAllUnfinishedDeliveries() {
+		return em.createQuery(
+				"select delivery from Delivery delivery where " +
+						"delivery.deliveryStatus!=:deliveryOK and" +
+						" delivery.deliveryStatus!=:deliveryFailed",
+				Delivery.class)
+				.setParameter("deliveryOK", DeliveryStatus.DELIVERY_OK)
+				.setParameter("deliveryFailed", DeliveryStatus.DELIVERY_FAILED)
+				.getResultList();
+
+	}
 }

@@ -2,7 +2,6 @@ package com.icl.integrator.model;
 
 import com.icl.integrator.util.EndpointType;
 import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -21,64 +20,65 @@ import java.util.Set;
 @DiscriminatorColumn(name = "ENDPOINT_TYPE",
                      discriminatorType = DiscriminatorType.STRING)
 public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
-		extends AbstractEntity {
+        extends AbstractEntity {
+
+    @Column(unique = true, nullable = false, length = 255,
+            name = "SERVICE_NAME")
+    private String serviceName;
 
 	@OneToMany(mappedBy = "endpoint",
 	           fetch = FetchType.EAGER)
-	@Cascade(value = {CascadeType.ALL})
+	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
 	protected Set<AbstractActionEntity> actions = new HashSet<>();
 
-	@Column(unique = true, nullable = false, length = 255,
-	        name = "SERVICE_NAME")
-	private String serviceName;
-
-	@Enumerated(EnumType.STRING)
-	@Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
-	        insertable = false)
-	private EndpointType type;
+    //TODO add references to delivery
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
+            insertable = false)
+    private EndpointType type;
 
 	@OneToOne
 	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
 	private DeliverySettings deliverySettings = DeliverySettings.createDefaultSettings();
 
-	protected AbstractEndpointEntity() {
+    protected AbstractEndpointEntity() {
 
-	}
+    }
 
-	protected AbstractEndpointEntity(EndpointType endpointType) {
-		this.type = endpointType;
-	}
+    public DeliverySettings getDeliverySettings() {
+        return deliverySettings;
+    }
 
-	public DeliverySettings getDeliverySettings() {
-		return deliverySettings;
-	}
+    public void setDeliverySettings(DeliverySettings deliverySettings) {
+        this.deliverySettings = deliverySettings;
+    }
 
-	public void setDeliverySettings(DeliverySettings deliverySettings) {
-		this.deliverySettings = deliverySettings;
-	}
+    protected AbstractEndpointEntity(EndpointType endpointType) {
+        this.type = endpointType;
+    }
 
-	public Set<AbstractActionEntity> getActions() {
-		return actions;
-	}
+    public Set<AbstractActionEntity> getActions() {
+        return actions;
+    }
 
-	public abstract void setActions(Set<T> actions);
+    public abstract void setActions(Set<T> actions);
 
-	public abstract T getActionByName(String actionName);
+    public abstract T getActionByName(String actionName);
 
-	public void addAction(T action) {
-		this.actions.add(action);
-	}
+    public void addAction(T action) {
+        this.actions.add(action);
+    }
 
-	public EndpointType getType() {
-		return type;
-	}
+    public EndpointType getType() {
+        return type;
+    }
 
-	public String getServiceName() {
-		return serviceName;
-	}
+    public String getServiceName() {
+        return serviceName;
+    }
 
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
-	}
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
 }
 

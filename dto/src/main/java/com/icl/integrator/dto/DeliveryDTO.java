@@ -14,94 +14,118 @@ import java.util.List;
  */
 public class DeliveryDTO {
 
-    private DestinationDescriptor responseHandlerDescriptor;
+	private DestinationDescriptor responseHandlerDescriptor;
 
-    private List<ServiceDTO> destinations;
+	private List<ServiceDTO> destinations;
 
-    private String action;
+	private String action;
 
-    private RequestDataDTO requestData;
+	private RequestDataDTO requestData;
 
-    public DeliveryDTO(DestinationDescriptor responseHandlerDescriptor,
-                       String action,
-                       List<ServiceDTO> destinations) {
-        this.action = action;
-        this.responseHandlerDescriptor = responseHandlerDescriptor;
-        this.destinations = destinations;
-    }
+	public DeliveryDTO(String action,
+	                   RequestDataDTO requestData) {
+		this.action = action;
+		this.requestData = requestData;
+	}
 
-    public DeliveryDTO() {
-    }
+	public DeliveryDTO(String action,
+	                   RequestDataDTO requestData,
+	                   DestinationDescriptor responseHandlerDescriptor) {
+		this.action = action;
+		this.requestData = requestData;
+		this.responseHandlerDescriptor = responseHandlerDescriptor;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	public DeliveryDTO(
+			List<ServiceDTO> destinations,
+			RequestDataDTO requestData, String action,
+			DestinationDescriptor responseHandlerDescriptor) {
+		this.destinations = destinations;
+		this.requestData = requestData;
+		this.action = action;
+		this.responseHandlerDescriptor = responseHandlerDescriptor;
+	}
 
-        DeliveryDTO that = (DeliveryDTO) o;
+	public DeliveryDTO() {
+	}
 
-        if (!action.equals(that.action)) {
-            return false;
-        }
-        if (requestData != null ? !requestData
-                .equals(that.requestData) : that.requestData != null) {
-            return false;
-        }
-        if (!destinations.equals(that.destinations)) {
-            return false;
-        }
-        if (!responseHandlerDescriptor
-                .equals(that.responseHandlerDescriptor)) {
-            return false;
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
-        return true;
-    }
+		DeliveryDTO that = (DeliveryDTO) o;
 
-    @Override
-    public int hashCode() {
-        int result = responseHandlerDescriptor.hashCode();
-        result = 31 * result + destinations.hashCode();
-        result = 31 * result + action.hashCode();
-        result = 31 * result + (requestData != null ? requestData.hashCode() : 0);
-        return result;
-    }
+		if (!action.equals(that.action)) {
+			return false;
+		}
+		if (destinations != null ? !destinations.equals(that.destinations) :
+				that.destinations != null) {
+			return false;
+		}
+		if (!requestData.equals(that.requestData)) {
+			return false;
+		}
+		if (responseHandlerDescriptor != null ?
+				!responseHandlerDescriptor
+						.equals(that.responseHandlerDescriptor) :
+				that.responseHandlerDescriptor != null) {
+			return false;
+		}
 
-    public DestinationDescriptor getResponseHandlerDescriptor() {
-        return responseHandlerDescriptor;
-    }
+		return true;
+	}
 
-    public void setResponseHandlerDescriptor(
-		    RawDestinationDescriptor responseHandlerDescriptor) {
-        this.responseHandlerDescriptor =
-		        responseHandlerDescriptor;
-    }
+	@Override
+	public int hashCode() {
+		int result = responseHandlerDescriptor != null ?
+				responseHandlerDescriptor.hashCode() : 0;
+		result = 31 * result +
+				(destinations != null ? destinations.hashCode() : 0);
+		result = 31 * result + action.hashCode();
+		result = 31 * result + requestData.hashCode();
+		return result;
+	}
 
-    public List<ServiceDTO> getDestinations() {
-        return destinations;
-    }
+	public DestinationDescriptor getResponseHandlerDescriptor() {
+		return responseHandlerDescriptor;
+	}
 
-    public void setDestinations(List<ServiceDTO> destinations) {
-        this.destinations = destinations;
-    }
+	public void setResponseHandlerDescriptor(
+			RawDestinationDescriptor responseHandlerDescriptor) {
+		this.responseHandlerDescriptor =
+				responseHandlerDescriptor;
+	}
 
-    public String getAction() {
-        return action;
-    }
+	public List<ServiceDTO> getDestinations() {
+		return destinations;
+	}
 
-    public void setAction(String action) {
-        this.action = action;
-    }
+	public void setDestinations(List<ServiceDTO> destinations) {
+		this.destinations = destinations;
+	}
 
-    public RequestDataDTO getRequestData() {
-        return requestData;
-    }
+	public void addDestination(ServiceDTO serviceDTO) {
+		this.destinations.add(serviceDTO);
+	}
 
-    public void setRequestData(RequestDataDTO requestData) {
-        this.requestData = requestData;
-    }
+	public String getAction() {
+		return action;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
+	}
+
+	public RequestDataDTO getRequestData() {
+		return requestData;
+	}
+
+	public void setRequestData(RequestDataDTO requestData) {
+		this.requestData = requestData;
+	}
 }

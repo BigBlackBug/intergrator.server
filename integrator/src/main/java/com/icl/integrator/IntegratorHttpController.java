@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.services.IntegratorService;
@@ -87,11 +89,11 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
 			@RequestBody(
-					required = true) IntegratorPacket<PingDTO, T> pingDTO) {
-		TypeReference<IntegratorPacket<PingDTO, DestinationDescriptor>> type =
-				new TypeReference<IntegratorPacket<PingDTO, DestinationDescriptor>>() {
+					required = true) IntegratorPacket<ServiceDestinationDescriptor, T> serviceDescriptor) {
+		TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>> type =
+				new TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>>() {
 				};
-		return integratorService.isAvailable(fixConversion(pingDTO, type));
+		return integratorService.isAvailable(fixConversion(serviceDescriptor, type));
 	}
 
 	@Override
@@ -146,5 +148,19 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 				};
 		return integratorService
 				.getServiceInfo(fixConversion(serviceDTO, type));
+	}
+
+	@Override
+	public
+	<T extends DestinationDescriptor, Y>
+	ResponseDTO<List<ResponseDTO<Void>>> registerAutoDetection(
+			@RequestBody(required = true)
+			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO){
+		TypeReference<IntegratorPacket<AutoDetectionRegistrationDTO<Y>, DestinationDescriptor>>
+				type =
+				new TypeReference<IntegratorPacket<AutoDetectionRegistrationDTO<Y>, DestinationDescriptor>>() {
+				};
+		return integratorService.registerAutoDetection(
+				fixConversion(autoDetectionDTO, type));
 	}
 }

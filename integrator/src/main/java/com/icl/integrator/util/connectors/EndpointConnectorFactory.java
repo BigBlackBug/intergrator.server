@@ -2,6 +2,9 @@ package com.icl.integrator.util.connectors;
 
 import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.RawDestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.HttpActionDTO;
 import com.icl.integrator.dto.registration.QueueDTO;
@@ -122,21 +125,21 @@ public class EndpointConnectorFactory {
 		}
 	}
 
-//	public EndpointConnector createEndpointConnector(
-//			DestinationDescriptor targetResponseHandler) {
-//		if (targetResponseHandler.getDescriptorType() ==
-//				DestinationDescriptor.DescriptorType.RAW) {
-//			RawDestinationDescriptor dd =
-//					(RawDestinationDescriptor) targetResponseHandler;
-//			return createEndpointConnector(dd.getEndpoint(),
-//			                               dd.getActionDescriptor());
-//
-//		} else {
-//			ServiceDestinationDescriptor dd =
-//					(ServiceDestinationDescriptor) targetResponseHandler;
-//			return createEndpointConnector(dd.getServiceName(),
-//			                               dd.getEndpointType(),
-//			                               dd.getActionName());
-//		}
-//	}
+	public EndpointConnector createEndpointConnector(
+			DestinationDescriptor destinationDescriptor) {
+		if (destinationDescriptor.getDescriptorType() ==
+				DestinationDescriptor.DescriptorType.RAW) {
+			RawDestinationDescriptor dd =
+					(RawDestinationDescriptor) destinationDescriptor;
+			return createEndpointConnector(dd.getEndpoint(),
+			                               dd.getActionDescriptor());
+
+		} else {
+			ServiceDestinationDescriptor dd =
+					(ServiceDestinationDescriptor) destinationDescriptor;
+			return createEndpointConnector(dd.getService(),
+			                               dd.getEndpointType(),
+			                               dd.getAction());
+		}
+	}
 }
