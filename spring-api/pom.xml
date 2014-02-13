@@ -4,10 +4,10 @@
     <parent>
         <artifactId>root</artifactId>
         <groupId>com.icl.integrator</groupId>
-        <version>1.5</version>
+        <version>${projectVersion}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>1.5</version>
+    <version>${projectVersion}</version>
     <artifactId>spring-api</artifactId>
     <packaging>jar</packaging>
 
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>com.icl.integrator</groupId>
             <artifactId>api</artifactId>
-            <version>1.5</version>
+            <version>${projectVersion}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
