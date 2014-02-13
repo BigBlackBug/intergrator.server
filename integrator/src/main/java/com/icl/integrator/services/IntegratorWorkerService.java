@@ -2,7 +2,10 @@ package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.dto.FullServiceDTO;
+import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
@@ -80,12 +83,12 @@ public class IntegratorWorkerService {
 		return persistenceService.getActions(serviceDTO.getServiceName());
 	}
 
-	public Boolean pingService(PingDTO pingDTO) {
+	public Boolean pingService(ServiceDestinationDescriptor serviceDescriptor) {
 		EndpointConnector connector = connectorFactory
 				.createEndpointConnector(
-						new ServiceDTO(pingDTO.getServiceName(),
-						                   pingDTO.getEndpointType()),
-						pingDTO.getAction());
+						new ServiceDTO(serviceDescriptor.getService(),
+						                   serviceDescriptor.getEndpointType()),
+						serviceDescriptor.getAction());
 		connector.testConnection();
 		return true;
 	}

@@ -3,6 +3,7 @@ package com.icl.integrator.httpclient;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
@@ -143,13 +144,17 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
-    public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO) {
-        return isAvailable(new IntegratorPacket<>(pingDTO));
+    public ResponseDTO<Boolean> isAvailable(ServiceDestinationDescriptor serviceDescriptor) {
+	    IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>
+			    integratorPacket =
+			    new IntegratorPacket<>();
+	    integratorPacket.setPacket(serviceDescriptor);
+	    return isAvailable(integratorPacket);
     }
 
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
-            IntegratorPacket<PingDTO, T> pingDTO) {
+            IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "isAvailable", IntegratorPacket.class);
         ParameterizedTypeReference<ResponseDTO<Boolean>>

@@ -412,9 +412,9 @@ public class AppTests {
                 ));
         targetResponseHandler.setActionDescriptor(new QueueDTO
                                                           ("SourceQueue"));
-        IntegratorPacket<PingDTO, DestinationDescriptor>
+        IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>
                 packet =
-                new IntegratorPacket<PingDTO, DestinationDescriptor>(
+                new IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>(
                         new RawDestinationDescriptor());
         mockMvc.perform(post("/integrator/ping").contentType(
                 MediaType.APPLICATION_JSON).content(mapper.writeValueAsString

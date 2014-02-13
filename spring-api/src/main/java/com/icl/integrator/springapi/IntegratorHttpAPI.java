@@ -3,6 +3,7 @@ package com.icl.integrator.springapi;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
@@ -61,7 +62,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @ResponseBody
     <T extends DestinationDescriptor>
     ResponseDTO<Boolean> isAvailable(@RequestBody(required = true)
-                                     IntegratorPacket<PingDTO, T> pingDTO);
+                                     IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO);
 
     @Override
     @RequestMapping(value = "getServiceList", method = RequestMethod.POST)

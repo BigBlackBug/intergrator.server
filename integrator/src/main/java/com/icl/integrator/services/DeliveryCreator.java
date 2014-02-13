@@ -180,16 +180,16 @@ public class DeliveryCreator {
 			if (endpointType == EndpointType.HTTP) {
 				endpointEntity =
 						persistenceService.getHttpService(
-								realSourceService.getServiceName());
+								realSourceService.getService());
 				actionEntity = persistenceService
-						.getHttpAction(realSourceService.getActionName(),
+						.getHttpAction(realSourceService.getAction(),
 						               endpointEntity.getId());
 			} else if (endpointType == EndpointType.JMS) {
 				endpointEntity =
 						persistenceService.getJmsService(
-								realSourceService.getServiceName());
+								realSourceService.getService());
 				actionEntity = persistenceService.getJmsAction(
-						realSourceService.getActionName(),
+						realSourceService.getAction(),
 						endpointEntity.getId());
 			}
 		}

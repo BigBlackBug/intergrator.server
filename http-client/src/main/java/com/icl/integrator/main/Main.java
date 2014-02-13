@@ -2,6 +2,7 @@ package com.icl.integrator.main;
 
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.httpclient.IntegratorHttpClient;
@@ -100,9 +101,9 @@ public class Main {
 	}
 
 	public static ResponseDTO<Boolean> ping(IntegratorHttpClient httpClient) {
-		PingDTO pingDTO = new PingDTO();
+		ServiceDestinationDescriptor pingDTO = new ServiceDestinationDescriptor();
 		pingDTO.setAction("ACTION");
-		pingDTO.setServiceName("NEW_SERVICE");
+		pingDTO.setService("NEW_SERVICE");
 		pingDTO.setEndpointType(EndpointType.HTTP);
 		return httpClient.isAvailable(pingDTO);
 	}

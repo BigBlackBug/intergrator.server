@@ -18,7 +18,6 @@ import java.util.UUID;
  * Time: 13:51
  * To change this template use File | Settings | File Templates.
  */
-//TODO tакже убрать getSingleResult
 @Service
 public class PersistenceService {
 

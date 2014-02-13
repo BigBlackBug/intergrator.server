@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.DeliveryDTO;
 import com.icl.integrator.dto.IntegratorPacket;
-import com.icl.integrator.dto.PingDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
@@ -101,10 +101,10 @@ public class IntegratorJmsController implements MessageListener {
                     break;
                 }
                 case IS_AVAILABLE: {
-                    IntegratorPacket<PingDTO, DestinationDescriptor> packet =
+                    IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor> packet =
                             mapper.convertValue(
                                     integratorPacket,
-                                    new TypeReference<IntegratorPacket<PingDTO, DestinationDescriptor>>() {
+                                    new TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>>() {
                                     });
                     integratorService.isAvailable(packet);
                     break;

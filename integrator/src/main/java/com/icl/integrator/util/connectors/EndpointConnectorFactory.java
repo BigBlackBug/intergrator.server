@@ -137,9 +137,9 @@ public class EndpointConnectorFactory {
 		} else {
 			ServiceDestinationDescriptor dd =
 					(ServiceDestinationDescriptor) destinationDescriptor;
-			return createEndpointConnector(dd.getServiceName(),
+			return createEndpointConnector(dd.getService(),
 			                               dd.getEndpointType(),
-			                               dd.getActionName());
+			                               dd.getAction());
 		}
 	}
 }

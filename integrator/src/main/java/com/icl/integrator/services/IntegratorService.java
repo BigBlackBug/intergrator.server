@@ -4,9 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
-import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
+import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.model.*;
+import com.icl.integrator.model.AbstractActionEntity;
+import com.icl.integrator.model.AbstractEndpointEntity;
+import com.icl.integrator.model.Delivery;
 import com.icl.integrator.services.validation.ValidationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,16 +110,16 @@ public class IntegratorService implements IntegratorAPI {
 
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
-            IntegratorPacket<PingDTO, T> pingDTO) {
-        logger.info("Received a ping request for " + pingDTO);
+            IntegratorPacket<ServiceDestinationDescriptor, T> serviceDescriptor) {
+        logger.info("Received a ping request for " + serviceDescriptor);
         ResponseDTO<Boolean> response;
         try {
-            workerService.pingService(pingDTO.getPacket());
+            workerService.pingService(serviceDescriptor.getPacket());
             response = new ResponseDTO<>(Boolean.TRUE, Boolean.class);
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        sendResponse(pingDTO.getResponseHandlerDescriptor(), response);
+        sendResponse(serviceDescriptor.getResponseHandlerDescriptor(), response);
         return response;
     }
 

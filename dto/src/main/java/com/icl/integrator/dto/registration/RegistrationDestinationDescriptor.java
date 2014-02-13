@@ -5,7 +5,6 @@ import com.icl.integrator.dto.destination.DestinationDescriptor;
 /**
  * Created by BigBlackBug on 2/13/14.
  */
-//TODO add add methods
 public class RegistrationDestinationDescriptor {
 
 	private DestinationDescriptor destinationDescriptor;

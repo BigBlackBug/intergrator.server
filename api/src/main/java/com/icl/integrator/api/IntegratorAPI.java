@@ -2,6 +2,7 @@ package com.icl.integrator.api;
 
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
@@ -34,7 +35,7 @@ public interface IntegratorAPI {
             IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
 
     public <T extends DestinationDescriptor>
-    ResponseDTO<Boolean> isAvailable(IntegratorPacket<PingDTO, T> pingDTO);
+    ResponseDTO<Boolean> isAvailable(IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO);
 
     public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>>
     getServiceList(IntegratorPacket<Void, T> packet);

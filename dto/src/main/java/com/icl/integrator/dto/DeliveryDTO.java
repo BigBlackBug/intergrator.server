@@ -14,13 +14,13 @@ import java.util.List;
  */
 public class DeliveryDTO {
 
-    private DestinationDescriptor responseHandlerDescriptor;
+	private DestinationDescriptor responseHandlerDescriptor;
 
-    private List<ServiceDTO> destinations;
+	private List<ServiceDTO> destinations;
 
-    private String action;
+	private String action;
 
-    private RequestDataDTO requestData;
+	private RequestDataDTO requestData;
 
 	public DeliveryDTO(String action,
 	                   RequestDataDTO requestData) {
@@ -47,7 +47,7 @@ public class DeliveryDTO {
 	}
 
 	public DeliveryDTO() {
-    }
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -92,36 +92,40 @@ public class DeliveryDTO {
 	}
 
 	public DestinationDescriptor getResponseHandlerDescriptor() {
-        return responseHandlerDescriptor;
-    }
+		return responseHandlerDescriptor;
+	}
 
-    public void setResponseHandlerDescriptor(
-		    RawDestinationDescriptor responseHandlerDescriptor) {
-        this.responseHandlerDescriptor =
-		        responseHandlerDescriptor;
-    }
+	public void setResponseHandlerDescriptor(
+			RawDestinationDescriptor responseHandlerDescriptor) {
+		this.responseHandlerDescriptor =
+				responseHandlerDescriptor;
+	}
 
-    public List<ServiceDTO> getDestinations() {
-        return destinations;
-    }
+	public List<ServiceDTO> getDestinations() {
+		return destinations;
+	}
 
-    public void setDestinations(List<ServiceDTO> destinations) {
-        this.destinations = destinations;
-    }
+	public void setDestinations(List<ServiceDTO> destinations) {
+		this.destinations = destinations;
+	}
 
-    public String getAction() {
-        return action;
-    }
+	public void addDestination(ServiceDTO serviceDTO) {
+		this.destinations.add(serviceDTO);
+	}
 
-    public void setAction(String action) {
-        this.action = action;
-    }
+	public String getAction() {
+		return action;
+	}
 
-    public RequestDataDTO getRequestData() {
-        return requestData;
-    }
+	public void setAction(String action) {
+		this.action = action;
+	}
 
-    public void setRequestData(RequestDataDTO requestData) {
-        this.requestData = requestData;
-    }
+	public RequestDataDTO getRequestData() {
+		return requestData;
+	}
+
+	public void setRequestData(RequestDataDTO requestData) {
+		this.requestData = requestData;
+	}
 }

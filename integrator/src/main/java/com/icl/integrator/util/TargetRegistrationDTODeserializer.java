@@ -19,6 +19,7 @@ import java.util.List;
  * Time: 14:03
  * To change this template use File | Settings | File Templates.
  */
+//TODO add null handlers freaking everywhere
 public class TargetRegistrationDTODeserializer extends
         JsonDeserializer<TargetRegistrationDTO> {
 
@@ -28,7 +29,7 @@ public class TargetRegistrationDTODeserializer extends
         ObjectNode treeNode = jp.readValueAsTree();
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         TargetRegistrationDTO dto = new TargetRegistrationDTO();
-	    dto.setDeliverySettings(    //TODO mb null
+	    dto.setDeliverySettings(
 			    mapper.readValue(treeNode.get("deliverySettings").toString(),
 			                     DeliverySettingsDTO.class));
 	    dto.setServiceName(treeNode.get("serviceName").asText());
