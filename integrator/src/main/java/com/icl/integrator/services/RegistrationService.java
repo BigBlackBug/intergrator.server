@@ -20,10 +20,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -94,31 +91,33 @@ public class RegistrationService {
         String serviceName = registrationDTO.getServiceName();
         JMSEndpointDescriptorDTO descriptor =
                 (JMSEndpointDescriptorDTO) endpoint.getDescriptor();
-        List<JMSAction> httpActions = getJmsActions(actions);
 	    JMSServiceEndpoint serviceEntity =
 			    createJmsEntity(descriptor, serviceName,
 			                    registrationDTO.getDeliverySettings());
-        try {
-            serviceEntity = persistenceService.merge(serviceEntity);
-        } catch (DataAccessException ex) {
-            logger.error("GG", ex);
-            throw new TargetRegistrationException("Ошибка регистрации", ex);
-        }
-        for (JMSAction action : httpActions) {
-            ResponseDTO<Void> responseDTO;
-            try {
-                action.setEndpoint(serviceEntity);
-                serviceEntity.addAction(action);
-                persistenceService.merge(action);
-                responseDTO = new ResponseDTO<>(true);
-            } catch (DataAccessException ex) {
-                ErrorDTO errorDTO = new ErrorDTO();
-                errorDTO.setErrorMessage("Ошибка регистрации");
-                errorDTO.setDeveloperMessage(ex.getMessage());
-                responseDTO = new ResponseDTO<>(errorDTO);
-            }
-            result.put(action.getActionName(), responseDTO);
-        }
+
+	    try {
+		    serviceEntity = persistenceService.saveOrUpdate(serviceEntity);
+	    } catch (DataAccessException ex) {
+		    logger.error("GG", ex);
+		    throw new TargetRegistrationException("Ошибка регистрации", ex);
+	    }
+	    List<JMSAction> httpActions =
+			    getJmsActions(actions, serviceEntity.getId());
+	    for (JMSAction action : httpActions) {
+		    ResponseDTO<Void> responseDTO;
+		    try {
+			    action.setEndpoint(serviceEntity);
+			    serviceEntity.addAction(action);
+			    persistenceService.saveOrUpdate(action);
+			    responseDTO = new ResponseDTO<>(true);
+		    } catch (Exception ex) {
+			    ErrorDTO errorDTO = new ErrorDTO();
+			    errorDTO.setErrorMessage("Ошибка регистрации");
+			    errorDTO.setDeveloperMessage(ex.getMessage());
+			    responseDTO = new ResponseDTO<>(errorDTO);
+		    }
+		    result.put(action.getActionName(), responseDTO);
+	    }
     }
 
 	//TODO refactor
@@ -132,26 +131,27 @@ public class RegistrationService {
         String serviceName = registrationDTO.getServiceName();
         HttpEndpointDescriptorDTO descriptor =
                 (HttpEndpointDescriptorDTO) endpoint.getDescriptor();
-        List<HttpAction> httpActions = getHttpActions(actions);
+
 	    DeliverySettingsDTO deliverySettings =
 			    registrationDTO.getDeliverySettings();
 	    HttpServiceEndpoint serviceEntity =
 			    createHttpEntity(descriptor, serviceName,
 			                     deliverySettings);
         try {
-            serviceEntity = persistenceService.merge(serviceEntity);
+            serviceEntity = persistenceService.saveOrUpdate(serviceEntity);
         } catch (DataAccessException ex) {
             logger.error("GG", ex);
             throw new TargetRegistrationException("Ошибка регистрации", ex);
         }
+	    List<HttpAction> httpActions = getHttpActions(actions,serviceEntity.getId());
         for (HttpAction action : httpActions) {
             ResponseDTO<Void> responseDTO;
             try {
                 action.setEndpoint(serviceEntity);
                 serviceEntity.addAction(action);
-                persistenceService.merge(action);
+	            persistenceService.saveOrUpdate(action);
                 responseDTO = new ResponseDTO<>(true);
-            } catch (DataAccessException ex) {
+            } catch (Exception ex) {
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setErrorMessage("Ошибка регистрации");
                 errorDTO.setDeveloperMessage(ex.getMessage());
@@ -160,83 +160,127 @@ public class RegistrationService {
             result.put(action.getActionName(), responseDTO);
         }
     }
-
+	@Transactional
     private <T extends ActionDescriptor> List<HttpAction> getHttpActions(
-            List<ActionEndpointDTO<T>> actions) {
+            List<ActionEndpointDTO<T>> actions, UUID serviceID) {
         List<HttpAction> httpActions = new ArrayList<>();
         for (ActionEndpointDTO<T> actionDescriptor : actions) {
             HttpActionDTO httpActionDTO =
                     (HttpActionDTO) actionDescriptor.getActionDescriptor();
-            String actionName = actionDescriptor.getActionName();
-            HttpAction actionMapping = new HttpAction();
-            actionMapping.setActionName(actionName);
-            actionMapping.setActionURL(httpActionDTO.getPath());
-            httpActions.add(actionMapping);
+	        String actionName = actionDescriptor.getActionName();
+	        HttpAction httpAction = persistenceService
+			        .findHttpAction(serviceID, httpActionDTO.getPath());
+	        if (httpAction == null) {
+		        httpAction = new HttpAction();
+		        httpAction.setActionURL(httpActionDTO.getPath());
+	        }
+	        httpAction.setActionName(actionName);
+
+	        httpActions.add(httpAction);
         }
         return httpActions;
     }
 
+	@Transactional
     private <T extends ActionDescriptor> List<JMSAction> getJmsActions(
-            List<ActionEndpointDTO<T>> actions) {
+		    List<ActionEndpointDTO<T>> actions, UUID serviceID) {
         List<JMSAction> jmsActions = new ArrayList<>();
         for (ActionEndpointDTO<T> actionDescriptor : actions) {
             QueueDTO queueDTO =
                     (QueueDTO) actionDescriptor.getActionDescriptor();
             String actionName = actionDescriptor.getActionName();
-            JMSAction actionMapping = new JMSAction();
-            actionMapping.setUsername(queueDTO.getUsername());
-            actionMapping.setActionName(actionName);
-            actionMapping.setPassword(queueDTO.getPassword());
-            actionMapping.setQueueName(queueDTO.getQueueName());
-            jmsActions.add(actionMapping);
+	        JMSAction jmsAction = persistenceService
+			        .findJmsAction(serviceID, queueDTO.getQueueName(),
+			                       queueDTO.getUsername(),
+			                       queueDTO.getPassword());
+	        if (jmsAction == null) {
+		        jmsAction = new JMSAction();
+		        jmsAction.setUsername(queueDTO.getUsername());
+		        jmsAction.setPassword(queueDTO.getPassword());
+		        jmsAction.setQueueName(queueDTO.getQueueName());
+	        }
+	        jmsAction.setActionName(actionName);
+
+	        jmsActions.add(jmsAction);
         }
         return jmsActions;
     }
-
+	@Transactional
 	private HttpServiceEndpoint createHttpEntity(
 			HttpEndpointDescriptorDTO descriptor,
 			String serviceName, DeliverySettingsDTO deliverySettings) {
-		HttpServiceEndpoint endpoint = new HttpServiceEndpoint();
-		endpoint.setServiceName(serviceName);
-		endpoint.setServiceURL(descriptor.getHost());
-		endpoint.setServicePort(descriptor.getPort());
-		DeliverySettings settings;
-		if (deliverySettings == null) {
-			settings = DeliverySettings.createDefaultSettings();
+		HttpServiceEndpoint endpoint = persistenceService
+				.findHttpService(descriptor.getHost(), descriptor.getPort());
+		if (endpoint != null) {
+			endpoint.setServiceName(serviceName);
+			DeliverySettings settings;
+			if (deliverySettings != null) {
+				settings = new DeliverySettings();
+				settings.setRetryDelay(deliverySettings.getRetryDelay());
+				settings.setRetryNumber(deliverySettings.getRetryNumber());
+				settings.setEndpoint(endpoint);
+				endpoint.setDeliverySettings(settings);
+			}
 		} else {
-			settings = new DeliverySettings();
-			settings.setRetryDelay(deliverySettings.getRetryDelay());
-			settings.setRetryNumber(deliverySettings.getRetryNumber());
+			endpoint = new HttpServiceEndpoint();
+			endpoint.setServiceName(serviceName);
+			endpoint.setServiceURL(descriptor.getHost());
+			endpoint.setServicePort(descriptor.getPort());
+			DeliverySettings settings;
+			if (deliverySettings == null) {
+				settings = DeliverySettings.createDefaultSettings();
+			} else {
+				settings = new DeliverySettings();
+				settings.setRetryDelay(deliverySettings.getRetryDelay());
+				settings.setRetryNumber(deliverySettings.getRetryNumber());
+			}
+			settings.setEndpoint(endpoint);
+			endpoint.setDeliverySettings(settings);
 		}
-		settings.setEndpoint(endpoint);
-		endpoint.setDeliverySettings(settings);
 		return endpoint;
 	}
 
+	@Transactional
 	private JMSServiceEndpoint createJmsEntity(
 			JMSEndpointDescriptorDTO descriptor,
 			String serviceName, DeliverySettingsDTO deliverySettings) {
-		JMSServiceEndpoint endpoint = new JMSServiceEndpoint();
-		endpoint.setConnectionFactory(descriptor.getConnectionFactory());
-		String jndiProperties = null;
+
+		String jndiProperties;
 		try {
 			jndiProperties = mapper.
 					writeValueAsString(descriptor.getJndiProperties());
 		} catch (JsonProcessingException e) {
 			throw new TargetRegistrationException(e);
 		}
-		endpoint.setJndiProperties(jndiProperties);
-		endpoint.setServiceName(serviceName);
-		DeliverySettings settings;
-		if (deliverySettings == null) {
-			settings = DeliverySettings.createDefaultSettings();
+		String connectionFactory = descriptor.getConnectionFactory();
+		JMSServiceEndpoint endpoint = persistenceService
+				.findJmsService(connectionFactory,jndiProperties);
+		if (endpoint != null) {
+			endpoint.setServiceName(serviceName);
+			DeliverySettings settings;
+			if (deliverySettings != null) {
+				settings = new DeliverySettings();
+				settings.setRetryDelay(deliverySettings.getRetryDelay());
+				settings.setRetryNumber(deliverySettings.getRetryNumber());
+				settings.setEndpoint(endpoint);
+				endpoint.setDeliverySettings(settings);
+			}
 		} else {
-			settings = new DeliverySettings();
-			settings.setRetryDelay(deliverySettings.getRetryDelay());
-			settings.setRetryNumber(deliverySettings.getRetryNumber());
+			endpoint = new JMSServiceEndpoint();
+			endpoint.setConnectionFactory(connectionFactory);
+			endpoint.setJndiProperties(jndiProperties);
+			endpoint.setServiceName(serviceName);
+			DeliverySettings settings;
+			if (deliverySettings == null) {
+				settings = DeliverySettings.createDefaultSettings();
+			} else {
+				settings = new DeliverySettings();
+				settings.setRetryDelay(deliverySettings.getRetryDelay());
+				settings.setRetryNumber(deliverySettings.getRetryNumber());
+			}
+			settings.setEndpoint(endpoint);
+			endpoint.setDeliverySettings(settings);
 		}
-		settings.setEndpoint(endpoint);
-		endpoint.setDeliverySettings(settings);
 		return endpoint;
 	}
 

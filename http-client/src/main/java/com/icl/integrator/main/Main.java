@@ -32,10 +32,10 @@ public class Main {
 		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
 				new EndpointDTO<>(EndpointType.HTTP, desr);
 //		autoRegister(httpClient);//TODO handle dups
-		ResponseDTO<Map<String, ResponseDTO<UUID>>> mapResponseDTO =
-				sendAuto(httpClient);
-		System.out.println(mapResponseDTO);
-//	    register(httpClient);
+//		ResponseDTO<Map<String, ResponseDTO<UUID>>> mapResponseDTO =
+//				sendAuto(httpClient);
+//		System.out.println(mapResponseDTO);
+	    register(httpClient);
 //	    deliver(httpClient);
 
 	}
@@ -190,6 +190,7 @@ public class Main {
 		actionDTO.setActionName("ACTION");
 		regDTO.setActionRegistrations(
 				Arrays.asList(new ActionRegistrationDTO<>(actionDTO, true)));
+		regDTO.setDeliverySettings(new DeliverySettingsDTO(10,15000));
 		//----------------------------------------------------------------------
 		return httpClient.registerService(regDTO);
 	}

@@ -18,8 +18,7 @@ import java.util.UUID;
  * Time: 13:51
  * To change this template use File | Settings | File Templates.
  */
-//TODO обработчик на создание. проверять есть ли сгенеренный сервис или экшон
-	//также убрать getSingleResult
+//TODO tакже убрать getSingleResult
 @Service
 public class PersistenceService {
 
@@ -48,6 +47,16 @@ public class PersistenceService {
     public <T extends AbstractEntity> T merge(T entity) {
         return em.merge(entity);
     }
+
+	@Transactional
+	public <T extends AbstractEntity> T saveOrUpdate(T entity) {
+		if(entity.getId() == null){
+			em.persist(entity);
+			return entity;
+		} else {
+			return em.merge(entity);
+		}
+	}
 
 	@Transactional
 	public <T extends AbstractEntity> T refresh(T entity) {
