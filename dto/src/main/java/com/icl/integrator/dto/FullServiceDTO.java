@@ -14,38 +14,42 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class FullServiceDTO<T extends EndpointDescriptor,
-        Y extends ActionDescriptor> {
+		Y extends ActionDescriptor> {
 
-    private String serviceName;
+	private String serviceName;
 
-    private EndpointDTO<T> serviceEndpoint;
+	private EndpointDTO<T> serviceEndpoint;
 
-    private List<ActionEndpointDTO<Y>> actions;
+	private List<ActionEndpointDTO<Y>> actions;
 
-    public FullServiceDTO() {
-    }
+	public FullServiceDTO() {
+	}
 
-    public String getServiceName() {
-        return serviceName;
-    }
+	public String getServiceName() {
+		return serviceName;
+	}
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
 
-    public EndpointDTO<T> getServiceEndpoint() {
-        return serviceEndpoint;
-    }
+	public EndpointDTO<T> getServiceEndpoint() {
+		return serviceEndpoint;
+	}
 
-    public void setServiceEndpoint(EndpointDTO<T> serviceEndpoint) {
-        this.serviceEndpoint = serviceEndpoint;
-    }
+	public void setServiceEndpoint(EndpointDTO<T> serviceEndpoint) {
+		this.serviceEndpoint = serviceEndpoint;
+	}
 
-    public List<ActionEndpointDTO<Y>> getActions() {
-        return actions;
-    }
+	public List<ActionEndpointDTO<Y>> getActions() {
+		return actions;
+	}
 
-    public void setActions(List<ActionEndpointDTO<Y>> actions) {
-        this.actions = actions;
-    }
+	public void setActions(List<ActionEndpointDTO<Y>> actions) {
+		this.actions = actions;
+	}
+
+	public void addAction(ActionEndpointDTO<Y> actionEndpointDTO) {
+		this.actions.add(actionEndpointDTO);
+	}
 }

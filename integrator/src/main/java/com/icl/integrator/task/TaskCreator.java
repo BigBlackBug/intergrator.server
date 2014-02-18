@@ -15,6 +15,9 @@ import java.util.concurrent.Callable;
  * To change this template use File | Settings | File Templates.
  */
 
+/**
+ * @param <T> - тип результата
+ */
 public class TaskCreator<T> {
 
     private static long counter = 0;
@@ -38,6 +41,10 @@ public class TaskCreator<T> {
     public TaskCreator setCallback(Callback<T> callback) {
         taskRunnable.setCallback(callback);
         return this;
+    }
+
+    public Callback<T> getCallback() {
+        return taskRunnable.getCallback();
     }
 
     public TaskCreator setDescriptor(Descriptor<TaskCreator<T>> descriptor) {
@@ -117,19 +124,19 @@ public class TaskCreator<T> {
                 result = action.call();
             } catch (Exception e) {
                 Class<?> excClass = e.getClass();
-                Callback exceptionCallback;
+                boolean handled = false;
                 do {
-                    exceptionCallback =
+                    Callback exceptionCallback =
                             exceptionHandlerMap.get(excClass);
                     if (exceptionCallback != null) {
-                        break;
+                        exceptionCallback.execute(e);
+                        handled = true;
                     }
                     excClass = excClass.getSuperclass();
-                } while (!excClass.equals(Exception.class));
-                if (exceptionCallback == null) {
-                    exceptionCallback = defaultExceptionHandler;
+                } while (!excClass.equals(Object.class));
+                if (!handled) {
+                    defaultExceptionHandler.execute(e);
                 }
-                exceptionCallback.execute(e);
                 return;
             }
             if (callback != null) {
@@ -139,6 +146,10 @@ public class TaskCreator<T> {
 
         public void setCallback(Callback<T> callback) {
             this.callback = callback;
+        }
+
+        public Callback<T> getCallback() {
+            return callback;
         }
     }
 

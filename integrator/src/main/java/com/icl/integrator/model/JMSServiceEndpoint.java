@@ -1,10 +1,11 @@
 package com.icl.integrator.model;
 
-import org.hibernate.annotations.Cascade;
+import com.icl.integrator.util.EndpointType;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,54 +15,49 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "JMS_ENDPOINT")
-public class JMSServiceEndpoint extends AbstractEndpointEntity {
+@DiscriminatorValue(value = "JMS")
+public class JMSServiceEndpoint extends AbstractEndpointEntity<JMSAction> {
 
-    @OneToMany(fetch = FetchType.EAGER,
-               mappedBy = "jmsServiceEndpoint")
-    @Cascade(value = org.hibernate.annotations.CascadeType.ALL)
-    private List<JMSAction> jmsActions = new ArrayList<>();
+	@Column(length = 255, name = "CONNECTION_FACTORY")
+	private String connectionFactory;
 
-    @Column(nullable = false, length = 255, name = "CONNECTION_FACTORY")
-    private String connectionFactory;
+	@Column(length = 255, name = "JNDI_PROPERTIES")
+	private String jndiProperties;
 
-    @Column(nullable = false, length = 255, name = "JNDI_PROPERTIES")
-    private String jndiProperties;
+	public JMSServiceEndpoint() {
+		super(EndpointType.JMS);
+	}
 
-    public List<JMSAction> getJmsActions() {
-        return jmsActions;
-    }
+	@Override
+	public void setActions(Set<JMSAction> actions) {
+		this.actions.clear();
+		this.actions.addAll(actions);
+	}
 
-    public void setJmsActions(List<JMSAction> jmsActions) {
-        this.jmsActions = jmsActions;
-    }
+	@Override
+	public JMSAction getActionByName(String actionName) {
+		for (AbstractActionEntity entity : this.actions) {
+			if (entity.getActionName().equals(actionName)) {
+				return (JMSAction) entity;
+			}
+		}
+		return null;
+	}
 
-    public String getJndiProperties() {
-        return jndiProperties;
-    }
 
-    public void setJndiProperties(String jndiProperties) {
-        this.jndiProperties = jndiProperties;
-    }
+	public String getJndiProperties() {
+		return jndiProperties;
+	}
 
-    public String getConnectionFactory() {
-        return connectionFactory;
-    }
+	public void setJndiProperties(String jndiProperties) {
+		this.jndiProperties = jndiProperties;
+	}
 
-    public void setConnectionFactory(String connectionFactory) {
-        this.connectionFactory = connectionFactory;
-    }
+	public String getConnectionFactory() {
+		return connectionFactory;
+	}
 
-    public JMSAction getActionByName(String actionName) {
-        for (JMSAction action : jmsActions) {
-            if (action.getActionName().equals(actionName)) {
-                return action;
-            }
-        }
-        return null;
-    }
-
-    public void addAction(JMSAction action) {
-        jmsActions.add(action);
-    }
+	public void setConnectionFactory(String connectionFactory) {
+		this.connectionFactory = connectionFactory;
+	}
 }

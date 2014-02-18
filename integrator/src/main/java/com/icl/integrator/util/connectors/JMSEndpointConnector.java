@@ -91,22 +91,27 @@ public class JMSEndpointConnector implements EndpointConnector {
     @Override
     public <Request, Response> Response sendRequest(Request data,
                                                     Class<Response> responseClass)
-            throws Exception {
-        Context ctx = new InitialContext(
-                new Hashtable<>(connectionData.getJndiProperties()));
-        ConnectionFactory factory = (ConnectionFactory) ctx
-                .lookup(connectionData.getConnectionFactory());
-        Connection connection = factory.createConnection(
-                queueDescriptor.getUsername(), queueDescriptor.getPassword());
-        Session session = connection.createSession(false,
-                                                   Session.AUTO_ACKNOWLEDGE);
-        Queue queue = session.createQueue(queueDescriptor.getQueueName());
-        MessageProducer producer = session.createProducer(queue);
-        String dataJson = serializer.writeValueAsString(data);
-        TextMessage message = session.createTextMessage(dataJson);
-        producer.send(message);
-        session.close();
-        connection.close();
+            throws EndpointConnectorExceptions.JMSConnectorException {
+        try {
+            Context ctx = new InitialContext(
+                    new Hashtable<>(connectionData.getJndiProperties()));
+            ConnectionFactory factory = (ConnectionFactory) ctx
+                    .lookup(connectionData.getConnectionFactory());
+            Connection connection = factory.createConnection(
+                    queueDescriptor.getUsername(),
+                    queueDescriptor.getPassword());
+            Session session = connection.createSession(false,
+                                                       Session.AUTO_ACKNOWLEDGE);
+            Queue queue = session.createQueue(queueDescriptor.getQueueName());
+            MessageProducer producer = session.createProducer(queue);
+            String dataJson = serializer.writeValueAsString(data);
+            TextMessage message = session.createTextMessage(dataJson);
+            producer.send(message);
+            session.close();
+            connection.close();
+        } catch (Exception ex) {
+            throw new EndpointConnectorExceptions.JMSConnectorException(ex);
+        }
         return null;
     }
 

@@ -1,12 +1,15 @@
 package com.icl.integrator.services;
 
-import com.icl.integrator.dto.*;
-import com.icl.integrator.util.IntegratorException;
+import com.icl.integrator.dto.ErrorDTO;
+import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.model.Delivery;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,21 +27,29 @@ public class PacketProcessor {
     @Autowired
     private DeliveryService deliveryService;
 
-    public Map<String, ResponseDTO<UUID>> process(DeliveryDTO packet) {
-        Map<String, ResponseDTO<UUID>> serviceToRequestID = new
-                HashMap<>();
-        for (DestinationDTO destination : packet.getDestinations()) {
+	@Autowired
+	private DeliveryCreator deliveryCreator;
+
+    public Map<String, ResponseDTO<UUID>> process(List<Delivery> deliveries,
+                                                  DestinationDescriptor destinationDescriptor) {
+        //mb null
+        PersistentDestination persistentDestination =
+		        deliveryCreator.persistDestination(
+				        destinationDescriptor);
+        Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
+        for (Delivery delivery : deliveries) {
             ResponseDTO<UUID> response;
             try {
-                UUID requestID = deliveryService.deliver(destination, packet);
-                response = new ResponseDTO<>(requestID, UUID.class);
-            } catch (IntegratorException ex) {
-                ErrorDTO error = new ErrorDTO(ex);
-                response = new ResponseDTO<>(error);
+	            UUID requestID = deliveryService.deliver(delivery,
+			            persistentDestination);
+	            response = new ResponseDTO<>(requestID, UUID.class);
+            } catch (Exception ex) {
+	            ErrorDTO error = new ErrorDTO(ex);
+	            response = new ResponseDTO<>(error);
             }
-            serviceToRequestID.put(destination.getServiceName(), response);
+            serviceToRequestID
+                    .put(delivery.getEndpoint().getServiceName(), response);
         }
         return serviceToRequestID;
     }
-
 }

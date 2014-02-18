@@ -1,8 +1,12 @@
 package com.icl.integrator.httpclient;
 
 import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.RawDestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
@@ -59,14 +63,29 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         return sb.toString();
     }
 
+    @Override
+    public <T extends DestinationDescriptor> Boolean ping(
+            IntegratorPacket<Void, T> responseHandler) {
+        HttpMethodDescriptor methodPair = getMethodPath(
+                "ping", IntegratorPacket.class);
+        ParameterizedTypeReference<Boolean>
+                type = new ParameterizedTypeReference<Boolean>() {
+        };
+        try {
+            return sendRequest(responseHandler, type, methodPair);
+        } catch (MalformedURLException e) {
+            throw new IntegratorClientException(e);
+        }
+    }
+
     public Boolean ping() {
-        return ping(new IntegratorPacket<Void>
-                            (new DestinationDescriptorDTO()));
+        return ping(new IntegratorPacket<Void, DestinationDescriptor>
+                            (new RawDestinationDescriptor()));
     }
 
     public ResponseDTO<List<ServiceDTO>> getServiceList() {
-        return getServiceList(new IntegratorPacket<Void>
-                                      (new DestinationDescriptorDTO()));
+        return getServiceList(new IntegratorPacket<Void, DestinationDescriptor>
+                                      (new RawDestinationDescriptor()));
     }
 
     public ResponseDTO<List<String>> getSupportedActions(
@@ -85,9 +104,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         return deliver(new IntegratorPacket<>(delivery));
     }
 
+    //TODO format
     @Override
-    public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
-            IntegratorPacket<DeliveryDTO> delivery) {
+    public <T extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
+            IntegratorPacket<DeliveryDTO, T> delivery) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "deliver", IntegratorPacket.class);
         ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<UUID>>>>
@@ -102,20 +122,6 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
-    @Override
-    public Boolean ping(IntegratorPacket<Void> responseHandler) {
-        HttpMethodDescriptor methodPair = getMethodPath(
-                "ping", IntegratorPacket.class);
-        ParameterizedTypeReference<Boolean>
-                type = new ParameterizedTypeReference<Boolean>() {
-        };
-        try {
-            return sendRequest(responseHandler, type, methodPair);
-        } catch (MalformedURLException e) {
-            throw new IntegratorClientException(e);
-        }
-    }
-
     public <T extends ActionDescriptor>
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             TargetRegistrationDTO<T> registrationDTO) {
@@ -123,9 +129,8 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public <T extends ActionDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            IntegratorPacket <TargetRegistrationDTO<T>> registrationDTO) {
+    public <T extends ActionDescriptor, Y extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+            IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "registerService", IntegratorPacket.class);
         ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<Void>>>>
@@ -137,15 +142,19 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         } catch (MalformedURLException e) {
             throw new IntegratorClientException(e);
         }
-
     }
 
-    public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO) {
-        return isAvailable(new IntegratorPacket<>(pingDTO));
+    public ResponseDTO<Boolean> isAvailable(ServiceDestinationDescriptor serviceDescriptor) {
+	    IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>
+			    integratorPacket =
+			    new IntegratorPacket<>();
+	    integratorPacket.setPacket(serviceDescriptor);
+	    return isAvailable(integratorPacket);
     }
 
     @Override
-    public ResponseDTO<Boolean> isAvailable(IntegratorPacket<PingDTO> pingDTO) {
+    public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
+            IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "isAvailable", IntegratorPacket.class);
         ParameterizedTypeReference<ResponseDTO<Boolean>>
@@ -159,8 +168,8 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public ResponseDTO<List<ServiceDTO>> getServiceList(
-            IntegratorPacket<Void> responseHandler) {
+    public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>> getServiceList(
+            IntegratorPacket<Void, T> responseHandler) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "getServiceList", IntegratorPacket.class);
         try {
@@ -175,8 +184,8 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public ResponseDTO<List<String>> getSupportedActions(
-            IntegratorPacket<ServiceDTO> serviceDTO) {
+    public <T extends DestinationDescriptor> ResponseDTO<List<String>> getSupportedActions(
+            IntegratorPacket<ServiceDTO, T> serviceDTO) {
         HttpMethodDescriptor methodPair = getMethodPath
                 ("getSupportedActions", IntegratorPacket.class);
         try {
@@ -195,8 +204,8 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public ResponseDTO<Void> addAction(
-            IntegratorPacket<AddActionDTO> actionDTO) {
+    public <T extends DestinationDescriptor> ResponseDTO<Void> addAction(
+            IntegratorPacket<AddActionDTO, T> actionDTO) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "addAction", IntegratorPacket.class);
         try {
@@ -211,15 +220,14 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
-    ResponseDTO<FullServiceDTO<T, Y>> getServiceInfo(
-            IntegratorPacket<ServiceDTO> serviceDTO) {
+    public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor, DDType extends DestinationDescriptor> ResponseDTO<FullServiceDTO<EDType, ADType>> getServiceInfo(
+            IntegratorPacket<ServiceDTO, DDType> serviceDTO) {
         HttpMethodDescriptor methodPair = getMethodPath
                 ("getServiceInfo", IntegratorPacket.class);
         try {
-            ParameterizedTypeReference<ResponseDTO<FullServiceDTO<T, Y>>>
+            ParameterizedTypeReference<ResponseDTO<FullServiceDTO<EDType, ADType>>>
                     type =
-                    new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<T, Y>>>() {
+                    new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<EDType, ADType>>>() {
                     };
             return sendRequest(serviceDTO, type, methodPair);
         } catch (MalformedURLException e) {
@@ -227,7 +235,28 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
-    private HttpMethodDescriptor getMethodPath(String methodName,
+	@Override
+	public <T extends DestinationDescriptor, Y> ResponseDTO<List<ResponseDTO<Void>>>
+	registerAutoDetection(IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO) {
+		HttpMethodDescriptor methodPair = getMethodPath(
+				"registerAutoDetection", IntegratorPacket.class);
+		try {
+			ParameterizedTypeReference<ResponseDTO<List<ResponseDTO<Void>>>>
+					type =
+					new ParameterizedTypeReference<ResponseDTO<List<ResponseDTO<Void>>>>() {
+					};
+			return sendRequest(autoDetectionDTO, type, methodPair);
+		} catch (MalformedURLException e) {
+			throw new IntegratorClientException(e);
+		}
+	}
+
+	public <Y> ResponseDTO<List<ResponseDTO<Void>>>
+	registerAutoDetection(AutoDetectionRegistrationDTO<Y> autoDetectionDTO) {
+		return registerAutoDetection(new IntegratorPacket<>(autoDetectionDTO));
+	}
+
+	private HttpMethodDescriptor getMethodPath(String methodName,
                                                Class<?>... parameterTypes) {
         Method m = null;
         try {
@@ -241,7 +270,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     private <Response, Request> Response sendRequest(
-            Request data, ParameterizedTypeReference<Response> responseClass,
+            Request data, ParameterizedTypeReference<Response> responseType,
             HttpMethodDescriptor methodDescriptor)
             throws RestClientException, MalformedURLException {
         RestTemplate restTemplate = new RestTemplate();
@@ -254,15 +283,14 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
 
         String urlString = url.toString();
         HttpEntity<Request> requestEntity = new HttpEntity<>(data);
-
         if (methodType.equals(RequestMethod.GET)) {
             return restTemplate.
                     exchange(urlString, HttpMethod.GET,
-                             requestEntity, responseClass).getBody();
+                             requestEntity, responseType).getBody();
         } else if (methodType.equals(RequestMethod.POST)) {
             return restTemplate.
                     exchange(urlString, HttpMethod.POST,
-                             requestEntity, responseClass).getBody();
+                             requestEntity, responseType).getBody();
         } else {
             throw new MethodNotSupportedException();
         }

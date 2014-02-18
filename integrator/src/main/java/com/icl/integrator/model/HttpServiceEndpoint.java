@@ -1,10 +1,11 @@
 package com.icl.integrator.model;
 
-import org.hibernate.annotations.Cascade;
+import com.icl.integrator.util.EndpointType;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,48 +15,48 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "HTTP_ENDPOINT")
-public class HttpServiceEndpoint extends AbstractEndpointEntity{
+@DiscriminatorValue(value = "HTTP")
+public class HttpServiceEndpoint extends AbstractEndpointEntity<HttpAction> {
 
-    @Column(name = "SERVICE_PORT")
-    private Integer servicePort;
+	@Column(name = "SERVICE_PORT")
+	private Integer servicePort;
 
-    @Column(nullable = false, length = 255, name = "SERVICE_URL")
-    private String serviceURL;
+	@Column(length = 255, name = "SERVICE_URL")
+	private String serviceURL;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "httpServiceEndpoint")
-    @Cascade(value = org.hibernate.annotations.CascadeType.ALL)
-    private List<HttpAction> httpActions = new ArrayList<>();
+	public HttpServiceEndpoint() {
+		super(EndpointType.HTTP);
+	}
 
-    public HttpServiceEndpoint() {
-    }
+	@Override
+	public void setActions(Set<HttpAction> actions) {
+		this.actions.clear();
+		this.actions.addAll(actions);
+	}
 
-    public Integer getServicePort() {
-        return servicePort;
-    }
+	@Override
+	public HttpAction getActionByName(String actionName) {
+		for (AbstractActionEntity entity : this.actions) {
+			if (entity.getActionName().equals(actionName)) {
+				return (HttpAction) entity;
+			}
+		}
+		return null;
+	}
 
-    public void setServicePort(Integer servicePort) {
-        this.servicePort = servicePort;
-    }
+	public Integer getServicePort() {
+		return servicePort;
+	}
 
-    public List<HttpAction> getHttpActions() {
-        return httpActions;
-    }
+	public void setServicePort(Integer servicePort) {
+		this.servicePort = servicePort;
+	}
 
-    public void setHttpActions(
-            List<HttpAction> httpActions) {
-        this.httpActions = httpActions;
-    }
+	public String getServiceURL() {
+		return serviceURL;
+	}
 
-    public String getServiceURL() {
-        return serviceURL;
-    }
-
-    public void setServiceURL(String serviceURL) {
-        this.serviceURL = serviceURL;
-    }
-
-    public void addAction(HttpAction action) {
-        httpActions.add(action);
-    }
+	public void setServiceURL(String serviceURL) {
+		this.serviceURL = serviceURL;
+	}
 }

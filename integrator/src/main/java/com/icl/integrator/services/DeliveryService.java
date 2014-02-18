@@ -2,16 +2,15 @@ package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.icl.integrator.dto.*;
-import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.model.TaskLogEntry;
+import com.icl.integrator.dto.ErrorDTO;
+import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.dto.ResponseFromTargetDTO;
+import com.icl.integrator.model.AbstractActionEntity;
+import com.icl.integrator.model.AbstractEndpointEntity;
+import com.icl.integrator.model.Delivery;
+import com.icl.integrator.model.DeliveryStatus;
 import com.icl.integrator.task.Callback;
-import com.icl.integrator.task.Descriptor;
 import com.icl.integrator.task.TaskCreator;
-import com.icl.integrator.task.retryhandler.DatabaseRetryHandler;
-import com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory;
-import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.apache.commons.logging.Log;
@@ -19,9 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.MessageFormat;
+import java.util.Date;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 import static org.springframework.util.StringUtils.quote;
 
@@ -35,212 +33,258 @@ import static org.springframework.util.StringUtils.quote;
 @Service
 public class DeliveryService {
 
-    private static Log logger = LogFactory.getLog(DeliveryService.class);
+	private static Log logger = LogFactory.getLog(DeliveryService.class);
 
-    @Autowired
-    protected RequestScheduler scheduler;
+	@Autowired
+	protected Scheduler scheduler;
 
-    @Autowired
-    private EndpointConnectorFactory factory;
+	@Autowired
+	private EndpointConnectorFactory factory;
 
-    @Autowired
-    private DatabaseRetryHandlerFactory databaseRetryHandlerFactory;
+	@Autowired
+	private DeliveryCreator deliveryCreator;
 
-    @Autowired
-    private ObjectMapper serializer;
+	@Autowired
+	private ObjectMapper mapper;
 
-    public <T> void deliver(DestinationDescriptorDTO sourceService, T packet)
-            throws IntegratorException {
-        logger.info("Scheduling a request to service " +
-                            "defined as source -> " +
-                            sourceService.getActionDescriptor());
-        EndpointConnector sourceConnector = factory.createEndpointConnector(
-                sourceService.getEndpoint(),
-                sourceService.getActionDescriptor());
-        DeliveryCallable<ResponseFromIntegratorDTO<T>>
-                deliveryCallable =
-                new DeliveryCallable<>(
-                        sourceConnector,
-                        new ResponseFromIntegratorDTO<>(packet));
-        scheduler.schedule(new TaskCreator<>(deliveryCallable));
-    }
+	@Autowired
+	private PersistenceService persistenceService;
 
-    public UUID deliver(DestinationDTO destination,
-                        DeliveryDTO packet) throws IntegratorException {
-        logger.info("Scheduling a request to target " +
-                            destination.getServiceName());
-        EndpointConnector destinationConnector =
-                factory.createEndpointConnector(destination,
-                                                packet.getAction());
-        DeliveryCallable<RequestDataDTO> deliveryCallable =
-                new DeliveryCallable<>(destinationConnector, packet.getRequestData());
-        DestinationDescriptorDTO targetResponseHandler =
-                packet.getTargetResponseHandlerDescriptor();
-        if (targetResponseHandler != null) {
-            EndpointDTO endpoint = targetResponseHandler.getEndpoint();
-            ActionDescriptor actionDescriptor = targetResponseHandler
-                    .getActionDescriptor();
-            EndpointConnector targetResponseConnector = factory
-                    .createEndpointConnector(endpoint, actionDescriptor);
-            return deliver(deliveryCallable, targetResponseConnector,
-                           destination);
-        }
-        return deliver(deliveryCallable, destination, packet);
-    }
+	private <T> UUID executeDelivery(
+			final DeliveryCallable<T, ResponseDTO> deliveryCallable,
+			PersistentDestination persistentDestination,
+			final Delivery delivery) {
+		UUID requestID = UUID.randomUUID();
+		logger.info("Generated an ID for the request: " + quote(
+				requestID.toString()));
+		TaskCreator<ResponseDTO> deliveryTaskCreator =
+				new TaskCreator<>(deliveryCallable);
+//		deliveryTaskCreator.setDescriptor(
+//				new Descriptor<TaskCreator<ResponseDTO>>() {
+//					@Override
+//					public String describe(
+//							TaskCreator<ResponseDTO> creator) {
+//						return "Отправка запроса: " +
+//								deliveryCallable.getConnector().toString();
+//					}
+//				});
+        //accepts real response
+		Callback<ErrorDTO> deliveryFailed = null;
+        //accepts raw response. must be wrapped
+        SourceDeliveryCallback<ResponseDTO> deliverySuccess = null;
+		if (persistentDestination != null) {
+			String targetServiceName = delivery.getEndpoint().getServiceName();
+			deliveryFailed = new SourceDeliveryFailedCallback(requestID,
+			                                                  persistentDestination, targetServiceName);
+			deliverySuccess = new SourceDeliverySuccessCallback(requestID,
+			                                                    persistentDestination, targetServiceName);
+		}/*else{
+            deliveryFailed = new Callback<ErrorDTO>() {
+                @Override
+                public void execute(ErrorDTO arg) {
+                delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_FAILED);
+                persistenceService.merge(delivery);
+                }
+            };
+        }  */
+		deliveryTaskCreator.setCallback(new DeliverySuccessCallback(
+				delivery, requestID, deliverySuccess));
 
-    private <T> UUID deliver(final DeliveryCallable<T> deliveryCallable,
-                             DestinationDTO destinationDTO,
-                             DeliveryDTO packet) {
-        UUID requestID = UUID.randomUUID();
-        logger.info("Generated an ID for the request: " + quote(
-                requestID.toString()));
+		//статус деливери failed ставим в шедулере
+        //тут шедуль принимающий ответ
+		scheduler.scheduleDelivery(new Schedulable<>(deliveryTaskCreator,
+		                                             delivery),
+		                           deliveryFailed);
+		return requestID;
+	}
 
-        DatabaseRetryHandler handler =
-                createRetryHandler(packet, destinationDTO, requestID);
+	public UUID deliver(Delivery delivery) {
+		return deliver(delivery, null);
+	}
 
-        TaskCreator<ResponseDTO> deliveryTaskCreator =
-                new TaskCreator<>(deliveryCallable);
-        deliveryTaskCreator.setDescriptor(
-                new Descriptor<TaskCreator<ResponseDTO>>() {
-                    @Override
-                    public String describe(
-                            TaskCreator<ResponseDTO> creator) {
-                        return "Отправка запроса: " +
-                                deliveryCallable.getConnector().toString();
-                    }
-                });
-        if (destinationDTO.scheduleRedelivery()) {
-            scheduler.schedule(deliveryTaskCreator, handler);
-        } else {
-            scheduler.schedule(deliveryTaskCreator);
-        }
-        return requestID;
-    }
+	public UUID deliver(Delivery delivery,
+	                    PersistentDestination persistentDestination) {
+		//detached
+		AbstractEndpointEntity endpoint = delivery.getEndpoint();
+		AbstractActionEntity action = delivery.getAction();
 
-    private DatabaseRetryHandler createRetryHandler(
-            DeliveryDTO packet, DestinationDTO destinationDTO,
-            UUID requestID) {
-        DatabaseRetryHandler handler =
-                databaseRetryHandlerFactory.createHandler();
-        TaskLogEntry logEntry =
-                createTaskLogEntry(packet.getRequestData(), destinationDTO, requestID);
-        handler.setLogEntry(logEntry);
-        return handler;
-    }
+		logger.info("Scheduling a request to target " +
+				            endpoint.getServiceName());
+		EndpointConnector destinationConnector =
+				factory.createEndpointConnector(endpoint, action);
+		DeliveryCallable<String, ResponseDTO> deliveryCallable =
+				new DeliveryCallable<>(destinationConnector,delivery.getDeliveryData(),
+				                       ResponseDTO.class);
 
-    private TaskLogEntry createTaskLogEntry(RequestDataDTO packet,
-                                            DestinationDTO destinationDTO,
-                                            UUID requestID) {
-        TaskLogEntry logEntry = new TaskLogEntry();
-        String generalMessage = "Не могу доставить запрос {0} " +
-                "на сервис {1}";
-        String targetServiceName = destinationDTO.getServiceName();
-        generalMessage = MessageFormat.format(generalMessage, requestID,
-                                              targetServiceName);
-        logEntry.setMessage(generalMessage);
+		return executeDelivery(deliveryCallable, persistentDestination,
+		                       delivery);
+	}
 
-        String dataJson = null;
-        try {
-            dataJson = serializer.writeValueAsString(packet);
-        } catch (JsonProcessingException e) {
-            logEntry.setAdditionalMessage(e.getMessage());
-            logger.info("Unable to serialize incoming json data");
-        }
-        logEntry.setDataJson(dataJson);
-        return logEntry;
-    }
+	private class DeliverySuccessCallback implements Callback<ResponseDTO> {
 
-    private <T> UUID deliver(final DeliveryCallable<T> deliveryCallable,
-                             EndpointConnector targetResponseConnector,
-                             DestinationDTO destinationDTO) {
-        UUID requestID = UUID.randomUUID();
-        logger.info("Generated an ID for the request: " + quote(
-                requestID.toString()));
-        TaskCreator<ResponseDTO> deliveryTaskCreator =
-                new TaskCreator<>(deliveryCallable);
-        deliveryTaskCreator.setDescriptor(
-                new Descriptor<TaskCreator<ResponseDTO>>() {
-                    @Override
-                    public String describe(
-                            TaskCreator<ResponseDTO> creator) {
-                        return "Отправка запроса: " +
-                                deliveryCallable.getConnector().toString();
-                    }
-                });
-        Callable<Void> deliveryFailedCallable = new DeliveryFailedCallable(
-                targetResponseConnector, destinationDTO, requestID);
-        deliveryTaskCreator.setCallback(new DeliverySuccessCallback(
-                targetResponseConnector, destinationDTO, requestID));
+		private final Delivery delivery;
 
-        if (destinationDTO.scheduleRedelivery()) {
-            scheduler.schedule(deliveryTaskCreator, deliveryFailedCallable);
-        } else {
-            scheduler.schedule(deliveryTaskCreator);
-        }
-        return requestID;
-    }
+		private final UUID requestID;
 
-    private class DeliverySuccessCallback implements
-            Callback<ResponseDTO> {
+		private Callback<ResponseDTO> afterExecution;
 
-        private final Callable<Void> successCallable = new
-                Callable<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        ResponseFromTargetDTO data =
-                                new ResponseFromTargetDTO(
-                                        responseDTO,
-                                        destination.getServiceName(),
-                                        requestID.toString());
-                        targetResponseConnector
-                                .sendRequest(data, ResponseDTO.class);
-                        return null;
-                    }
-                };
+		public DeliverySuccessCallback(Delivery delivery, UUID requestID,
+		                               Callback<ResponseDTO> afterExecution) {
+			this.delivery = delivery;
+			this.afterExecution = afterExecution;
+			this.requestID = requestID;
+		}
 
-        private final DestinationDTO destination;
+		public DeliverySuccessCallback(Delivery delivery, UUID requestID) {
+			this.delivery = delivery;
+			this.requestID = requestID;
+		}
 
-        private final UUID requestID;
+		@Override
+		public void execute(ResponseDTO responseDTO) {
+			String responseString = null;
+			try {
+				if (responseDTO != null) {
+					responseString = mapper.writeValueAsString(responseDTO);
+				}
+			} catch (JsonProcessingException e) {
+				responseString = "Unable to serialize response from " +
+						"target";
+			}
+			delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_OK);
+			delivery.setResponseData(responseString);
+			delivery.setResponseDate(new Date());
+			persistenceService.merge(delivery);
+			if (afterExecution != null) {
+				ResponseDTO<ResponseFromTargetDTO>
+						data =
+						new ResponseDTO<>(new ResponseFromTargetDTO(
+								responseDTO,
+								delivery.getEndpoint().getServiceName(),
+								requestID.toString()));
+				afterExecution.execute(data);
+			}
+		}
+	}
 
-        private final EndpointConnector targetResponseConnector;
+    private abstract class SourceDeliveryCallback<T> implements Callback<T>{
+        protected final PersistentDestination persistentDestination;
 
-        //  получаем после выполнения метода
-        private ResponseDTO responseDTO;
+        protected final String targetServiceName;
 
-        private DeliverySuccessCallback(EndpointConnector targetResponseConnector,
-                                        DestinationDTO
-                                                destination, UUID requestID) {
-            this.destination = destination;
-            this.targetResponseConnector = targetResponseConnector;
+        protected final UUID requestID;
+
+        private Log logger = LogFactory.getLog(SourceDeliveryCallback.class);
+
+        public SourceDeliveryCallback(UUID requestID,
+                                      PersistentDestination persistentDestination,
+                                      String targetServiceName) {
             this.requestID = requestID;
+            this.persistentDestination = persistentDestination;
+            this.targetServiceName = targetServiceName;
+        }
+
+//	    @Transactional
+        protected void deliver(ResponseDTO data){
+            logger.info("Sending response to the source from " +
+		                        targetServiceName);
+
+            AbstractEndpointEntity service =
+                    persistentDestination.getService();
+            AbstractActionEntity action =
+                    persistentDestination.getAction();
+            final EndpointConnector sourceConnector =
+                    factory.createEndpointConnector(service,action);
+	        Delivery sourceDelivery;
+	        try {
+		        sourceDelivery =
+				        deliveryCreator.createDelivery(service, action, data);
+	        } catch (JsonProcessingException e) {
+		        //will never happen
+		        return;
+	        }
+            DeliveryCallable<ResponseDTO, Void>
+                    successCallable =
+                    new DeliveryCallable<>(sourceConnector, data,
+                                           Void.class);
+
+//				ObjectNode node = mapper.valueToTree(responseFromTarget);
+//				String message = "Не смогли вернуть запрос " +
+//						"на источник по адресу {0}";
+//				DatabaseRetryHandler handler =
+//						databaseRetryHandlerFactory.createHandler();
+//				TaskLogEntry logEntry = new TaskLogEntry(
+//						MessageFormat.format(message,
+//						                     sourceConnector.toString()),
+//						node);
+//				handler.setLogEntry(logEntry);
+            TaskCreator<Void> deliveryToSource =
+                    new TaskCreator<>(successCallable);
+//				deliveryToSource
+//						.setDescriptor(new Descriptor<TaskCreator<Void>>() {
+//							@Override
+//							public String describe(TaskCreator<Void> object) {
+//								return "Отправка запроса: " +
+//										sourceConnector
+//												.toString();
+//							}
+//						});
+            deliveryToSource.setCallback(new DeliveryStatusSetter(
+		            sourceDelivery, DeliveryStatus.DELIVERY_OK));
+
+	        scheduler.scheduleGeneral(
+			        new Schedulable<>(deliveryToSource, sourceDelivery), null);
+        }
+    }
+
+	//TODO убрать нафиг
+	private class SourceDeliverySuccessCallback extends
+            SourceDeliveryCallback<ResponseDTO> {
+
+        public SourceDeliverySuccessCallback(UUID requestID,
+                                             PersistentDestination persistentDestination,
+                                             String targetServiceName) {
+            super(requestID, persistentDestination, targetServiceName);
+        }
+
+		@Override
+		public void execute(ResponseDTO responseToSource) {
+            deliver(responseToSource);
+		}
+	}
+
+    private class SourceDeliveryFailedCallback extends
+            SourceDeliveryCallback<ErrorDTO> {
+
+        public SourceDeliveryFailedCallback(UUID requestID,
+                                            PersistentDestination persistentDestination,
+                                            String targetServiceName) {
+            super(requestID, persistentDestination, targetServiceName);
         }
 
         @Override
-        public void execute(ResponseDTO responseDTO) {
-            logger.info("Sending response to the source from " + destination
-                    .getServiceName());
-            this.responseDTO = responseDTO;
-            ObjectMapper mapper = new ObjectMapper();
-            ObjectNode node = mapper.valueToTree(responseDTO);
-            String message = "Не смогли вернуть запрос " +
-                    "на источник по адресу {0}";
-            DatabaseRetryHandler handler =
-                    databaseRetryHandlerFactory.createHandler();
-            TaskLogEntry logEntry = new TaskLogEntry(
-                    MessageFormat.format(message, targetResponseConnector.toString()),
-                    node);
-            handler.setLogEntry(logEntry);
-            TaskCreator<Void> taskCreator = new TaskCreator<>(successCallable);
-            taskCreator.setDescriptor(
-                    new Descriptor<TaskCreator<Void>>() {
-                        @Override
-                        public String describe(
-                                TaskCreator<Void> creator) {
-                            return "Отправка запроса: " + targetResponseConnector
-                                    .toString();
-                        }
-                    });
-            scheduler.schedule(taskCreator, handler);
+        public void execute(ErrorDTO errorDTO) {
+            deliver(new ResponseDTO<>(errorDTO));
         }
     }
+
+	private class DeliveryStatusSetter implements Callback<Void> {
+
+		private final DeliveryStatus deliveryStatus;
+
+		private final Delivery delivery;
+
+		private DeliveryStatusSetter(Delivery delivery,
+		                             DeliveryStatus deliveryStatus) {
+			this.deliveryStatus = deliveryStatus;
+			this.delivery = delivery;
+		}
+
+		@Override
+		public void execute(Void arg) {
+			delivery.setDeliveryStatus(deliveryStatus);
+			persistenceService.merge(delivery);
+		}
+	}
+
 }
