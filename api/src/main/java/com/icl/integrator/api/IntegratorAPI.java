@@ -2,8 +2,10 @@ package com.icl.integrator.api;
 
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 
@@ -20,7 +22,8 @@ import java.util.UUID;
  */
 public interface IntegratorAPI {
 
-    public <T extends DestinationDescriptor>
+    public
+    <T extends DestinationDescriptor>
     ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             IntegratorPacket<DeliveryDTO, T> delivery);
 
@@ -32,7 +35,7 @@ public interface IntegratorAPI {
             IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
 
     public <T extends DestinationDescriptor>
-    ResponseDTO<Boolean> isAvailable(IntegratorPacket<PingDTO, T> pingDTO);
+    ResponseDTO<Boolean> isAvailable(IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO);
 
     public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>>
     getServiceList(IntegratorPacket<Void, T> packet);
@@ -48,4 +51,6 @@ public interface IntegratorAPI {
     public <T extends DestinationDescriptor> ResponseDTO<Void>
     addAction(IntegratorPacket<AddActionDTO, T> actionDTO);
 
+	public <T extends DestinationDescriptor,Y> ResponseDTO<List<ResponseDTO<Void>>> registerAutoDetection(
+			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);
 }

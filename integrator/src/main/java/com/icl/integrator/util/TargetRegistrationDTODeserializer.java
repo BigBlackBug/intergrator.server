@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.dto.registration.ActionEndpointDTO;
-import com.icl.integrator.dto.registration.ActionRegistrationDTO;
-import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.registration.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +19,7 @@ import java.util.List;
  * Time: 14:03
  * To change this template use File | Settings | File Templates.
  */
+//TODO add null handlers freaking everywhere
 public class TargetRegistrationDTODeserializer extends
         JsonDeserializer<TargetRegistrationDTO> {
 
@@ -31,7 +29,10 @@ public class TargetRegistrationDTODeserializer extends
         ObjectNode treeNode = jp.readValueAsTree();
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         TargetRegistrationDTO dto = new TargetRegistrationDTO();
-        dto.setServiceName(treeNode.get("serviceName").asText());
+	    dto.setDeliverySettings(
+			    mapper.readValue(treeNode.get("deliverySettings").toString(),
+			                     DeliverySettingsDTO.class));
+	    dto.setServiceName(treeNode.get("serviceName").asText());
         EndpointDTO endpoint =
                 mapper.readValue(treeNode.get("endpoint").toString(),
                                  EndpointDTO.class);

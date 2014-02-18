@@ -3,8 +3,10 @@ package com.icl.integrator.springapi;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import org.springframework.http.MediaType;
@@ -32,8 +34,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @Override
     @RequestMapping(value = "deliver", method = RequestMethod.POST)
     public
-    @ResponseBody
-    <T extends DestinationDescriptor>
+    @ResponseBody  <T extends DestinationDescriptor>
     ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             @RequestBody(required = true)
             IntegratorPacket<DeliveryDTO, T> delivery);
@@ -61,7 +62,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @ResponseBody
     <T extends DestinationDescriptor>
     ResponseDTO<Boolean> isAvailable(@RequestBody(required = true)
-                                     IntegratorPacket<PingDTO, T> pingDTO);
+                                     IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO);
 
     @Override
     @RequestMapping(value = "getServiceList", method = RequestMethod.POST)
@@ -95,4 +96,13 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     ResponseDTO<FullServiceDTO<EDType, ADType>> getServiceInfo(
             @RequestBody(required = true)
             IntegratorPacket<ServiceDTO, DDType> serviceDTO);
+
+	@Override
+	@RequestMapping(value = "registerAutoDetection", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor, Y>
+	ResponseDTO<List<ResponseDTO<Void>>> registerAutoDetection(
+			@RequestBody(required = true)
+			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);
 }

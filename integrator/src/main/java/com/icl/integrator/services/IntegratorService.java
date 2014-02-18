@@ -1,21 +1,24 @@
 package com.icl.integrator.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.model.RequestLogEntry;
+import com.icl.integrator.model.AbstractActionEntity;
+import com.icl.integrator.model.AbstractEndpointEntity;
+import com.icl.integrator.model.Delivery;
+import com.icl.integrator.services.validation.ValidationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,55 +48,37 @@ public class IntegratorService implements IntegratorAPI {
     @Autowired
     private DeliveryService deliveryService;
 
-    @Autowired
-    private PersistenceService persistenceService;
+	@Autowired
+	private DeliveryCreator deliveryCreator;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+	@Autowired
+	private ValidationService validationService;
 
-    private <Request, Response> RequestLogEntry createLogEntry(
-            RequestLogEntry.RequestType requestType, Date requestTime,
-            Request requestData, Response responseData) {
-        RequestLogEntry entry = new RequestLogEntry();
-        try {
-            entry.setRequestData(objectMapper.writeValueAsString(requestData));
-        } catch (JsonProcessingException e) {
-            logger.info("Unable to convert request entity to json");
-            return null;
-        }
-        entry.setRequestDate(requestTime);
-        entry.setRequestType(requestType);
-        try {
-            entry.setResponseData(
-                    objectMapper.writeValueAsString(responseData));
-        } catch (JsonProcessingException e) {
-            logger.info("Unable to convert request entity to json");
-            return null;
-        }
-        return entry;
-    }
+	@Autowired
+	private ObjectMapper mapper;
 
-    @Override
-    public <T extends DestinationDescriptor> ResponseDTO<Map<String,
+	@Override
+    public  <T extends DestinationDescriptor> ResponseDTO<Map<String,
             ResponseDTO<UUID>>> deliver(
             IntegratorPacket<DeliveryDTO, T> delivery) {
         logger.info("Received a delivery request");
         ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
         try {
-            Date requestTime = new Date();
+	        DeliveryDTO packet = delivery.getPacket();
+	        validationService.validate(packet.getRequestData());
+
+            Deliveries deliveries =
+		            deliveryCreator.createDeliveries(packet);
+            //посылаем в шыну
             PacketProcessor processor = processorFactory.createProcessor();
             Map<String, ResponseDTO<UUID>> serviceToRequestID =
-                    processor.process(delivery.getPacket());
-
+                    processor.process(deliveries.getDeliveries(),
+                                      packet.getResponseHandlerDescriptor());
+            serviceToRequestID.putAll(deliveries.getErrorMap());
             response = new ResponseDTO<Map<String, ResponseDTO<UUID>>>(serviceToRequestID);
-            RequestLogEntry logEntry =
-                    createLogEntry(RequestLogEntry.RequestType.DELIVERY,
-                                   requestTime, delivery, serviceToRequestID);
-            persistenceService.merge(logEntry);
         } catch (Exception ex) {
             response = new ResponseDTO<Map<String, ResponseDTO<UUID>>>(ex);
         }
-        //TODO стоп, а что если он пустой?
         sendResponse(delivery.getResponseHandlerDescriptor(), response);
         return response;
     }
@@ -111,7 +96,6 @@ public class IntegratorService implements IntegratorAPI {
     ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
             IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
         logger.info("Received a service registration request");
-        Date requestTime = new Date();
         ResponseDTO<Map<String, ResponseDTO<Void>>> response;
         try {
             Map<String, ResponseDTO<Void>> result =
@@ -120,10 +104,6 @@ public class IntegratorService implements IntegratorAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<Map<String, ResponseDTO<Void>>>(new ErrorDTO(ex));
         }
-        RequestLogEntry logEntry =
-                createLogEntry(RequestLogEntry.RequestType.REGISTRATION,
-                               requestTime, registrationDTO, response);
-        persistenceService.merge(logEntry);
 
         sendResponse(registrationDTO.getResponseHandlerDescriptor(), response);
         return response;
@@ -131,16 +111,16 @@ public class IntegratorService implements IntegratorAPI {
 
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
-            IntegratorPacket<PingDTO, T> pingDTO) {
-        logger.info("Received a ping request for " + pingDTO);
+            IntegratorPacket<ServiceDestinationDescriptor, T> serviceDescriptor) {
+        logger.info("Received a ping request for " + serviceDescriptor);
         ResponseDTO<Boolean> response;
         try {
-            workerService.pingService(pingDTO.getPacket());
+            workerService.pingService(serviceDescriptor.getPacket());
             response = new ResponseDTO<Boolean>(Boolean.TRUE, Boolean.class);
         } catch (Exception ex) {
             response = new ResponseDTO<Boolean>(new ErrorDTO(ex));
         }
-        sendResponse(pingDTO.getResponseHandlerDescriptor(), response);
+        sendResponse(serviceDescriptor.getResponseHandlerDescriptor(), response);
         return response;
     }
 
@@ -156,7 +136,7 @@ public class IntegratorService implements IntegratorAPI {
         }
 
         sendResponse(packet.getResponseHandlerDescriptor(), response);
-        return response;//TODO тут кагбэ ошибка вылетает
+        return response;
     }
 
     @Override
@@ -207,16 +187,47 @@ public class IntegratorService implements IntegratorAPI {
         return response;
     }
 
-    private <T> void sendResponse(DestinationDescriptor responseHandler,
-                                  T response) {
-        if (responseHandler != null) {
-            try {
-                deliveryService.deliver(responseHandler, response);
-            } catch (Exception ex) {
-                logger.error("Не могу отправить ответ на дополнительный " +
-                                     "эндпоинт", ex);
-            }
-        }
-    }
+	//TODO rename endpoint to service
+	private <T> void sendResponse(DestinationDescriptor destinationDescriptor,
+	                              T response) {
+		if (destinationDescriptor != null) {
+			Delivery delivery;
+			try {
+				PersistentDestination destination = deliveryCreator
+						.persistDestination(destinationDescriptor);
+				AbstractActionEntity action = destination.getAction();
+				AbstractEndpointEntity service = destination.getService();
+				delivery = deliveryCreator.createDelivery(service,action,response);
+			} catch (Exception ex) {
+				logger.error("Ошибка создания конечной точки доставки", ex);
+				return;
+			}
+			try {
+				deliveryService.deliver(delivery);
+			} catch (Exception ex) {
+				logger.error("Не могу отправить ответ на дополнительный " +
+						             "сервис", ex);
+				return;
+			}
+		}
+	}
+
+	@Override
+	public <T extends DestinationDescriptor,Y> ResponseDTO<List<ResponseDTO<Void>>>
+	registerAutoDetection(
+			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO) {
+		logger.info("Received an autodetection registration request");
+		ResponseDTO<List<ResponseDTO<Void>>> response;
+		try {
+			List<ResponseDTO<Void>> result =
+					registrationService.register(autoDetectionDTO.getPacket());
+			response = new ResponseDTO<List<ResponseDTO<Void>>>(result);
+		} catch (Exception ex) {
+			response = new ResponseDTO<List<ResponseDTO<Void>>>(new ErrorDTO(ex));
+		}
+
+		sendResponse(autoDetectionDTO.getResponseHandlerDescriptor(), response);
+		return response;
+	}
 
 }

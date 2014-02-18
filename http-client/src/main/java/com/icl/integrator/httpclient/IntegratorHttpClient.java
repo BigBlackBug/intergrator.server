@@ -3,8 +3,10 @@ package com.icl.integrator.httpclient;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
+import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
+import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
@@ -142,12 +144,18 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     public ResponseDTO<Boolean> isAvailable(PingDTO pingDTO) {
-        return isAvailable(new IntegratorPacket<PingDTO, DestinationDescriptor>(pingDTO));
+        return isAvailable(new IntegratorPacket<>(pingDTO));
+    public ResponseDTO<Boolean> isAvailable(ServiceDestinationDescriptor serviceDescriptor) {
+	    IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>
+			    integratorPacket =
+			    new IntegratorPacket<>();
+	    integratorPacket.setPacket(serviceDescriptor);
+	    return isAvailable(integratorPacket);
     }
 
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
-            IntegratorPacket<PingDTO, T> pingDTO) {
+            IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "isAvailable", IntegratorPacket.class);
         ParameterizedTypeReference<ResponseDTO<Boolean>>
@@ -228,7 +236,28 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
-    private HttpMethodDescriptor getMethodPath(String methodName,
+	@Override
+	public <T extends DestinationDescriptor, Y> ResponseDTO<List<ResponseDTO<Void>>>
+	registerAutoDetection(IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO) {
+		HttpMethodDescriptor methodPair = getMethodPath(
+				"registerAutoDetection", IntegratorPacket.class);
+		try {
+			ParameterizedTypeReference<ResponseDTO<List<ResponseDTO<Void>>>>
+					type =
+					new ParameterizedTypeReference<ResponseDTO<List<ResponseDTO<Void>>>>() {
+					};
+			return sendRequest(autoDetectionDTO, type, methodPair);
+		} catch (MalformedURLException e) {
+			throw new IntegratorClientException(e);
+		}
+	}
+
+	public <Y> ResponseDTO<List<ResponseDTO<Void>>>
+	registerAutoDetection(AutoDetectionRegistrationDTO<Y> autoDetectionDTO) {
+		return registerAutoDetection(new IntegratorPacket<>(autoDetectionDTO));
+	}
+
+	private HttpMethodDescriptor getMethodPath(String methodName,
                                                Class<?>... parameterTypes) {
         Method m = null;
         try {
@@ -255,7 +284,6 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
 
         String urlString = url.toString();
         HttpEntity<Request> requestEntity = new HttpEntity<Request>(data);
-
         if (methodType.equals(RequestMethod.GET)) {
             return restTemplate.
                     exchange(urlString, HttpMethod.GET,

@@ -1,5 +1,6 @@
 package com.icl.integrator.api;
 
+import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
 
 /**
@@ -11,6 +12,6 @@ import com.icl.integrator.dto.ResponseFromTargetDTO;
  */
 public interface SourceService {
 
-    public void handleResponseFromTarget(ResponseFromTargetDTO responseDTO);
+    public void handleResponseFromTarget(ResponseDTO<ResponseFromTargetDTO> responseDTO);
 
 }

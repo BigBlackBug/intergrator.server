@@ -1,8 +1,10 @@
 package com.icl.integrator.model;
 
-import org.hibernate.annotations.Cascade;
+import com.icl.integrator.util.EndpointType;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,37 +14,21 @@ import javax.persistence.*;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "HTTP_ACTION", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"ACTION_NAME", "ENDPOINT_ID"})
-})
-public class HttpAction extends AbstractActionEntity{
+@DiscriminatorValue(value = "HTTP")
+public class HttpAction extends AbstractActionEntity {
 
-    @Column(nullable = false, length = 255, name = "ACTION_URL")
-    private String actionURL;
+	@Column(length = 255, name = "ACTION_URL")
+	private String actionURL;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ENDPOINT_ID", nullable = false,
-                updatable = false)
-    @Cascade(value = org.hibernate.annotations.CascadeType.PERSIST)
-    private HttpServiceEndpoint httpServiceEndpoint;
+	public HttpAction() {
+		super(EndpointType.HTTP);
+	}
 
-    public HttpAction() {
-    }
+	public String getActionURL() {
+		return actionURL;
+	}
 
-    public HttpServiceEndpoint getHttpServiceEndpoint() {
-        return httpServiceEndpoint;
-    }
-
-    public void setHttpServiceEndpoint(
-            HttpServiceEndpoint httpServiceEndpoint) {
-        this.httpServiceEndpoint = httpServiceEndpoint;
-    }
-
-    public String getActionURL() {
-        return actionURL;
-    }
-
-    public void setActionURL(String actionURL) {
-        this.actionURL = actionURL;
-    }
+	public void setActionURL(String actionURL) {
+		this.actionURL = actionURL;
+	}
 }

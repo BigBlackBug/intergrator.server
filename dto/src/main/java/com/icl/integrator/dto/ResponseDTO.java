@@ -19,7 +19,6 @@ public class ResponseDTO<T> {
         this(true);
     }
 
-    //TODO разобраться, а нужен ли нам вообще responseClass.
     // Да, нужен на сорсе, чтоб распарсить результат от таргета.
     public ResponseDTO(T response, Class<T> responseClass) {
         this(true);

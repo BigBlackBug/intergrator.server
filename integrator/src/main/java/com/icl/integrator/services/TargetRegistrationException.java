@@ -16,7 +16,11 @@ public class TargetRegistrationException extends RuntimeException {
     public TargetRegistrationException() {
     }
 
-    public TargetRegistrationException(String message) {
+	public TargetRegistrationException(Throwable cause) {
+		super(cause);
+	}
+
+	public TargetRegistrationException(String message) {
         super(message);
     }
 }

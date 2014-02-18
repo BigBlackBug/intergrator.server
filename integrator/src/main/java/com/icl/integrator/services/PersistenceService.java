@@ -1,8 +1,7 @@
 package com.icl.integrator.services;
 
-import com.icl.integrator.model.AbstractEntity;
-import com.icl.integrator.model.HttpServiceEndpoint;
-import com.icl.integrator.model.JMSServiceEndpoint;
+import com.icl.integrator.dto.DeliveryType;
+import com.icl.integrator.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,10 +47,58 @@ public class PersistenceService {
         return em.merge(entity);
     }
 
+	@Transactional
+	public <T extends AbstractEntity> T saveOrUpdate(T entity) {
+		if(entity.getId() == null){
+			em.persist(entity);
+			return entity;
+		} else {
+			return em.merge(entity);
+		}
+	}
+
+	@Transactional
+	public <T extends AbstractEntity> T refresh(T entity) {
+		em.refresh(entity);
+		return entity;
+	}
+
+    @Transactional
+    public <T extends AbstractEntity> T persist(T entity) {
+        em.persist(entity);
+	    return entity;
+    }
+
+	@Transactional
+	public <T extends AbstractEntity> T find(Class<T> entityClass,UUID id) {
+		return em.find(entityClass,id);
+	}
+
     @Transactional
     public List<HttpServiceEndpoint> getHttpServices() {
         return em.createQuery("select ep from HttpServiceEndpoint ep",
                               HttpServiceEndpoint.class).getResultList();
+    }
+
+    @Transactional
+    public HttpAction getHttpAction(String actionName, UUID endpointID) {
+        return em.createQuery(
+                "select action from HttpAction action where " +
+                        "endpoint.id=:endpointID and action.actionName=:actionName",
+                HttpAction.class)
+                .setParameter("actionName", actionName)
+                .setParameter("endpointID", endpointID)
+                .getSingleResult();
+    }
+
+    @Transactional
+    public JMSAction getJmsAction(String actionName, UUID endpointID) {
+        return em.createQuery(
+                "select action from JMSAction action where " +
+                        "endpoint.id=:endpointID and action.actionName=:actionName",
+                JMSAction.class)
+                .setParameter("actionName", actionName)
+                .setParameter("endpointID", endpointID).getSingleResult();
     }
 
     @Transactional
@@ -59,22 +107,113 @@ public class PersistenceService {
                               JMSServiceEndpoint.class).getResultList();
     }
 
+//    @Transactional
+//    public List<String> getHttpActions(String serviceName) {
+//        String query =
+//                "select action.actionName from HttpServiceEndpoint ep join " +
+//                        "ep.httpActions action where ep.serviceName=:serviceName";
+//        return em.createQuery(query, String.class).
+//                setParameter("serviceName", serviceName).getResultList();
+//    }
+//
+//    @Transactional
+//    public List<String> getJmsActions(String serviceName) {
+//        String query =
+//                "select action.actionName from JMSServiceEndpoint ep join " +
+//                        "ep.jmsActions action where ep.serviceName=:serviceName";
+//        return em.createQuery(query, String.class).
+//                setParameter("serviceName", serviceName).getResultList();
+//    }
+
     @Transactional
-    public List<String> getHttpActions(String serviceName) {
+    public List<String> getActions(String serviceName) {
         String query =
-                "select action.actionName from HttpServiceEndpoint ep join " +
-                        "ep.httpActions action where ep.serviceName=:serviceName";
+                "select action.actionName from AbstractEndpointEntity ep join " +
+                        "ep.actions action where ep.serviceName=:serviceName";
         return em.createQuery(query, String.class).
                 setParameter("serviceName", serviceName).getResultList();
     }
 
     @Transactional
-    public List<String> getJmsActions(String serviceName) {
-        String query =
-                "select action.actionName from JMSServiceEndpoint ep join " +
-                        "ep.jmsActions action where ep.serviceName=:serviceName";
-        return em.createQuery(query, String.class).
-                setParameter("serviceName", serviceName).getResultList();
+    public HttpServiceEndpoint findHttpService(String host, int port) {
+        String query = "select ep from HttpServiceEndpoint ep where " +
+                "ep.serviceURL=:serviceURL and ep.servicePort=:servicePort";
+        try {
+            return em.createQuery(query, HttpServiceEndpoint.class).
+                    setParameter("serviceURL", host).
+                    setParameter("servicePort", port).
+                    getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+	@Transactional
+    public HttpAction findHttpAction(UUID id, String path) {
+        try {
+            String query =
+                    "select action from HttpAction action join " +
+                            "action.endpoint ep where ep.id=:endpointId and action.actionURL=:actionURL";
+            return em.createQuery(query, HttpAction.class).
+                    setParameter("endpointId", id).
+                    setParameter("actionURL", path).
+                    getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+	@Transactional
+    public JMSServiceEndpoint findJmsService(String connectionFactory,
+                                             String jndiProperties) {
+        try {
+            String query = "select ep from JMSServiceEndpoint ep where " +
+                    "ep.connectionFactory=:connectionFactory and ep.jndiProperties=:jndiProperties";
+            return em.createQuery(query, JMSServiceEndpoint.class).
+                    setParameter("connectionFactory", connectionFactory).
+                    setParameter("jndiProperties", jndiProperties).
+                    getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
+    }
+	@Transactional
+    public JMSAction findJmsAction(UUID id, String queueName, String username,
+                                   String password) {
+        try {
+            String query =
+                    "select action from JMSServiceEndpoint ep join " +
+                            "ep.actions action where ep.id=:endpointId and " +
+                            "action.queueName=:queueName and " +
+                            "action.username=:username and " +
+                            "action.password=:password";
+            return em.createQuery(query, JMSAction.class).
+                    setParameter("endpointId", id).
+                    setParameter("password", password).
+                    setParameter("queueName", queueName).
+                    setParameter("username", username).
+                    getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
     }
 
+	@Transactional
+	public List<AutoDetectionPacket> findAutoDetectionPackets(
+			DeliveryType deliveryType) {
+		return em.createQuery(
+				"select packet from AutoDetectionPacket packet where packet.deliveryType=:deliveryType",AutoDetectionPacket.class)
+				.setParameter("deliveryType", deliveryType).getResultList();
+	}
+
+	@Transactional
+	public List<Delivery> findAllUnfinishedDeliveries() {
+		return em.createQuery(
+				"select delivery from Delivery delivery where " +
+						"delivery.deliveryStatus!=:deliveryOK and" +
+						" delivery.deliveryStatus!=:deliveryFailed",
+				Delivery.class)
+				.setParameter("deliveryOK", DeliveryStatus.DELIVERY_OK)
+				.setParameter("deliveryFailed", DeliveryStatus.DELIVERY_FAILED)
+				.getResultList();
+
+	}
 }

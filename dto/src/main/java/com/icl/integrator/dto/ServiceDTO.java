@@ -40,4 +40,9 @@ public class ServiceDTO {
     public void setEndpointType(EndpointType endpointType) {
         this.endpointType = endpointType;
     }
+
+    @Override
+    public String toString() {
+        return "type: "+endpointType+" service_name:"+serviceName;
+    }
 }

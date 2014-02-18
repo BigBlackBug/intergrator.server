@@ -29,5 +29,25 @@ public abstract class AbstractEntity {
     public UUID getId() {
         return id;
     }
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof AbstractEntity)) {
+			return false;
+		}
 
+		if (this == obj) {
+			return true;
+		}
+
+		AbstractEntity ae = (AbstractEntity) obj;
+		return ae.getId() != null && ae.getId().equals(getId());
+	}
+
+	@Override
+	public int hashCode() {
+		if (id != null) {
+			return id.hashCode();
+		}
+		return super.hashCode();
+	}
 }
