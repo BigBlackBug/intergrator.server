@@ -51,12 +51,16 @@ public class ValidationService {
 					jsonSchemaFactory.getJsonSchema(schemaFile.toURI().toString());
 			integratorValidator = new JsonValidator(jsonSchema);
 			for (DeliveryType deliveryType : DeliveryType.values()) {
-				if (deliveryType != DeliveryType.UNDEFINED) {
+				Validator validator;
+				if (deliveryType == DeliveryType.UNDEFINED) {
+					validator = new EmptyValidator();
+				} else {
 					String fileName = deliveryType.name().toLowerCase() + ".json";
 					schemaFile = loader.getResource("classpath:/validators/" + fileName).getFile();
 					jsonSchema = jsonSchemaFactory.getJsonSchema(schemaFile.toURI().toString());
-					validatorMap.put(deliveryType, new PacketValidator(jsonSchema));
+					validator = new PacketValidator(jsonSchema);
 				}
+				validatorMap.put(deliveryType, validator);
 			}
 		} catch (Exception e) {
 			throw new ValidatorException(
@@ -78,6 +82,22 @@ public class ValidationService {
 	private static interface Validator<T> {
 
 		public void validate(T packet) throws PacketValidationException, ValidatorException;
+	}
+
+	private class EmptyValidator<T> extends DefaultValidator<T> {
+
+		private EmptyValidator() {
+			super(null);
+		}
+
+		@Override
+		public void validate(T packet) throws PacketValidationException, ValidatorException {
+		}
+
+		@Override
+		protected JsonNode getNode(T packet) throws IOException {
+			return null;
+		}
 	}
 
 	private class JsonValidator extends DefaultValidator<String> {
