@@ -26,7 +26,6 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 	@Column(nullable = false, length = 255, name = "ACTION_NAME")
 	private String actionName;
 
-	//TODO add references to delivery
 	@Enumerated(EnumType.STRING)
 	@Column(name = "ACTION_TYPE", nullable = false, updatable = false,
 	        insertable = false)

@@ -64,12 +64,12 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public <T extends DestinationDescriptor> Boolean ping(
+    public <T extends DestinationDescriptor> ResponseDTO<Boolean> ping(
             IntegratorPacket<Void, T> responseHandler) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "ping", IntegratorPacket.class);
-        ParameterizedTypeReference<Boolean>
-                type = new ParameterizedTypeReference<Boolean>() {
+        ParameterizedTypeReference<ResponseDTO<Boolean>>
+                type = new ParameterizedTypeReference<ResponseDTO<Boolean>>() {
         };
         try {
             return sendRequest(responseHandler, type, methodPair);
@@ -78,7 +78,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
-    public Boolean ping() {
+    public ResponseDTO<Boolean> ping() {
         return ping(new IntegratorPacket<Void, DestinationDescriptor>
                             (new RawDestinationDescriptor()));
     }

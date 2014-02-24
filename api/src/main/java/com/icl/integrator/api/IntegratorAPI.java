@@ -27,7 +27,7 @@ public interface IntegratorAPI {
     ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
             IntegratorPacket<DeliveryDTO, T> delivery);
 
-    public <T extends DestinationDescriptor> Boolean
+    public <T extends DestinationDescriptor> ResponseDTO<Boolean>
     ping(IntegratorPacket<Void, T> packet);
 
     public <T extends ActionDescriptor, Y extends DestinationDescriptor>

@@ -15,6 +15,9 @@ class Deliveries {
 	public Deliveries() {
 	}
 
+	public boolean isEmpty(){
+		return deliveries.isEmpty();
+	}
 	public void addError(String serviceName, Exception ex) {
 		ErrorDTO error = new ErrorDTO(ex);
 		errorMap.put(serviceName, new ResponseDTO<UUID>(error));

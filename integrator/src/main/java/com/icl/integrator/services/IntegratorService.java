@@ -10,9 +10,6 @@ import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.model.AbstractActionEntity;
-import com.icl.integrator.model.AbstractEndpointEntity;
-import com.icl.integrator.model.Delivery;
 import com.icl.integrator.services.validation.ValidationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,16 +76,16 @@ public class IntegratorService implements IntegratorAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<>(ex);
         }
-        sendResponse(delivery.getResponseHandlerDescriptor(), response);
+        deliveryService.deliver(delivery.getResponseHandlerDescriptor(), response);
         return response;
     }
 
     @Override
-    public <T extends DestinationDescriptor> Boolean ping(
+    public <T extends DestinationDescriptor> ResponseDTO<Boolean> ping(
             IntegratorPacket<Void, T> responseHandler) {
-        sendResponse(responseHandler.getResponseHandlerDescriptor(),
+        deliveryService.deliver(responseHandler.getResponseHandlerDescriptor(),
                      Boolean.TRUE);
-        return true;
+	    return new ResponseDTO<>(true,Boolean.TYPE);
     }
 
     @Override
@@ -105,7 +102,7 @@ public class IntegratorService implements IntegratorAPI {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
-        sendResponse(registrationDTO.getResponseHandlerDescriptor(), response);
+        deliveryService.deliver(registrationDTO.getResponseHandlerDescriptor(), response);
         return response;
     }
 
@@ -120,7 +117,7 @@ public class IntegratorService implements IntegratorAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        sendResponse(serviceDescriptor.getResponseHandlerDescriptor(), response);
+        deliveryService.deliver(serviceDescriptor.getResponseHandlerDescriptor(), response);
         return response;
     }
 
@@ -135,7 +132,7 @@ public class IntegratorService implements IntegratorAPI {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
-        sendResponse(packet.getResponseHandlerDescriptor(), response);
+        deliveryService.deliver(packet.getResponseHandlerDescriptor(), response);
         return response;
     }
 
@@ -150,7 +147,7 @@ public class IntegratorService implements IntegratorAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);
+        deliveryService.deliver(serviceDTO.getResponseHandlerDescriptor(), response);
         return response;
     }
 
@@ -164,7 +161,7 @@ public class IntegratorService implements IntegratorAPI {
         } catch (Exception ex) {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
-        sendResponse(actionDTO.getResponseHandlerDescriptor(), response);
+        deliveryService.deliver(actionDTO.getResponseHandlerDescriptor(), response);
         return response;
     }
 
@@ -183,34 +180,9 @@ public class IntegratorService implements IntegratorAPI {
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
-        sendResponse(serviceDTO.getResponseHandlerDescriptor(), response);
+        deliveryService.deliver(serviceDTO.getResponseHandlerDescriptor(), response);
         return response;
     }
-
-	//TODO rename endpoint to service
-	private <T> void sendResponse(DestinationDescriptor destinationDescriptor,
-	                              T response) {
-		if (destinationDescriptor != null) {
-			Delivery delivery;
-			try {
-				PersistentDestination destination = deliveryCreator
-						.persistDestination(destinationDescriptor);
-				AbstractActionEntity action = destination.getAction();
-				AbstractEndpointEntity service = destination.getService();
-				delivery = deliveryCreator.createDelivery(service,action,response);
-			} catch (Exception ex) {
-				logger.error("Ошибка создания конечной точки доставки", ex);
-				return;
-			}
-			try {
-				deliveryService.deliver(delivery);
-			} catch (Exception ex) {
-				logger.error("Не могу отправить ответ на дополнительный " +
-						             "сервис", ex);
-				return;
-			}
-		}
-	}
 
 	@Override
 	public <T extends DestinationDescriptor,Y> ResponseDTO<List<ResponseDTO<Void>>>
@@ -226,7 +198,7 @@ public class IntegratorService implements IntegratorAPI {
 			response = new ResponseDTO<>(new ErrorDTO(ex));
 		}
 
-		sendResponse(autoDetectionDTO.getResponseHandlerDescriptor(), response);
+		deliveryService.deliver(autoDetectionDTO.getResponseHandlerDescriptor(), response);
 		return response;
 	}
 

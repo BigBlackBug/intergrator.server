@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.model.AbstractActionEntity;
 import com.icl.integrator.model.AbstractEndpointEntity;
 import com.icl.integrator.model.Delivery;
@@ -50,6 +51,28 @@ public class DeliveryService {
 	@Autowired
 	private PersistenceService persistenceService;
 
+	//TODO rename endpoint to service
+	public <T> void deliver(DestinationDescriptor destinationDescriptor,T packet) {
+		if (destinationDescriptor != null) {
+			Delivery delivery;
+			try {
+				PersistentDestination destination = deliveryCreator
+						.persistDestination(destinationDescriptor);
+				AbstractActionEntity action = destination.getAction();
+				AbstractEndpointEntity service = destination.getService();
+				delivery = deliveryCreator.createDelivery(service,action, packet);
+			} catch (Exception ex) {
+				logger.error("Ошибка создания конечной точки доставки", ex);
+				return;
+			}
+			try {
+				deliver(delivery);
+			} catch (Exception ex) {
+				logger.error("Не могу отправить пакет на сервис", ex);
+				return;
+			}
+		}
+	}
 	private <T> UUID executeDelivery(
 			final DeliveryCallable<T, ResponseDTO> deliveryCallable,
 			PersistentDestination persistentDestination,
@@ -237,7 +260,6 @@ public class DeliveryService {
         }
     }
 
-	//TODO убрать нафиг
 	private class SourceDeliverySuccessCallback extends
             SourceDeliveryCallback<ResponseDTO> {
 

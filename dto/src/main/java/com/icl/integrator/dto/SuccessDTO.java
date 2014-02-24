@@ -9,58 +9,66 @@ package com.icl.integrator.dto;
  */
 public class SuccessDTO<T> {
 
-    private Class<T> responseClass;
+	private Class<T> responseClass;
 
-    private T responseValue;
+	private T responseValue;
 
-    public SuccessDTO(Class<T> responseClass, T responseValue) {
-        this.responseClass = responseClass;
-        this.responseValue = responseValue;
-    }
+	public SuccessDTO(Class<T> responseClass, T responseValue) {
+		this.responseClass = responseClass;
+		this.responseValue = responseValue;
+	}
 
-    public SuccessDTO(T responseValue) {
-        this.responseValue = responseValue;
-    }
+	public SuccessDTO(T responseValue) {
+		this.responseValue = responseValue;
+	}
 
-    public SuccessDTO() {
-    }
+	public SuccessDTO() {
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
-        SuccessDTO that = (SuccessDTO) o;
+		SuccessDTO that = (SuccessDTO) o;
 
-        if (responseClass != null ? !responseClass
-                .equals(that.responseClass) : that.responseClass != null) {
-            return false;
-        }
-        if (responseValue != null ? !responseValue
-                .equals(that.responseValue) : that.responseValue != null) {
-            return false;
-        }
+		if (responseClass != null ? !responseClass
+				.equals(that.responseClass) : that.responseClass != null) {
+			return false;
+		}
+		if (responseValue != null ? !responseValue
+				.equals(that.responseValue) : that.responseValue != null) {
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public int hashCode() {
-        int result = responseClass != null ? responseClass.hashCode() : 0;
-        result = 31 * result + (responseValue != null ? responseValue
-                .hashCode() : 0);
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		int result = responseClass != null ? responseClass.hashCode() : 0;
+		result = 31 * result + (responseValue != null ? responseValue
+				.hashCode() : 0);
+		return result;
+	}
 
-    public Class<T> getResponseClass() {
-        return responseClass;
-    }
+	public Class<T> getResponseClass() {
+		return responseClass;
+	}
 
-    public T getResponseValue() {
-        return responseValue;
-    }
+	public T getResponseValue() {
+		return responseValue;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Class: '").append(responseClass).append("' Value: ")
+				.append(responseValue);
+		return sb.toString();
+	}
 }

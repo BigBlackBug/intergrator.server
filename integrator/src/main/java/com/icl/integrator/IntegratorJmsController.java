@@ -2,15 +2,18 @@ package com.icl.integrator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.DeliveryDTO;
-import com.icl.integrator.dto.IntegratorPacket;
-import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.services.DeliveryService;
 import com.icl.integrator.services.IntegratorService;
+import com.icl.integrator.services.validation.PacketValidationException;
+import com.icl.integrator.services.validation.ValidationService;
+import com.icl.integrator.services.validation.ValidatorException;
+import com.icl.integrator.util.IntegratorException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,115 +29,138 @@ import java.text.MessageFormat;
 @Component
 public class IntegratorJmsController implements MessageListener {
 
-    private final static Log logger = LogFactory.getLog(
-            IntegratorJmsController.class);
+	private final static Log logger = LogFactory.getLog(
+			IntegratorJmsController.class);
 
-    @Autowired
-    private ObjectMapper mapper;
+	@Autowired
+	private ObjectMapper mapper;
 
-    @Autowired
-    private IntegratorService integratorService;
+	@Autowired
+	private IntegratorService integratorService;
 
-    //TODO format
-    @Override
-    public void onMessage(final Message message) {
-        IntegratorPacket<?, ?> integratorPacket;
-        if (message instanceof TextMessage) {
-            String content;
-            try {
-                content = ((TextMessage) message).getText();
-            } catch (JMSException e) {
-                logger.error("Ошибка получения текста сообщения", e);
-                return;
-            }
-            try {
-                integratorPacket =
-                        mapper.readValue(content, IntegratorPacket.class);
-            } catch (IOException e) {
-                logger.error("Не могу десериализовать сообщение в объект", e);
-                return;
-            }
-            switch (integratorPacket.getMethod()) {
-                case ADD_ACTION: {
-                    IntegratorPacket<AddActionDTO, DestinationDescriptor
-                            > packet = mapper.convertValue(
-                            integratorPacket,
-                            new TypeReference<IntegratorPacket<AddActionDTO, DestinationDescriptor>>() {
-                            });
-                    integratorService.addAction(packet);
-                    break;
-                }
-                case DELIVER: {
-                    IntegratorPacket<DeliveryDTO, DestinationDescriptor>
-                            packet = mapper.convertValue(
-                            integratorPacket,
-                            new TypeReference<IntegratorPacket<DeliveryDTO, DestinationDescriptor>>() {
-                            });
-                    integratorService.deliver(packet);
-                    break;
-                }
-                case GET_SERVICE_INFO: {
-                    IntegratorPacket<ServiceDTO, DestinationDescriptor> packet =
-                            mapper.convertValue(
-                                    integratorPacket,
-                                    new TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>() {
-                                    });
-                    integratorService.getServiceInfo(packet);
-                    break;
-                }
-                case GET_SERVICE_LIST: {
-                    IntegratorPacket<Void, DestinationDescriptor> packet =
-                            mapper.convertValue(
-                                    integratorPacket,
-                                    new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
-                                    });
-                    integratorService.getServiceList(packet);
-                    break;
-                }
-                case GET_SUPPORTED_ACTIONS: {
-                    IntegratorPacket<ServiceDTO, DestinationDescriptor> packet =
-                            mapper.convertValue(
-                                    integratorPacket,
-                                    new TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>() {
-                                    });
-                    integratorService.getSupportedActions(packet);
-                    break;
-                }
-                case IS_AVAILABLE: {
-                    IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor> packet =
-                            mapper.convertValue(
-                                    integratorPacket,
-                                    new TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>>() {
-                                    });
-                    integratorService.isAvailable(packet);
-                    break;
-                }
-                case PING: {
-                    IntegratorPacket<Void, DestinationDescriptor> packet =
-                            mapper.convertValue(
-                                    integratorPacket,
-                                    new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
-                                    });
-                    integratorService.ping(packet);
-                    break;
-                }
-                case REGISTER_SERVICE: {
-                    IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>, DestinationDescriptor>
-                            packet
-                            = mapper.convertValue(
-                            integratorPacket,
-                            new TypeReference<IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>, DestinationDescriptor>>() {
-                            });
-                    integratorService.registerService(packet);
-                    break;
-                }
-            }
-        } else {
-            logger.error(MessageFormat.format(
-                    "Присланный тип сообщения {0} не поддерживается",
-                    message.getClass()));
-            return;
-        }
-    }
+	@Autowired
+	private ValidationService validationService;
+
+	@Autowired
+	private DeliveryService deliveryService;
+
+	//TODO format
+	@Override
+	public void onMessage(final Message message) {
+		IntegratorPacket<?, ?> integratorPacket;
+		DestinationDescriptor destinationDescriptor = null;
+		try {
+			if (message instanceof TextMessage) {
+				String content;
+				try {
+					content = ((TextMessage) message).getText();
+				} catch (JMSException e) {
+					throw new IntegratorException("Ошибка получения текста сообщения", e);
+				}
+				try {
+					integratorPacket =
+							mapper.readValue(content, IntegratorPacket.class);
+				} catch (IOException e) {
+					throw new IntegratorException("Не могу десериализовать сообщение в объект", e);
+				}
+				try {
+					validationService.validateIntegratorPacket(content);
+				} catch (PacketValidationException | ValidatorException ex) {
+					throw new IntegratorException("Ошибка валидации", ex);
+				}
+				IntegratorMethod method = integratorPacket.getMethod();
+				if (method == null) {
+					//TODO костыыыль
+					throw new IntegratorException("Поле method у IntegratorPacket не заполнено",
+					                              new NullPointerException());
+				}
+				destinationDescriptor = integratorPacket.getResponseHandlerDescriptor();
+				switch (method) {
+					case ADD_ACTION: {
+						IntegratorPacket<AddActionDTO, DestinationDescriptor
+								> packet = mapper.convertValue(
+								integratorPacket,
+								new TypeReference<IntegratorPacket<AddActionDTO, DestinationDescriptor>>() {
+								});
+						integratorService.addAction(packet);
+						break;
+					}
+					case DELIVER: {
+						IntegratorPacket<DeliveryDTO, DestinationDescriptor>
+								packet = mapper.convertValue(
+								integratorPacket,
+								new TypeReference<IntegratorPacket<DeliveryDTO, DestinationDescriptor>>() {
+								});
+						integratorService.deliver(packet);
+						break;
+					}
+					case GET_SERVICE_INFO: {
+						IntegratorPacket<ServiceDTO, DestinationDescriptor> packet =
+								mapper.convertValue(
+										integratorPacket,
+										new TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>() {
+										});
+						integratorService.getServiceInfo(packet);
+						break;
+					}
+					case GET_SERVICE_LIST: {
+						IntegratorPacket<Void, DestinationDescriptor> packet =
+								mapper.convertValue(
+										integratorPacket,
+										new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
+										});
+						integratorService.getServiceList(packet);
+						break;
+					}
+					case GET_SUPPORTED_ACTIONS: {
+						IntegratorPacket<ServiceDTO, DestinationDescriptor> packet =
+								mapper.convertValue(
+										integratorPacket,
+										new TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>() {
+										});
+						integratorService.getSupportedActions(packet);
+						break;
+					}
+					case IS_AVAILABLE: {
+						IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>
+								packet =
+								mapper.convertValue(
+										integratorPacket,
+										new TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>>() {
+										});
+						integratorService.isAvailable(packet);
+						break;
+					}
+					case PING: {
+						IntegratorPacket<Void, DestinationDescriptor> packet =
+								mapper.convertValue(
+										integratorPacket,
+										new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
+										});
+						integratorService.ping(packet);
+						break;
+					}
+					case REGISTER_SERVICE: {
+						IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>, DestinationDescriptor>
+								packet
+								= mapper.convertValue(
+								integratorPacket,
+								new TypeReference<IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>, DestinationDescriptor>>() {
+								});
+						integratorService.registerService(packet);
+						break;
+					}
+				}
+			} else {
+				throw new IntegratorException(MessageFormat.format(
+						"Присланный тип сообщения {0} не поддерживается",
+						message.getClass()));
+			}
+		} catch (IntegratorException ex) {
+			String errorMessage = ex.getMessage();
+			logger.error(errorMessage, ex.getCause());
+			deliveryService.deliver(destinationDescriptor, new ErrorDTO(ex));
+		}
+	}
 
 }

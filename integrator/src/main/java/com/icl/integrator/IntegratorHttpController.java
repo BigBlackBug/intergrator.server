@@ -12,12 +12,16 @@ import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.services.IntegratorService;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +36,9 @@ import java.util.UUID;
 @Controller
 public class IntegratorHttpController implements IntegratorHttpAPI {
 
+	private static Log logger =
+			LogFactory.getLog(IntegratorHttpController.class);
+
 	@Autowired
 	private IntegratorService integratorService;
 
@@ -41,13 +48,6 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	private <Result, Arg> Result fixConversion(
 			Arg argument, TypeReference<Result> type) {
 		return objectMapper.convertValue(argument, type);
-	}
-
-	@RequestMapping(value = "/test")
-	public
-	@ResponseBody
-	void test(@RequestBody Map string) {
-		System.out.println(string);
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	//TODO format
 	@Override
-	public <T extends DestinationDescriptor> Boolean ping(@RequestBody(
+	public <T extends DestinationDescriptor> ResponseDTO<Boolean> ping(@RequestBody(
 			required = false) IntegratorPacket<Void, T> responseHandler) {
 		TypeReference<IntegratorPacket<Void, DestinationDescriptor>> type =
 				new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
@@ -162,5 +162,16 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 				};
 		return integratorService.registerAutoDetection(
 				fixConversion(autoDetectionDTO, type));
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ResponseDTO> handleNotAuthenticatedException(
+			Exception ex,
+			HttpServletRequest request) {
+		logger.info("handling exception");
+		return new ResponseEntity<ResponseDTO>(
+				new ResponseDTO<>(new ErrorDTO(ex)),
+				HttpStatus.BAD_REQUEST
+		);
 	}
 }
