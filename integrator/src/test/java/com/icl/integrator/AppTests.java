@@ -138,7 +138,7 @@ public class AppTests {
 		String json = mapper.writeValueAsString(p);
 	      validationService.validateIntegratorPacket(json);
 	}
-	@Test(expected = PacketValidationException.class)
+	@Test
 	public void testValidator2()throws Exception{
 		HttpEndpointDescriptorDTO desr = new
 				HttpEndpointDescriptorDTO("localhost", 8080);

@@ -16,30 +16,35 @@
 
         },
         "packet": {
-            "type": "object",
             "oneOf": [
                 {
                     "type": "null"
                 },
                 {
-                    "$ref": "#/definitions/deliveryDTO"
-                },
-                {
-                    "$ref": "#/definitions/targetRegistrationDTO"
-                },
-                {
-                    "$ref": "#/definitions/serviceDD"
-                },
-                {
-                    "$ref": "#/definitions/serviceDTO"
-                },
-                {
-                    "$ref": "#/definitions/addActionDTO"
-                },
-                {
-                    "$ref": "#/definitions/autoDetectionRegistrationDTO"
+                    "type": "object",
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/deliveryDTO"
+                        },
+                        {
+                            "$ref": "#/definitions/targetRegistrationDTO"
+                        },
+                        {
+                            "$ref": "#/definitions/serviceDD"
+                        },
+                        {
+                            "$ref": "#/definitions/serviceDTO"
+                        },
+                        {
+                            "$ref": "#/definitions/addActionDTO"
+                        },
+                        {
+                            "$ref": "#/definitions/autoDetectionRegistrationDTO"
+                        }
+                    ]
                 }
             ]
+
         },
         "responseHandlerDescriptor": {
             "oneOf": [
