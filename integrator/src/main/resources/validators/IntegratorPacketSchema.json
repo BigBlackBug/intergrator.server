@@ -4,13 +4,23 @@
     "type": "object",
     "properties": {
         "method": {
-            "type": "string",
-            "enum": [ "PING", "DELIVER", "REGISTER_SERVICE", "IS_AVAILABLE", "GET_SERVICE_LIST", "GET_SUPPORTED_ACTIONS", "ADD_ACTION", "GET_SERVICE_INFO" ]
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "string",
+                    "enum": [ "PING", "DELIVER", "REGISTER_SERVICE", "IS_AVAILABLE", "GET_SERVICE_LIST", "GET_SUPPORTED_ACTIONS", "ADD_ACTION", "GET_SERVICE_INFO" ]
+                }
+            ]
+
         },
         "packet": {
             "type": "object",
             "oneOf": [
-                {"type":"null"},
+                {
+                    "type": "null"
+                },
                 {
                     "$ref": "#/definitions/deliveryDTO"
                 },
@@ -32,7 +42,15 @@
             ]
         },
         "responseHandlerDescriptor": {
-            "$ref": "#/definitions/destinationDescriptor"
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "$ref": "#/definitions/destinationDescriptor"
+                }
+            ]
+
         }
     },
     "definitions": {
@@ -41,21 +59,42 @@
             "required": ["requestData"],
             "properties": {
                 "responseHandlerDescriptor": {
-                    "oneOf":[
-                        {"type":"null"},
-                        {"$ref": "#/definitions/destinationDescriptor"}
-                ]},
-                "destinations": {
-                    "type": "array",
-                    "items": [
+                    "oneOf": [
                         {
-                            "$ref": "#/definitions/serviceDTO"
+                            "type": "null"
+                        },
+                        {
+                            "$ref": "#/definitions/destinationDescriptor"
+                        }
+                    ]
+                },
+                "destinations": {
+                    "oneOf": [
+                        {
+                            "type": "null"
+                        },
+                        {
+                            "type": "array",
+                            "items": [
+                                {
+                                    "$ref": "#/definitions/serviceDTO"
+                                }
+                            ]
                         }
                     ]
 
+
                 },
                 "action": {
-                    "type": "string"
+                    "oneOf": [
+                        {
+                            "type": "null"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+
                 },
                 "requestData": {
                     "type": "object",

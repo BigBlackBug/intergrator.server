@@ -152,7 +152,7 @@ public class AppTests {
 		p.setMethod(null);
 		p.setPacket(null);
 		p.setResponseHandlerDescriptor(null);
-		String json = mapper.writeValueAsString(p);
+		String json = new ObjectMapper().writeValueAsString(p);
 		validationService.validateIntegratorPacket(json);
 	}
 	@Test
