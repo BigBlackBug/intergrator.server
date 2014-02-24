@@ -57,34 +57,44 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @WebAppConfiguration
 @TransactionConfiguration(transactionManager = "transactionManager",
                           defaultRollback = false)
-@ContextConfiguration(locations = {"classpath:/applicationContext.xml","classpath:/integrator-servlet.xml"})
+@ContextConfiguration(
+		locations = {"classpath:/applicationContext.xml", "classpath:/integrator-servlet.xml"})
 public class AppTests {
 
-    private static Log logger =
-            LogFactory.getLog(AppTests.class);
+	private static Log logger =
+			LogFactory.getLog(AppTests.class);
 
-    @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Autowired
-    protected WebApplicationContext wac;
+	@SuppressWarnings("SpringJavaAutowiringInspection")
+	@Autowired
+	protected WebApplicationContext wac;
 
-    @Autowired
-    protected EndpointResolverService endpointResolverService;
+	@Autowired
+	protected EndpointResolverService endpointResolverService;
 
-    @Autowired
-    protected DatabaseRetryHandlerFactory factory;
+	@Autowired
+	protected DatabaseRetryHandlerFactory factory;
 
-    private MockMvc mockMvc;
+	@PersistenceContext
+	EntityManager em;
 
-    @Autowired
-    private ObjectMapper mapper;
+	private MockMvc mockMvc;
 
-    @Autowired
-    private PersistenceService persistenceService;
+	@Autowired
+	private ObjectMapper mapper;
 
-    @Before
-    @Transactional
-    public void setup() throws Exception {
-        this.mockMvc = webAppContextSetup(this.wac).build();
+	@Autowired
+	private PersistenceService persistenceService;
+
+	@Autowired
+	private JsonMatcher jsonMatcher;
+
+	@Autowired
+	private ValidationService validationService;
+
+	@Before
+	@Transactional
+	public void setup() throws Exception {
+		this.mockMvc = webAppContextSetup(this.wac).build();
 //        HttpServiceEndpoint ep = new HttpServiceEndpoint();
 //        ep.setServiceURL("URL");
 //        ep.setServicePort(123);
@@ -112,90 +122,49 @@ public class AppTests {
 //        dp.setRequestDate(new Date());
 ////		dp.setDestinations(Arrays.<AbstractEndpointEntity>asList(ep));
 //        persistenceService.persist(dp);
-    }
-
-	@Autowired
-	private JsonMatcher jsonMatcher;
-    @PersistenceContext
-    EntityManager em;
-
-	@Autowired
-	private ValidationService validationService;
-
-	@Test(expected = PacketValidationException.class)
-	public void testValidator()throws Exception{
-		HttpEndpointDescriptorDTO desr = new
-				HttpEndpointDescriptorDTO("localhost", 8080);
-		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-				new EndpointDTO<>(EndpointType.HTTP, desr);
-		RawDestinationDescriptor dd =
-				new RawDestinationDescriptor(
-
-				);
-		dd.setActionDescriptor(
-		                       new HttpActionDTO("/ext_source/handleGetServiceList"));
-		IntegratorPacket p = new IntegratorPacket(dd);
-		String json = mapper.writeValueAsString(p);
-	      validationService.validateIntegratorPacket(json);
 	}
-	@Test
-	public void testValidator2()throws Exception{
-		HttpEndpointDescriptorDTO desr = new
-				HttpEndpointDescriptorDTO("localhost", 8080);
-		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-				new EndpointDTO<>(EndpointType.HTTP, desr);
-		RawDestinationDescriptor dd =
-				new RawDestinationDescriptor(
-				   endpoint,       new HttpActionDTO("/ext_source/handleGetServiceList")
-				);
-		IntegratorPacket p = new IntegratorPacket();
-		p.setMethod(null);
-		p.setPacket(null);
-		p.setResponseHandlerDescriptor(null);
-		String json = new ObjectMapper().writeValueAsString(p);
-		validationService.validateIntegratorPacket(json);
-	}
+
 	@Test
 	public void testPAGeneral() throws Exception {
-		TestClass reference =new TestClass();
-		reference.string="STRING";
+		TestClass reference = new TestClass();
+		reference.string = "STRING";
 		JsonNode referenceJson = mapper.valueToTree(reference);
 
-		TestClass data =new TestClass();
-		data.integer=5;
-		data.string="STRING";
+		TestClass data = new TestClass();
+		data.integer = 5;
+		data.string = "STRING";
 		data.nested = new Nested();
 		JsonNode dataJson = mapper.valueToTree(data);
 
 		Assert.assertTrue(jsonMatcher.matches(dataJson, referenceJson));
 
-		data.string="!F#";
+		data.string = "!F#";
 		dataJson = mapper.valueToTree(data);
 		Assert.assertFalse(jsonMatcher.matches(dataJson, referenceJson));
 	}
 
 	@Test
 	public void testPANested() throws Exception {
-		TestClass reference =new TestClass();
-		reference.integer=415;
+		TestClass reference = new TestClass();
+		reference.integer = 415;
 
 		Nested nested = new Nested();
 		nested.integer = 100;
 		reference.nested = nested;
 		JsonNode referenceJson = mapper.valueToTree(reference);
 
-		TestClass data =new TestClass();
-		data.integer=415;
-		data.string="STRING";
+		TestClass data = new TestClass();
+		data.integer = 415;
+		data.string = "STRING";
 		Nested nested2 = new Nested();
 		nested2.integer = 100;
-		nested2.string="WHATEVER";
+		nested2.string = "WHATEVER";
 		data.nested = nested2;
 		JsonNode dataJson = mapper.valueToTree(data);
 
 		Assert.assertTrue(jsonMatcher.matches(dataJson, referenceJson));
 
-		data.integer=150;
+		data.integer = 150;
 		dataJson = mapper.valueToTree(data);
 
 		Assert.assertFalse(jsonMatcher.matches(dataJson, referenceJson));
@@ -206,17 +175,17 @@ public class AppTests {
 		Nested nested = new Nested();
 		nested.integer = 100;
 
-		TestClass reference =new TestClass();
-		reference.string="STRING";
-		reference.nestedList =  new ArrayList<>();
+		TestClass reference = new TestClass();
+		reference.string = "STRING";
+		reference.nestedList = new ArrayList<>();
 		reference.nestedList.add(nested);
 		JsonNode referenceJson = mapper.valueToTree(reference);
 
-		TestClass data =new TestClass();
-		data.integer=500;
-		data.string="STRING";
+		TestClass data = new TestClass();
+		data.integer = 500;
+		data.string = "STRING";
 		data.nested = new Nested();
-		data.nestedList =  new ArrayList<>();
+		data.nestedList = new ArrayList<>();
 		data.nestedList.add(nested);
 		JsonNode dataJson = mapper.valueToTree(data);
 
@@ -224,7 +193,7 @@ public class AppTests {
 
 		Nested nested2 = new Nested();
 		nested2.integer = 100;
-		nested2.string="WHATEVER";
+		nested2.string = "WHATEVER";
 		data.nestedList.add(nested2);
 
 		dataJson = mapper.valueToTree(data);
@@ -232,7 +201,305 @@ public class AppTests {
 		Assert.assertFalse(jsonMatcher.matches(dataJson, referenceJson));
 	}
 
+	@Test
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Ignore
+	public void testPers() throws Exception {
+		List<AbstractEndpointEntity> resultList =
+				em.createQuery("select e from AbstractEndpointEntity e",
+				               AbstractEndpointEntity.class).getResultList();
+		AbstractEndpointEntity abstractEndpointEntity = resultList.get(0);
+		if (abstractEndpointEntity.getType() == EndpointType.HTTP) {
+			HttpServiceEndpoint ed =
+					(HttpServiceEndpoint) abstractEndpointEntity;
+			Set<AbstractActionEntity> actions = ed.getActions();
+			AbstractActionEntity actionEntity = actions.iterator().next();
+			if (actionEntity.getType() == EndpointType.HTTP) {
+				HttpAction a = (HttpAction) actionEntity;
+			}
+			return;
+		}
+		Assert.fail();
+	}
+
+	@After
+	@Transactional
+	public void trunc() throws Exception {
+//		em.createQuery("delete from AbstractEndpointEntity").executeUpdate();
+//		em.createQuery("delete from AbstractActionEntity").executeUpdate();
+//		em.createQuery("delete from DeliveryPacket").executeUpdate();
+	}
+
+	private DeliveryDTO getDelvieryDTO() {
+		DeliveryDTO deliveryDTO = new DeliveryDTO();
+
+		HttpEndpointDescriptorDTO desr = new
+				HttpEndpointDescriptorDTO("192.168.84.142", 8080);
+		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
+				new EndpointDTO<>(EndpointType.HTTP, desr);
+
+//        deliveryDTO.setTargetResponseHandlerDescriptor(
+//                new DestinationDescriptorDTO(
+//                        endpoint,
+//                        new HttpActionDTO("/source/handleResponseFromTarget")
+//                ));
+		HashMap<String, String> map = new HashMap<>();
+		map.put("java.naming.provider.url", "tcp://localhost:61616");
+		map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
+				".ActiveMQInitialContextFactory");
+		RawDestinationDescriptor targetResponseHandler =
+				new RawDestinationDescriptor();
+		targetResponseHandler.setEndpoint(
+				new EndpointDTO<>(EndpointType.JMS, new
+						JMSEndpointDescriptorDTO("ConnectionFactory", map)
+				));
+		targetResponseHandler.setActionDescriptor(new QueueDTO
+				                                          ("SourceQueue"));
+		deliveryDTO.setResponseHandlerDescriptor(targetResponseHandler);
+		RawDestinationDescriptor
+				deliveryResponseHandler = new RawDestinationDescriptor();
+
+
+//        HashMap<String, String> map = new HashMap<>();
+//        map.put("java.naming.provider.url", "tcp://localhost:61616");
+//        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
+//                ".ActiveMQInitialContextFactory");
+//        deliveryResponseHandler.setEndpoint(
+//                new EndpointDTO<>(EndpointType.JMS, new
+//                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
+//                ));
+//        deliveryResponseHandler.setActionDescriptor(new QueueDTO
+//                                                            ("SourceQueue"));
+		deliveryResponseHandler
+				.setEndpoint(endpoint);
+		deliveryResponseHandler.setActionDescriptor(
+				new HttpActionDTO("/ext_source/handleDeliveryResponse"));
+		deliveryDTO.setAction("ACTION");
+		deliveryDTO.setRequestData(new RequestDataDTO(DeliveryType.UNDEFINED,
+		                                              new HashMap<String, Object>() {{
+			                                              put("a", "b");
+		                                              }}));
+		ServiceDTO destination = new ServiceDTO(
+				"NEW_SERVICE", EndpointType.HTTP);
+		deliveryDTO.setDestinations(Arrays.asList(destination));
+		return deliveryDTO;
+	}
+
+	private QueueDTO getQueueDTO() {
+		QueueDTO dto = new QueueDTO();
+		dto.setUsername("USERNAME");
+		dto.setPassword("PASSWORD");
+		dto.setQueueName("QUEUENAME");
+		return dto;
+	}
+
+	private EndpointDTO<EndpointDescriptor> getJMSDTO() {
+		JMSEndpointDescriptorDTO d = new JMSEndpointDescriptorDTO();
+		d.setConnectionFactory("CONNFACTORY");
+		d.setJndiProperties(new HashMap<String, String>() {{
+			put("a", "1");
+		}});
+		EndpointDTO<EndpointDescriptor> dto = new EndpointDTO<>();
+		dto.setEndpointType(EndpointType.JMS);
+		dto.setDescriptor(d);
+		return dto;
+	}
+
+	private EndpointDTO<EndpointDescriptor> getHttpDTO() {
+		HttpEndpointDescriptorDTO d = new HttpEndpointDescriptorDTO();
+		d.setHost("HOST");
+		d.setPort(10001);
+		EndpointDTO<EndpointDescriptor> dto = new EndpointDTO<>();
+		dto.setEndpointType(EndpointType.HTTP);
+		dto.setDescriptor(d);
+		return dto;
+	}
+
+	@Test
+	@Ignore
+	public void testMvc() throws Exception {
+		RawDestinationDescriptor targetResponseHandler =
+				new RawDestinationDescriptor();
+		targetResponseHandler.setEndpoint(
+				new EndpointDTO<>(EndpointType.JMS, new
+						JMSEndpointDescriptorDTO("ConnectionFactory", null)
+				));
+		targetResponseHandler.setActionDescriptor(new QueueDTO
+				                                          ("SourceQueue"));
+		IntegratorPacket<Void, DestinationDescriptor>
+				packet =
+				new IntegratorPacket<Void, DestinationDescriptor>(
+						targetResponseHandler);
+
+		mockMvc.perform(post("/integrator/getServiceList").contentType(
+				MediaType.APPLICATION_JSON).content(mapper.writeValueAsString
+				(packet))).andExpect(status().is(200));
+	}
+
+	@Test
+	@Ignore
+	public void testPingMVC() throws Exception {
+		RawDestinationDescriptor targetResponseHandler =
+				new RawDestinationDescriptor();
+		targetResponseHandler.setEndpoint(
+				new EndpointDTO<>(EndpointType.JMS, new
+						JMSEndpointDescriptorDTO("ConnectionFactory", null)
+				));
+		targetResponseHandler.setActionDescriptor(new QueueDTO
+				                                          ("SourceQueue"));
+		IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>
+				packet =
+				new IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>(
+						new RawDestinationDescriptor());
+		mockMvc.perform(post("/integrator/ping").contentType(
+				MediaType.APPLICATION_JSON).content(mapper.writeValueAsString
+				(packet))).andExpect(status().is(200));
+	}
+
+	@Test
+	public void testRawDDDeserializer() throws Exception {
+		RawDestinationDescriptor targetResponseHandler =
+				new RawDestinationDescriptor();
+		targetResponseHandler.setEndpoint(
+				new EndpointDTO<>(EndpointType.JMS, new
+						JMSEndpointDescriptorDTO("ConnectionFactory",
+						                         Collections.<String,
+								                         String>emptyMap())
+				));
+		targetResponseHandler.setActionDescriptor(new QueueDTO
+				                                          ("SourceQueue"));
+		IntegratorPacket<Void, DestinationDescriptor>
+				packet =
+				new IntegratorPacket<Void, DestinationDescriptor>(
+						targetResponseHandler);
+		String expected = mapper.writeValueAsString(packet);
+		IntegratorPacket integratorPacket =
+				mapper.readValue(expected, IntegratorPacket.class);
+		Assert.assertEquals(packet, integratorPacket);
+	}
+
+	@Test
+	public void testServiceDDDeserializer() throws Exception {
+		IntegratorPacket<Void, DestinationDescriptor>
+				packet =
+				new IntegratorPacket<Void, DestinationDescriptor>(
+						new ServiceDestinationDescriptor(
+								"ser", "actuin", EndpointType.HTTP));
+		String expected = mapper.writeValueAsString(packet);
+		IntegratorPacket integratorPacket =
+				mapper.readValue(expected, IntegratorPacket.class);
+		Assert.assertEquals(packet, integratorPacket);
+	}
+
+	@Test
+	public void testRegDeserializer() throws Exception {
+		TargetRegistrationDTO<HttpActionDTO> expected =
+				new TargetRegistrationDTO<>();
+		expected.setServiceName("NEW_SERVICE");
+		//----------------------------------------------------------------------
+		EndpointDTO<HttpEndpointDescriptorDTO>
+				endpointDTO = new EndpointDTO<>();
+		endpointDTO.setEndpointType(EndpointType.HTTP);
+
+		HttpEndpointDescriptorDTO descr = new HttpEndpointDescriptorDTO();
+		descr.setHost("192.168.84.142");
+		descr.setPort(8080);
+		endpointDTO.setDescriptor(descr);
+
+		expected.setEndpoint(endpointDTO);
+		//----------------------------------------------------------------------
+		ActionEndpointDTO<HttpActionDTO> actionDTO = new ActionEndpointDTO<>();
+
+		HttpActionDTO actionDescriptor = new HttpActionDTO();
+		actionDescriptor.setPath("/destination/handleRequest");
+
+		actionDTO.setActionDescriptor(actionDescriptor);
+		actionDTO.setActionName("ACTION");
+		expected.setActionRegistrations(
+				Arrays.asList(new ActionRegistrationDTO<>(actionDTO, true)));
+		expected.setDeliverySettings(new DeliverySettingsDTO());
+		String sstring = mapper.writeValueAsString(expected);
+		TargetRegistrationDTO result =
+				mapper.readValue(sstring, TargetRegistrationDTO.class);
+		Assert.assertEquals(expected, result);
+	}
+
+	@Test
+	public void testHttpDeserializer() throws Exception {
+		RawDestinationDescriptor
+				serviceDTO = new RawDestinationDescriptor();
+		ActionDescriptor descriptor = new HttpActionDTO("PATH");
+		serviceDTO.setActionDescriptor(descriptor);
+		serviceDTO.setEndpoint(getHttpDTO());
+		String s = mapper.writeValueAsString(serviceDTO);
+		RawDestinationDescriptor
+				serviceDTO1 =
+				mapper.readValue(s, RawDestinationDescriptor.class);
+		Assert.assertEquals(serviceDTO, serviceDTO1);
+	}
+
+	@Test
+	public void testDeserializer() throws Exception {
+		RawDestinationDescriptor
+				serviceDTO = new RawDestinationDescriptor();
+		ActionDescriptor descriptor = getQueueDTO();
+		serviceDTO.setActionDescriptor(descriptor);
+		serviceDTO.setEndpoint(getJMSDTO());
+		String s = mapper.writeValueAsString(serviceDTO);
+		RawDestinationDescriptor
+				serviceDTO1 =
+				mapper.readValue(s, RawDestinationDescriptor.class);
+		Assert.assertEquals(serviceDTO, serviceDTO1);
+	}
+
+	@Test
+	public void testHandler() throws Exception {
+		DatabaseRetryHandler handler = factory.createHandler();
+		handler.setLogEntry(new TaskLogEntry("OLOLO2"));
+		handler.call();
+		Assert.assertTrue(true);
+	}
+
+	//    @Test
+//    public void simple() throws Exception {
+//        mockMvc.perform(get("/"))
+//                .andExpect(status().isOk())
+//                .andExpect(view().name("hello"));
+//    }
+	@Test
+	public void testEx() throws Exception {
+		Runnable runnable =
+				new TaskCreator<>(new Callable<String>() {
+					@Override
+					public String call() throws Exception {
+						throw new HttpClientErrorException(
+								HttpStatus.GATEWAY_TIMEOUT);
+					}
+				})
+						.addExceptionHandler(
+								new Callback<RestClientException>() {
+									@Override
+									public void execute(
+											RestClientException arg) {
+										Assert.assertTrue(true);
+									}
+								}, RestClientException.class)
+						.addExceptionHandler(new Callback<IllegalArgumentException>() {
+							@Override
+							public void execute(IllegalArgumentException arg) {
+								Assert.fail();
+							}
+						}, IllegalArgumentException.class)
+						.create();
+		runnable.run();
+//        Assert.fail();
+	}
+
 	private static class Nested {
+
+		private String string;
+
+		private Integer integer;
 
 		private Nested() {
 		}
@@ -245,8 +512,6 @@ public class AppTests {
 			this.integer = integer;
 		}
 
-		private String string;
-
 		public String getString() {
 			return string;
 		}
@@ -254,11 +519,17 @@ public class AppTests {
 		public void setString(String string) {
 			this.string = string;
 		}
-
-		private Integer integer;
 	}
 
 	private static class TestClass {
+
+		private Integer integer;
+
+		private String string;
+
+		private Nested nested;
+
+		private List<Nested> nestedList;
 
 		private TestClass() {
 		}
@@ -294,308 +565,6 @@ public class AppTests {
 		public void setNestedList(List<Nested> nestedList) {
 			this.nestedList = nestedList;
 		}
-
-		private Integer integer;
-
-		private String string;
-
-		private Nested nested;
-
-		private List<Nested> nestedList;
 	}
-
-	@Test
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Ignore
-    public void testPers() throws Exception {
-        List<AbstractEndpointEntity> resultList =
-                em.createQuery("select e from AbstractEndpointEntity e",
-                               AbstractEndpointEntity.class).getResultList();
-        AbstractEndpointEntity abstractEndpointEntity = resultList.get(0);
-        if (abstractEndpointEntity.getType() == EndpointType.HTTP) {
-            HttpServiceEndpoint ed =
-                    (HttpServiceEndpoint) abstractEndpointEntity;
-            Set<AbstractActionEntity> actions = ed.getActions();
-            AbstractActionEntity actionEntity = actions.iterator().next();
-            if (actionEntity.getType() == EndpointType.HTTP) {
-                HttpAction a = (HttpAction) actionEntity;
-            }
-            return;
-        }
-        Assert.fail();
-    }
-
-    @After
-    @Transactional
-    public void trunc() throws Exception {
-//		em.createQuery("delete from AbstractEndpointEntity").executeUpdate();
-//		em.createQuery("delete from AbstractActionEntity").executeUpdate();
-//		em.createQuery("delete from DeliveryPacket").executeUpdate();
-    }
-
-    private DeliveryDTO getDelvieryDTO() {
-        DeliveryDTO deliveryDTO = new DeliveryDTO();
-
-        HttpEndpointDescriptorDTO desr = new
-                HttpEndpointDescriptorDTO("192.168.84.142", 8080);
-        EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-                new EndpointDTO<>(EndpointType.HTTP, desr);
-
-//        deliveryDTO.setTargetResponseHandlerDescriptor(
-//                new DestinationDescriptorDTO(
-//                        endpoint,
-//                        new HttpActionDTO("/source/handleResponseFromTarget")
-//                ));
-        HashMap<String, String> map = new HashMap<>();
-        map.put("java.naming.provider.url", "tcp://localhost:61616");
-        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
-                ".ActiveMQInitialContextFactory");
-        RawDestinationDescriptor targetResponseHandler =
-                new RawDestinationDescriptor();
-        targetResponseHandler.setEndpoint(
-                new EndpointDTO<>(EndpointType.JMS, new
-                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
-                ));
-        targetResponseHandler.setActionDescriptor(new QueueDTO
-                                                          ("SourceQueue"));
-        deliveryDTO.setResponseHandlerDescriptor(targetResponseHandler);
-        RawDestinationDescriptor
-                deliveryResponseHandler = new RawDestinationDescriptor();
-
-
-//        HashMap<String, String> map = new HashMap<>();
-//        map.put("java.naming.provider.url", "tcp://localhost:61616");
-//        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
-//                ".ActiveMQInitialContextFactory");
-//        deliveryResponseHandler.setEndpoint(
-//                new EndpointDTO<>(EndpointType.JMS, new
-//                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
-//                ));
-//        deliveryResponseHandler.setActionDescriptor(new QueueDTO
-//                                                            ("SourceQueue"));
-        deliveryResponseHandler
-                .setEndpoint(endpoint);
-        deliveryResponseHandler.setActionDescriptor(
-                new HttpActionDTO("/ext_source/handleDeliveryResponse"));
-        deliveryDTO.setAction("ACTION");
-        deliveryDTO.setRequestData(new RequestDataDTO(DeliveryType.UNDEFINED,
-                new HashMap<String, Object>() {{
-                    put("a", "b");
-                }}));
-	    ServiceDTO destination = new ServiceDTO(
-                "NEW_SERVICE", EndpointType.HTTP);
-        deliveryDTO.setDestinations(Arrays.asList(destination));
-        return deliveryDTO;
-    }
-
-    private QueueDTO getQueueDTO() {
-        QueueDTO dto = new QueueDTO();
-        dto.setUsername("USERNAME");
-        dto.setPassword("PASSWORD");
-        dto.setQueueName("QUEUENAME");
-        return dto;
-    }
-
-    private EndpointDTO<EndpointDescriptor> getJMSDTO() {
-        JMSEndpointDescriptorDTO d = new JMSEndpointDescriptorDTO();
-        d.setConnectionFactory("CONNFACTORY");
-        d.setJndiProperties(new HashMap<String, String>() {{
-            put("a", "1");
-        }});
-        EndpointDTO<EndpointDescriptor> dto = new EndpointDTO<>();
-        dto.setEndpointType(EndpointType.JMS);
-        dto.setDescriptor(d);
-        return dto;
-    }
-
-    private EndpointDTO<EndpointDescriptor> getHttpDTO() {
-        HttpEndpointDescriptorDTO d = new HttpEndpointDescriptorDTO();
-        d.setHost("HOST");
-        d.setPort(10001);
-        EndpointDTO<EndpointDescriptor> dto = new EndpointDTO<>();
-        dto.setEndpointType(EndpointType.HTTP);
-        dto.setDescriptor(d);
-        return dto;
-    }
-
-    @Test
-    @Ignore
-    public void testMvc() throws Exception {
-        RawDestinationDescriptor targetResponseHandler =
-                new RawDestinationDescriptor();
-        targetResponseHandler.setEndpoint(
-                new EndpointDTO<>(EndpointType.JMS, new
-                        JMSEndpointDescriptorDTO("ConnectionFactory", null)
-                ));
-        targetResponseHandler.setActionDescriptor(new QueueDTO
-                                                          ("SourceQueue"));
-        IntegratorPacket<Void, DestinationDescriptor>
-                packet =
-                new IntegratorPacket<Void, DestinationDescriptor>(
-                        targetResponseHandler);
-
-        mockMvc.perform(post("/integrator/getServiceList").contentType(
-                MediaType.APPLICATION_JSON).content(mapper.writeValueAsString
-                (packet))).andExpect(status().is(200));
-    }
-
-    @Test
-    @Ignore
-    public void testPingMVC() throws Exception {
-        RawDestinationDescriptor targetResponseHandler =
-                new RawDestinationDescriptor();
-        targetResponseHandler.setEndpoint(
-                new EndpointDTO<>(EndpointType.JMS, new
-                        JMSEndpointDescriptorDTO("ConnectionFactory", null)
-                ));
-        targetResponseHandler.setActionDescriptor(new QueueDTO
-                                                          ("SourceQueue"));
-        IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>
-                packet =
-                new IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>(
-                        new RawDestinationDescriptor());
-        mockMvc.perform(post("/integrator/ping").contentType(
-                MediaType.APPLICATION_JSON).content(mapper.writeValueAsString
-                (packet))).andExpect(status().is(200));
-    }
-
-    @Test
-    public void testRawDDDeserializer() throws Exception {
-        RawDestinationDescriptor targetResponseHandler =
-                new RawDestinationDescriptor();
-        targetResponseHandler.setEndpoint(
-                new EndpointDTO<>(EndpointType.JMS, new
-                        JMSEndpointDescriptorDTO("ConnectionFactory",
-                                                 Collections.<String,
-                                                         String>emptyMap())
-                ));
-        targetResponseHandler.setActionDescriptor(new QueueDTO
-                                                          ("SourceQueue"));
-        IntegratorPacket<Void, DestinationDescriptor>
-                packet =
-                new IntegratorPacket<Void, DestinationDescriptor>(
-                        targetResponseHandler);
-        String expected = mapper.writeValueAsString(packet);
-        IntegratorPacket integratorPacket =
-                mapper.readValue(expected, IntegratorPacket.class);
-        Assert.assertEquals(packet, integratorPacket);
-    }
-
-    @Test
-    public void testServiceDDDeserializer() throws Exception {
-        IntegratorPacket<Void, DestinationDescriptor>
-                packet =
-                new IntegratorPacket<Void, DestinationDescriptor>(
-                        new ServiceDestinationDescriptor(
-                                "ser", "actuin", EndpointType.HTTP));
-        String expected = mapper.writeValueAsString(packet);
-        IntegratorPacket integratorPacket =
-                mapper.readValue(expected, IntegratorPacket.class);
-        Assert.assertEquals(packet, integratorPacket);
-    }
-
-    @Test
-    public void testRegDeserializer() throws Exception {
-        TargetRegistrationDTO<HttpActionDTO> expected =
-                new TargetRegistrationDTO<>();
-        expected.setServiceName("NEW_SERVICE");
-        //----------------------------------------------------------------------
-        EndpointDTO<HttpEndpointDescriptorDTO>
-                endpointDTO = new EndpointDTO<>();
-        endpointDTO.setEndpointType(EndpointType.HTTP);
-
-        HttpEndpointDescriptorDTO descr = new HttpEndpointDescriptorDTO();
-        descr.setHost("192.168.84.142");
-        descr.setPort(8080);
-        endpointDTO.setDescriptor(descr);
-
-        expected.setEndpoint(endpointDTO);
-        //----------------------------------------------------------------------
-        ActionEndpointDTO<HttpActionDTO> actionDTO = new ActionEndpointDTO<>();
-
-        HttpActionDTO actionDescriptor = new HttpActionDTO();
-        actionDescriptor.setPath("/destination/handleRequest");
-
-        actionDTO.setActionDescriptor(actionDescriptor);
-        actionDTO.setActionName("ACTION");
-        expected.setActionRegistrations(
-                Arrays.asList(new ActionRegistrationDTO<>(actionDTO, true)));
-		expected.setDeliverySettings(new DeliverySettingsDTO());
-        String sstring = mapper.writeValueAsString(expected);
-        TargetRegistrationDTO result =
-                mapper.readValue(sstring, TargetRegistrationDTO.class);
-        Assert.assertEquals(expected, result);
-    }
-
-    @Test
-    public void testHttpDeserializer() throws Exception {
-        RawDestinationDescriptor
-                serviceDTO = new RawDestinationDescriptor();
-        ActionDescriptor descriptor = new HttpActionDTO("PATH");
-        serviceDTO.setActionDescriptor(descriptor);
-        serviceDTO.setEndpoint(getHttpDTO());
-        String s = mapper.writeValueAsString(serviceDTO);
-        RawDestinationDescriptor
-                serviceDTO1 =
-                mapper.readValue(s, RawDestinationDescriptor.class);
-        Assert.assertEquals(serviceDTO, serviceDTO1);
-    }
-
-    @Test
-    public void testDeserializer() throws Exception {
-        RawDestinationDescriptor
-                serviceDTO = new RawDestinationDescriptor();
-        ActionDescriptor descriptor = getQueueDTO();
-        serviceDTO.setActionDescriptor(descriptor);
-        serviceDTO.setEndpoint(getJMSDTO());
-        String s = mapper.writeValueAsString(serviceDTO);
-        RawDestinationDescriptor
-                serviceDTO1 =
-                mapper.readValue(s, RawDestinationDescriptor.class);
-        Assert.assertEquals(serviceDTO, serviceDTO1);
-    }
-
-    @Test
-    public void testHandler() throws Exception {
-        DatabaseRetryHandler handler = factory.createHandler();
-        handler.setLogEntry(new TaskLogEntry("OLOLO2"));
-        handler.call();
-        Assert.assertTrue(true);
-    }
-
-    //    @Test
-//    public void simple() throws Exception {
-//        mockMvc.perform(get("/"))
-//                .andExpect(status().isOk())
-//                .andExpect(view().name("hello"));
-//    }
-    @Test
-    public void testEx() throws Exception {
-        Runnable runnable =
-                new TaskCreator<>(new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        throw new HttpClientErrorException(
-                                HttpStatus.GATEWAY_TIMEOUT);
-                    }
-                })
-            .addExceptionHandler(
-                        new Callback<RestClientException>() {
-                            @Override
-                            public void execute(
-                                    RestClientException arg) {
-                                Assert.assertTrue(true);
-                            }
-                        }, RestClientException.class)
-            .addExceptionHandler(new Callback<IllegalArgumentException>() {
-                @Override
-                public void execute(IllegalArgumentException arg) {
-                    Assert.fail();
-                }
-            }, IllegalArgumentException.class)
-                        .create();
-        runnable.run();
-//        Assert.fail();
-    }
 
 }
