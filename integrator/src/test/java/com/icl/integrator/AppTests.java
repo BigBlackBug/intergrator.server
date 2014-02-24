@@ -15,6 +15,8 @@ import com.icl.integrator.model.*;
 import com.icl.integrator.services.EndpointResolverService;
 import com.icl.integrator.services.JsonMatcher;
 import com.icl.integrator.services.PersistenceService;
+import com.icl.integrator.services.validation.PacketValidationException;
+import com.icl.integrator.services.validation.ValidationService;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
 import com.icl.integrator.task.retryhandler.DatabaseRetryHandler;
@@ -55,7 +57,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @WebAppConfiguration
 @TransactionConfiguration(transactionManager = "transactionManager",
                           defaultRollback = false)
-@ContextConfiguration(locations = {"classpath:/integrator-servlet.xml"})
+@ContextConfiguration(locations = {"classpath:/applicationContext.xml","classpath:/integrator-servlet.xml"})
 public class AppTests {
 
     private static Log logger =
@@ -117,6 +119,42 @@ public class AppTests {
     @PersistenceContext
     EntityManager em;
 
+	@Autowired
+	private ValidationService validationService;
+
+	@Test(expected = PacketValidationException.class)
+	public void testValidator()throws Exception{
+		HttpEndpointDescriptorDTO desr = new
+				HttpEndpointDescriptorDTO("localhost", 8080);
+		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
+				new EndpointDTO<>(EndpointType.HTTP, desr);
+		RawDestinationDescriptor dd =
+				new RawDestinationDescriptor(
+
+				);
+		dd.setActionDescriptor(
+		                       new HttpActionDTO("/ext_source/handleGetServiceList"));
+		IntegratorPacket p = new IntegratorPacket(dd);
+		String json = mapper.writeValueAsString(p);
+	      validationService.validateIntegratorPacket(json);
+	}
+	@Test(expected = PacketValidationException.class)
+	public void testValidator2()throws Exception{
+		HttpEndpointDescriptorDTO desr = new
+				HttpEndpointDescriptorDTO("localhost", 8080);
+		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
+				new EndpointDTO<>(EndpointType.HTTP, desr);
+		RawDestinationDescriptor dd =
+				new RawDestinationDescriptor(
+				   endpoint,       new HttpActionDTO("/ext_source/handleGetServiceList")
+				);
+		IntegratorPacket p = new IntegratorPacket();
+		p.setMethod(null);
+		p.setPacket(null);
+		p.setResponseHandlerDescriptor(null);
+		String json = mapper.writeValueAsString(p);
+		validationService.validateIntegratorPacket(json);
+	}
 	@Test
 	public void testPAGeneral() throws Exception {
 		TestClass reference =new TestClass();

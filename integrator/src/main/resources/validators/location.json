@@ -1,0 +1,309 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "IntegratorPacket",
+    "type": "object", "required": [ "packet" ],
+    "properties": {
+        "method": {
+            "type": "string",
+            "enum": [ "PING", "DELIVER", "REGISTER_SERVICE", "IS_AVAILABLE", "GET_SERVICE_LIST", "GET_SUPPORTED_ACTIONS", "ADD_ACTION", "GET_SERVICE_INFO" ]
+        },
+        "packet": {
+            "type": "object",
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/deliveryDTO"
+                },
+                {
+                    "$ref": "#/definitions/targetRegistrationDTO"
+                },
+                {
+                    "$ref": "#/definitions/serviceDD"
+                },
+                {
+                    "$ref": "#/definitions/serviceDTO"
+                },
+                {
+                    "$ref": "#/definitions/addActionDTO"
+                },
+                {
+                    "$ref": "#/definitions/autoDetectionRegistrationDTO"
+                }
+            ]
+        },
+        "responseHandlerDescriptor": {
+            "$ref": "#/definitions/destinationDescriptor"
+        }
+    },
+    "definitions": {
+        "deliveryDTO": {
+            "type": "object",
+            "required": ["requestData"],
+            "properties": {
+                "responseHandlerDescriptor": {
+                    "oneOf":[
+                        {"type":"null"},
+                        {"$ref": "#/definitions/destinationDescriptor"}
+                ]},
+                "destinations": {
+                    "type": "array",
+                    "items": [
+                        {
+                            "$ref": "#/definitions/serviceDTO"
+                        }
+                    ]
+
+                },
+                "action": {
+                    "type": "string"
+                },
+                "requestData": {
+                    "type": "object",
+                    "required": ["deliveryType", "data"],
+                    "properties": {
+                        "deliveryType": {
+                            "type": "string",
+                            "enum": [ "INCIDENT", "DICTIONARY", "LOCATION", "RESULT", "UNDEFINED" ]
+                        },
+                        "data": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "targetRegistrationDTO": {
+            "type": "object",
+            "required": ["serviceName", "endpoint", "deliverySettings", "actionRegistrations"],
+            "properties": {
+                "serviceName": {
+                    "type": "string"
+                },
+                "endpoint": {
+                    "$ref": "#/definitions/endpointDTO"
+                },
+                "deliverySettings": {
+                    "required": ["retryDelay", "retryNumber"],
+                    "type": "object",
+                    "properties": {
+                        "retryNumber": {
+                            "type": "number",
+                            "minimum": 0,
+                            "exclusiveMinimum": true
+                        },
+                        "retryDelay": {
+                            "type": "number",
+                            "minimum": 0,
+                            "exclusiveMinimum": true
+                        }
+                    }
+
+                },
+                "actionRegistrations": {
+                    "type": "array",
+                    "items": [
+                        {
+                            "$ref": "#/definitions/actionRegDTO"
+                        }
+                    ]
+                }
+            }
+        },
+        "actionRegDTO": {
+            "type": "object",
+            "required": ["forceRegister", "action"],
+            "properties": {
+                "forceRegister": {
+                    "type": "boolean"
+                },
+                "action": {
+                    "type": "object",
+                    "required": ["actionName", "actionDescriptor"],
+                    "properties": {
+                        "actionName": {
+                            "type": "string"
+                        },
+                        "actionDescriptor": {
+                            "$ref": "#/definitions/actionDesc"
+                        }
+                    }
+                }
+            }
+        },
+        "serviceDTO": {
+            "type": "object",
+            "required": [ "serviceName", "endpointType" ],
+            "properties": {
+                "serviceName": {
+                    "type": "string"
+                },
+                "endpointType": {
+                    "type": "string",
+                    "enum": [ "HTTP", "JMS" ]
+                }
+            }
+        },
+        "addActionDTO": {
+            "type": "object",
+            "required": [ "service", "actionRegistration" ],
+            "properties": {
+                "service": {
+                    "$ref": "#definitions/serviceDTO"
+                },
+                "actionRegistration": {
+                    "$ref": "#definitions/actionRegDTO"
+                }
+            }
+        },
+        "autoDetectionRegistrationDTO": {
+            "type": "object",
+            "required": [ "deliveryType", "referenceObject", "destinationDescriptors" ],
+            "properties": {
+                "deliveryType": {
+                    "type": "string",
+                    "enum": [ "INCIDENT", "DICTIONARY", "LOCATION", "RESULT", "UNDEFINED" ]
+                },
+                "referenceObject": {
+                    "type": "object"
+                },
+                "destinationDescriptors": {
+                    "type": "array",
+                    "items": [
+                        {
+                            "required": [ "destinationDescriptor", "forceRegister"],
+                            "type": "object",
+                            "properties": {
+                                "destinationDescriptor": {
+                                    "$ref": "#definitions/destinationDescriptor"
+                                },
+                                "forceRegister": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "serviceDD": {
+            "required": [ "descriptorType", "service", "action", "endpointType" ],
+            "type": "object",
+            "properties": {
+                "descriptorType": {
+                    "type": "string",
+                    "enum": [ "RAW", "SERVICE" ]
+                },
+                "service": {
+                    "type": "string"
+                },
+                "action": {
+                    "type": "string"
+                },
+                "endpointType": {
+                    "type": "string",
+                    "enum": [ "HTTP", "JMS" ]
+                }
+            }
+        },
+        "destinationDescriptor": {
+            "type": "object",
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/serviceDD"
+                },
+                {
+                    "required": [ "descriptorType", "endpoint", "actionDescriptor"],
+                    "type": "object",
+                    "properties": {
+                        "descriptorType": {
+                            "type": "string",
+                            "enum": [ "RAW", "SERVICE" ]
+                        },
+                        "endpoint": {
+                            "$ref": "#/definitions/endpointDTO"
+                        },
+                        "actionDescriptor": {
+                            "$ref": "#/definitions/actionDesc"
+                        }
+                    }
+                }
+            ]
+        },
+        "actionDesc": {
+            "type": "object",
+            "oneOf": [
+                {
+                    "type": "object",
+                    "required": ["path"],
+                    "properties": {
+                        "path": {
+                            "type": "string"
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "required": ["username", "password", "queueName"],
+                    "properties": {
+                        "username": {
+                            "type": "string"
+                        },
+                        "password": {
+                            "type": "string"
+                        },
+                        "queueName": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
+        },
+        "endpointDTO": {
+            "type": "object",
+            "required": ["endpointType", "descriptor"],
+            "properties": {
+                "endpointType": {
+                    "type": "string",
+                    "enum": [ "HTTP", "JMS" ]
+                },
+                "descriptor": {
+                    "type": "object",
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/httpDesc"
+                        },
+                        {
+                            "$ref": "#/definitions/jmsDesc"
+                        }
+                    ]
+                }
+            }
+        },
+        "httpDesc": {
+            "type": "object",
+            "required": ["host", "port"],
+            "properties": {
+                "host": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                }
+            }
+        },
+        "jmsDesc": {
+            "type": "object",
+            "required": ["connectionFactory", "jndiProperties"],
+            "properties": {
+                "connectionFactory": {
+                    "type": "string"
+                },
+                "jndiProperties": {
+                    "type": "object",
+                    "default": {}
+                }
+            }
+        }
+    }
+}

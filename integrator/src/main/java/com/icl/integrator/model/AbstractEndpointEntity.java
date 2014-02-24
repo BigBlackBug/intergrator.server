@@ -31,7 +31,6 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
 	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
 	protected Set<AbstractActionEntity> actions = new HashSet<>();
 
-    //TODO add references to delivery
     @Enumerated(EnumType.STRING)
     @Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
             insertable = false)

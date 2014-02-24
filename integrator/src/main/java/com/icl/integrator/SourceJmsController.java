@@ -34,7 +34,6 @@ public class SourceJmsController implements SourceService, MessageListener {
     @Override
     public void handleResponseFromTarget(ResponseDTO<ResponseFromTargetDTO> responseDTO) {
         //TODO implement
-
     }
 
     @Override

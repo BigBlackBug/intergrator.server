@@ -249,8 +249,7 @@ public class DeliveryCreator {
 	}
 
 	@Transactional
-	public Deliveries createDeliveries(DeliveryDTO deliveryDTO)
-			throws JsonProcessingException {       //TODO exc handle
+	public Deliveries createDeliveries(DeliveryDTO deliveryDTO) throws JsonProcessingException {
 		logger.info("Creating a delivery packet");
 
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
@@ -269,11 +268,14 @@ public class DeliveryCreator {
 	}
 
 	@Transactional
-	private Deliveries createAutoDetectedDeliveries(DeliveryDTO deliveryDTO) {
+	private Deliveries createAutoDetectedDeliveries(DeliveryDTO deliveryDTO) throws IntegratorException{
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
 		DeliveryType deliveryType = requestData.getDeliveryType();
 		List<AutoDetectionPacket> autoDetectionPackets =
 				persistenceService.findAutoDetectionPackets(deliveryType);
+		if(autoDetectionPackets.isEmpty()){
+			throw new IntegratorException("Не могу автоматически определить целевые сервисы");
+		}
 		Deliveries deliveries = new Deliveries();
 		for (AutoDetectionPacket packet : autoDetectionPackets) {
 			Object data = requestData.getData();

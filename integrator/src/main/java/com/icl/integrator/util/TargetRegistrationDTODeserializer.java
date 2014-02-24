@@ -19,7 +19,6 @@ import java.util.List;
  * Time: 14:03
  * To change this template use File | Settings | File Templates.
  */
-//TODO add null handlers freaking everywhere
 public class TargetRegistrationDTODeserializer extends
         JsonDeserializer<TargetRegistrationDTO> {
 

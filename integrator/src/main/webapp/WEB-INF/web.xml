@@ -5,7 +5,6 @@
 	http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
     <display-name>Spring MVC Application</display-name>
-
     <servlet>
         <servlet-name>integrator</servlet-name>
         <servlet-class>
@@ -17,6 +16,25 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:applicationContext.xml</param-value>
+    </context-param>
+
+
+    <filter>
+        <filter-name>validationFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>validationFilter</filter-name>
+        <url-pattern>/integrator/*</url-pattern>
+    </filter-mapping>
+
 
     <servlet-mapping>
         <servlet-name>integrator</servlet-name>
