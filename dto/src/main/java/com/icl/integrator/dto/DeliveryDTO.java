@@ -22,16 +22,12 @@ public class DeliveryDTO {
 
 	private RequestDataDTO requestData;
 
-	public DeliveryDTO(String action,
-	                   RequestDataDTO requestData) {
-		this.action = action;
+	public DeliveryDTO(RequestDataDTO requestData) {
 		this.requestData = requestData;
 	}
 
-	public DeliveryDTO(String action,
-	                   RequestDataDTO requestData,
+	public DeliveryDTO(RequestDataDTO requestData,
 	                   DestinationDescriptor responseHandlerDescriptor) {
-		this.action = action;
 		this.requestData = requestData;
 		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
