@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.services.validation.PacketValidationException;
 import com.icl.integrator.services.validation.ValidationService;
+import com.icl.integrator.services.validation.ValidatorException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,23 +37,28 @@ public class ValidationFilter implements Filter {
 		MultiReadHttpServletRequest multiReadRequest =
 				new MultiReadHttpServletRequest((HttpServletRequest) request);
 
-		String json = IOUtils.toString(multiReadRequest.getInputStream());
-		try {
-			validationService.validateIntegratorPacket(json);
-		} catch (PacketValidationException pvex) {
-			logger.info("Ошибка валидации пакета", pvex);
-			response.setContentType("application/json");
-			ResponseDTO error = new ResponseDTO(pvex);
-			String responseJson = objectMapper.writeValueAsString(error);
-			response.setContentLength(responseJson.length());
-			response.getWriter().write(responseJson);
-			return;
-		}
-		chain.doFilter(multiReadRequest, response);
-	}
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        //фильтруем только пост запросы к интегратору
+        if(httpRequest.getMethod().equalsIgnoreCase("POST")){
+            String json = IOUtils.toString(multiReadRequest.getInputStream());
+            try {
+                validationService.validateIntegratorPacket(json);
+            } catch (PacketValidationException | ValidatorException vex) {
+                logger.info("Ошибка валидации пакета", vex);
+                response.setContentType("application/json");
+                ResponseDTO error = new ResponseDTO(vex);
+                String responseJson = objectMapper.writeValueAsString(error);
+                response.setContentLength(responseJson.length());
+                response.getWriter().write(responseJson);
+                return;
+            }
+        }
 
-	@Override
-	public void destroy() {
+        chain.doFilter(multiReadRequest, response);
+    }
+
+    @Override
+    public void destroy() {
 
 	}
 }
