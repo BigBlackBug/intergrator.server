@@ -32,10 +32,10 @@ public class DeliveryDTO {
 		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
 
-	public DeliveryDTO(
-			List<ServiceDTO> destinations,
-			RequestDataDTO requestData, String action,
-			DestinationDescriptor responseHandlerDescriptor) {
+	public DeliveryDTO(String action,
+	                   List<ServiceDTO> destinations,
+	                   RequestDataDTO requestData,
+	                   DestinationDescriptor responseHandlerDescriptor) {
 		this.destinations = destinations;
 		this.requestData = requestData;
 		this.action = action;
