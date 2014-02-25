@@ -2,6 +2,7 @@ package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.dto.DeliveryType;
 import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
@@ -10,6 +11,7 @@ import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
+import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.ConnectionException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
@@ -303,6 +305,10 @@ public class RegistrationService {
 	public <Y> List<ResponseDTO<Void>> register(AutoDetectionRegistrationDTO<Y> packet)
 			throws Exception {
 		AutoDetectionPacket autoDetectionPacket = new AutoDetectionPacket();
+        if(packet.getDeliveryType() == DeliveryType.UNDEFINED){
+            throw new IntegratorException("Тип доставки не может быть " +
+                                                  "UNDEFINED");
+        }
 		autoDetectionPacket.setDeliveryType(packet.getDeliveryType());
 		List<ResponseDTO<Void>> result = new ArrayList<>();
 		String referenceObject =

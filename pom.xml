@@ -18,7 +18,8 @@
     <properties>
         <aspectj.version>1.7.4</aspectj.version>
         <jackson.version>2.2.3</jackson.version>
-        <java.version>1.7</java.version>
+        <java.source.version>1.7</java.source.version>
+        <java.target.version>1.6</java.target.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--<roo.version>1.2.3.RELEASE</roo.version>-->
         <!--<slf4j.version>1.7.2</slf4j.version>-->
@@ -96,8 +97,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <source>${java.source.version}</source>
+                    <target>${java.target.version}</target>
                 </configuration>
             </plugin>
             <plugin>
