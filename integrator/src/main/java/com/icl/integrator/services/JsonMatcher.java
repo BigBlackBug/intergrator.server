@@ -1,6 +1,7 @@
 package com.icl.integrator.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.Map;
 public class JsonMatcher {
 
 	public boolean matches(JsonNode data, JsonNode reference) {
-		if(data == null && reference == null){
+		if(reference instanceof NullNode){
 			return true;
 		}
 		if (reference.isObject()) {

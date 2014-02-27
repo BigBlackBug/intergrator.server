@@ -22,24 +22,20 @@ public class DeliveryDTO {
 
 	private RequestDataDTO requestData;
 
-	public DeliveryDTO(String action,
-	                   RequestDataDTO requestData) {
-		this.action = action;
+	public DeliveryDTO(RequestDataDTO requestData) {
 		this.requestData = requestData;
 	}
 
-	public DeliveryDTO(String action,
-	                   RequestDataDTO requestData,
+	public DeliveryDTO(RequestDataDTO requestData,
 	                   DestinationDescriptor responseHandlerDescriptor) {
-		this.action = action;
 		this.requestData = requestData;
 		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
 
-	public DeliveryDTO(
-			List<ServiceDTO> destinations,
-			RequestDataDTO requestData, String action,
-			DestinationDescriptor responseHandlerDescriptor) {
+	public DeliveryDTO(String action,
+	                   List<ServiceDTO> destinations,
+	                   RequestDataDTO requestData,
+	                   DestinationDescriptor responseHandlerDescriptor) {
 		this.destinations = destinations;
 		this.requestData = requestData;
 		this.action = action;

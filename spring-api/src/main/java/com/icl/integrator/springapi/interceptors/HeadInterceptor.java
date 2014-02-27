@@ -1,4 +1,4 @@
-package com.icl.integrator;
+package com.icl.integrator.springapi.interceptors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,6 +19,8 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 	                         HttpServletResponse response, Object handler)
 			throws Exception {
 		if (request.getMethod().equals("HEAD")) {
+//			HandlerMethod method = (HandlerMethod) handler;
+			//TODO analyze method arguments
 			logger.info("Received a HEAD request. Ignoring");
 			return false;
 		} else {

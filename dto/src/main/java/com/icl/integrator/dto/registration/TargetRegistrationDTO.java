@@ -1,7 +1,6 @@
 package com.icl.integrator.dto.registration;
 
 import com.icl.integrator.dto.EndpointDTO;
-import com.icl.integrator.util.EndpointType;
 
 import java.util.List;
 
@@ -47,10 +46,6 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
 
 	public void setDeliverySettings(DeliverySettingsDTO deliverySettings) {
 		this.deliverySettings = deliverySettings;
-	}
-
-	public EndpointType getEndpointType() {
-		return endpoint.getEndpointType();
 	}
 
 	public EndpointDTO getEndpoint() {

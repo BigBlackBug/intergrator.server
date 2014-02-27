@@ -201,7 +201,7 @@
         <mvc:interceptor>
             <mvc:mapping path="/source/**"/>
             <mvc:mapping path="/ext_source/**"/>
-            <bean class="com.icl.integrator.HeadInterceptor" />
+            <bean class="com.icl.integrator.springapi.interceptors.HeadInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>
 </beans>
