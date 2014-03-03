@@ -43,10 +43,6 @@ public class RawDestinationDescriptor extends DestinationDescriptor {
         this.endpoint = endpoint;
     }
 
-    public boolean isInitialized() {
-        return endpoint != null && actionDescriptor != null;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

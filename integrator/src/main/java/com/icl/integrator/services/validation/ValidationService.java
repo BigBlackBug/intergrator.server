@@ -30,7 +30,6 @@ public class ValidationService {
 
 	private JsonValidator integratorValidator;
 
-
 	@Autowired
 	private ObjectMapper mapper;
 

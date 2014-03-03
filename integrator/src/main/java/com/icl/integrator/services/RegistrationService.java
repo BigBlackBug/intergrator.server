@@ -17,7 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -29,7 +29,7 @@ import java.util.*;
  * Time: 15:06
  * To change this template use File | Settings | File Templates.
  */
-@Component
+@Service
 public class RegistrationService {
 
     private static Log logger = LogFactory.getLog(RegistrationService.class);
@@ -46,6 +46,7 @@ public class RegistrationService {
 	@Autowired
 	private DeliveryCreator deliveryCreator;
 
+	@Transactional
     public <T extends ActionDescriptor>
     Map<String, ResponseDTO<Void>> register(
             TargetRegistrationDTO<T> registrationDTO)
@@ -160,6 +161,7 @@ public class RegistrationService {
             result.put(action.getActionName(), responseDTO);
         }
     }
+
 	@Transactional
     private <T extends ActionDescriptor> List<HttpAction> getHttpActions(
             List<ActionEndpointDTO<T>> actions, UUID serviceID) {

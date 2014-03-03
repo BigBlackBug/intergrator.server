@@ -1,6 +1,5 @@
 package com.icl.integrator.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
@@ -51,9 +50,6 @@ public class IntegratorService implements IntegratorAPI {
 	@Autowired
 	private ValidationService validationService;
 
-	@Autowired
-	private ObjectMapper mapper;
-
 	@Override
     public  <T extends DestinationDescriptor> ResponseDTO<Map<String,
             ResponseDTO<UUID>>> deliver(
@@ -74,7 +70,8 @@ public class IntegratorService implements IntegratorAPI {
             serviceToRequestID.putAll(deliveries.getErrorMap());
             response = new ResponseDTO<>(serviceToRequestID);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(ex);
+	        logger.error(ex);
+	        response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         deliveryService.deliver(delivery.getResponseHandlerDescriptor(), response);
         return response;
@@ -99,6 +96,7 @@ public class IntegratorService implements IntegratorAPI {
                     registrationService.register(registrationDTO.getPacket());
             response = new ResponseDTO<>(result);
         } catch (Exception ex) {
+	        logger.error(ex);
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
@@ -115,6 +113,7 @@ public class IntegratorService implements IntegratorAPI {
             workerService.pingService(serviceDescriptor.getPacket());
             response = new ResponseDTO<>(Boolean.TRUE, Boolean.class);
         } catch (Exception ex) {
+	        logger.error(ex);
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         deliveryService.deliver(serviceDescriptor.getResponseHandlerDescriptor(), response);
@@ -129,7 +128,8 @@ public class IntegratorService implements IntegratorAPI {
             List<ServiceDTO> serviceList = workerService.getServiceList();
             response = new ResponseDTO<>(serviceList);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
+	        logger.error(ex);
+	        response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
         deliveryService.deliver(packet.getResponseHandlerDescriptor(), response);
@@ -145,7 +145,8 @@ public class IntegratorService implements IntegratorAPI {
                     .getSupportedActions(serviceDTO.getPacket());
             response = new ResponseDTO<>(actions);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
+	        logger.error(ex);
+	        response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         deliveryService.deliver(serviceDTO.getResponseHandlerDescriptor(), response);
         return response;
@@ -159,7 +160,8 @@ public class IntegratorService implements IntegratorAPI {
             workerService.addAction(actionDTO.getPacket());
             response = new ResponseDTO<>(true);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
+	        logger.error(ex);
+	        response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         deliveryService.deliver(actionDTO.getResponseHandlerDescriptor(), response);
         return response;
@@ -177,7 +179,8 @@ public class IntegratorService implements IntegratorAPI {
                             .getServiceInfo(serviceDTO.getPacket());
             response = new ResponseDTO<>(serviceInfo);
         } catch (Exception ex) {
-            response = new ResponseDTO<>(new ErrorDTO(ex));
+	        logger.error(ex);
+	        response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
         deliveryService.deliver(serviceDTO.getResponseHandlerDescriptor(), response);
@@ -195,6 +198,7 @@ public class IntegratorService implements IntegratorAPI {
 					registrationService.register(autoDetectionDTO.getPacket());
 			response = new ResponseDTO<>(result);
 		} catch (Exception ex) {
+			logger.error(ex);
 			response = new ResponseDTO<>(new ErrorDTO(ex));
 		}
 

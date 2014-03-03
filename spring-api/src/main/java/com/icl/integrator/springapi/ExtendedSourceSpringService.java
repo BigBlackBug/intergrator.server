@@ -7,6 +7,7 @@ import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.source.EndpointDescriptor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +28,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 
 	@Override
 	@RequestMapping(value = "/handleDeliveryResponse",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
@@ -35,6 +37,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 
 	@Override
 	@RequestMapping(value = "/handleServiceRegistrationResponse",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
@@ -44,6 +47,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 
 	@Override
 	@RequestMapping(value = "/handleServiceIsAvailableResponse",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
@@ -51,8 +55,9 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                                      ResponseDTO<Boolean> response);
 
 	@Override
-	@RequestMapping(value = "/handleGetServiceList", method = RequestMethod
-			.POST)
+	@RequestMapping(value = "/handleGetServiceList",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
+	                method = RequestMethod.POST)
 	public
 	@ResponseBody
 	void handleGetServiceList(@RequestBody(required = true)
@@ -60,6 +65,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 
 	@Override
 	@RequestMapping(value = "/handleGetSupportedActions",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
@@ -68,6 +74,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 
 	@Override
 	@RequestMapping(value = "/handleAddAction",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
@@ -76,6 +83,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 
 	@Override
 	@RequestMapping(value = "/handleGetServiceInfo",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
@@ -85,6 +93,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 
 	@Override
 	@RequestMapping(value = "/handleResponseFromTarget",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody

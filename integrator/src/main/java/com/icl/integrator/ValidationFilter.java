@@ -37,6 +37,7 @@ public class ValidationFilter implements Filter {
 				new MultiReadHttpServletRequest((HttpServletRequest) request);
 
 		String json = IOUtils.toString(multiReadRequest.getInputStream());
+		logger.info(json);
 		try {
 			validationService.validateIntegratorPacket(json);
 		} catch (PacketValidationException pvex) {
