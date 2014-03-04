@@ -3,13 +3,14 @@ package com.icl.integrator.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.ErrorDTO;
-import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.model.AbstractActionEntity;
 import com.icl.integrator.model.AbstractEndpointEntity;
 import com.icl.integrator.model.Delivery;
 import com.icl.integrator.model.DeliveryStatus;
+import com.icl.integrator.services.converters.Converter;
+import com.icl.integrator.services.utils.PersistentDestination;
+import com.icl.integrator.services.utils.ResponseDeliveryDescriptor;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
 import com.icl.integrator.util.connectors.EndpointConnector;
@@ -21,8 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.UUID;
-
-import static org.springframework.util.StringUtils.quote;
 
 /**
  * Created with IntelliJ IDEA.
@@ -66,21 +65,19 @@ public class DeliveryService {
 				return;
 			}
 			try {
-				deliver(delivery);
+				deliver(delivery,Void.class);
 			} catch (Exception ex) {
 				logger.error("Не могу отправить пакет на сервис", ex);
 				return;
 			}
 		}
 	}
-	private <T> UUID executeDelivery(
-			final DeliveryCallable<T, ResponseDTO> deliveryCallable,
-			PersistentDestination persistentDestination,
-			final Delivery delivery) {
-		UUID requestID = UUID.randomUUID();
-		logger.info("Generated an ID for the request: " + quote(
-				requestID.toString()));
-		TaskCreator<ResponseDTO> deliveryTaskCreator =
+
+	private <PacketClass,ResponseClass,ТипКоторыйПринимаетСорс> void executeDelivery(
+			final DeliveryCallable<PacketClass, ResponseClass> deliveryCallable,
+			final Delivery delivery,
+			ResponseDeliveryDescriptor<ResponseClass,ТипКоторыйПринимаетСорс> deliveryDescriptor) {
+		TaskCreator<ResponseClass> deliveryTaskCreator =
 				new TaskCreator<>(deliveryCallable);
 //		deliveryTaskCreator.setDescriptor(
 //				new Descriptor<TaskCreator<ResponseDTO>>() {
@@ -94,13 +91,21 @@ public class DeliveryService {
         //accepts real response
 		Callback<ErrorDTO> deliveryFailed = null;
         //accepts raw response. must be wrapped
-        SourceDeliveryCallback<ResponseDTO> deliverySuccess = null;
-		if (persistentDestination != null) {
+		Callback<ResponseClass> deliverySuccess = null;
+		if (deliveryDescriptor != null) {
 			String targetServiceName = delivery.getEndpoint().getServiceName();
-			deliveryFailed = new SourceDeliveryFailedCallback(requestID,
-			                                                  persistentDestination, targetServiceName);
-			deliverySuccess = new SourceDeliverySuccessCallback(requestID,
-			                                                    persistentDestination, targetServiceName);
+			PersistentDestination persistentDestination =
+					deliveryDescriptor.getPersistentDestination();
+			Converter<ErrorDTO, ТипКоторыйПринимаетСорс> failedConverter =
+					deliveryDescriptor.getFailedConverter();
+			Converter<ResponseClass, ТипКоторыйПринимаетСорс> successConverter =
+					deliveryDescriptor.getSuccessConverter();
+			deliveryFailed = new SourceDeliveryFailedCallback<>(delivery.getId(),
+			                                                  persistentDestination,
+			                                                  targetServiceName, failedConverter);
+			deliverySuccess = new SourceDeliverySuccessCallback<>(delivery.getId(),
+			                                                    persistentDestination,
+			                                                    targetServiceName, successConverter);
 		}/*else{
             deliveryFailed = new Callback<ErrorDTO>() {
                 @Override
@@ -110,23 +115,29 @@ public class DeliveryService {
                 }
             };
         }  */
-		deliveryTaskCreator.setCallback(new DeliverySuccessCallback(
-				delivery, requestID, deliverySuccess));
+		//если войд, то всё нулл
+		//если не войд, то конвертим
+		//сюда надопереадавать продбюсер
+//		deliveryTaskCreator.setCallback(new DeliverySuccessCallback(
+//				delivery, requestID, deliverySuccess));
+		deliveryTaskCreator.setCallback(new DeliverySuccessCallback<>(delivery,deliverySuccess));
 
 		//статус деливери failed ставим в шедулере
         //тут шедуль принимающий ответ
 		scheduler.scheduleDelivery(new Schedulable<>(deliveryTaskCreator,
 		                                             delivery),
 		                           deliveryFailed);
-		return requestID;
 	}
 
-	public UUID deliver(Delivery delivery) {
-		return deliver(delivery, null);
+	public <T> void deliver(Delivery delivery,Class<T> responseClass) {
+		deliver(delivery, responseClass,null);
 	}
 
-	public UUID deliver(Delivery delivery,
-	                    PersistentDestination persistentDestination) {
+
+	public <ResponseClass,ТипКПС> void deliver(Delivery delivery,
+	                    Class<ResponseClass> responseClass,
+	                    ResponseDeliveryDescriptor<ResponseClass,ТипКПС>
+			responseDeliveryDescriptor) {
 		//detached
 		AbstractEndpointEntity endpoint = delivery.getEndpoint();
 		AbstractActionEntity action = delivery.getAction();
@@ -135,62 +146,61 @@ public class DeliveryService {
 				            endpoint.getServiceName());
 		EndpointConnector destinationConnector =
 				factory.createEndpointConnector(endpoint, action);
-		DeliveryCallable<String, ResponseDTO> deliveryCallable =
+		DeliveryCallable<String, ResponseClass> deliveryCallable =
 				new DeliveryCallable<>(destinationConnector,delivery.getDeliveryData(),
-				                       ResponseDTO.class);
+				                       responseClass);
 
-		return executeDelivery(deliveryCallable, persistentDestination,
-		                       delivery);
+		//если воед, то оставляем как есть. new Error
+		executeDelivery(deliveryCallable,delivery,responseDeliveryDescriptor);
 	}
 
-	private class DeliverySuccessCallback implements Callback<ResponseDTO> {
+	private class DeliverySuccessCallback<T> implements Callback<T> {
 
 		private final Delivery delivery;
 
-		private final UUID requestID;
+//		private final UUID requestID;
 
-		private Callback<ResponseDTO> afterExecution;
+		private Callback<T> afterExecution;
 
-		public DeliverySuccessCallback(Delivery delivery, UUID requestID,
-		                               Callback<ResponseDTO> afterExecution) {
+		public DeliverySuccessCallback(Delivery delivery/*, UUID requestID*/,
+		                               Callback<T> afterExecution) {
 			this.delivery = delivery;
 			this.afterExecution = afterExecution;
-			this.requestID = requestID;
+//			this.requestID = requestID;
 		}
 
-		public DeliverySuccessCallback(Delivery delivery, UUID requestID) {
+		public DeliverySuccessCallback(Delivery delivery/*, UUID requestID*/) {
 			this.delivery = delivery;
-			this.requestID = requestID;
+//			this.requestID = requestID;
 		}
 
 		@Override
-		public void execute(ResponseDTO responseDTO) {
+		public void execute(T responseDTO) {
 			String responseString = null;
 			try {
 				if (responseDTO != null) {
 					responseString = mapper.writeValueAsString(responseDTO);
 				}
 			} catch (JsonProcessingException e) {
-				responseString = "Unable to serialize response from " +
-						"target";
+				responseString = "Unable to serialize response from target";
 			}
 			delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_OK);
 			delivery.setResponseData(responseString);
 			delivery.setResponseDate(new Date());
 			persistenceService.merge(delivery);
 			if (afterExecution != null) {
-				ResponseDTO<ResponseFromTargetDTO>
-						data =
-						new ResponseDTO<>(new ResponseFromTargetDTO(
-								responseDTO,
-								delivery.getEndpoint().getServiceName(),
-								requestID.toString()));
-				afterExecution.execute(data);
+//				ResponseDTO<ResponseFromTargetDTO>
+//						data =
+//						new ResponseDTO<>(new ResponseFromTargetDTO(
+//								responseDTO,
+//								delivery.getEndpoint().getServiceName(),
+//								requestID.toString()));
+				afterExecution.execute(responseDTO);
 			}
 		}
 	}
 
-    private abstract class SourceDeliveryCallback<T> implements Callback<T>{
+    private abstract class SourceDeliveryCallback<T,ResponseClass> implements Callback<T>{
         protected final PersistentDestination persistentDestination;
 
         protected final String targetServiceName;
@@ -208,7 +218,7 @@ public class DeliveryService {
         }
 
 //	    @Transactional
-        protected void deliver(ResponseDTO data){
+        protected void deliver(ResponseClass data){
             logger.info("Sending response to the source from " +
 		                        targetServiceName);
 
@@ -226,7 +236,7 @@ public class DeliveryService {
 		        //will never happen
 		        return;
 	        }
-            DeliveryCallable<ResponseDTO, Void>
+            DeliveryCallable<ResponseClass, Void>
                     successCallable =
                     new DeliveryCallable<>(sourceConnector, data,
                                            Void.class);
@@ -260,33 +270,40 @@ public class DeliveryService {
         }
     }
 
-	private class SourceDeliverySuccessCallback extends
-            SourceDeliveryCallback<ResponseDTO> {
+	private class SourceDeliverySuccessCallback<TargetResponseClass,ResponseClass> extends
+            SourceDeliveryCallback<TargetResponseClass,ResponseClass> {
 
-        public SourceDeliverySuccessCallback(UUID requestID,
+		private final Converter<TargetResponseClass,ResponseClass> converter;
+
+		public SourceDeliverySuccessCallback(UUID requestID,
                                              PersistentDestination persistentDestination,
-                                             String targetServiceName) {
+                                             String targetServiceName,Converter<TargetResponseClass,ResponseClass> converter) {
             super(requestID, persistentDestination, targetServiceName);
+	        this.converter = converter;
         }
 
 		@Override
-		public void execute(ResponseDTO responseToSource) {
-            deliver(responseToSource);
+		public void execute(TargetResponseClass responseToSource) {
+            deliver(converter.convert(responseToSource));
 		}
 	}
 
-    private class SourceDeliveryFailedCallback extends
-            SourceDeliveryCallback<ErrorDTO> {
+    private class SourceDeliveryFailedCallback<ResponseClass> extends
+            SourceDeliveryCallback<ErrorDTO,ResponseClass> {
 
         public SourceDeliveryFailedCallback(UUID requestID,
                                             PersistentDestination persistentDestination,
-                                            String targetServiceName) {
+                                            String targetServiceName,
+                                            Converter<ErrorDTO,ResponseClass> converter) {
             super(requestID, persistentDestination, targetServiceName);
+	        this.converter = converter;
         }
+	    private final Converter<ErrorDTO,ResponseClass> converter;
 
         @Override
         public void execute(ErrorDTO errorDTO) {
-            deliver(new ResponseDTO<>(errorDTO));
+//            deliver(new ResponseDTO<>(errorDTO));
+	        deliver(converter.convert(errorDTO));
         }
     }
 

@@ -1,9 +1,13 @@
 package com.icl.integrator;
 
+import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.model.Delivery;
 import com.icl.integrator.model.DeliveryStatus;
 import com.icl.integrator.services.DeliveryService;
 import com.icl.integrator.services.PersistenceService;
+import com.icl.integrator.services.converters.DefaultDeliverySuccessConverter;
+import com.icl.integrator.services.converters.DefaultErrorConverter;
+import com.icl.integrator.services.utils.ResponseDeliveryDescriptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +51,18 @@ public class DeliveryBootstrap implements
 			delivery.setRequestDate(new Date());
 			delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
 			delivery = persistenceService.saveOrUpdate(delivery);
-			deliveryService.deliver(delivery);
+			if(delivery.hasCallbacks()){
+				DefaultErrorConverter errorConverter = new DefaultErrorConverter();
+				DefaultDeliverySuccessConverter successConverter =
+						new DefaultDeliverySuccessConverter(delivery);
+				Class<?> aClass = delivery.getClass();
+				deliveryService.deliver(delivery,ResponseDTO.class,new ResponseDeliveryDescriptor<>(
+						null,
+						errorConverter,successConverter));
+			}else{
+				deliveryService.deliver(delivery,Void.class);
+			}
+			//TODO NOT FOOLPROOF
 		}
 		isInitialized = true;
 	}

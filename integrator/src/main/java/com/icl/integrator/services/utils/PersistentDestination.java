@@ -1,15 +1,15 @@
-package com.icl.integrator.services;
+package com.icl.integrator.services.utils;
 
 import com.icl.integrator.model.AbstractActionEntity;
 import com.icl.integrator.model.AbstractEndpointEntity;
 
-class PersistentDestination {
+public class PersistentDestination {
 
 	private final AbstractActionEntity action;
 
 	private final AbstractEndpointEntity service;
 
-	PersistentDestination(AbstractEndpointEntity service,
+	public PersistentDestination(AbstractEndpointEntity service,
 	                      AbstractActionEntity action) {
 		this.action = action;
 		this.service = service;
