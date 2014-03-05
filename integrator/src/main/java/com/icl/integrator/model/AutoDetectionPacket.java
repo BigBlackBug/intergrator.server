@@ -1,6 +1,7 @@
 package com.icl.integrator.model;
 
 import com.icl.integrator.dto.DeliveryType;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -23,7 +24,11 @@ public class AutoDetectionPacket extends AbstractEntity {
 	@Lob
 	private String referenceObject;
 
-	@ElementCollection(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.EAGER)
+	@Cascade(value = {
+			org.hibernate.annotations.CascadeType.MERGE,
+			org.hibernate.annotations.CascadeType.PERSIST,
+			org.hibernate.annotations.CascadeType.REFRESH})
 	private List<DestinationEntity> destinations = new ArrayList<>();
 
 	public AutoDetectionPacket() {

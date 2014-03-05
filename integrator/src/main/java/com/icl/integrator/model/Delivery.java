@@ -54,8 +54,23 @@ public class Delivery extends AbstractEntity {
 	@Lob
 	private String lastFailureReason;
 
+	@JoinColumn(name = "RESPONSE_HANDLER_DESTINATION")
+	@ManyToOne
+	private DestinationEntity responseHandlerDestination;
+
+	@Column(name = "GENERAL_DELIVERY",nullable = false)
+	private Boolean generalDelivery;
+
 	public Delivery() {
 
+	}
+
+	public Boolean getGeneralDelivery() {
+		return generalDelivery;
+	}
+
+	public void setGeneralDelivery(Boolean generalDelivery) {
+		this.generalDelivery = generalDelivery;
 	}
 
 	public String getDeliveryData() {
@@ -78,16 +93,16 @@ public class Delivery extends AbstractEntity {
 		return responseDate;
 	}
 
+	public void setResponseDate(Date responseDate) {
+		this.responseDate = responseDate;
+	}
+
 	public String getLastFailureReason() {
 		return lastFailureReason;
 	}
 
 	public void setLastFailureReason(String lastFailureReason) {
 		this.lastFailureReason = lastFailureReason;
-	}
-
-	public void setResponseDate(Date responseDate) {
-		this.responseDate = responseDate;
 	}
 
 	public String getResponseData() {
@@ -120,5 +135,13 @@ public class Delivery extends AbstractEntity {
 
 	public void setEndpoint(AbstractEndpointEntity endpoint) {
 		this.endpoint = endpoint;
+	}
+
+	public DestinationEntity getResponseHandlerDestination() {
+		return responseHandlerDestination;
+	}
+
+	public void setResponseHandlerDestination(DestinationEntity responseHandlerDestination) {
+		this.responseHandlerDestination = responseHandlerDestination;
 	}
 }

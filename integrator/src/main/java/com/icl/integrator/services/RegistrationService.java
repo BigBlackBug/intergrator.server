@@ -10,7 +10,6 @@ import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
-import com.icl.integrator.services.utils.PersistentDestination;
 import com.icl.integrator.util.connectors.ConnectionException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
@@ -103,11 +102,10 @@ public class RegistrationService {
 		    logger.error("GG", ex);
 		    throw new TargetRegistrationException("Ошибка регистрации", ex);
 	    }
-	    List<JMSAction> httpActions =
-			    getJmsActions(actions, serviceEntity.getId());
-	    for (JMSAction action : httpActions) {
+	    for (ActionEndpointDTO<T> actionDTO : actions) {
 		    ResponseDTO<Void> responseDTO;
 		    try {
+			    JMSAction action = getJmsAction(actionDTO,serviceEntity.getId());
 			    action.setEndpoint(serviceEntity);
 			    serviceEntity.addAction(action);
 			    persistenceService.saveOrUpdate(action);
@@ -118,7 +116,7 @@ public class RegistrationService {
 			    errorDTO.setDeveloperMessage(ex.getMessage());
 			    responseDTO = new ResponseDTO<>(errorDTO);
 		    }
-		    result.put(action.getActionName(), responseDTO);
+		    result.put(actionDTO.getActionName(), responseDTO);
 	    }
     }
 
@@ -145,10 +143,12 @@ public class RegistrationService {
             logger.error("GG", ex);
             throw new TargetRegistrationException("Ошибка регистрации", ex);
         }
-	    List<HttpAction> httpActions = getHttpActions(actions,serviceEntity.getId());
-        for (HttpAction action : httpActions) {
+//	    List<HttpAction> httpActions = getHttpActions(actions,serviceEntity.getId());
+        for (ActionEndpointDTO<T> actionDTO : actions) {
             ResponseDTO<Void> responseDTO;
+	        HttpAction action;
             try {
+	            action = getHttpAction(actionDTO, serviceEntity.getId());
                 action.setEndpoint(serviceEntity);
                 serviceEntity.addAction(action);
 	            persistenceService.saveOrUpdate(action);
@@ -159,74 +159,140 @@ public class RegistrationService {
                 errorDTO.setDeveloperMessage(ex.getMessage());
                 responseDTO = new ResponseDTO<>(errorDTO);
             }
-            result.put(action.getActionName(), responseDTO);
+            result.put(actionDTO.getActionName(), responseDTO);
         }
     }
-
 	@Transactional
-    private <T extends ActionDescriptor> List<HttpAction> getHttpActions(
-            List<ActionEndpointDTO<T>> actions, UUID serviceID) {
-        List<HttpAction> httpActions = new ArrayList<>();
-        for (ActionEndpointDTO<T> actionDescriptor : actions) {
-            HttpActionDTO httpActionDTO =
-                    (HttpActionDTO) actionDescriptor.getActionDescriptor();
-	        String actionName = actionDescriptor.getActionName();
-	        HttpAction httpAction = persistenceService
-			        .findHttpAction(serviceID, httpActionDTO.getPath());
-	        if (httpAction == null) {
-		        httpAction = new HttpAction();
-		        httpAction.setActionURL(httpActionDTO.getPath());
-	        }
-	        httpAction.setActionName(actionName);
+	private <T extends ActionDescriptor> HttpAction getHttpAction(
+		ActionEndpointDTO<T> actionDescriptor, UUID serviceID) throws TargetRegistrationException{
+		HttpActionDTO httpActionDTO =
+				(HttpActionDTO) actionDescriptor.getActionDescriptor();
+		String actionName = actionDescriptor.getActionName();
+		HttpAction httpAction = persistenceService
+				.findHttpAction(serviceID, httpActionDTO.getPath());
+		if(httpAction!=null){
+			if(httpAction.isGenerated()){
+				httpAction.setGenerated(false);
+				httpAction.setActionName(actionName);
+			}else{
+				throw new TargetRegistrationException("Такое действие уже зарегистрировано под именем '"+actionName+"'");
+			}
+		} else{
+			httpAction = new HttpAction();
+	        httpAction.setActionURL(httpActionDTO.getPath());
+            httpAction.setActionName(actionName);
+			httpAction.setGenerated(false);
+		}
+        return httpAction;
+	}
 
-	        httpActions.add(httpAction);
-        }
-        return httpActions;
-    }
-
+//	@Transactional
+//    private <T extends ActionDescriptor> List<HttpAction> getHttpActions(
+//            List<ActionEndpointDTO<T>> actions, UUID serviceID) {
+//        List<HttpAction> httpActions = new ArrayList<>();
+//        for (ActionEndpointDTO<T> actionDescriptor : actions) {
+//            HttpActionDTO httpActionDTO =
+//                    (HttpActionDTO) actionDescriptor.getActionDescriptor();
+//	        String actionName = actionDescriptor.getActionName();
+//	        HttpAction httpAction = persistenceService
+//			        .findHttpAction(serviceID, httpActionDTO.getPath());
+//	        if(httpAction!=null){
+//		        if(httpAction.isGenerated()){
+//			        httpAction.setGenerated(false);
+//			        httpAction.setActionName(actionName);
+//		        }else{
+//			        throw new
+//		        }
+//	        }
+////	        if (httpAction == null) {
+////		        httpAction = new HttpAction();
+////		        httpAction.setActionURL(httpActionDTO.getPath());
+////	        }
+////	        httpAction.setActionName(actionName);
+//
+//	        httpActions.add(httpAction);
+//        }
+//        return httpActions;
+//    }
 	@Transactional
-    private <T extends ActionDescriptor> List<JMSAction> getJmsActions(
-		    List<ActionEndpointDTO<T>> actions, UUID serviceID) {
-        List<JMSAction> jmsActions = new ArrayList<>();
-        for (ActionEndpointDTO<T> actionDescriptor : actions) {
-            QueueDTO queueDTO =
-                    (QueueDTO) actionDescriptor.getActionDescriptor();
-            String actionName = actionDescriptor.getActionName();
-	        JMSAction jmsAction = persistenceService
-			        .findJmsAction(serviceID, queueDTO.getQueueName(),
-			                       queueDTO.getUsername(),
-			                       queueDTO.getPassword());
-	        if (jmsAction == null) {
-		        jmsAction = new JMSAction();
-		        jmsAction.setUsername(queueDTO.getUsername());
-		        jmsAction.setPassword(queueDTO.getPassword());
-		        jmsAction.setQueueName(queueDTO.getQueueName());
-	        }
-	        jmsAction.setActionName(actionName);
+	private <T extends ActionDescriptor> JMSAction getJmsAction(
+			ActionEndpointDTO<T>actionDescriptor, UUID serviceID) {
+		QueueDTO queueDTO =
+				(QueueDTO) actionDescriptor.getActionDescriptor();
+		String actionName = actionDescriptor.getActionName();
+		JMSAction jmsAction = persistenceService
+				.findJmsAction(serviceID, queueDTO.getQueueName(),
+				               queueDTO.getUsername(),
+				               queueDTO.getPassword());
+		if(jmsAction!=null){
+			if(jmsAction.isGenerated()){
+				jmsAction.setGenerated(false);
+				jmsAction.setActionName(actionName);
+			}else{
+				throw new TargetRegistrationException("Такое действие уже зарегистрировано под именем '"+actionName+"'");
+			}
+		} else{
+			jmsAction = new JMSAction();
+			jmsAction.setUsername(queueDTO.getUsername());
+			jmsAction.setPassword(queueDTO.getPassword());
+			jmsAction.setQueueName(queueDTO.getQueueName());
+			jmsAction.setActionName(actionName);
+			jmsAction.setGenerated(false);
+		}
 
-	        jmsActions.add(jmsAction);
-        }
-        return jmsActions;
-    }
+		return jmsAction;
+	}
+//	@Transactional
+//    private <T extends ActionDescriptor> List<JMSAction> getJmsActions(
+//		    List<ActionEndpointDTO<T>> actions, UUID serviceID) {
+//        List<JMSAction> jmsActions = new ArrayList<>();
+//        for (ActionEndpointDTO<T> actionDescriptor : actions) {
+//            QueueDTO queueDTO =
+//                    (QueueDTO) actionDescriptor.getActionDescriptor();
+//            String actionName = actionDescriptor.getActionName();
+//	        JMSAction jmsAction = persistenceService
+//			        .findJmsAction(serviceID, queueDTO.getQueueName(),
+//			                       queueDTO.getUsername(),
+//			                       queueDTO.getPassword());
+//	        if (jmsAction == null) {
+//		        jmsAction = new JMSAction();
+//		        jmsAction.setUsername(queueDTO.getUsername());
+//		        jmsAction.setPassword(queueDTO.getPassword());
+//		        jmsAction.setQueueName(queueDTO.getQueueName());
+//	        }
+//	        jmsAction.setActionName(actionName);
+//
+//	        jmsActions.add(jmsAction);
+//        }
+//        return jmsActions;
+//    }
 	@Transactional
 	private HttpServiceEndpoint createHttpEntity(
 			HttpEndpointDescriptorDTO descriptor,
-			String serviceName, DeliverySettingsDTO deliverySettings) {
+			String serviceName, DeliverySettingsDTO deliverySettings) throws TargetRegistrationException{
 		HttpServiceEndpoint endpoint = persistenceService
 				.findHttpService(descriptor.getHost(), descriptor.getPort());
 		if (endpoint != null) {
-			endpoint.setServiceName(serviceName);
-			DeliverySettings settings;
-			if (deliverySettings != null) {
-				settings = new DeliverySettings();
-				settings.setRetryDelay(deliverySettings.getRetryDelay());
-				settings.setRetryNumber(deliverySettings.getRetryNumber());
-				settings.setEndpoint(endpoint);
-				endpoint.setDeliverySettings(settings);
+			if(endpoint.isGenerated()){
+				endpoint.setServiceName(serviceName);
+				endpoint.setGenerated(false);
+				DeliverySettings settings;
+				if (deliverySettings != null) {
+					settings = new DeliverySettings();
+					settings.setRetryDelay(deliverySettings.getRetryDelay());
+					settings.setRetryNumber(deliverySettings.getRetryNumber());
+					settings.setEndpoint(endpoint);
+					endpoint.setDeliverySettings(settings);
+				}
+			}else{
+				throw new TargetRegistrationException(
+						"Данный сервис уже зарегистрирован под именем '" +
+								endpoint.getServiceName() + "'");
 			}
 		} else {
 			endpoint = new HttpServiceEndpoint();
 			endpoint.setServiceName(serviceName);
+			endpoint.setGenerated(false);
 			endpoint.setServiceURL(descriptor.getHost());
 			endpoint.setServicePort(descriptor.getPort());
 			DeliverySettings settings;
@@ -246,8 +312,7 @@ public class RegistrationService {
 	@Transactional
 	private JMSServiceEndpoint createJmsEntity(
 			JMSEndpointDescriptorDTO descriptor,
-			String serviceName, DeliverySettingsDTO deliverySettings) {
-
+			String serviceName, DeliverySettingsDTO deliverySettings) throws TargetRegistrationException{
 		String jndiProperties;
 		try {
 			jndiProperties = mapper.
@@ -259,17 +324,25 @@ public class RegistrationService {
 		JMSServiceEndpoint endpoint = persistenceService
 				.findJmsService(connectionFactory,jndiProperties);
 		if (endpoint != null) {
-			endpoint.setServiceName(serviceName);
-			DeliverySettings settings;
-			if (deliverySettings != null) {
-				settings = new DeliverySettings();
-				settings.setRetryDelay(deliverySettings.getRetryDelay());
-				settings.setRetryNumber(deliverySettings.getRetryNumber());
-				settings.setEndpoint(endpoint);
-				endpoint.setDeliverySettings(settings);
+			if(endpoint.isGenerated()){
+				endpoint.setServiceName(serviceName);
+				endpoint.setGenerated(false);
+				DeliverySettings settings;
+				if (deliverySettings != null) {
+					settings = new DeliverySettings();
+					settings.setRetryDelay(deliverySettings.getRetryDelay());
+					settings.setRetryNumber(deliverySettings.getRetryNumber());
+					settings.setEndpoint(endpoint);
+					endpoint.setDeliverySettings(settings);
+				}
+			}else{
+				throw new TargetRegistrationException(
+						"Данный сервис уже зарегистрирован под именем '" +
+								endpoint.getServiceName() + "'");
 			}
 		} else {
 			endpoint = new JMSServiceEndpoint();
+			endpoint.setGenerated(false);
 			endpoint.setConnectionFactory(connectionFactory);
 			endpoint.setJndiProperties(jndiProperties);
 			endpoint.setServiceName(serviceName);
@@ -317,7 +390,7 @@ public class RegistrationService {
 		for (RegistrationDestinationDescriptor regDD : destinationDescriptors) {
 			DestinationDescriptor destinationDescriptor =
 					regDD.getDestinationDescriptor();
-			PersistentDestination persistentDestination;
+			DestinationEntity persistentDestination;
 			try {
 				if (!regDD.isForceRegister()) {
 					testConnection(destinationDescriptor);

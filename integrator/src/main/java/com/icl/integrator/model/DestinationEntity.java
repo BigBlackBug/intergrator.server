@@ -1,18 +1,20 @@
 package com.icl.integrator.model;
 
-import javax.persistence.Embeddable;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 /**
  * Created by BigBlackBug on 2/12/14.
  */
-@Embeddable
-public class DestinationEntity {
+@Entity
+@Table(name = "DESTINATION_ENTITY")
+public class DestinationEntity extends AbstractEntity{
 
 	@OneToOne
+	@JoinColumn(name = "ACTION")
 	private AbstractActionEntity action;
 
 	@OneToOne
+	@JoinColumn(name = "SERVICE")
 	private AbstractEndpointEntity service;
 
 	public DestinationEntity() {

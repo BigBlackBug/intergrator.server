@@ -43,7 +43,6 @@ public class IntegratorWorkerService {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	//TODO refactor
 	@Transactional
 	public <T extends ActionDescriptor> void addAction(
 			AddActionDTO<T> actionDTO) throws IntegratorException {
@@ -58,24 +57,53 @@ public class IntegratorWorkerService {
 		if (endpointType == EndpointType.HTTP) {
 			HttpServiceEndpoint serviceEndpoint =
 					persistenceService.getHttpService(service.getServiceName());
-			HttpActionDTO newActionDTO = (HttpActionDTO)
-					action.getActionDescriptor();
-			HttpAction newAction = new HttpAction();
-			newAction.setActionName(actionName);
-			newAction.setActionURL(newActionDTO.getPath());
-			newAction.setEndpoint(serviceEndpoint);
-			serviceEndpoint.addAction(newAction);
+			HttpActionDTO httpActionDTO = (HttpActionDTO) action.getActionDescriptor();
+
+			HttpAction httpAction = persistenceService
+					.findHttpAction(serviceEndpoint.getId(), httpActionDTO.getPath());
+			if (httpAction != null) {
+				if (httpAction.isGenerated()) {
+					httpAction.setGenerated(false);
+					httpAction.setActionName(actionName);
+				} else {
+					throw new TargetRegistrationException(
+							"Такое действие уже зарегистрировано под именем '" + actionName + "'");
+				}
+			} else {
+				httpAction = new HttpAction();
+				httpAction.setActionURL(httpActionDTO.getPath());
+				httpAction.setActionName(actionName);
+				httpAction.setGenerated(false);
+				httpAction.setEndpoint(serviceEndpoint);
+				serviceEndpoint.addAction(httpAction);
+			}
 		} else if (endpointType == EndpointType.JMS) {
 			JMSServiceEndpoint serviceEndpoint =
 					persistenceService.getJmsService(service.getServiceName());
 			QueueDTO queueDTO = (QueueDTO) action.getActionDescriptor();
-			JMSAction newAction = new JMSAction();
-			newAction.setActionName(actionName);
-			newAction.setPassword(queueDTO.getPassword());
-			newAction.setQueueName(queueDTO.getQueueName());
-			newAction.setUsername(queueDTO.getUsername());
-			newAction.setEndpoint(serviceEndpoint);
-			serviceEndpoint.addAction(newAction);
+			JMSAction jmsAction = persistenceService
+					.findJmsAction(serviceEndpoint.getId(), queueDTO.getQueueName(),
+					               queueDTO.getUsername(),
+					               queueDTO.getPassword());
+
+			if (jmsAction != null) {
+				if (jmsAction.isGenerated()) {
+					jmsAction.setGenerated(false);
+					jmsAction.setActionName(actionName);
+				} else {
+					throw new TargetRegistrationException(
+							"Такое действие уже зарегистрировано под именем '" + actionName + "'");
+				}
+			} else {
+				jmsAction = new JMSAction();
+				jmsAction.setUsername(queueDTO.getUsername());
+				jmsAction.setPassword(queueDTO.getPassword());
+				jmsAction.setQueueName(queueDTO.getQueueName());
+				jmsAction.setActionName(actionName);
+				jmsAction.setGenerated(false);
+				jmsAction.setEndpoint(serviceEndpoint);
+				serviceEndpoint.addAction(jmsAction);
+			}
 		}
 	}
 
@@ -87,7 +115,7 @@ public class IntegratorWorkerService {
 		EndpointConnector connector = connectorFactory
 				.createEndpointConnector(
 						new ServiceDTO(serviceDescriptor.getService(),
-						                   serviceDescriptor.getEndpointType()),
+						               serviceDescriptor.getEndpointType()),
 						serviceDescriptor.getAction());
 		connector.testConnection();
 		return true;

@@ -4,9 +4,9 @@ import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.model.Delivery;
+import com.icl.integrator.model.DestinationEntity;
 import com.icl.integrator.services.converters.DefaultDeliverySuccessConverter;
 import com.icl.integrator.services.converters.DefaultErrorConverter;
-import com.icl.integrator.services.utils.PersistentDestination;
 import com.icl.integrator.services.utils.ResponseDeliveryDescriptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import static org.springframework.util.StringUtils.quote;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,28 +34,17 @@ public class PacketProcessor {
 	@Autowired
 	private DeliveryCreator deliveryCreator;
 
-    public Map<String, ResponseDTO<UUID>> process(List<Delivery> deliveries,
-                                                  DestinationDescriptor destinationDescriptor) {
-        //mb null
-        PersistentDestination persistentDestination =
-		        deliveryCreator.persistDestination(destinationDescriptor);
+    public Map<String, ResponseDTO<UUID>> process(List<Delivery> deliveries) {
         Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
         for (Delivery delivery : deliveries) {
             ResponseDTO<UUID> response;
 	        String serviceName = delivery.getEndpoint().getServiceName();
 	        try {
-//	            CallbackParams callbackParams = new CallbackParams();
-//	            callbackParams.setDelivery(delivery);
-//	            UUID requestID = UUID.randomUUID();
-//	            logger.info("Generated an ID for the request: " + quote(
-//			            requestID.toString()));
-//	            callbackParams.setRequestID(requestID.toString());
-//	            callbackParams.setServiceName(serviceName);
 		        DefaultErrorConverter errorConverter = new DefaultErrorConverter();
 		        DefaultDeliverySuccessConverter successConverter =
 				        new DefaultDeliverySuccessConverter(delivery);
-		        deliveryService.deliver(delivery,ResponseDTO.class,new ResponseDeliveryDescriptor<>(
-				        persistentDestination,errorConverter,successConverter));
+		        deliveryService.deliver(delivery,ResponseDTO.class,
+		                                new ResponseDeliveryDescriptor<>(errorConverter,successConverter));
 	            response = new ResponseDTO<>(delivery.getId(), UUID.class);
             } catch (Exception ex) {
 	            ErrorDTO error = new ErrorDTO(ex);

@@ -13,7 +13,6 @@ import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
-import com.icl.integrator.services.utils.PersistentDestination;
 import com.icl.integrator.util.EndpointType;
 import com.icl.integrator.util.IntegratorException;
 import org.apache.commons.logging.Log;
@@ -44,10 +43,11 @@ public class DeliveryCreator {
 	@Autowired
 	private PersistenceService persistenceService;
 
-	private HttpAction createNewAction(HttpServiceEndpoint service,
-	                                   HttpActionDTO httpActionDTO) {
+	private HttpAction createHttpAction(HttpServiceEndpoint service,
+	                                    HttpActionDTO httpActionDTO) {
 		HttpAction httpAction = new HttpAction();
 		httpAction.setActionURL(httpActionDTO.getPath());
+		httpAction.setGenerated(true);
 		httpAction.setActionName(generateActionName(service.getServiceName()));
 		httpAction.setEndpoint(service);
 		service.addAction(httpAction);
@@ -58,6 +58,7 @@ public class DeliveryCreator {
 	                                  QueueDTO queueDTO) {
 		JMSAction jmsAction = new JMSAction();
 		jmsAction.setPassword(queueDTO.getPassword());
+		jmsAction.setGenerated(true);
 		jmsAction.setQueueName(queueDTO.getQueueName());
 		jmsAction.setUsername(queueDTO.getUsername());
 		jmsAction.setActionName(generateActionName(service.getServiceName()));
@@ -76,8 +77,7 @@ public class DeliveryCreator {
 	}
 
 	@Transactional
-	public PersistentDestination persistDestination(
-			DestinationDescriptor destination) {
+	public DestinationEntity persistDestination(DestinationDescriptor destination) {
 		if (destination == null) {
 			return null;
 		}
@@ -110,19 +110,19 @@ public class DeliveryCreator {
 							DeliverySettings.createDefaultSettings();
 					service.setDeliverySettings(defaultSettings);
 					defaultSettings.setEndpoint(service);
+					service.setGenerated(true);
 					service.setServiceName(generateServiceName());
 					service.setServiceURL(realDescriptor.getHost());
 					service.setServicePort(realDescriptor.getPort());
-					HttpAction action =
-							createNewAction(service, httpActionDTO);
+					HttpAction action = createHttpAction(service, httpActionDTO);
 					endpointEntity = persistenceService.persist(service);
-					actionEntity =action;
+					actionEntity = action;
 				} else {
 					endpointEntity = service;
 					HttpAction action = persistenceService.findHttpAction(
 							service.getId(), httpActionDTO.getPath());
 					if (action == null) {
-						action = createNewAction(service, httpActionDTO);
+						action = createHttpAction(service, httpActionDTO);
 						actionEntity = persistenceService.persist(action);
 					} else {
 						actionEntity = action;
@@ -153,6 +153,7 @@ public class DeliveryCreator {
 					service.setDeliverySettings(defaultSettings);
 					defaultSettings.setEndpoint(service);
 					service.setServiceName(generateServiceName());
+					service.setGenerated(true);
 					service.setConnectionFactory(
 							realDescriptor.getConnectionFactory());
 					service.setJndiProperties(jndiPropertiesString);
@@ -194,13 +195,15 @@ public class DeliveryCreator {
 						endpointEntity.getId());
 			}
 		}
-		return new PersistentDestination(endpointEntity, actionEntity);
+		DestinationEntity destinationEntity = new DestinationEntity(endpointEntity, actionEntity);
+		return persistenceService.saveOrUpdate(destinationEntity);
 	}
 
 	@Transactional
 	public <T> Delivery createDelivery(AbstractEndpointEntity service,
 	                                   AbstractActionEntity action,
-	                                   T data) throws JsonProcessingException {
+	                                   T data, DestinationEntity destinationEntity,
+	                                   Boolean isGeneral) throws JsonProcessingException {
 		service = persistenceService
 				.find(AbstractEndpointEntity.class, service.getId());
 		action = persistenceService
@@ -211,11 +214,14 @@ public class DeliveryCreator {
 		delivery.setRequestDate(new Date());
 		delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
 		delivery.setEndpoint(service);
+		delivery.setResponseHandlerDestination(destinationEntity);
+		delivery.setGeneralDelivery(isGeneral);
 		persistenceService.persist(delivery);
 		return delivery;
 	}
 
-	private <T> Deliveries createDeliveries(DeliveryDTO deliveryDTO, T data) {
+	private <T> Deliveries createDeliveries(DeliveryDTO deliveryDTO, T data,
+	                                        DestinationDescriptor responseHandlerDescriptor) {
 		Deliveries deliveries = new Deliveries();
 		for (ServiceDTO destination : deliveryDTO.getDestinations()) {
 			try {
@@ -236,8 +242,9 @@ public class DeliveryCreator {
 					actionEntity = persistenceService.getJmsAction(
 							deliveryDTO.getAction(), endpointEntity.getId());
 				}
-				Delivery delivery = createDelivery(
-						endpointEntity, actionEntity, data);
+				DestinationEntity destinationEntity = persistDestination(responseHandlerDescriptor);
+				Delivery delivery = createDelivery(endpointEntity, actionEntity,
+				                                   data, destinationEntity, true);
 				persistenceService.persist(delivery);
 				deliveries.addDelivery(delivery);
 			} catch (Exception ex) {
@@ -250,31 +257,35 @@ public class DeliveryCreator {
 	}
 
 	@Transactional
-	public Deliveries createDeliveries(DeliveryDTO deliveryDTO) throws JsonProcessingException {
+	public Deliveries createDeliveries(DeliveryDTO deliveryDTO,
+	                                   DestinationDescriptor responseHandlerDescriptor)
+			throws JsonProcessingException {
 		logger.info("Creating a delivery packet");
 
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
 		Deliveries deliveries;
 		if (requestData.getDeliveryType() == DeliveryType.UNDEFINED) {
-			deliveries = createDeliveries(deliveryDTO, requestData);
+			deliveries = createDeliveries(deliveryDTO, requestData, responseHandlerDescriptor);
 		} else {
 			if (deliveryDTO.getDestinations() != null) {
 				deliveries =
-						createDeliveries(deliveryDTO, requestData);
+						createDeliveries(deliveryDTO, requestData, responseHandlerDescriptor);
 			} else {
-				deliveries = createAutoDetectedDeliveries(deliveryDTO);
+				deliveries = createAutoDetectedDeliveries(deliveryDTO, responseHandlerDescriptor);
 			}
 		}
 		return deliveries;
 	}
 
 	@Transactional
-	private Deliveries createAutoDetectedDeliveries(DeliveryDTO deliveryDTO) throws IntegratorException{
+	private Deliveries createAutoDetectedDeliveries(DeliveryDTO deliveryDTO,
+	                                                DestinationDescriptor responseHandlerDescriptor)
+			throws IntegratorException {
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
 		DeliveryType deliveryType = requestData.getDeliveryType();
 		List<AutoDetectionPacket> autoDetectionPackets =
 				persistenceService.findAutoDetectionPackets(deliveryType);
-		if(autoDetectionPackets.isEmpty()){
+		if (autoDetectionPackets.isEmpty()) {
 			throw new IntegratorException("Не могу автоматически определить целевые сервисы");
 		}
 		Deliveries deliveries = new Deliveries();
@@ -292,9 +303,13 @@ public class DeliveryCreator {
 				List<DestinationEntity> destinations = packet.getDestinations();
 				for (DestinationEntity destination : destinations) {
 					try {
+						DestinationEntity destinationEntity =
+								persistDestination(responseHandlerDescriptor);
 						Delivery delivery = createDelivery(
 								destination.getService(),
-								destination.getAction(), requestData);
+								destination.getAction(),
+								requestData,
+								destinationEntity, true);
 						deliveries.addDelivery(delivery);
 					} catch (JsonProcessingException e) {
 						throw new IntegratorException(e);

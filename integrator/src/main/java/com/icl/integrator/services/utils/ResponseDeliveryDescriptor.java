@@ -5,7 +5,7 @@ import com.icl.integrator.services.converters.Converter;
 
 public class ResponseDeliveryDescriptor<ResponseClass, ТипКоторыйПринимаетСорс> {
 
-	private PersistentDestination persistentDestination;
+//	private DestinationEntity persistentDestination;
 
 	//	private CallbackParams callbackParams;
 //
@@ -28,17 +28,17 @@ public class ResponseDeliveryDescriptor<ResponseClass, ТипКоторыйПр�
 	private Converter<ResponseClass, ТипКоторыйПринимаетСорс> successConverter;
 
 	public ResponseDeliveryDescriptor(
-			PersistentDestination persistentDestination,
+//			DestinationEntity persistentDestination,
 			Converter<ErrorDTO, ТипКоторыйПринимаетСорс> failedConverter,
 			Converter<ResponseClass, ТипКоторыйПринимаетСорс> successConverter) {
-		this.persistentDestination = persistentDestination;
+//		this.persistentDestination = persistentDestination;
 		this.failedConverter = failedConverter;
 		this.successConverter = successConverter;
 	}
 
-	public PersistentDestination getPersistentDestination() {
-		return persistentDestination;
-	}
+//	public DestinationEntity getPersistentDestination() {
+//		return persistentDestination;
+//	}
 
 	public Converter<ResponseClass, ТипКоторыйПринимаетСорс> getSuccessConverter() {
 		return successConverter;

@@ -61,12 +61,10 @@ public class IntegratorService implements IntegratorAPI {
 	        validationService.validate(packet.getRequestData());
 
             Deliveries deliveries =
-		            deliveryCreator.createDeliveries(packet);
-            //посылаем в шыну
+		            deliveryCreator.createDeliveries(packet,packet.getResponseHandlerDescriptor());
             PacketProcessor processor = processorFactory.createProcessor();
             Map<String, ResponseDTO<UUID>> serviceToRequestID =
-                    processor.process(deliveries.getDeliveries(),
-                                      packet.getResponseHandlerDescriptor());
+                    processor.process(deliveries.getDeliveries());
             serviceToRequestID.putAll(deliveries.getErrorMap());
             response = new ResponseDTO<>(serviceToRequestID);
         } catch (Exception ex) {

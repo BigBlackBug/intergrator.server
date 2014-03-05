@@ -1,7 +1,6 @@
 package com.icl.integrator.dto;
 
 import com.icl.integrator.dto.destination.DestinationDescriptor;
-import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 
 import java.util.List;
 
@@ -91,10 +90,8 @@ public class DeliveryDTO {
 		return responseHandlerDescriptor;
 	}
 
-	public void setResponseHandlerDescriptor(
-			RawDestinationDescriptor responseHandlerDescriptor) {
-		this.responseHandlerDescriptor =
-				responseHandlerDescriptor;
+	public void setResponseHandlerDescriptor(DestinationDescriptor responseHandlerDescriptor) {
+		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
 
 	public List<ServiceDTO> getDestinations() {

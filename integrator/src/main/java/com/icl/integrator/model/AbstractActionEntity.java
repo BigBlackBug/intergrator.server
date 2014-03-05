@@ -36,6 +36,9 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 	@JoinColumn(name = "ENDPOINT_ID", nullable = false)
 	private AbstractEndpointEntity endpoint;
 
+	@Column(nullable = false, name = "GENERATED")
+	private boolean generated;
+
 	protected AbstractActionEntity() {
 
 	}
@@ -62,5 +65,13 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 
 	public void setActionName(String actionName) {
 		this.actionName = actionName;
+	}
+
+	public void setGenerated(boolean generated) {
+		this.generated = generated;
+	}
+
+	public boolean isGenerated() {
+		return generated;
 	}
 }

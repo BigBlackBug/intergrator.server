@@ -47,20 +47,19 @@ public class DeliveryBootstrap implements
 			return;
 		}
 		List<Delivery> deliveries = persistenceService.findAllUnfinishedDeliveries();
-		for(Delivery delivery:deliveries){
+		for (Delivery delivery : deliveries) {
 			delivery.setRequestDate(new Date());
 			delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
 			delivery = persistenceService.saveOrUpdate(delivery);
-			if(delivery.hasCallbacks()){
+			if (delivery.getGeneralDelivery()) {
 				DefaultErrorConverter errorConverter = new DefaultErrorConverter();
 				DefaultDeliverySuccessConverter successConverter =
 						new DefaultDeliverySuccessConverter(delivery);
-				Class<?> aClass = delivery.getClass();
-				deliveryService.deliver(delivery,ResponseDTO.class,new ResponseDeliveryDescriptor<>(
-						null,
-						errorConverter,successConverter));
-			}else{
-				deliveryService.deliver(delivery,Void.class);
+				deliveryService.deliver(delivery, ResponseDTO.class,
+				                        new ResponseDeliveryDescriptor<>(
+						                        errorConverter, successConverter));
+			} else {
+				deliveryService.deliver(delivery, Void.class);
 			}
 			//TODO NOT FOOLPROOF
 		}

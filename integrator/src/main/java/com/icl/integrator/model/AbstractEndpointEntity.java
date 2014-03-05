@@ -40,7 +40,10 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
 	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
 	private DeliverySettings deliverySettings = DeliverySettings.createDefaultSettings();
 
-    protected AbstractEndpointEntity() {
+	@Column(nullable = false, name = "GENERATED")
+	private boolean generated;
+
+	protected AbstractEndpointEntity() {
 
     }
 
@@ -79,5 +82,13 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
+
+	public void setGenerated(boolean generated) {
+		this.generated = generated;
+	}
+
+	public boolean isGenerated() {
+		return generated;
+	}
 }
 
