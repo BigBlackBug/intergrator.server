@@ -263,6 +263,7 @@ public class DeliveryService {
 		@Override
 		public void execute(Void arg) {
 			delivery.setDeliveryStatus(deliveryStatus);
+			delivery.setResponseDate(new Date());
 			persistenceService.merge(delivery);
 		}
 	}

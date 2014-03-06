@@ -196,25 +196,24 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
-    public ResponseDTO addAction(AddActionDTO actionDTO) {
+    public <T extends ActionDescriptor>  ResponseDTO<Void> addAction(AddActionDTO<T> actionDTO) {
         return addAction(new IntegratorPacket<>(actionDTO));
     }
 
-    @Override
-    public <T extends DestinationDescriptor> ResponseDTO<Void> addAction(
-            IntegratorPacket<AddActionDTO, T> actionDTO) {
-        HttpMethodDescriptor methodPair = getMethodPath(
-                "addAction", IntegratorPacket.class);
-        try {
-            ParameterizedTypeReference<ResponseDTO<Void>>
-                    type =
-                    new ParameterizedTypeReference<ResponseDTO<Void>>() {
-                    };
-            return sendRequest(actionDTO, type, methodPair);
-        } catch (MalformedURLException e) {
-            throw new IntegratorClientException(e);
-        }
-    }
+	@Override
+	public <T extends DestinationDescriptor, Y extends ActionDescriptor> ResponseDTO<Void> addAction(
+			IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {
+		HttpMethodDescriptor methodPair = getMethodPath("addAction", IntegratorPacket.class);
+		try {
+			ParameterizedTypeReference<ResponseDTO<Void>>
+					type =
+					new ParameterizedTypeReference<ResponseDTO<Void>>() {
+					};
+			return sendRequest(actionDTO, type, methodPair);
+		} catch (MalformedURLException e) {
+			throw new IntegratorClientException(e);
+		}
+	}
 
     @Override
     public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor, DDType extends DestinationDescriptor> ResponseDTO<FullServiceDTO<EDType, ADType>> getServiceInfo(

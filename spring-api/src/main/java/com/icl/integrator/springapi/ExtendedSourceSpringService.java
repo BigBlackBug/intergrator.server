@@ -6,6 +6,7 @@ import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.registration.RegistrationResultDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +44,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	@ResponseBody
 	void handleServiceRegistrationResponse(
 			@RequestBody(required = true)
-			ResponseDTO<Map<String, ResponseDTO<Void>>> response);
+			ResponseDTO<RegistrationResultDTO> response);
 
 	@Override
 	@RequestMapping(value = "/handleServiceIsAvailableResponse",

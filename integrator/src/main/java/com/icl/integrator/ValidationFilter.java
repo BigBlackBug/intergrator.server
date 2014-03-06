@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.services.validation.PacketValidationException;
 import com.icl.integrator.services.validation.ValidationService;
+import com.icl.integrator.services.validation.ValidatorException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,7 +41,7 @@ public class ValidationFilter implements Filter {
 		logger.info(json);
 		try {
 			validationService.validateIntegratorPacket(json);
-		} catch (PacketValidationException pvex) {
+		} catch (PacketValidationException | ValidatorException pvex) {
 			logger.info("Ошибка валидации пакета", pvex);
 			response.setContentType("application/json");
 			ResponseDTO error = new ResponseDTO(pvex);

@@ -77,10 +77,10 @@ public class IntegratorJmsController implements MessageListener {
 				destinationDescriptor = integratorPacket.getResponseHandlerDescriptor();
 				switch (method) {
 					case ADD_ACTION: {
-						IntegratorPacket<AddActionDTO, DestinationDescriptor
+						IntegratorPacket<AddActionDTO<ActionDescriptor>, DestinationDescriptor
 								> packet = mapper.convertValue(
 								integratorPacket,
-								new TypeReference<IntegratorPacket<AddActionDTO, DestinationDescriptor>>() {
+								new TypeReference<IntegratorPacket<AddActionDTO<ActionDescriptor>, DestinationDescriptor>>() {
 								});
 						integratorService.addAction(packet);
 						break;

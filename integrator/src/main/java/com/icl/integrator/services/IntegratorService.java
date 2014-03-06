@@ -149,8 +149,8 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public <T extends DestinationDescriptor> ResponseDTO<Void> addAction(
-            IntegratorPacket<AddActionDTO, T> actionDTO) {
+    public <T extends DestinationDescriptor,Y extends ActionDescriptor> ResponseDTO<Void> addAction(
+            IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {
         ResponseDTO<Void> response;
         try {
             workerService.addAction(actionDTO.getPacket());

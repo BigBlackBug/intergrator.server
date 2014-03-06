@@ -214,8 +214,8 @@ public class Scheduler {
                                                             .getRetryDelay());
             logger.info("Rescheduling next request to " +
                                 DATE_FORMAT.format(nextRequestDate));
-            delivery.setDeliveryStatus(DeliveryStatus.WAITING_FOR_DELIVERY);
-            persistenceService.merge(delivery);
+//            delivery.setDeliveryStatus(DeliveryStatus.WAITING_FOR_DELIVERY);
+//            persistenceService.merge(delivery);
             EXECUTOR.schedule(taskCreator.create(),
                               deliverySettings.getRetryDelay(),
                               TimeUnit.MILLISECONDS);
@@ -226,3 +226,4 @@ public class Scheduler {
     }
 
 }
+

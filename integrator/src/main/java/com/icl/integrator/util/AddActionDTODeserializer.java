@@ -26,12 +26,11 @@ public final class AddActionDTODeserializer
     @Override
     public AddActionDTO deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
-        AddActionDTO result = new AddActionDTO();
         ObjectNode treeNode = jp.readValueAsTree();
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         ServiceDTO endpoint = mapper.readValue(
                 treeNode.get("service").toString(), ServiceDTO.class);
-        JsonNode actionRegistrationNode = treeNode.get("actionRegistrationDTO");
+        JsonNode actionRegistrationNode = treeNode.get("actionRegistration");
         boolean forceRegister =
                 actionRegistrationNode.get("forceRegister").asBoolean();
         ActionEndpointDTO action = mapper.parseActionEndpoint(

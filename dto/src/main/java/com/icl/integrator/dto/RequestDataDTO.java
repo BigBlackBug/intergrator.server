@@ -1,5 +1,7 @@
 package com.icl.integrator.dto;
 
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: BigBlackBug
@@ -11,12 +13,12 @@ public class RequestDataDTO {
 
 	private DeliveryType deliveryType;
 
-	private Object data;
+	private Map<String,Object> data;
 
 	public RequestDataDTO() {
 	}
 
-	public RequestDataDTO(DeliveryType deliveryType, Object data) {
+	public RequestDataDTO(DeliveryType deliveryType, Map<String,Object> data) {
 		this.deliveryType = deliveryType;
 		this.data = data;
 	}
@@ -33,7 +35,7 @@ public class RequestDataDTO {
 		return data;
 	}
 
-	public void setData(Object data) {
+	public void setData(Map<String,Object> data) {
 		this.data = data;
 	}
 

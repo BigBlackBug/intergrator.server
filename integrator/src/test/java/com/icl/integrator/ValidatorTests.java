@@ -18,6 +18,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.util.HashMap;
+
 /**
  * Created by BigBlackBug on 2/24/14.
  */
@@ -70,7 +72,10 @@ public class ValidatorTests {
 		DeliveryDTO deliveryDTO = new DeliveryDTO();
 		deliveryDTO.setAction("ACTION");
 		deliveryDTO.setDestinations(null);
-		deliveryDTO.setRequestData(new RequestDataDTO(DeliveryType.INCIDENT,desr));
+		deliveryDTO.setRequestData(new RequestDataDTO(DeliveryType.INCIDENT,
+		                                              new HashMap<String, Object>() {{
+			                                              put("a", "b");
+		                                              }}));
 		serialize(p);
 		p.setResponseHandlerDescriptor(sdd);
 		try{

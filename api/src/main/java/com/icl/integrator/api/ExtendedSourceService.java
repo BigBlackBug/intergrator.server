@@ -4,6 +4,7 @@ import com.icl.integrator.dto.FullServiceDTO;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.registration.RegistrationResultDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public interface ExtendedSourceService extends SourceService {
     public void handleDeliveryResponse(Map<String, ResponseDTO<UUID>> response);
 
     public void handleServiceRegistrationResponse(
-            ResponseDTO<Map<String, ResponseDTO<Void>>> response);
+            ResponseDTO<RegistrationResultDTO> response);
 
     public void handleServiceIsAvailableResponse(ResponseDTO<Boolean> response);
 

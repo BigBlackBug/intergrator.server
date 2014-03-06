@@ -45,8 +45,8 @@ public interface IntegratorAPI {
     ResponseDTO<FullServiceDTO<EDType, ADType>>
     getServiceInfo(IntegratorPacket<ServiceDTO, DDType> serviceDTO);
 
-    public <T extends DestinationDescriptor> ResponseDTO<Void>
-    addAction(IntegratorPacket<AddActionDTO, T> actionDTO);
+    public <T extends DestinationDescriptor,Y extends ActionDescriptor> ResponseDTO<Void>
+    addAction(IntegratorPacket<AddActionDTO<Y>, T> actionDTO);
 
 	public <T extends DestinationDescriptor,Y> ResponseDTO<List<ResponseDTO<Void>>> registerAutoDetection(
 			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);

@@ -55,7 +55,7 @@ public class DeliveryDTO {
 
 		DeliveryDTO that = (DeliveryDTO) o;
 
-		if (!action.equals(that.action)) {
+		if (action != null ? !action.equals(that.action) : that.action != null) {
 			return false;
 		}
 		if (destinations != null ? !destinations.equals(that.destinations) :
@@ -66,8 +66,7 @@ public class DeliveryDTO {
 			return false;
 		}
 		if (responseHandlerDescriptor != null ?
-				!responseHandlerDescriptor
-						.equals(that.responseHandlerDescriptor) :
+				!responseHandlerDescriptor.equals(that.responseHandlerDescriptor) :
 				that.responseHandlerDescriptor != null) {
 			return false;
 		}
@@ -77,11 +76,9 @@ public class DeliveryDTO {
 
 	@Override
 	public int hashCode() {
-		int result = responseHandlerDescriptor != null ?
-				responseHandlerDescriptor.hashCode() : 0;
-		result = 31 * result +
-				(destinations != null ? destinations.hashCode() : 0);
-		result = 31 * result + action.hashCode();
+		int result = responseHandlerDescriptor != null ? responseHandlerDescriptor.hashCode() : 0;
+		result = 31 * result + (destinations != null ? destinations.hashCode() : 0);
+		result = 31 * result + (action != null ? action.hashCode() : 0);
 		result = 31 * result + requestData.hashCode();
 		return result;
 	}

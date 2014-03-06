@@ -189,19 +189,16 @@
         <jms:listener id="IntegratorQueueListener"
                       destination="IntegratorQueue"
                       ref="integratorJmsController"/>
-        <jms:listener id="TargetQueueListener" destination="SourceQueue"
-                      ref="sourceJmsController"/>
-
-        <jms:listener id="InternalIntegratorQueue" destination="InternalIntegratorQueue"
-                      ref="sourceJmsController"/>
+        <!--<jms:listener id="TargetQueueListener" destination="SourceQueue"-->
+                      <!--ref="sourceJmsController"/>-->
     </jms:listener-container>
 
 
-    <mvc:interceptors>
-        <mvc:interceptor>
-            <mvc:mapping path="/source/**"/>
-            <mvc:mapping path="/ext_source/**"/>
-            <bean class="com.icl.integrator.springapi.interceptors.HeadInterceptor" />
-        </mvc:interceptor>
-    </mvc:interceptors>
+    <!--<mvc:interceptors>-->
+        <!--<mvc:interceptor>-->
+            <!--<mvc:mapping path="/source/**"/>-->
+            <!--<mvc:mapping path="/ext_source/**"/>-->
+            <!--<bean class="com.icl.integrator.springapi.interceptors.HeadInterceptor" />-->
+        <!--</mvc:interceptor>-->
+    <!--</mvc:interceptors>-->
 </beans>

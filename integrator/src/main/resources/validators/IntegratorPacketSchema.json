@@ -200,10 +200,10 @@
             "additionalProperties": false,
             "properties": {
                 "service": {
-                    "$ref": "#definitions/serviceDTO"
+                    "$ref": "#/definitions/serviceDTO"
                 },
                 "actionRegistration": {
-                    "$ref": "#definitions/actionRegDTO"
+                    "$ref": "#/definitions/actionRegDTO"
                 }
             }
         },
@@ -228,7 +228,7 @@
                             "additionalProperties": false,
                             "properties": {
                                 "destinationDescriptor": {
-                                    "$ref": "#definitions/destinationDescriptor"
+                                    "$ref": "#/definitions/destinationDescriptor"
                                 },
                                 "forceRegister": {
                                     "type": "boolean"

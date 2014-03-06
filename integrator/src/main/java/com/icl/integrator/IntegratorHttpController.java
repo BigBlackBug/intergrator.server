@@ -122,13 +122,13 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	}
 
 	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<Void> addAction(
+	public <T extends DestinationDescriptor,Y extends ActionDescriptor> ResponseDTO<Void> addAction(
 			@RequestBody(
 					required = true)
-			IntegratorPacket<AddActionDTO, T> actionDTO) {
-		TypeReference<IntegratorPacket<AddActionDTO, DestinationDescriptor>>
+			IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {
+		TypeReference<IntegratorPacket<AddActionDTO<Y>, DestinationDescriptor>>
 				type =
-				new TypeReference<IntegratorPacket<AddActionDTO, DestinationDescriptor>>() {
+				new TypeReference<IntegratorPacket<AddActionDTO<Y>, DestinationDescriptor>>() {
 				};
 		return integratorService.addAction(fixConversion(actionDTO, type));
 	}
@@ -157,8 +157,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 				type =
 				new TypeReference<IntegratorPacket<AutoDetectionRegistrationDTO<Y>, DestinationDescriptor>>() {
 				};
-		return integratorService.registerAutoDetection(
-				fixConversion(autoDetectionDTO, type));
+		return integratorService.registerAutoDetection(fixConversion(autoDetectionDTO, type));
 	}
 
 	@ExceptionHandler(Exception.class)

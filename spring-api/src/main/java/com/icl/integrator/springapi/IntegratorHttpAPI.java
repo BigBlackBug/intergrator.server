@@ -82,9 +82,9 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @Override
     @RequestMapping(value = "addAction", method = RequestMethod.POST)
     @ResponseBody
-    <T extends DestinationDescriptor>
+    <T extends DestinationDescriptor,Y extends ActionDescriptor>
     ResponseDTO<Void> addAction(@RequestBody(required = true)
-                                IntegratorPacket<AddActionDTO, T> actionDTO);
+                                IntegratorPacket<AddActionDTO<Y>, T> actionDTO);
 
     @Override
     @RequestMapping(value = "getServiceInfo", method = RequestMethod.POST)
