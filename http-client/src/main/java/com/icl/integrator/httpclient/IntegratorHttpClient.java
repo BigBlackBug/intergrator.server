@@ -4,10 +4,7 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
-import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.dto.registration.AddActionDTO;
-import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
-import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.springframework.core.ParameterizedTypeReference;
@@ -123,19 +120,19 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     public <T extends ActionDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+    ResponseDTO<RegistrationResultDTO> registerService(
             TargetRegistrationDTO<T> registrationDTO) {
         return registerService(new IntegratorPacket<>(registrationDTO));
     }
 
     @Override
-    public <T extends ActionDescriptor, Y extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
+    public <T extends ActionDescriptor, Y extends DestinationDescriptor> ResponseDTO<RegistrationResultDTO> registerService(
+		    IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "registerService", IntegratorPacket.class);
-        ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<Void>>>>
+        ParameterizedTypeReference<ResponseDTO<RegistrationResultDTO>>
                 type =
-                new ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<Void>>>>() {
+                new ParameterizedTypeReference<ResponseDTO<RegistrationResultDTO>>() {
                 };
         try {
             return sendRequest(registrationDTO, type, methodPair);

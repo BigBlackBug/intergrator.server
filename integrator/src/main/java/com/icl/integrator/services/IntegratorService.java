@@ -4,10 +4,7 @@ import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
-import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.dto.registration.AddActionDTO;
-import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
-import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.services.validation.ValidationService;
 import org.apache.commons.logging.Log;
@@ -85,14 +82,15 @@ public class IntegratorService implements IntegratorAPI {
 
     @Override
     public <T extends ActionDescriptor, Y extends DestinationDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
+    ResponseDTO<RegistrationResultDTO> registerService(
+		    IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
         logger.info("Received a service registration request");
-        ResponseDTO<Map<String, ResponseDTO<Void>>> response;
+        ResponseDTO<RegistrationResultDTO> response;
         try {
             Map<String, ResponseDTO<Void>> result =
                     registrationService.register(registrationDTO.getPacket());
-            response = new ResponseDTO<>(result);
+            response = new ResponseDTO<>(new RegistrationResultDTO(
+		            registrationDTO.getPacket().getServiceName(),result));
         } catch (Exception ex) {
 	        logger.error(ex);
             response = new ResponseDTO<>(new ErrorDTO(ex));

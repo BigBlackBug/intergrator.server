@@ -3,10 +3,7 @@ package com.icl.integrator.api;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
-import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.dto.registration.AddActionDTO;
-import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
-import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.util.List;
@@ -31,8 +28,8 @@ public interface IntegratorAPI {
     ping(IntegratorPacket<Void, T> packet);
 
     public <T extends ActionDescriptor, Y extends DestinationDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
+    ResponseDTO<RegistrationResultDTO> registerService(
+		    IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
 
     public <T extends DestinationDescriptor>
     ResponseDTO<Boolean> isAvailable(IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO);

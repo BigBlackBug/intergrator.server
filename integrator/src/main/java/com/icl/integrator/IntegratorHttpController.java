@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
-import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.dto.registration.AddActionDTO;
-import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
-import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.services.IntegratorService;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
@@ -73,7 +70,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	}
 
 	@Override
-	public <T extends ActionDescriptor, Y extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
+	public <T extends ActionDescriptor, Y extends DestinationDescriptor> ResponseDTO<RegistrationResultDTO> registerService(
 			@RequestBody(
 					required = true)
 			IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
@@ -89,7 +86,8 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
 			@RequestBody(
-					required = true) IntegratorPacket<ServiceDestinationDescriptor, T> serviceDescriptor) {
+					required = true)
+			IntegratorPacket<ServiceDestinationDescriptor, T> serviceDescriptor) {
 		TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>> type =
 				new TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>>() {
 				};
@@ -151,11 +149,10 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	}
 
 	@Override
-	public
-	<T extends DestinationDescriptor, Y>
+	public <T extends DestinationDescriptor, Y>
 	ResponseDTO<List<ResponseDTO<Void>>> registerAutoDetection(
 			@RequestBody(required = true)
-			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO){
+			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO) {
 		TypeReference<IntegratorPacket<AutoDetectionRegistrationDTO<Y>, DestinationDescriptor>>
 				type =
 				new TypeReference<IntegratorPacket<AutoDetectionRegistrationDTO<Y>, DestinationDescriptor>>() {

@@ -15,7 +15,6 @@ import com.icl.integrator.model.*;
 import com.icl.integrator.services.EndpointResolverService;
 import com.icl.integrator.services.JsonMatcher;
 import com.icl.integrator.services.PersistenceService;
-import com.icl.integrator.services.validation.PacketValidationException;
 import com.icl.integrator.services.validation.ValidationService;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;

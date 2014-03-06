@@ -4,10 +4,7 @@ import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
-import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.dto.registration.AddActionDTO;
-import com.icl.integrator.dto.registration.AutoDetectionRegistrationDTO;
-import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,9 +49,9 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public
     @ResponseBody
     <T extends ActionDescriptor, Y extends DestinationDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<Void>>> registerService(
-            @RequestBody(required = true)
-            IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
+    ResponseDTO<RegistrationResultDTO> registerService(
+		    @RequestBody(required = true)
+		    IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
 
     @Override
     @RequestMapping(value = "isAvailable", method = RequestMethod.POST)
