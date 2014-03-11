@@ -58,23 +58,9 @@ public class Delivery extends AbstractEntity {
 	@ManyToOne
 	private DestinationEntity responseHandlerDestination;
 
-//	@Column(name = "GENERAL_DELIVERY",nullable = false)
-//	private Boolean generalDelivery;//TODO REMOVE
-
-//	@Column(name = "DELIVERY_TYPE",nullable = false)
-//	private DeliveryType deliveryType;
-
 	public Delivery() {
 
 	}
-//
-//	public Boolean getGeneralDelivery() {
-//		return generalDelivery;
-//	}
-//
-//	public void setGeneralDelivery(Boolean generalDelivery) {
-//		this.generalDelivery = generalDelivery;
-//	}
 
 	public String getDeliveryData() {
 		return deliveryData;

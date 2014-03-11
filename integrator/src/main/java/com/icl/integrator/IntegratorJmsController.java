@@ -11,7 +11,6 @@ import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
-import com.icl.integrator.services.DeliveryService;
 import com.icl.integrator.services.IntegratorService;
 import com.icl.integrator.services.validation.PacketValidationException;
 import com.icl.integrator.services.validation.ValidationService;
@@ -44,14 +43,9 @@ public class IntegratorJmsController implements MessageListener {
 	@Autowired
 	private ValidationService validationService;
 
-	@Autowired
-	private DeliveryService deliveryService;
-
-	//TODO format
 	@Override
 	public void onMessage(final Message message) {
 		IntegratorPacket<?, ?> integratorPacket;
-		DestinationDescriptor destinationDescriptor = null;
 		try {
 			if (message instanceof TextMessage) {
 				String content;
@@ -77,7 +71,6 @@ public class IntegratorJmsController implements MessageListener {
 					throw new IntegratorException("Поле method у IntegratorPacket не заполнено",
 					                              new NullPointerException());
 				}
-				destinationDescriptor = integratorPacket.getResponseHandlerDescriptor();
 				switch (method) {
 					case ADD_ACTION: {
 						IntegratorPacket<AddActionDTO<ActionDescriptor>, DestinationDescriptor
