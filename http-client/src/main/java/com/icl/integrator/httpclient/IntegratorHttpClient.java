@@ -2,7 +2,6 @@ package com.icl.integrator.httpclient;
 
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
-import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
@@ -76,13 +75,11 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     public ResponseDTO<Boolean> ping() {
-        return ping(new IntegratorPacket<Void, DestinationDescriptor>
-                            (new RawDestinationDescriptor()));
+        return ping(new IntegratorPacket<Void, DestinationDescriptor>());
     }
 
     public ResponseDTO<List<ServiceDTO>> getServiceList() {
-        return getServiceList(new IntegratorPacket<Void, DestinationDescriptor>
-                                      (new RawDestinationDescriptor()));
+        return getServiceList(new IntegratorPacket<Void, DestinationDescriptor>());
     }
 
     public ResponseDTO<List<String>> getSupportedActions(

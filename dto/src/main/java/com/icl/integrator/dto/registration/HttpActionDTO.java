@@ -7,20 +7,22 @@ package com.icl.integrator.dto.registration;
  * Time: 11:04
  * To change this template use File | Settings | File Templates.
  */
-public class HttpActionDTO implements ActionDescriptor {
+public class HttpActionDTO extends ActionDescriptor {
 
     private String path;
 
     public HttpActionDTO() {
+	    super(null);
     }
 
-    public HttpActionDTO(String path) {
+    public HttpActionDTO(String path,ActionMethod actionMethod) {
+	    super(actionMethod);
         this.path = path;
     }
 
     @Override
     public String toString() {
-        return "path";
+        return "path = "+path;
     }
 
     @Override

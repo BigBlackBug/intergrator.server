@@ -105,9 +105,9 @@
                 "requestData": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["deliveryType", "data"],
+                    "required": ["deliveryPacketType", "data"],
                     "properties": {
-                        "deliveryType": {
+                        "deliveryPacketType": {
                             "type": "string",
                             "enum": [ "INCIDENT", "DICTIONARY", "LOCATION", "RESULT", "UNDEFINED" ]
                         },
@@ -209,10 +209,10 @@
         },
         "autoDetectionRegistrationDTO": {
             "type": "object",
-            "required": [ "deliveryType", "referenceObject", "destinationDescriptors" ],
+            "required": [ "deliveryPacketType", "referenceObject", "destinationDescriptors" ],
             "additionalProperties": false,
             "properties": {
-                "deliveryType": {
+                "deliveryPacketType": {
                     "type": "string",
                     "enum": [ "INCIDENT", "DICTIONARY", "LOCATION", "RESULT", "UNDEFINED" ]
                 },
@@ -290,17 +290,33 @@
             "oneOf": [
                 {
                     "type": "object",
-                    "required": ["path"],
+                    "required": ["path", "actionMethod"],
                     "additionalProperties": false,
                     "properties": {
                         "path": {
                             "type": "string"
+                        },
+                        "actionMethod": {
+                            "type": "string",
+                            "enum": [
+                                "GENERAL_DELIVERY",
+                                "HANDLE_RESPONSE_FROM_TARGET",
+                                "HANDLE_DELIVERY_RESPONSE",
+                                "HANDLE_SERVER_REGISTRATION_RESPONSE",
+                                "HANDLE_SERVICE_IS_AVAILABLE",
+                                "HANDLE_GET_SERVER_LIST",
+                                "HANDLER_GET_SUPPORTED_ACTIONS",
+                                "HANDLE_ADD_ACTION",
+                                "HANDLE_GET_SERVICE_INFO",
+                                "HANDLE_PING",
+                                "HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE"
+                            ]
                         }
                     }
                 },
                 {
                     "type": "object",
-                    "required": ["username", "password", "queueName"],
+                    "required": ["username", "password", "queueName", "actionMethod"],
                     "additionalProperties": false,
                     "properties": {
                         "username": {
@@ -311,6 +327,22 @@
                         },
                         "queueName": {
                             "type": "string"
+                        },
+                        "actionMethod": {
+                            "type": "string",
+                            "enum": [
+                                "GENERAL_DELIVERY",
+                                "HANDLE_RESPONSE_FROM_TARGET",
+                                "HANDLE_DELIVERY_RESPONSE",
+                                "HANDLE_SERVER_REGISTRATION_RESPONSE",
+                                "HANDLE_SERVICE_IS_AVAILABLE",
+                                "HANDLE_GET_SERVER_LIST",
+                                "HANDLER_GET_SUPPORTED_ACTIONS",
+                                "HANDLE_ADD_ACTION",
+                                "HANDLE_GET_SERVICE_INFO",
+                                "HANDLE_PING",
+                                "HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE"
+                            ]
                         }
                     }
                 }

@@ -62,6 +62,9 @@ public class ServiceDestinationDescriptor extends DestinationDescriptor {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
+		if (!super.equals(o)) {
+			return false;
+		}
 
 		ServiceDestinationDescriptor that = (ServiceDestinationDescriptor) o;
 
@@ -80,7 +83,8 @@ public class ServiceDestinationDescriptor extends DestinationDescriptor {
 
 	@Override
 	public int hashCode() {
-		int result = service.hashCode();
+		int result = super.hashCode();
+		result = 31 * result + service.hashCode();
 		result = 31 * result + action.hashCode();
 		result = 31 * result + endpointType.hashCode();
 		return result;

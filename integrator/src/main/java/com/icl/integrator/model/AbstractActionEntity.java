@@ -1,11 +1,10 @@
 package com.icl.integrator.model;
 
+import com.icl.integrator.dto.registration.ActionMethod;
 import com.icl.integrator.util.EndpointType;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,9 +31,13 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 	private EndpointType type;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-    @Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
+	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
 	@JoinColumn(name = "ENDPOINT_ID", nullable = false)
 	private AbstractEndpointEntity endpoint;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "ACTION_METHOD", nullable = false, updatable = false)
+	private ActionMethod actionMethod;
 
 	@Column(nullable = false, name = "GENERATED")
 	private boolean generated;
@@ -45,6 +48,14 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 
 	protected AbstractActionEntity(EndpointType endpointType) {
 		this.type = endpointType;
+	}
+
+	public ActionMethod getActionMethod() {
+		return actionMethod;
+	}
+
+	public void setActionMethod(ActionMethod actionMethod) {
+		this.actionMethod = actionMethod;
 	}
 
 	public AbstractEndpointEntity getEndpoint() {
@@ -67,11 +78,11 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 		this.actionName = actionName;
 	}
 
-	public void setGenerated(boolean generated) {
-		this.generated = generated;
-	}
-
 	public boolean isGenerated() {
 		return generated;
+	}
+
+	public void setGenerated(boolean generated) {
+		this.generated = generated;
 	}
 }

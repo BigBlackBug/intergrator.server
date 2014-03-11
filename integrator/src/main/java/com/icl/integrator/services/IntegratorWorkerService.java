@@ -43,6 +43,9 @@ public class IntegratorWorkerService {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@Autowired
+	private DeliveryCreator deliveryCreator;
+
 	@Transactional
 	public <T extends ActionDescriptor> void addAction(
 			AddActionDTO<T> actionDTO) throws IntegratorException {
@@ -74,6 +77,7 @@ public class IntegratorWorkerService {
 				httpAction.setActionURL(httpActionDTO.getPath());
 				httpAction.setActionName(actionName);
 				httpAction.setGenerated(false);
+				httpAction.setActionMethod(httpActionDTO.getActionMethod());
 				httpAction.setEndpoint(serviceEndpoint);
 				serviceEndpoint.addAction(httpAction);
 			}
@@ -96,6 +100,7 @@ public class IntegratorWorkerService {
 				}
 			} else {
 				jmsAction = new JMSAction();
+				jmsAction.setActionMethod(queueDTO.getActionMethod());
 				jmsAction.setUsername(queueDTO.getUsername());
 				jmsAction.setPassword(queueDTO.getPassword());
 				jmsAction.setQueueName(queueDTO.getQueueName());
@@ -112,11 +117,7 @@ public class IntegratorWorkerService {
 	}
 
 	public Boolean pingService(ServiceDestinationDescriptor serviceDescriptor) {
-		EndpointConnector connector = connectorFactory
-				.createEndpointConnector(
-						new ServiceDTO(serviceDescriptor.getService(),
-						               serviceDescriptor.getEndpointType()),
-						serviceDescriptor.getAction());
+		EndpointConnector connector = connectorFactory.createEndpointConnector(serviceDescriptor);
 		connector.testConnection();
 		return true;
 	}
@@ -190,7 +191,7 @@ public class IntegratorWorkerService {
 		for (AbstractActionEntity action : service.getActions()) {
 			HttpAction realAction = (HttpAction) action;
 			HttpActionDTO httpActionDTO = new HttpActionDTO(
-					realAction.getActionURL());
+					realAction.getActionURL(),realAction.getActionMethod());
 			result.add(new ActionEndpointDTO<>(
 					action.getActionName(), httpActionDTO));
 		}
@@ -204,7 +205,8 @@ public class IntegratorWorkerService {
 			JMSAction realAction = (JMSAction) action;
 			QueueDTO actionDTO = new QueueDTO(realAction.getQueueName(),
 			                                  realAction.getUsername(),
-			                                  realAction.getPassword());
+			                                  realAction.getPassword(),
+			                                  realAction.getActionMethod());
 			result.add(new ActionEndpointDTO<>(
 					action.getActionName(), actionDTO));
 		}

@@ -7,7 +7,7 @@ package com.icl.integrator.dto.registration;
  * Time: 10:58
  * To change this template use File | Settings | File Templates.
  */
-public class QueueDTO implements ActionDescriptor {
+public class QueueDTO extends ActionDescriptor {
 
     private String username;
 
@@ -16,16 +16,18 @@ public class QueueDTO implements ActionDescriptor {
     private String queueName;
 
     public QueueDTO() {
-
+         super(null);
     }
 
-    public QueueDTO(String queueName, String username, String password) {
+    public QueueDTO(String queueName, String username, String password,ActionMethod actionMethod) {
+	    super(actionMethod);
         this.queueName = queueName;
         this.username = username;
         this.password = password;
     }
 
-    public QueueDTO(String queueName) {
+    public QueueDTO(String queueName,ActionMethod actionMethod) {
+	    super(actionMethod);
         this.queueName = queueName;
     }
 

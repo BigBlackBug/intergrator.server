@@ -1,7 +1,6 @@
 package com.icl.integrator.util;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,7 +24,7 @@ public final class AddActionDTODeserializer
 
     @Override
     public AddActionDTO deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
+            throws IOException {
         ObjectNode treeNode = jp.readValueAsTree();
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         ServiceDTO endpoint = mapper.readValue(
@@ -36,8 +35,9 @@ public final class AddActionDTODeserializer
         ActionEndpointDTO action = mapper.parseActionEndpoint(
                 actionRegistrationNode.get("action"),
                 endpoint.getEndpointType());
-        ActionRegistrationDTO actionRegistrationDTO =
-                new ActionRegistrationDTO(action, forceRegister);
+//	    ActionMethod deliveryType =
+//			    mapper.readValue(actionRegistrationNode.get("deliveryType").toString(), ActionMethod.class);
+        ActionRegistrationDTO actionRegistrationDTO = new ActionRegistrationDTO(action, forceRegister);
         return new AddActionDTO<>(endpoint, actionRegistrationDTO);
     }
 }

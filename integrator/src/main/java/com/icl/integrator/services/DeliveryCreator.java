@@ -50,6 +50,7 @@ public class DeliveryCreator {
 		httpAction.setGenerated(true);
 		httpAction.setActionName(generateActionName(service.getServiceName()));
 		httpAction.setEndpoint(service);
+		httpAction.setActionMethod(httpActionDTO.getActionMethod());
 		service.addAction(httpAction);
 		return httpAction;
 	}
@@ -62,6 +63,7 @@ public class DeliveryCreator {
 		jmsAction.setQueueName(queueDTO.getQueueName());
 		jmsAction.setUsername(queueDTO.getUsername());
 		jmsAction.setActionName(generateActionName(service.getServiceName()));
+		jmsAction.setActionMethod(queueDTO.getActionMethod());
 		jmsAction.setEndpoint(service);
 		service.addAction(jmsAction);
 		return jmsAction;
@@ -202,8 +204,8 @@ public class DeliveryCreator {
 	@Transactional
 	public <T> Delivery createDelivery(AbstractEndpointEntity service,
 	                                   AbstractActionEntity action,
-	                                   T data, DestinationEntity destinationEntity,
-	                                   Boolean isGeneral) throws JsonProcessingException {
+	                                   T data,
+	                                   DestinationEntity destinationEntity) throws JsonProcessingException {
 		service = persistenceService
 				.find(AbstractEndpointEntity.class, service.getId());
 		action = persistenceService
@@ -215,7 +217,7 @@ public class DeliveryCreator {
 		delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
 		delivery.setEndpoint(service);
 		delivery.setResponseHandlerDestination(destinationEntity);
-		delivery.setGeneralDelivery(isGeneral);
+//		delivery.setGeneralDelivery(isGeneral);
 		persistenceService.persist(delivery);
 		return delivery;
 	}
@@ -244,7 +246,7 @@ public class DeliveryCreator {
 				}
 				DestinationEntity destinationEntity = persistDestination(responseHandlerDescriptor);
 				Delivery delivery = createDelivery(endpointEntity, actionEntity,
-				                                   data, destinationEntity, true);
+				                                   data, destinationEntity);
 				persistenceService.persist(delivery);
 				deliveries.addDelivery(delivery);
 			} catch (Exception ex) {
@@ -309,7 +311,7 @@ public class DeliveryCreator {
 								destination.getService(),
 								destination.getAction(),
 								requestData,
-								destinationEntity, true);
+								destinationEntity);
 						deliveries.addDelivery(delivery);
 					} catch (JsonProcessingException e) {
 						throw new IntegratorException(e);

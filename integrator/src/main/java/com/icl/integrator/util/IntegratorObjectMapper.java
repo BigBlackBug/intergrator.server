@@ -43,21 +43,19 @@ public class IntegratorObjectMapper extends ObjectMapper {
     public ActionDescriptor parseActionDescriptor(
             JsonNode treeNode, EndpointType type) throws IOException {
         ActionDescriptor descriptor = null;
+	    ActionMethod actionMethod =
+			    readValue(treeNode.get("actionMethod").toString(), ActionMethod.class);
         try {
-            if (type == EndpointType.HTTP) {
-                HttpActionDTO actionDTO = new HttpActionDTO();
-                actionDTO.setPath(treeNode.get("path").asText());
-                descriptor = actionDTO;
+	        if (type == EndpointType.HTTP) {
+		        String path = treeNode.get("path").asText();
+		        descriptor = new HttpActionDTO(path, actionMethod);
             } else if (type == EndpointType.JMS) {
-                QueueDTO queueDTO = new QueueDTO();
-                queueDTO.setQueueName(treeNode.get("queueName").asText());
-                JsonNode password = treeNode.get("password");
-                queueDTO.setPassword(
-                        password == null ? null : password.asText());
-                JsonNode username = treeNode.get("username");
-                queueDTO.setUsername(
-                        username == null ? null : username.asText());
-                descriptor = queueDTO;
+		        String queueName = treeNode.get("queueName").asText();
+		        JsonNode passwordNode = treeNode.get("password");
+		        String password = passwordNode == null ? null : passwordNode.asText();
+		        JsonNode usernameNode = treeNode.get("username");
+		        String username = usernameNode == null ? null : usernameNode.asText();
+		        descriptor = new QueueDTO(queueName,username,password, actionMethod);
             }
         } catch (NullPointerException npe) {
             throw new JsonMappingException(

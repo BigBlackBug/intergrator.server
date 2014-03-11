@@ -1,5 +1,6 @@
 package com.icl.integrator.util.connectors;
 
+import com.icl.integrator.dto.registration.ActionMethod;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -23,8 +24,11 @@ public class HTTPEndpointConnector implements EndpointConnector {
 
 	private final URL url;
 
-	HTTPEndpointConnector(URL url) {
+	private final ActionMethod actionMethod;
+
+	HTTPEndpointConnector(URL url,ActionMethod actionMethod) {
 		this.url = url;
+		this.actionMethod = actionMethod;
 	}
 
 	@Override
@@ -34,8 +38,9 @@ public class HTTPEndpointConnector implements EndpointConnector {
 			HttpHeaders headers = new HttpHeaders();
 			headers.add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 			HttpEntity<String> entity = new HttpEntity<>(headers);
-			restTemplate.exchange(url.toURI(), HttpMethod.HEAD,
-			                      entity, Void.class);
+
+			restTemplate.exchange(url.toURI().toString()+"?action_method={action_method}", HttpMethod.HEAD,
+			                      entity, Void.class, actionMethod);
 		} catch (URISyntaxException e) {
 			throw new ConnectionException("URL не валиден", e);
 		} catch (HttpClientErrorException ex) {

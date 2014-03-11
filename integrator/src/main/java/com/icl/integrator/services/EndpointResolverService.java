@@ -1,5 +1,6 @@
 package com.icl.integrator.services;
 
+import com.icl.integrator.dto.registration.ActionMethod;
 import com.icl.integrator.model.HttpAction;
 import com.icl.integrator.model.JMSServiceEndpoint;
 import com.icl.integrator.util.IntegratorException;
@@ -26,7 +27,7 @@ public class EndpointResolverService {
 	private EntityManager em;
 
 	@Transactional
-	public URL getServiceURL(String serviceName, String action)
+	public Result getServiceURL(String serviceName, String action)
 			throws IntegratorException {
 		Query query = em.createQuery(
 				"select " +
@@ -43,9 +44,10 @@ public class EndpointResolverService {
 		try {
 			queryResult =
 					new QueryResult((Object[]) query.getSingleResult());
-			return new URL(DEFAULT_PROTOCOL, queryResult.serviceURL,
-			               queryResult.servicePort,
-			               queryResult.actionURL);
+			URL url = new URL(DEFAULT_PROTOCOL, queryResult.serviceURL,
+			                  queryResult.servicePort,
+			                  queryResult.actionURL);
+			return new Result(url,queryResult.actionMethod);
 		} catch (NoResultException ex) {
 			throw new IntegratorException("Сервис " + serviceName + ", " +
 					                              "принимающий запросы типа " +
@@ -85,11 +87,35 @@ public class EndpointResolverService {
 
 		final int servicePort;
 
+		final ActionMethod actionMethod;
+
 		public QueryResult(Object[] queryResult) {
 			this.serviceURL = String.valueOf(queryResult[0]);
 			this.servicePort = Integer.valueOf(String.valueOf(queryResult[1]));
 			this.actionURL = ((HttpAction) queryResult[2]).getActionURL();
+			this.actionMethod = ((HttpAction) queryResult[2]).getActionMethod();
 		}
 	}
+
+	public static class Result {
+
+		private final URL url;
+
+		private final ActionMethod actionMethod;
+
+		Result(URL url, ActionMethod actionMethod) {
+			this.url = url;
+			this.actionMethod = actionMethod;
+		}
+
+		public URL getUrl() {
+			return url;
+		}
+
+		public ActionMethod getActionMethod() {
+			return actionMethod;
+		}
+	}
+
 
 }

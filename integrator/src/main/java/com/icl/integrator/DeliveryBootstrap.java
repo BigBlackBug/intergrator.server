@@ -1,6 +1,7 @@
 package com.icl.integrator;
 
 import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.dto.registration.ActionMethod;
 import com.icl.integrator.model.Delivery;
 import com.icl.integrator.model.DeliveryStatus;
 import com.icl.integrator.services.DeliveryService;
@@ -51,7 +52,7 @@ public class DeliveryBootstrap implements
 			delivery.setRequestDate(new Date());
 			delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
 			delivery = persistenceService.saveOrUpdate(delivery);
-			if (delivery.getGeneralDelivery()) {
+			if (delivery.getAction().getActionMethod() == ActionMethod.GENERAL_DELIVERY) {
 				DefaultErrorConverter errorConverter = new DefaultErrorConverter();
 				DefaultDeliverySuccessConverter successConverter =
 						new DefaultDeliverySuccessConverter(delivery);
@@ -61,7 +62,6 @@ public class DeliveryBootstrap implements
 			} else {
 				deliveryService.deliver(delivery, Void.class);
 			}
-			//TODO NOT FOOLPROOF
 		}
 		isInitialized = true;
 	}

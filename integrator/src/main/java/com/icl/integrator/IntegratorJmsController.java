@@ -2,7 +2,10 @@ package com.icl.integrator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.DeliveryDTO;
+import com.icl.integrator.dto.IntegratorMethod;
+import com.icl.integrator.dto.IntegratorPacket;
+import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
@@ -159,7 +162,6 @@ public class IntegratorJmsController implements MessageListener {
 		} catch (IntegratorException ex) {
 			String errorMessage = ex.getMessage();
 			logger.error(errorMessage, ex.getCause());
-			deliveryService.deliver(destinationDescriptor, new ErrorDTO(ex));
 		}
 	}
 

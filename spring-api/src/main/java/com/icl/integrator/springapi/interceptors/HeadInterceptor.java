@@ -2,6 +2,7 @@ package com.icl.integrator.springapi.interceptors;
 
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.registration.ActionMethod;
 import com.icl.integrator.dto.registration.RegistrationResultDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import org.apache.commons.logging.Log;
@@ -25,39 +26,41 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 
 	private final static Log logger = LogFactory.getLog(HeadInterceptor.class);
 
-	private static final Map<DeliveryType, Type> types;
+	private static final Map<ActionMethod, Type> types;
 
 	static {
 		types = new HashMap<>();
-		types.put(DeliveryType.TARGET_METHOD, new ParameterizedTypeReference<RequestDataDTO>() {
+		types.put(ActionMethod.GENERAL_DELIVERY, new ParameterizedTypeReference<RequestDataDTO>() {
 		}.getType());
-		types.put(DeliveryType.HANDLE_RESPONSE_FROM_TARGET,
+		types.put(ActionMethod.HANDLE_RESPONSE_FROM_TARGET,
 		          new ParameterizedTypeReference<ResponseDTO<ResponseFromTargetDTO>>() {
 		          }.getType());
-		types.put(DeliveryType.HANDLE_DELIVERY,
+		types.put(ActionMethod.HANDLE_DELIVERY_RESPONSE,
 		          new ParameterizedTypeReference<Map<String, ResponseDTO<UUID>>>() {
 		          }.getType());
-		types.put(DeliveryType.HANDLE_SERV_REG,
+		types.put(ActionMethod.HANDLE_SERVER_REGISTRATION_RESPONSE,
 		          new ParameterizedTypeReference<ResponseDTO<RegistrationResultDTO>>() {
 		          }.getType());
-		types.put(DeliveryType.HANDLER_SER_IS_AVAIL,
+		types.put(ActionMethod.HANDLE_SERVICE_IS_AVAILABLE,
 		          new ParameterizedTypeReference<ResponseDTO<Boolean>>() {
 		          }.getType());
-		types.put(DeliveryType.HANDLE_GET_SERLIST,
+		types.put(ActionMethod.HANDLE_GET_SERVER_LIST,
 		          new ParameterizedTypeReference<ResponseDTO<List<ServiceDTO>>>() {
 		          }.getType());
-		types.put(DeliveryType.HANDLER_GET_SUPP_ACTIONS,
+		types.put(ActionMethod.HANDLER_GET_SUPPORTED_ACTIONS,
 		          new ParameterizedTypeReference<ResponseDTO<List<String>>>() {
 		          }.getType());
-		types.put(DeliveryType.HANDLE_ADD_ACTION,
+		types.put(ActionMethod.HANDLE_ADD_ACTION,
 		          new ParameterizedTypeReference<ResponseDTO<Void>>() {
 		          }.getType());
-		types.put(DeliveryType.HANDLE_GET_SERV_INFO,
+		types.put(ActionMethod.HANDLE_GET_SERVICE_INFO,
 		          new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<EndpointDescriptor, ActionDescriptor>>>() {
 		          }.getType());              //TODO TETS
-		types.put(DeliveryType.HANDLE_AUTO_REG,
+		types.put(ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE,
 		          new ParameterizedTypeReference<ResponseDTO<List<ResponseDTO<Void>>>>() {
 		          }.getType());
+		types.put(ActionMethod.HANDLE_PING, new ParameterizedTypeReference<ResponseDTO<Boolean>>() {
+		}.getType());
 	}
 
 	@Override
@@ -67,11 +70,12 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 		if (request.getMethod().equals("HEAD")) {
 			logger.info("Received a HEAD request. Ignoring");
 			Type realType = ((HandlerMethod) handler).getMethod().getGenericParameterTypes()[0];
-			String deliveryType = request.getParameter("DELIVERY_TYPE");
+			String actionMethod = request.getParameter("action_method");
 
-			Type requiredType = types.get(DeliveryType.valueOf(deliveryType));
+			Type requiredType = types.get(ActionMethod.valueOf(actionMethod));
 			if (!requiredType.equals(realType)) {
-				response.sendError(422, "Выбранное действие не поддерживается");
+				response.sendError(422, "Выбранный метод не подходит для этого действия. Правильная сигнатура "+
+						requiredType.toString());
 			}
 			return false;
 		} else {

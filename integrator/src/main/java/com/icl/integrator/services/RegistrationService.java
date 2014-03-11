@@ -181,6 +181,7 @@ public class RegistrationService {
 			httpAction = new HttpAction();
 	        httpAction.setActionURL(httpActionDTO.getPath());
             httpAction.setActionName(actionName);
+			httpAction.setActionMethod(httpActionDTO.getActionMethod());
 			httpAction.setGenerated(false);
 		}
         return httpAction;
@@ -233,6 +234,7 @@ public class RegistrationService {
 			}
 		} else{
 			jmsAction = new JMSAction();
+			jmsAction.setActionMethod(queueDTO.getActionMethod());
 			jmsAction.setUsername(queueDTO.getUsername());
 			jmsAction.setPassword(queueDTO.getPassword());
 			jmsAction.setQueueName(queueDTO.getQueueName());

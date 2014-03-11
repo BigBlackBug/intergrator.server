@@ -1,5 +1,221 @@
-{
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Dictionary",
-    "type": "object"
-}
+{"/properties/packet/oneOf/0": [
+    {
+        "level": "error",
+        "schema": {
+            "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+            "pointer": "/properties/packet/oneOf/0"
+        },
+        "instance": {
+            "pointer": "/packet"
+        },
+        "domain": "validation",
+        "keyword": "type",
+        "message": "instance type (object) does not match any allowed primitive type (allowed: [\"null\"])",
+        "found": "object",
+        "expected": ["null"]
+    }
+], "/properties/packet/oneOf/1": [
+    {
+        "level": "error",
+        "schema": {
+            "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+            "pointer": "/properties/packet/oneOf/1"
+        },
+        "instance": {
+            "pointer": "/packet"
+        },
+        "domain": "validation",
+        "keyword": "oneOf",
+        "message": "instance failed to match exactly one schema (matched 0 out of 6)",
+        "matched": 0,
+        "nrSchemas": 6,
+        "reports": {
+            "/properties/packet/oneOf/1/oneOf/0": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/deliveryDTO/properties/requestData"
+                    },
+                    "instance": {
+                        "pointer": "/packet/requestData"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"deliveryPacketType\"]",
+                    "unwanted": ["deliveryPacketType"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/deliveryDTO/properties/requestData"
+                    },
+                    "instance": {
+                        "pointer": "/packet/requestData"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"deliveryType\"])",
+                    "required": ["data", "deliveryType"],
+                    "missing": ["deliveryType"]
+                }
+            ],
+            "/properties/packet/oneOf/1/oneOf/1": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/targetRegistrationDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"action\",\"destinations\",\"requestData\",\"responseHandlerDescriptor\"]",
+                    "unwanted": ["action", "destinations", "requestData", "responseHandlerDescriptor"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/targetRegistrationDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"actionRegistrations\",\"deliverySettings\",\"endpoint\",\"serviceName\"])",
+                    "required": ["actionRegistrations", "deliverySettings", "endpoint", "serviceName"],
+                    "missing": ["actionRegistrations", "deliverySettings", "endpoint", "serviceName"]
+                }
+            ],
+            "/properties/packet/oneOf/1/oneOf/2": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/serviceDD"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"destinations\",\"requestData\",\"responseHandlerDescriptor\"]",
+                    "unwanted": ["destinations", "requestData", "responseHandlerDescriptor"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/serviceDD"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"descriptorType\",\"endpointType\",\"service\"])",
+                    "required": ["action", "descriptorType", "endpointType", "service"],
+                    "missing": ["descriptorType", "endpointType", "service"]
+                }
+            ],
+            "/properties/packet/oneOf/1/oneOf/3": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/serviceDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"action\",\"destinations\",\"requestData\",\"responseHandlerDescriptor\"]",
+                    "unwanted": ["action", "destinations", "requestData", "responseHandlerDescriptor"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/serviceDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"endpointType\",\"serviceName\"])",
+                    "required": ["endpointType", "serviceName"],
+                    "missing": ["endpointType", "serviceName"]
+                }
+            ],
+            "/properties/packet/oneOf/1/oneOf/4": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/addActionDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"action\",\"destinations\",\"requestData\",\"responseHandlerDescriptor\"]",
+                    "unwanted": ["action", "destinations", "requestData", "responseHandlerDescriptor"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/addActionDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"actionRegistration\",\"service\"])",
+                    "required": ["actionRegistration", "service"],
+                    "missing": ["actionRegistration", "service"]
+                }
+            ],
+            "/properties/packet/oneOf/1/oneOf/5": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/autoDetectionRegistrationDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"action\",\"destinations\",\"requestData\",\"responseHandlerDescriptor\"]",
+                    "unwanted": ["action", "destinations", "requestData", "responseHandlerDescriptor"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/BigBlackBug/IdeaProjects/Integrator2/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/autoDetectionRegistrationDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"deliveryType\",\"destinationDescriptors\",\"referenceObject\"])",
+                    "required": ["deliveryType", "destinationDescriptors", "referenceObject"],
+                    "missing": ["deliveryType", "destinationDescriptors", "referenceObject"]
+                }
+            ]
+        }
+    }
+]}

@@ -229,66 +229,63 @@ public class AppTests {
 //		em.createQuery("delete from DeliveryPacket").executeUpdate();
 	}
 
-	private DeliveryDTO getDelvieryDTO() {
-		DeliveryDTO deliveryDTO = new DeliveryDTO();
-
-		HttpEndpointDescriptorDTO desr = new
-				HttpEndpointDescriptorDTO("192.168.84.142", 8080);
-		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-				new EndpointDTO<>(EndpointType.HTTP, desr);
-
-//        deliveryDTO.setTargetResponseHandlerDescriptor(
-//                new DestinationDescriptorDTO(
-//                        endpoint,
-//                        new HttpActionDTO("/source/handleResponseFromTarget")
-//                ));
-		HashMap<String, String> map = new HashMap<>();
-		map.put("java.naming.provider.url", "tcp://localhost:61616");
-		map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
-				".ActiveMQInitialContextFactory");
-		RawDestinationDescriptor targetResponseHandler =
-				new RawDestinationDescriptor();
-		targetResponseHandler.setEndpoint(
-				new EndpointDTO<>(EndpointType.JMS, new
-						JMSEndpointDescriptorDTO("ConnectionFactory", map)
-				));
-		targetResponseHandler.setActionDescriptor(new QueueDTO
-				                                          ("SourceQueue"));
-		deliveryDTO.setResponseHandlerDescriptor(targetResponseHandler);
-		RawDestinationDescriptor
-				deliveryResponseHandler = new RawDestinationDescriptor();
-
-
-//        HashMap<String, String> map = new HashMap<>();
-//        map.put("java.naming.provider.url", "tcp://localhost:61616");
-//        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
-//                ".ActiveMQInitialContextFactory");
-//        deliveryResponseHandler.setEndpoint(
-//                new EndpointDTO<>(EndpointType.JMS, new
-//                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
-//                ));
-//        deliveryResponseHandler.setActionDescriptor(new QueueDTO
-//                                                            ("SourceQueue"));
-		deliveryResponseHandler
-				.setEndpoint(endpoint);
-		deliveryResponseHandler.setActionDescriptor(
-				new HttpActionDTO("/ext_source/handleDeliveryResponse"));
-		deliveryDTO.setAction("ACTION");
-		deliveryDTO.setRequestData(new RequestDataDTO(DeliveryPacketType.UNDEFINED,
-		                                              new HashMap<String, Object>() {{
-			                                              put("a", "b");
-		                                              }}));
-		ServiceDTO destination = new ServiceDTO(
-				"NEW_SERVICE", EndpointType.HTTP);
-		deliveryDTO.setDestinations(Arrays.asList(destination));
-		return deliveryDTO;
-	}
+//	private DeliveryDTO getDelvieryDTO() {
+//		DeliveryDTO deliveryDTO = new DeliveryDTO();
+//
+//		HttpEndpointDescriptorDTO desr = new
+//				HttpEndpointDescriptorDTO("192.168.84.142", 8080);
+//		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
+//				new EndpointDTO<>(EndpointType.HTTP, desr);
+//
+////        deliveryDTO.setTargetResponseHandlerDescriptor(
+////                new DestinationDescriptorDTO(
+////                        endpoint,
+////                        new HttpActionDTO("/source/handleResponseFromTarget")
+////                ));
+//		HashMap<String, String> map = new HashMap<>();
+//		map.put("java.naming.provider.url", "tcp://localhost:61616");
+//		map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
+//				".ActiveMQInitialContextFactory");
+//		RawDestinationDescriptor targetResponseHandler =
+//				new RawDestinationDescriptor();
+//		targetResponseHandler.setEndpoint(
+//				new EndpointDTO<>(EndpointType.JMS, new
+//						JMSEndpointDescriptorDTO("ConnectionFactory", map)
+//				));
+//		targetResponseHandler.setActionDescriptor(new QueueDTO
+//				                                          ("SourceQueue"));
+//		deliveryDTO.setResponseHandlerDescriptor(targetResponseHandler);
+//		RawDestinationDescriptor
+//				deliveryResponseHandler = new RawDestinationDescriptor();
+//
+//
+////        HashMap<String, String> map = new HashMap<>();
+////        map.put("java.naming.provider.url", "tcp://localhost:61616");
+////        map.put("java.naming.factory.initial", "org.apache.activemq.jndi" +
+////                ".ActiveMQInitialContextFactory");
+////        deliveryResponseHandler.setEndpoint(
+////                new EndpointDTO<>(EndpointType.JMS, new
+////                        JMSEndpointDescriptorDTO("ConnectionFactory", map)
+////                ));
+////        deliveryResponseHandler.setActionDescriptor(new QueueDTO
+////                                                            ("SourceQueue"));
+//		deliveryResponseHandler
+//				.setEndpoint(endpoint);
+//		deliveryResponseHandler.setActionDescriptor(
+//				new HttpActionDTO("/ext_source/handleDeliveryResponse"));
+//		deliveryDTO.setAction("ACTION");
+//		deliveryDTO.setRequestData(new RequestDataDTO(DeliveryPacketType.UNDEFINED,
+//		                                              new HashMap<String, Object>() {{
+//			                                              put("a", "b");
+//		                                              }}));
+//		ServiceDTO destination = new ServiceDTO(
+//				"NEW_SERVICE", EndpointType.HTTP);
+//		deliveryDTO.setDestinations(Arrays.asList(destination));
+//		return deliveryDTO;
+//	}
 
 	private QueueDTO getQueueDTO() {
-		QueueDTO dto = new QueueDTO();
-		dto.setUsername("USERNAME");
-		dto.setPassword("PASSWORD");
-		dto.setQueueName("QUEUENAME");
+		QueueDTO dto = new QueueDTO("NAME",ActionMethod.HANDLE_ADD_ACTION);
 		return dto;
 	}
 
@@ -324,7 +321,7 @@ public class AppTests {
 						JMSEndpointDescriptorDTO("ConnectionFactory", null)
 				));
 		targetResponseHandler.setActionDescriptor(new QueueDTO
-				                                          ("SourceQueue"));
+				                                          ("SourceQueue",ActionMethod.HANDLE_GET_SERVER_LIST));
 		IntegratorPacket<Void, DestinationDescriptor>
 				packet =
 				new IntegratorPacket<Void, DestinationDescriptor>(
@@ -345,7 +342,7 @@ public class AppTests {
 						JMSEndpointDescriptorDTO("ConnectionFactory", null)
 				));
 		targetResponseHandler.setActionDescriptor(new QueueDTO
-				                                          ("SourceQueue"));
+				                                          ("SourceQueue",ActionMethod.HANDLE_RESPONSE_FROM_TARGET));
 		IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>
 				packet =
 				new IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>(
@@ -366,7 +363,7 @@ public class AppTests {
 								                         String>emptyMap())
 				));
 		targetResponseHandler.setActionDescriptor(new QueueDTO
-				                                          ("SourceQueue"));
+				                                          ("SourceQueue",ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE));
 		IntegratorPacket<Void, DestinationDescriptor>
 				packet =
 				new IntegratorPacket<Void, DestinationDescriptor>(
@@ -409,8 +406,8 @@ public class AppTests {
 		//----------------------------------------------------------------------
 		ActionEndpointDTO<HttpActionDTO> actionDTO = new ActionEndpointDTO<>();
 
-		HttpActionDTO actionDescriptor = new HttpActionDTO();
-		actionDescriptor.setPath("/destination/handleRequest");
+		HttpActionDTO actionDescriptor = new HttpActionDTO("/destination/handleRequest",
+		                                                   ActionMethod.GENERAL_DELIVERY);
 
 		actionDTO.setActionDescriptor(actionDescriptor);
 		actionDTO.setActionName("ACTION");
@@ -427,7 +424,7 @@ public class AppTests {
 	public void testHttpDeserializer() throws Exception {
 		RawDestinationDescriptor
 				serviceDTO = new RawDestinationDescriptor();
-		ActionDescriptor descriptor = new HttpActionDTO("PATH");
+		ActionDescriptor descriptor = new HttpActionDTO("PATH",ActionMethod.HANDLE_ADD_ACTION);
 		serviceDTO.setActionDescriptor(descriptor);
 		serviceDTO.setEndpoint(getHttpDTO());
 		String s = mapper.writeValueAsString(serviceDTO);

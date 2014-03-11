@@ -46,7 +46,6 @@ public class DeliveryService {
 	@Autowired
 	private PersistenceService persistenceService;
 
-	//TODO rename endpoint to service
 	public <T> void deliver(DestinationDescriptor destinationDescriptor,T packet) {
 		if (destinationDescriptor != null) {
 			Delivery delivery;
@@ -55,7 +54,7 @@ public class DeliveryService {
 						.persistDestination(destinationDescriptor);
 				AbstractActionEntity action = destination.getAction();
 				AbstractEndpointEntity service = destination.getService();
-				delivery = deliveryCreator.createDelivery(service,action, packet, null, false);
+				delivery = deliveryCreator.createDelivery(service,action, packet, null);
 			} catch (Exception ex) {
 				logger.error("Ошибка создания конечной точки доставки", ex);
 				return;
@@ -119,7 +118,8 @@ public class DeliveryService {
 		EndpointConnector destinationConnector =
 				factory.createEndpointConnector(endpoint, action);
 		DeliveryCallable<String, ResponseClass> deliveryCallable =
-				new DeliveryCallable<>(destinationConnector,delivery.getDeliveryData(),
+				new DeliveryCallable<>(destinationConnector,
+				                       delivery.getDeliveryData(),
 				                       responseClass);
 
 		//если воед, то оставляем как есть. new Error
@@ -192,7 +192,7 @@ public class DeliveryService {
 	        Delivery sourceDelivery;
 	        try {
 		        sourceDelivery =
-				        deliveryCreator.createDelivery(service, action, data, null, false);
+				        deliveryCreator.createDelivery(service, action, data, null);
 	        } catch (JsonProcessingException e) {
 		        //will never happen
 		        return;

@@ -51,11 +51,12 @@ public class TargetRegistrationDTODeserializer extends
         int size = actions.size();
         for (int i = 0; i < size; i++) {
             JsonNode node = actions.get(i);
-            boolean forceRegister =
-                    node.get("forceRegister").asBoolean();
+            boolean forceRegister = node.get("forceRegister").asBoolean();
             ActionEndpointDTO<T> action = mapper.parseActionEndpoint(
                     node.get("action"), endpointType);
-            result.add(new ActionRegistrationDTO<>(action, forceRegister));
+//	        DeliveryType deliveryType =
+//			        mapper.readValue(node.get("deliveryType").toString(), DeliveryType.class);
+	        result.add(new ActionRegistrationDTO<>(action, forceRegister));
         }
         return result;
     }

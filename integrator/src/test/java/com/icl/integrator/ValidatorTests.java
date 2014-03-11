@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.registration.ActionMethod;
 import com.icl.integrator.dto.registration.HttpActionDTO;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.services.validation.PacketValidationException;
@@ -49,7 +50,7 @@ public class ValidatorTests {
 
 				);
 		dd.setActionDescriptor(
-				new HttpActionDTO("/ext_source/handleGetServiceList"));
+				new HttpActionDTO("/ext_source/handleGetServiceList", ActionMethod.GENERAL_DELIVERY));
 		IntegratorPacket p = new IntegratorPacket(dd);
 		serialize(p);
 	}
@@ -62,7 +63,7 @@ public class ValidatorTests {
 				new EndpointDTO<>(EndpointType.HTTP, desr);
 		RawDestinationDescriptor dd =
 				new RawDestinationDescriptor(
-						endpoint, new HttpActionDTO("/ext_source/handleGetServiceList")
+						endpoint, new HttpActionDTO("/ext_source/handleGetServiceList",ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE)
 				);
 		ServiceDestinationDescriptor sdd = new ServiceDestinationDescriptor("a",null,EndpointType.HTTP);
 		IntegratorPacket p = new IntegratorPacket();
@@ -94,7 +95,7 @@ public class ValidatorTests {
 				new EndpointDTO<>(EndpointType.HTTP, desr);
 		RawDestinationDescriptor dd =
 				new RawDestinationDescriptor(
-						endpoint, new HttpActionDTO("/ext_source/handleGetServiceList")
+						endpoint, new HttpActionDTO("/ext_source/handleGetServiceList",ActionMethod.HANDLE_GET_SERVER_LIST)
 				);
 		IntegratorPacket p = new IntegratorPacket();
 		p.setMethod(null);

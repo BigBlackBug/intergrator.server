@@ -36,9 +36,7 @@ public class EndpointConnectorFactory {
 	public EndpointConnector createEndpointConnector(String serviceName,
 	                                                 EndpointType endpointType,
 	                                                 String action) {
-		return createEndpointConnector(
-				new ServiceDTO(serviceName, endpointType),
-				action);
+		return createEndpointConnector(new ServiceDTO(serviceName, endpointType), action);
 	}
 
 	public EndpointConnector createEndpointConnector(
@@ -46,9 +44,9 @@ public class EndpointConnectorFactory {
 			throws IntegratorException {
 		switch (destination.getEndpointType()) {
 			case HTTP: {
-				URL url = endpointResolverService
+				EndpointResolverService.Result result = endpointResolverService
 						.getServiceURL(destination.getServiceName(), action);
-				return new HTTPEndpointConnector(url);
+				return new HTTPEndpointConnector(result.getUrl(), result.getActionMethod());
 			}
 			case JMS: {
 				JMSServiceEndpoint jmsEndpoint = endpointResolverService
@@ -75,7 +73,7 @@ public class EndpointConnectorFactory {
 					URL url = new URL("HTTP", endpointDescriptor.getHost(),
 					                  endpointDescriptor.getPort(),
 					                  actionDescriptor.getPath());
-					return new HTTPEndpointConnector(url);
+					return new HTTPEndpointConnector(url,descriptor.getActionMethod());
 				} catch (MalformedURLException e) {
 					throw new IntegratorException(e);
 				}
@@ -107,7 +105,7 @@ public class EndpointConnectorFactory {
 							new URL("HTTP", endpointDescriptor.getServiceURL(),
 							        endpointDescriptor.getServicePort(),
 							        actionDescriptor.getActionURL());
-					return new HTTPEndpointConnector(url);
+					return new HTTPEndpointConnector(url,actionDescriptor.getActionMethod());
 				} catch (MalformedURLException e) {
 					throw new IntegratorException(e);
 				}
