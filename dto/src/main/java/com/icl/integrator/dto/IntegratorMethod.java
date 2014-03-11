@@ -8,6 +8,13 @@ package com.icl.integrator.dto;
  * To change this template use File | Settings | File Templates.
  */
 public enum IntegratorMethod {
-    PING, DELIVER, REGISTER_SERVICE, IS_AVAILABLE, GET_SERVICE_LIST,
-    GET_SUPPORTED_ACTIONS, ADD_ACTION, GET_SERVICE_INFO
+	PING,
+	DELIVER,
+	REGISTER_SERVICE,
+	IS_AVAILABLE,
+	GET_SERVICE_LIST,
+	GET_SUPPORTED_ACTIONS,
+	ADD_ACTION,
+	GET_SERVICE_INFO,
+	REGISTER_AUTO_DETECTION
 }

@@ -31,9 +31,11 @@ public interface ExtendedSourceService extends SourceService {
 
     public void handleGetSupportedActions(ResponseDTO<List<String>> response);
 
-    public void handleAddAction(ResponseDTO response);
+    public void handleAddAction(ResponseDTO<Void> response);
 
     public <T extends EndpointDescriptor, Y extends ActionDescriptor>
     void handleGetServiceInfo(ResponseDTO<FullServiceDTO<T, Y>> response);
+
+	public void handleAutoDetectionRegistration(ResponseDTO<List<ResponseDTO<Void>>> response);
 
 }

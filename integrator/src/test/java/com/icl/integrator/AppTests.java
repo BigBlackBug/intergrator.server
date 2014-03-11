@@ -274,7 +274,7 @@ public class AppTests {
 		deliveryResponseHandler.setActionDescriptor(
 				new HttpActionDTO("/ext_source/handleDeliveryResponse"));
 		deliveryDTO.setAction("ACTION");
-		deliveryDTO.setRequestData(new RequestDataDTO(DeliveryType.UNDEFINED,
+		deliveryDTO.setRequestData(new RequestDataDTO(DeliveryPacketType.UNDEFINED,
 		                                              new HashMap<String, Object>() {{
 			                                              put("a", "b");
 		                                              }}));

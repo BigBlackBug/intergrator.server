@@ -1,6 +1,6 @@
 package com.icl.integrator.services;
 
-import com.icl.integrator.dto.DeliveryType;
+import com.icl.integrator.dto.DeliveryPacketType;
 import com.icl.integrator.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -198,10 +198,10 @@ public class PersistenceService {
 
 	@Transactional
 	public List<AutoDetectionPacket> findAutoDetectionPackets(
-			DeliveryType deliveryType) {
+			DeliveryPacketType deliveryPacketType) {
 		return em.createQuery(
 				"select packet from AutoDetectionPacket packet where packet.deliveryType=:deliveryType",AutoDetectionPacket.class)
-				.setParameter("deliveryType", deliveryType).getResultList();
+				.setParameter("deliveryType", deliveryPacketType).getResultList();
 	}
 
 	@Transactional

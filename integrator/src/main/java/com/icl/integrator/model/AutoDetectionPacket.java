@@ -1,6 +1,6 @@
 package com.icl.integrator.model;
 
-import com.icl.integrator.dto.DeliveryType;
+import com.icl.integrator.dto.DeliveryPacketType;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 
@@ -16,8 +16,8 @@ import java.util.List;
 public class AutoDetectionPacket extends AbstractEntity {
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "DELIVERY_TYPE")
-	private DeliveryType deliveryType;
+	@Column(name = "DELIVERY_PACKET_TYPE")
+	private DeliveryPacketType deliveryPacketType;
 
 	@Column(name = "REFERENCE_OBJECT")
 	@Type(type = "org.hibernate.type.StringClobType")
@@ -34,12 +34,12 @@ public class AutoDetectionPacket extends AbstractEntity {
 	public AutoDetectionPacket() {
 	}
 
-	public DeliveryType getDeliveryType() {
-		return deliveryType;
+	public DeliveryPacketType getDeliveryPacketType() {
+		return deliveryPacketType;
 	}
 
-	public void setDeliveryType(DeliveryType deliveryType) {
-		this.deliveryType = deliveryType;
+	public void setDeliveryPacketType(DeliveryPacketType deliveryPacketType) {
+		this.deliveryPacketType = deliveryPacketType;
 	}
 
 	public String getReferenceObject() {

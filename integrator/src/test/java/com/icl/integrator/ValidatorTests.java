@@ -72,7 +72,7 @@ public class ValidatorTests {
 		DeliveryDTO deliveryDTO = new DeliveryDTO();
 		deliveryDTO.setAction("ACTION");
 		deliveryDTO.setDestinations(null);
-		deliveryDTO.setRequestData(new RequestDataDTO(DeliveryType.INCIDENT,
+		deliveryDTO.setRequestData(new RequestDataDTO(DeliveryPacketType.INCIDENT,
 		                                              new HashMap<String, Object>() {{
 			                                              put("a", "b");
 		                                              }}));

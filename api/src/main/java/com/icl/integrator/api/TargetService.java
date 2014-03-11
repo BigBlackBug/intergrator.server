@@ -12,13 +12,6 @@ import com.icl.integrator.dto.ResponseDTO;
  */
 public interface TargetService<T> {
 
-    /**
-     * Метод обрабатывает входящие данные от интегратора.
-     * ВНИМАНИЕ, временная багофича! Для поддержки фукнциональности пинга,
-     * если requestDataDTO.empty(), то следует вернуться из метода.
-     * @param requestDataDTO - данные, пришедщие из интегратора
-     * @return
-     */
     public ResponseDTO<T> handleRequest(RequestDataDTO requestDataDTO);
 
 }

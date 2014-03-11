@@ -2,7 +2,7 @@ package com.icl.integrator.httpclient;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.DeliveryType;
+import com.icl.integrator.dto.DeliveryPacketType;
 import com.icl.integrator.dto.RequestDataDTO;
 
 import java.util.Map;
@@ -14,11 +14,11 @@ public class HttpClientUtils {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static <T> RequestDataDTO createRequestData(DeliveryType deliveryType, T data) {
+	public static <T> RequestDataDTO createRequestData(DeliveryPacketType deliveryPacketType, T data) {
 		Map<String, Object> dataMap =
 				OBJECT_MAPPER.convertValue(data, new TypeReference<Map<String, Object>>() {
 				});
-		return new RequestDataDTO(deliveryType, dataMap);
+		return new RequestDataDTO(deliveryPacketType, dataMap);
 	}
 
 }

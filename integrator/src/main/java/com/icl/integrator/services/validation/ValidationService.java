@@ -8,7 +8,7 @@ import com.github.fge.jsonschema.exceptions.ProcessingException;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.report.ProcessingReport;
-import com.icl.integrator.dto.DeliveryType;
+import com.icl.integrator.dto.DeliveryPacketType;
 import com.icl.integrator.dto.RequestDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -26,7 +26,7 @@ public class ValidationService {
 
 	private final JsonSchemaFactory jsonSchemaFactory;
 
-	private Map<DeliveryType, Validator> validatorMap = new HashMap<>();
+	private Map<DeliveryPacketType, Validator> validatorMap = new HashMap<>();
 
 	private JsonValidator integratorValidator;
 
@@ -49,17 +49,17 @@ public class ValidationService {
 			JsonSchema jsonSchema =
 					jsonSchemaFactory.getJsonSchema(schemaFile.toURI().toString());
 			integratorValidator = new JsonValidator(jsonSchema);
-			for (DeliveryType deliveryType : DeliveryType.values()) {
+			for (DeliveryPacketType deliveryPacketType : DeliveryPacketType.values()) {
 				Validator validator;
-				if (deliveryType == DeliveryType.UNDEFINED) {
+				if (deliveryPacketType == DeliveryPacketType.UNDEFINED) {
 					validator = new EmptyValidator();
 				} else {
-					String fileName = deliveryType.name().toLowerCase() + ".json";
+					String fileName = deliveryPacketType.name().toLowerCase() + ".json";
 					schemaFile = loader.getResource("classpath:/validators/" + fileName).getFile();
 					jsonSchema = jsonSchemaFactory.getJsonSchema(schemaFile.toURI().toString());
 					validator = new PacketValidator(jsonSchema);
 				}
-				validatorMap.put(deliveryType, validator);
+				validatorMap.put(deliveryPacketType, validator);
 			}
 		} catch (Exception e) {
 			throw new ValidatorException(
@@ -75,7 +75,7 @@ public class ValidationService {
 	@SuppressWarnings("unchecked")
 	public void validate(RequestDataDTO requestData)
 			throws PacketValidationException, ValidatorException {
-		validatorMap.get(requestData.getDeliveryType()).validate(requestData.getData());
+		validatorMap.get(requestData.getDeliveryPacketType()).validate(requestData.getData());
 	}
 
 	private static interface Validator<T> {

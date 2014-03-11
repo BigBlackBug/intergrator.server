@@ -264,7 +264,7 @@ public class DeliveryCreator {
 
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
 		Deliveries deliveries;
-		if (requestData.getDeliveryType() == DeliveryType.UNDEFINED) {
+		if (requestData.getDeliveryPacketType() == DeliveryPacketType.UNDEFINED) {
 			deliveries = createDeliveries(deliveryDTO, requestData, responseHandlerDescriptor);
 		} else {
 			if (deliveryDTO.getDestinations() != null) {
@@ -282,9 +282,9 @@ public class DeliveryCreator {
 	                                                DestinationDescriptor responseHandlerDescriptor)
 			throws IntegratorException {
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
-		DeliveryType deliveryType = requestData.getDeliveryType();
+		DeliveryPacketType deliveryPacketType = requestData.getDeliveryPacketType();
 		List<AutoDetectionPacket> autoDetectionPackets =
-				persistenceService.findAutoDetectionPackets(deliveryType);
+				persistenceService.findAutoDetectionPackets(deliveryPacketType);
 		if (autoDetectionPackets.isEmpty()) {
 			throw new IntegratorException("Не могу автоматически определить целевые сервисы");
 		}

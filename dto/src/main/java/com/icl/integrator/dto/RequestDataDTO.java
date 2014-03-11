@@ -11,24 +11,24 @@ import java.util.Map;
  */
 public class RequestDataDTO {
 
-	private DeliveryType deliveryType;
+	private DeliveryPacketType deliveryPacketType;
 
 	private Map<String,Object> data;
 
 	public RequestDataDTO() {
 	}
 
-	public RequestDataDTO(DeliveryType deliveryType, Map<String,Object> data) {
-		this.deliveryType = deliveryType;
+	public RequestDataDTO(DeliveryPacketType deliveryPacketType, Map<String,Object> data) {
+		this.deliveryPacketType = deliveryPacketType;
 		this.data = data;
 	}
 
-	public DeliveryType getDeliveryType() {
-		return deliveryType;
+	public DeliveryPacketType getDeliveryPacketType() {
+		return deliveryPacketType;
 	}
 
-	public void setDeliveryType(DeliveryType deliveryType) {
-		this.deliveryType = deliveryType;
+	public void setDeliveryPacketType(DeliveryPacketType deliveryPacketType) {
+		this.deliveryPacketType = deliveryPacketType;
 	}
 
 	public Object getData() {
@@ -53,7 +53,7 @@ public class RequestDataDTO {
 		if (data != null ? !data.equals(that.data) : that.data != null) {
 			return false;
 		}
-		if (deliveryType != that.deliveryType) {
+		if (deliveryPacketType != that.deliveryPacketType) {
 			return false;
 		}
 
@@ -62,7 +62,7 @@ public class RequestDataDTO {
 
 	@Override
 	public int hashCode() {
-		int result = deliveryType.hashCode();
+		int result = deliveryPacketType.hashCode();
 		result = 31 * result + (data != null ? data.hashCode() : 0);
 		return result;
 	}
