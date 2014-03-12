@@ -1,6 +1,7 @@
-package com.icl.integrator.util;
+package com.icl.integrator.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,9 +33,9 @@ public final class AddActionDTODeserializer
         JsonNode actionRegistrationNode = treeNode.get("actionRegistration");
         boolean forceRegister =
                 actionRegistrationNode.get("forceRegister").asBoolean();
-        ActionEndpointDTO action = mapper.parseActionEndpoint(
-                actionRegistrationNode.get("action"),
-                endpoint.getEndpointType());
+	    ActionEndpointDTO action = mapper.readValue(actionRegistrationNode.get("action").toString(),
+	                                                   new TypeReference<ActionEndpointDTO>() {
+	                                                   });
 //	    ActionMethod deliveryType =
 //			    mapper.readValue(actionRegistrationNode.get("deliveryType").toString(), ActionMethod.class);
         ActionRegistrationDTO actionRegistrationDTO = new ActionRegistrationDTO(action, forceRegister);

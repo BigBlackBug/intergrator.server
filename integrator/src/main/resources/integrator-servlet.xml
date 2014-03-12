@@ -77,7 +77,7 @@
 
     <!--Jackson configuration-->
     <!--<bean id="objectMapper"-->
-          <!--class="com.icl.integrator.util.IntegratorObjectMapper"/>-->
+          <!--class="com.icl.integrator.util.com.icl.integrator.deserializer.IntegratorObjectMapper"/>-->
     <bean id="jacksonMessageConverter"
           class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
         <property name="objectMapper" ref="objectMapper"/>

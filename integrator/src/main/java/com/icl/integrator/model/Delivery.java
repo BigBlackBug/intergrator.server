@@ -134,11 +134,4 @@ public class Delivery extends AbstractEntity {
 		this.responseHandlerDestination = responseHandlerDestination;
 	}
 
-//	public void setDeliveryType(DeliveryType deliveryType) {
-//		this.deliveryType = deliveryType;
-//	}
-//
-//	public DeliveryType getDeliveryType() {
-//		return deliveryType;
-//	}
 }

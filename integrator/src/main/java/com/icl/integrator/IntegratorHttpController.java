@@ -62,7 +62,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	//TODO format
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> ping(@RequestBody(
-			required = false) IntegratorPacket<Void, T> responseHandler) {
+			required = true) IntegratorPacket<Void, T> responseHandler) {
 		TypeReference<IntegratorPacket<Void, DestinationDescriptor>> type =
 				new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
 				};
@@ -85,8 +85,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
-			@RequestBody(
-					required = true)
+			@RequestBody(required = true)
 			IntegratorPacket<ServiceDestinationDescriptor, T> serviceDescriptor) {
 		TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>> type =
 				new TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>>() {
@@ -96,8 +95,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>> getServiceList(
-			@RequestBody(
-					required = false)
+			@RequestBody(required = true)
 			IntegratorPacket<Void, T> responseHandlerDescriptor) {
 		TypeReference<IntegratorPacket<Void, DestinationDescriptor>> type =
 				new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {

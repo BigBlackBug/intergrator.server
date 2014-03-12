@@ -1,4 +1,4 @@
-package com.icl.integrator.util;
+package com.icl.integrator.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -32,9 +32,8 @@ public class RawDestinationDescriptorDeserializer
 //		if (endpointDTO == null) {
 //			return result;
 //		}
-		ActionDescriptor sourceResponse = mapper.parseActionDescriptor(
-				treeNode.get("actionDescriptor"),
-				endpointDTO.getEndpointType());
+		ActionDescriptor sourceResponse = mapper.readValue(
+				treeNode.get("actionDescriptor").toString(),ActionDescriptor.class);
 		RawDestinationDescriptor result = new RawDestinationDescriptor();
 		result.setEndpoint(endpointDTO);
 		result.setActionDescriptor(sourceResponse);

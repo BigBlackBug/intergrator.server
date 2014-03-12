@@ -40,4 +40,32 @@ public class AddActionDTO<T extends ActionDescriptor> {
     public void setService(ServiceDTO service) {
         this.service = service;
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		AddActionDTO that = (AddActionDTO) o;
+
+		if (!actionRegistration.equals(that.actionRegistration)) {
+			return false;
+		}
+		if (!service.equals(that.service)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = actionRegistration.hashCode();
+		result = 31 * result + service.hashCode();
+		return result;
+	}
 }

@@ -13,6 +13,7 @@
         <module>http-client</module>
         <module>api</module>
         <module>spring-api</module>
+        <module>deserializer</module>
     </modules>
 
     <properties>

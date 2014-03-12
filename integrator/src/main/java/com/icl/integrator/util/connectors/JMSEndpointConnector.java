@@ -2,11 +2,11 @@ package com.icl.integrator.util.connectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.deserializer.IntegratorObjectMapper;
 import com.icl.integrator.dto.registration.QueueDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.JMSAction;
 import com.icl.integrator.model.JMSServiceEndpoint;
-import com.icl.integrator.util.IntegratorObjectMapper;
 
 import javax.jms.*;
 import javax.naming.Context;

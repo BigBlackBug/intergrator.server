@@ -1,5 +1,7 @@
 package com.icl.integrator.dto.registration;
 
+import com.icl.integrator.util.EndpointType;
+
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -12,11 +14,11 @@ public class HttpActionDTO extends ActionDescriptor {
     private String path;
 
     public HttpActionDTO() {
-	    super(null);
+	    super(null, EndpointType.HTTP);
     }
 
     public HttpActionDTO(String path,ActionMethod actionMethod) {
-	    super(actionMethod);
+	    super(actionMethod,EndpointType.HTTP);
         this.path = path;
     }
 
@@ -25,30 +27,35 @@ public class HttpActionDTO extends ActionDescriptor {
         return "path = "+path;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		if (!super.equals(o)) {
+			return false;
+		}
 
-        HttpActionDTO actionDTO = (HttpActionDTO) o;
+		HttpActionDTO that = (HttpActionDTO) o;
 
-        if (!path.equals(actionDTO.path)) {
-            return false;
-        }
+		if (!path.equals(that.path)) {
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public int hashCode() {
-        return path.hashCode();
-    }
+	@Override
+	public int hashCode() {
+		int result = super.hashCode();
+		result = 31 * result + path.hashCode();
+		return result;
+	}
 
-    public String getPath() {
+	public String getPath() {
         return path;
     }
 

@@ -20,21 +20,21 @@ import java.util.UUID;
  */
 public interface ExtendedSourceService extends SourceService {
 
-    public void handleDeliveryResponse(Map<String, ResponseDTO<UUID>> response);
+	public void handleDeliveryResponse(Map<String, ResponseDTO<UUID>> response);
 
-    public void handleServiceRegistrationResponse(
-            ResponseDTO<RegistrationResultDTO> response);
+	public void handleServiceRegistrationResponse(
+			ResponseDTO<RegistrationResultDTO> response);
 
-    public void handleServiceIsAvailableResponse(ResponseDTO<Boolean> response);
+	public void handleServiceIsAvailableResponse(ResponseDTO<Boolean> response);
 
-    public void handleGetServiceList(ResponseDTO<List<ServiceDTO>> response);
+	public void handleGetServiceList(ResponseDTO<List<ServiceDTO>> response);
 
-    public void handleGetSupportedActions(ResponseDTO<List<String>> response);
+	public void handleGetSupportedActions(ResponseDTO<List<String>> response);
 
-    public void handleAddAction(ResponseDTO<Void> response);
+	public void handleAddAction(ResponseDTO<Void> response);
 
-    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
-    void handleGetServiceInfo(ResponseDTO<FullServiceDTO<T, Y>> response);
+	public void handleGetServiceInfo(
+			ResponseDTO<FullServiceDTO<EndpointDescriptor, ActionDescriptor>> response);
 
 	public void handleAutoDetectionRegistration(ResponseDTO<List<ResponseDTO<Void>>> response);
 

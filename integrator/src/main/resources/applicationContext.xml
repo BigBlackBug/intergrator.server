@@ -17,5 +17,5 @@
           class="com.icl.integrator.ValidationFilter"/>
 
     <bean id="objectMapper"
-          class="com.icl.integrator.util.IntegratorObjectMapper"/>
+          class="com.icl.integrator.deserializer.IntegratorObjectMapper"/>
 </beans>

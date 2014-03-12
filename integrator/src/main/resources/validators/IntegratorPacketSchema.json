@@ -246,7 +246,7 @@
             "properties": {
                 "descriptorType": {
                     "type": "string",
-                    "enum": [ "RAW", "SERVICE" ]
+                    "enum": [ "SERVICE" ]
                 },
                 "service": {
                     "type": "string"
@@ -273,7 +273,7 @@
                     "properties": {
                         "descriptorType": {
                             "type": "string",
-                            "enum": [ "RAW", "SERVICE" ]
+                            "enum": [ "RAW" ]
                         },
                         "endpoint": {
                             "$ref": "#/definitions/endpointDTO"
@@ -290,11 +290,15 @@
             "oneOf": [
                 {
                     "type": "object",
-                    "required": ["path", "actionMethod"],
+                    "required": ["path", "actionMethod","endpointType"],
                     "additionalProperties": false,
                     "properties": {
                         "path": {
                             "type": "string"
+                        },
+                        "endpointType": {
+                            "type": "string",
+                            "enum": [ "HTTP" ]
                         },
                         "actionMethod": {
                             "type": "string",
@@ -316,9 +320,13 @@
                 },
                 {
                     "type": "object",
-                    "required": ["username", "password", "queueName", "actionMethod"],
+                    "required": ["username", "password", "queueName", "actionMethod","endpointType"],
                     "additionalProperties": false,
                     "properties": {
+                        "endpointType": {
+                            "type": "string",
+                            "enum": [ "JMS" ]
+                        },
                         "username": {
                             "type": "string"
                         },

@@ -1,5 +1,7 @@
 package com.icl.integrator.dto.registration;
 
+import com.icl.integrator.util.EndpointType;
+
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -11,8 +13,15 @@ public abstract class ActionDescriptor {
 
 	private ActionMethod actionMethod;
 
-	protected ActionDescriptor(ActionMethod actionMethod) {
+	private final EndpointType endpointType;
+
+	protected ActionDescriptor(ActionMethod actionMethod,EndpointType endpointType) {
 		this.actionMethod = actionMethod;
+		this.endpointType = endpointType;
+	}
+
+	public EndpointType getEndpointType() {
+		return endpointType;
 	}
 
 	public ActionMethod getActionMethod() {
@@ -37,12 +46,17 @@ public abstract class ActionDescriptor {
 		if (actionMethod != that.actionMethod) {
 			return false;
 		}
+		if (endpointType != that.endpointType) {
+			return false;
+		}
 
 		return true;
 	}
 
 	@Override
 	public int hashCode() {
-		return actionMethod.hashCode();
+		int result = actionMethod.hashCode();
+		result = 31 * result + endpointType.hashCode();
+		return result;
 	}
 }

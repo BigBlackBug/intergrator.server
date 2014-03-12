@@ -1,6 +1,7 @@
-package com.icl.integrator.util;
+package com.icl.integrator.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,25 +39,22 @@ public class TargetRegistrationDTODeserializer extends
         dto.setEndpoint(endpoint);
 
         List<ActionRegistrationDTO<ActionDescriptor>> actions =
-                getActions(treeNode.get("actionRegistrations"), endpoint.getEndpointType());
+                getActions(treeNode.get("actionRegistrations"));
         dto.setActionRegistrations(actions);
         return dto;
     }
 
     private <T extends ActionDescriptor>
-    List<ActionRegistrationDTO<T>> getActions(
-            JsonNode actions, EndpointType endpointType) throws IOException {
+    List<ActionRegistrationDTO<T>> getActions(JsonNode actions) throws IOException {
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         List<ActionRegistrationDTO<T>> result = new ArrayList<>();
         int size = actions.size();
         for (int i = 0; i < size; i++) {
             JsonNode node = actions.get(i);
             boolean forceRegister = node.get("forceRegister").asBoolean();
-            ActionEndpointDTO<T> action = mapper.parseActionEndpoint(
-                    node.get("action"), endpointType);
-//	        DeliveryType deliveryType =
-//			        mapper.readValue(node.get("deliveryType").toString(), DeliveryType.class);
-	        result.add(new ActionRegistrationDTO<>(action, forceRegister));
+            ActionEndpointDTO action = mapper.readValue(
+                    node.get("action").toString(),new TypeReference<ActionEndpointDTO>(){});
+	        result.add(new ActionRegistrationDTO(action, forceRegister));
         }
         return result;
     }

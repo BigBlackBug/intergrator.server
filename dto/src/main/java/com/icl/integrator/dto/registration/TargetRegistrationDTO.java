@@ -103,9 +103,7 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> {
 	public int hashCode() {
 		int result = serviceName.hashCode();
 		result = 31 * result + endpoint.hashCode();
-		result =
-				31 * result + (actionRegistrations != null ? actionRegistrations
-						.hashCode() : 0);
+		result = 31 * result + (actionRegistrations != null ? actionRegistrations.hashCode() : 0);
 		return result;
 	}
 

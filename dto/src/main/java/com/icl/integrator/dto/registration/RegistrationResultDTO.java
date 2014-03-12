@@ -39,4 +39,32 @@ public class RegistrationResultDTO {
 			Map<String, ResponseDTO<Void>> actionRegistrationResponses) {
 		this.actionRegistrationResponses = actionRegistrationResponses;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		RegistrationResultDTO that = (RegistrationResultDTO) o;
+
+		if (!actionRegistrationResponses.equals(that.actionRegistrationResponses)) {
+			return false;
+		}
+		if (!serviceName.equals(that.serviceName)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = serviceName.hashCode();
+		result = 31 * result + actionRegistrationResponses.hashCode();
+		return result;
+	}
 }

@@ -37,4 +37,32 @@ public class RegistrationDestinationDescriptor {
 	public void setForceRegister(boolean forceRegister) {
 		this.forceRegister = forceRegister;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		RegistrationDestinationDescriptor that = (RegistrationDestinationDescriptor) o;
+
+		if (forceRegister != that.forceRegister) {
+			return false;
+		}
+		if (!destinationDescriptor.equals(that.destinationDescriptor)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = destinationDescriptor.hashCode();
+		result = 31 * result + (forceRegister ? 1 : 0);
+		return result;
+	}
 }

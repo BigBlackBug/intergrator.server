@@ -41,7 +41,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public
     @ResponseBody
     <T extends DestinationDescriptor>
-    ResponseDTO<Boolean> ping(@RequestBody(required = false)
+    ResponseDTO<Boolean> ping(@RequestBody(required = true)
                  IntegratorPacket<Void, T> responseHandlerDescriptor);
 
     @Override
@@ -67,7 +67,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @ResponseBody
     <T extends DestinationDescriptor>
     ResponseDTO<List<ServiceDTO>> getServiceList(
-            @RequestBody(required = false)
+            @RequestBody(required = true)
             IntegratorPacket<Void, T> responseHandlerDescriptor);
 
     @Override

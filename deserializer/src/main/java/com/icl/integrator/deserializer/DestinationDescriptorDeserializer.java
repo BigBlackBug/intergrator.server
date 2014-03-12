@@ -1,4 +1,4 @@
-package com.icl.integrator.util;
+package com.icl.integrator.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

@@ -26,6 +26,11 @@
 
         <dependency>
             <groupId>com.icl.integrator</groupId>
+            <artifactId>deserializer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.icl.integrator</groupId>
             <artifactId>spring-api</artifactId>
             <version>${project.version}</version>
         </dependency>

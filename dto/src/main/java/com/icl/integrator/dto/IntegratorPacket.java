@@ -3,11 +3,9 @@ package com.icl.integrator.dto;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 
 /**
- * Created with IntelliJ IDEA.
- * User: e.shahmaev
- * Date: 24.01.14
- * Time: 13:07
- * To change this template use File | Settings | File Templates.
+ * Универсальный пакет, принимаемый интегратором.
+ * Если поле responseHandlerDescriptor установлено,
+ * то по указанному в нём адресу будет выслан ответ от интегратора.
  */
 public class IntegratorPacket<T, Y extends DestinationDescriptor> {
 
@@ -35,7 +33,13 @@ public class IntegratorPacket<T, Y extends DestinationDescriptor> {
         this.packet = packet;
     }
 
-    public IntegratorMethod getMethod() {
+	public IntegratorPacket(IntegratorMethod method, T packet, Y responseHandlerDescriptor) {
+		this.method = method;
+		this.packet = packet;
+		this.responseHandlerDescriptor = responseHandlerDescriptor;
+	}
+
+	public IntegratorMethod getMethod() {
         return method;
     }
 

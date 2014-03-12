@@ -200,8 +200,8 @@ public class PersistenceService {
 	public List<AutoDetectionPacket> findAutoDetectionPackets(
 			DeliveryPacketType deliveryPacketType) {
 		return em.createQuery(
-				"select packet from AutoDetectionPacket packet where packet.deliveryType=:deliveryType",AutoDetectionPacket.class)
-				.setParameter("deliveryType", deliveryPacketType).getResultList();
+				"select packet from AutoDetectionPacket packet where packet.deliveryPacketType=:deliveryPacketType",AutoDetectionPacket.class)
+				.setParameter("deliveryPacketType", deliveryPacketType).getResultList();
 	}
 
 	@Transactional

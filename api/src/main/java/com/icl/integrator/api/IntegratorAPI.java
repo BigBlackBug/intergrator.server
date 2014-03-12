@@ -19,25 +19,34 @@ import java.util.UUID;
  */
 public interface IntegratorAPI {
 
-    public
-    <T extends DestinationDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
-            IntegratorPacket<DeliveryDTO, T> delivery);
+	/**
+	 * Основной метод, используемый для доста
+	 * @param delivery
+	 * @param <T>
+	 * @return Карта вида (название сервиса)->(ID запроса или ошибка)
+	 */
+    public <T extends DestinationDescriptor>
+    ResponseDTO<Map<String, ResponseDTO<UUID>>>
+    deliver(IntegratorPacket<DeliveryDTO, T> delivery);
 
-    public <T extends DestinationDescriptor> ResponseDTO<Boolean>
+    public <T extends DestinationDescriptor>
+    ResponseDTO<Boolean>
     ping(IntegratorPacket<Void, T> packet);
 
     public <T extends ActionDescriptor, Y extends DestinationDescriptor>
-    ResponseDTO<RegistrationResultDTO> registerService(
-		    IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
+    ResponseDTO<RegistrationResultDTO>
+    registerService(IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
 
     public <T extends DestinationDescriptor>
-    ResponseDTO<Boolean> isAvailable(IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO);
+    ResponseDTO<Boolean>
+    isAvailable(IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO);
 
-    public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>>
+    public <T extends DestinationDescriptor>
+    ResponseDTO<List<ServiceDTO>>
     getServiceList(IntegratorPacket<Void, T> packet);
 
-    public <T extends DestinationDescriptor> ResponseDTO<List<String>>
+    public <T extends DestinationDescriptor>
+    ResponseDTO<List<String>>
     getSupportedActions(IntegratorPacket<ServiceDTO, T> serviceDTO);
 
     public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,
@@ -45,9 +54,11 @@ public interface IntegratorAPI {
     ResponseDTO<FullServiceDTO<EDType, ADType>>
     getServiceInfo(IntegratorPacket<ServiceDTO, DDType> serviceDTO);
 
-    public <T extends DestinationDescriptor,Y extends ActionDescriptor> ResponseDTO<Void>
+    public <T extends DestinationDescriptor,Y extends ActionDescriptor>
+    ResponseDTO<Void>
     addAction(IntegratorPacket<AddActionDTO<Y>, T> actionDTO);
 
-	public <T extends DestinationDescriptor,Y> ResponseDTO<List<ResponseDTO<Void>>> registerAutoDetection(
-			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);
+	public <T extends DestinationDescriptor,Y>
+	ResponseDTO<List<ResponseDTO<Void>>>
+	registerAutoDetection(IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);
 }

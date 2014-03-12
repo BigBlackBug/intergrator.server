@@ -98,10 +98,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         return deliver(new IntegratorPacket<>(delivery));
     }
 
-    //TODO format
     @Override
-    public <T extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
-            IntegratorPacket<DeliveryDTO, T> delivery) {
+    public <T extends DestinationDescriptor>
+    ResponseDTO<Map<String, ResponseDTO<UUID>>>
+    deliver(IntegratorPacket<DeliveryDTO, T> delivery) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "deliver", IntegratorPacket.class);
         ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<UUID>>>>
@@ -253,8 +253,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
                                                Class<?>... parameterTypes) {
         Method m = null;
         try {
-            m = getClass().getInterfaces()[0].getMethod(
-                    methodName, parameterTypes);
+            m = getClass().getInterfaces()[0].getMethod(methodName, parameterTypes);
         } catch (NoSuchMethodException e) {
         }
         RequestMapping annotation = m.getAnnotation(RequestMapping.class);

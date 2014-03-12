@@ -26,4 +26,27 @@ public class ResponseFromIntegratorDTO<T> {
     public void setResponse(T response) {
         this.response = response;
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		ResponseFromIntegratorDTO that = (ResponseFromIntegratorDTO) o;
+
+		if (!response.equals(that.response)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return response.hashCode();
+	}
 }

@@ -45,4 +45,32 @@ public class ServiceDTO {
     public String toString() {
         return "type: "+endpointType+" service_name:"+serviceName;
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		ServiceDTO that = (ServiceDTO) o;
+
+		if (endpointType != that.endpointType) {
+			return false;
+		}
+		if (!serviceName.equals(that.serviceName)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = serviceName.hashCode();
+		result = 31 * result + endpointType.hashCode();
+		return result;
+	}
 }

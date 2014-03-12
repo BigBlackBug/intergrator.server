@@ -88,9 +88,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	<T extends EndpointDescriptor, Y extends ActionDescriptor>
 	void handleGetServiceInfo(@RequestBody(required = true)
-	                          ResponseDTO<FullServiceDTO<T, Y>> response);
+	                          ResponseDTO<FullServiceDTO<EndpointDescriptor, ActionDescriptor>> response);
 
 	@Override
 	@RequestMapping(value = "/handleResponseFromTarget",

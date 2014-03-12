@@ -435,6 +435,20 @@ public class AppTests {
 	}
 
 	@Test
+	public void testaddActionDes() throws Exception {
+		AddActionDTO<ActionDescriptor> dto = new AddActionDTO<>();
+		dto.setService(new ServiceDTO("SERVICE2", EndpointType.HTTP));
+		dto.setActionRegistration(new ActionRegistrationDTO<>(
+				new ActionEndpointDTO<ActionDescriptor>("SOURCE_SERVICE2_ACTION", new HttpActionDTO(
+						"/ext_source2/handleResponseFromTarget",ActionMethod.HANDLE_RESPONSE_FROM_TARGET)), false));
+		String s = mapper.writeValueAsString(dto);
+		AddActionDTO
+				serviceDTO1 =
+				mapper.readValue(s, AddActionDTO.class);
+		Assert.assertEquals(dto, serviceDTO1);
+	}
+
+	@Test
 	public void testDeserializer() throws Exception {
 		RawDestinationDescriptor
 				serviceDTO = new RawDestinationDescriptor();
