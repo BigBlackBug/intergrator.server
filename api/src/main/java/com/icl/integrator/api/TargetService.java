@@ -12,6 +12,6 @@ import com.icl.integrator.dto.ResponseDTO;
  */
 public interface TargetService<T> {
 
-    public ResponseDTO<T> handleRequest(RequestDataDTO requestDataDTO);
+    public ResponseDTO<T> handleDelivery(RequestDataDTO requestDataDTO);
 
 }

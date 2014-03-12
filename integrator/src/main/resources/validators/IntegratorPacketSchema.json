@@ -303,7 +303,7 @@
                         "actionMethod": {
                             "type": "string",
                             "enum": [
-                                "GENERAL_DELIVERY",
+                                "HANDLE_DELIVERY",
                                 "HANDLE_RESPONSE_FROM_TARGET",
                                 "HANDLE_DELIVERY_RESPONSE",
                                 "HANDLE_SERVER_REGISTRATION_RESPONSE",
@@ -339,7 +339,7 @@
                         "actionMethod": {
                             "type": "string",
                             "enum": [
-                                "GENERAL_DELIVERY",
+                                "HANDLE_DELIVERY",
                                 "HANDLE_RESPONSE_FROM_TARGET",
                                 "HANDLE_DELIVERY_RESPONSE",
                                 "HANDLE_SERVER_REGISTRATION_RESPONSE",

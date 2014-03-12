@@ -30,7 +30,7 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 
 	static {
 		types = new HashMap<>();
-		types.put(ActionMethod.GENERAL_DELIVERY, new ParameterizedTypeReference<RequestDataDTO>() {
+		types.put(ActionMethod.HANDLE_DELIVERY, new ParameterizedTypeReference<RequestDataDTO>() {
 		}.getType());
 		types.put(ActionMethod.HANDLE_RESPONSE_FROM_TARGET,
 		          new ParameterizedTypeReference<ResponseDTO<ResponseFromTargetDTO>>() {

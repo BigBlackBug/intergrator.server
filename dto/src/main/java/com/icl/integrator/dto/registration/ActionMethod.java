@@ -1,7 +1,7 @@
 package com.icl.integrator.dto.registration;
 
 public enum ActionMethod {
-	GENERAL_DELIVERY,
+	HANDLE_DELIVERY,
 	HANDLE_RESPONSE_FROM_TARGET,
 	HANDLE_DELIVERY_RESPONSE,
 	HANDLE_SERVER_REGISTRATION_RESPONSE,

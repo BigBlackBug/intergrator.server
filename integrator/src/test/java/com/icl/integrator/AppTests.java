@@ -406,8 +406,8 @@ public class AppTests {
 		//----------------------------------------------------------------------
 		ActionEndpointDTO<HttpActionDTO> actionDTO = new ActionEndpointDTO<>();
 
-		HttpActionDTO actionDescriptor = new HttpActionDTO("/destination/handleRequest",
-		                                                   ActionMethod.GENERAL_DELIVERY);
+		HttpActionDTO actionDescriptor = new HttpActionDTO("/destination/handleDelivery",
+		                                                   ActionMethod.HANDLE_DELIVERY);
 
 		actionDTO.setActionDescriptor(actionDescriptor);
 		actionDTO.setActionName("ACTION");

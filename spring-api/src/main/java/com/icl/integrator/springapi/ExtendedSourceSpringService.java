@@ -33,7 +33,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleDeliveryResponse(@RequestBody(required = true)
+	void handleDeliveryResponse(@RequestBody
 	                            Map<String, ResponseDTO<UUID>> response);
 
 	@Override
@@ -43,7 +43,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleServiceRegistrationResponse(
-			@RequestBody(required = true)
+			@RequestBody
 			ResponseDTO<RegistrationResultDTO> response);
 
 	@Override
@@ -52,7 +52,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleServiceIsAvailableResponse(@RequestBody(required = true)
+	void handleServiceIsAvailableResponse(@RequestBody
 	                                      ResponseDTO<Boolean> response);
 
 	@Override
@@ -61,7 +61,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = RequestMethod.POST)
 	public
 	@ResponseBody
-	void handleGetServiceList(@RequestBody(required = true)
+	void handleGetServiceList(@RequestBody
 	                          ResponseDTO<List<ServiceDTO>> response);
 
 	@Override
@@ -70,7 +70,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleGetSupportedActions(@RequestBody(required = true)
+	void handleGetSupportedActions(@RequestBody
 	                               ResponseDTO<List<String>> response);
 
 	@Override
@@ -79,7 +79,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleAddAction(@RequestBody(required = true) ResponseDTO
+	void handleAddAction(@RequestBody ResponseDTO
 			                     response);
 
 	@Override
@@ -88,7 +88,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleGetServiceInfo(@RequestBody(required = true)
+	void handleGetServiceInfo(@RequestBody
 	                          ResponseDTO<FullServiceDTO<EndpointDescriptor, ActionDescriptor>> response);
 
 	@Override
@@ -97,6 +97,6 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleResponseFromTarget(@RequestBody(required = true)
+	void handleResponseFromTarget(@RequestBody
 	                              ResponseDTO<ResponseFromTargetDTO> responseDTO);
 }

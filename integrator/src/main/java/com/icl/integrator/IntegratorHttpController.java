@@ -50,7 +50,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	@Override
 	public <T extends DestinationDescriptor>
 	ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
-			@RequestBody(required = true)
+			@RequestBody
 			IntegratorPacket<DeliveryDTO, T> delivery) {
 		TypeReference<IntegratorPacket<DeliveryDTO, DestinationDescriptor>>
 				type =
@@ -61,8 +61,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	//TODO format
 	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<Boolean> ping(@RequestBody(
-			required = true) IntegratorPacket<Void, T> responseHandler) {
+	public <T extends DestinationDescriptor> ResponseDTO<Boolean> ping(@RequestBody IntegratorPacket<Void, T> responseHandler) {
 		TypeReference<IntegratorPacket<Void, DestinationDescriptor>> type =
 				new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
 				};
@@ -71,8 +70,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	@Override
 	public <T extends ActionDescriptor, Y extends DestinationDescriptor> ResponseDTO<RegistrationResultDTO> registerService(
-			@RequestBody(
-					required = true)
+			@RequestBody
 			IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
 		TypeReference<IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>, DestinationDescriptor>>
 				type =
@@ -85,7 +83,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
-			@RequestBody(required = true)
+			@RequestBody
 			IntegratorPacket<ServiceDestinationDescriptor, T> serviceDescriptor) {
 		TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>> type =
 				new TypeReference<IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>>() {
@@ -95,7 +93,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>> getServiceList(
-			@RequestBody(required = true)
+			@RequestBody
 			IntegratorPacket<Void, T> responseHandlerDescriptor) {
 		TypeReference<IntegratorPacket<Void, DestinationDescriptor>> type =
 				new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
@@ -106,8 +104,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<List<String>> getSupportedActions(
-			@RequestBody(
-					required = true)
+			@RequestBody
 			IntegratorPacket<ServiceDTO, T> serviceDTO) {
 
 		TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>
@@ -121,8 +118,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	@Override
 	public <T extends DestinationDescriptor,Y extends ActionDescriptor> ResponseDTO<Void> addAction(
-			@RequestBody(
-					required = true)
+			@RequestBody
 			IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {
 		TypeReference<IntegratorPacket<AddActionDTO<Y>, DestinationDescriptor>>
 				type =
@@ -136,7 +132,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 			ADType extends ActionDescriptor,
 			DDType extends DestinationDescriptor>
 	ResponseDTO<FullServiceDTO<EDType, ADType>>
-	getServiceInfo(@RequestBody(required = true)
+	getServiceInfo(@RequestBody
 	               IntegratorPacket<ServiceDTO, DDType> serviceDTO) {
 		TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>
 				type =
@@ -149,7 +145,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	@Override
 	public <T extends DestinationDescriptor, Y>
 	ResponseDTO<List<ResponseDTO<Void>>> registerAutoDetection(
-			@RequestBody(required = true)
+			@RequestBody
 			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO) {
 		TypeReference<IntegratorPacket<AutoDetectionRegistrationDTO<Y>, DestinationDescriptor>>
 				type =

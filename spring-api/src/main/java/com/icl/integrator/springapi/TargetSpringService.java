@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public interface TargetSpringService<T> extends TargetService<T> {
 
 	@Override
-	@RequestMapping(value = "/handleRequest",
+	@RequestMapping(value = "/handleDelivery",
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
 	ResponseDTO<T>
-	handleRequest(@RequestBody(required = true) RequestDataDTO requestDataDTO);
+	handleDelivery(@RequestBody RequestDataDTO requestDataDTO);
 }

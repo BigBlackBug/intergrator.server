@@ -52,7 +52,7 @@ public class DeliveryBootstrap implements
 			delivery.setRequestDate(new Date());
 			delivery.setDeliveryStatus(DeliveryStatus.ACCEPTED);
 			delivery = persistenceService.saveOrUpdate(delivery);
-			if (delivery.getAction().getActionMethod() == ActionMethod.GENERAL_DELIVERY) {
+			if (delivery.getAction().getActionMethod() == ActionMethod.HANDLE_DELIVERY) {
 				DefaultErrorConverter errorConverter = new DefaultErrorConverter();
 				DefaultDeliverySuccessConverter successConverter =
 						new DefaultDeliverySuccessConverter(delivery);

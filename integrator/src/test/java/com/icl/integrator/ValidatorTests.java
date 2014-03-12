@@ -50,7 +50,7 @@ public class ValidatorTests {
 
 				);
 		dd.setActionDescriptor(
-				new HttpActionDTO("/ext_source/handleGetServiceList", ActionMethod.GENERAL_DELIVERY));
+				new HttpActionDTO("/ext_source/handleGetServiceList", ActionMethod.HANDLE_DELIVERY));
 		IntegratorPacket p = new IntegratorPacket(dd);
 		serialize(p);
 	}

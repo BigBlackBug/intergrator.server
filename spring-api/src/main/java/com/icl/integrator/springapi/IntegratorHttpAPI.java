@@ -33,7 +33,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public
     @ResponseBody  <T extends DestinationDescriptor>
     ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
-            @RequestBody(required = true)
+            @RequestBody
             IntegratorPacket<DeliveryDTO, T> delivery);
 
     @Override
@@ -41,7 +41,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public
     @ResponseBody
     <T extends DestinationDescriptor>
-    ResponseDTO<Boolean> ping(@RequestBody(required = true)
+    ResponseDTO<Boolean> ping(@RequestBody
                  IntegratorPacket<Void, T> responseHandlerDescriptor);
 
     @Override
@@ -50,7 +50,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @ResponseBody
     <T extends ActionDescriptor, Y extends DestinationDescriptor>
     ResponseDTO<RegistrationResultDTO> registerService(
-		    @RequestBody(required = true)
+		    @RequestBody
 		    IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
 
     @Override
@@ -58,7 +58,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public
     @ResponseBody
     <T extends DestinationDescriptor>
-    ResponseDTO<Boolean> isAvailable(@RequestBody(required = true)
+    ResponseDTO<Boolean> isAvailable(@RequestBody
                                      IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO);
 
     @Override
@@ -67,7 +67,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @ResponseBody
     <T extends DestinationDescriptor>
     ResponseDTO<List<ServiceDTO>> getServiceList(
-            @RequestBody(required = true)
+            @RequestBody
             IntegratorPacket<Void, T> responseHandlerDescriptor);
 
     @Override
@@ -76,14 +76,14 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @ResponseBody
     <T extends DestinationDescriptor>
     ResponseDTO<List<String>> getSupportedActions(
-            @RequestBody(required = true)
+            @RequestBody
             IntegratorPacket<ServiceDTO, T> serviceDTO);
 
     @Override
     @RequestMapping(value = "addAction", method = RequestMethod.POST)
     @ResponseBody
     <T extends DestinationDescriptor,Y extends ActionDescriptor>
-    ResponseDTO<Void> addAction(@RequestBody(required = true)
+    ResponseDTO<Void> addAction(@RequestBody
                                 IntegratorPacket<AddActionDTO<Y>, T> actionDTO);
 
     @Override
@@ -91,7 +91,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,
             DDType extends DestinationDescriptor>
     ResponseDTO<FullServiceDTO<EDType, ADType>> getServiceInfo(
-            @RequestBody(required = true)
+            @RequestBody
             IntegratorPacket<ServiceDTO, DDType> serviceDTO);
 
 	@Override
@@ -100,6 +100,6 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
 	@ResponseBody
 	<T extends DestinationDescriptor, Y>
 	ResponseDTO<List<ResponseDTO<Void>>> registerAutoDetection(
-			@RequestBody(required = true)
+			@RequestBody
 			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);
 }
