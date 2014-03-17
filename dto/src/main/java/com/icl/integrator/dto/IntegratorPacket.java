@@ -2,12 +2,14 @@ package com.icl.integrator.dto;
 
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 
+import java.io.Serializable;
+
 /**
  * Универсальный пакет, принимаемый интегратором.
  * Если поле responseHandlerDescriptor установлено,
  * то по указанному в нём адресу будет выслан ответ от интегратора.
  */
-public class IntegratorPacket<T, Y extends DestinationDescriptor> {
+public class IntegratorPacket<T, Y extends DestinationDescriptor> implements Serializable {
 
     private T packet;
 

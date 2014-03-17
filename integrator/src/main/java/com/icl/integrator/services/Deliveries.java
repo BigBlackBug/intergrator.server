@@ -8,7 +8,7 @@ import java.util.*;
 
 class Deliveries {
 
-	private final Map<String, ResponseDTO<UUID>> errorMap = new HashMap<>();
+	private final Map<String, ResponseDTO<String>> errorMap = new HashMap<>();
 
 	private final List<Delivery> deliveries = new ArrayList<>();
 
@@ -18,16 +18,17 @@ class Deliveries {
 	public boolean isEmpty(){
 		return deliveries.isEmpty();
 	}
+
 	public void addError(String serviceName, Exception ex) {
 		ErrorDTO error = new ErrorDTO(ex);
-		errorMap.put(serviceName, new ResponseDTO<UUID>(error));
+		errorMap.put(serviceName, new ResponseDTO<String>(error));
 	}
 
 	public void addDelivery(Delivery delivery) {
 		deliveries.add(delivery);
 	}
 
-	public Map<String, ResponseDTO<UUID>> getErrorMap() {
+	public Map<String, ResponseDTO<String>> getErrorMap() {
 		return errorMap;
 	}
 

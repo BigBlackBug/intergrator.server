@@ -55,7 +55,7 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 		          }.getType());
 		types.put(ActionMethod.HANDLE_GET_SERVICE_INFO,
 		          new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<EndpointDescriptor, ActionDescriptor>>>() {
-		          }.getType());              //TODO TETS
+		          }.getType());
 		types.put(ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE,
 		          new ParameterizedTypeReference<ResponseDTO<List<ResponseDTO<Void>>>>() {
 		          }.getType());

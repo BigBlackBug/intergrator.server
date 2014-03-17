@@ -2,6 +2,7 @@ package com.icl.integrator.dto;
 
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  * Time: 9:20
  * To change this template use File | Settings | File Templates.
  */
-public class DeliveryDTO {
+public class DeliveryDTO implements Serializable{
 
 	private DestinationDescriptor responseHandlerDescriptor;
 

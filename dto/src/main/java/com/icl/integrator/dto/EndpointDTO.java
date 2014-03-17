@@ -1,9 +1,11 @@
 package com.icl.integrator.dto;
 
 import com.icl.integrator.dto.source.EndpointDescriptor;
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.dto.util.EndpointType;
 
-public class EndpointDTO<T extends EndpointDescriptor> {
+import java.io.Serializable;
+
+public class EndpointDTO<T extends EndpointDescriptor> implements Serializable {
 
     private EndpointType endpointType;
 

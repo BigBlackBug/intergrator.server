@@ -2,6 +2,8 @@ package com.icl.integrator.dto.registration;
 
 import com.icl.integrator.dto.ServiceDTO;
 
+import java.io.Serializable;
+
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -9,7 +11,7 @@ import com.icl.integrator.dto.ServiceDTO;
  * Time: 16:13
  * To change this template use File | Settings | File Templates.
  */
-public class AddActionDTO<T extends ActionDescriptor> {
+public class AddActionDTO<T extends ActionDescriptor> implements Serializable {
 
     private ActionRegistrationDTO<T> actionRegistration;
 

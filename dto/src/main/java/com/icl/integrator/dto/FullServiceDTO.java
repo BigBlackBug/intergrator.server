@@ -4,6 +4,7 @@ import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class FullServiceDTO<T extends EndpointDescriptor,
-		Y extends ActionDescriptor> {
+		Y extends ActionDescriptor> implements Serializable {
 
 	private String serviceName;
 

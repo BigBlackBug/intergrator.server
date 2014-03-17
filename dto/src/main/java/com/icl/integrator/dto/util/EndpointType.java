@@ -1,4 +1,4 @@
-package com.icl.integrator.util;
+package com.icl.integrator.dto.util;
 
 /**
  * Created with IntelliJ IDEA.

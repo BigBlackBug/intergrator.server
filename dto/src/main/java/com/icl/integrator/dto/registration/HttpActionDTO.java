@@ -1,6 +1,8 @@
 package com.icl.integrator.dto.registration;
 
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.dto.util.EndpointType;
+
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,7 +11,7 @@ import com.icl.integrator.util.EndpointType;
  * Time: 11:04
  * To change this template use File | Settings | File Templates.
  */
-public class HttpActionDTO extends ActionDescriptor {
+public class HttpActionDTO extends ActionDescriptor implements Serializable {
 
     private String path;
 

@@ -1,8 +1,9 @@
 package com.icl.integrator.dto;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class ResponseFromTargetDTO {
+public class ResponseFromTargetDTO implements Serializable {
 
     private ResponseDTO result;
 

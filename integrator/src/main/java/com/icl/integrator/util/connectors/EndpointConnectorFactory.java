@@ -12,7 +12,7 @@ import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
 import com.icl.integrator.services.EndpointResolverService;
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.util.IntegratorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

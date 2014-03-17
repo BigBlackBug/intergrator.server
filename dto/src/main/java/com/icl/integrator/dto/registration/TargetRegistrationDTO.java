@@ -2,6 +2,7 @@ package com.icl.integrator.dto.registration;
 
 import com.icl.integrator.dto.EndpointDTO;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  * Time: 14:47
  * To change this template use File | Settings | File Templates.
  */
-public class TargetRegistrationDTO<T extends ActionDescriptor> {
+public class TargetRegistrationDTO<T extends ActionDescriptor> implements Serializable {
 
 	private String serviceName;
 

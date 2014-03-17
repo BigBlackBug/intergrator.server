@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.HttpActionDTO;
 import com.icl.integrator.dto.registration.QueueDTO;
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.dto.util.EndpointType;
 
 import java.io.IOException;
 

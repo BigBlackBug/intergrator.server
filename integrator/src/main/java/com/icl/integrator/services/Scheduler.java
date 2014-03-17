@@ -6,7 +6,7 @@ import com.icl.integrator.model.DeliverySettings;
 import com.icl.integrator.model.DeliveryStatus;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
-import com.icl.integrator.util.Utils;
+import com.icl.integrator.dto.util.Utils;
 import com.icl.integrator.util.connectors.ConnectionException;
 import com.icl.integrator.util.connectors.EndpointConnectorExceptions;
 import org.apache.commons.logging.Log;

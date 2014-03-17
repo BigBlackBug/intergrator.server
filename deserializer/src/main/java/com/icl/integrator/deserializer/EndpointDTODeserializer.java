@@ -11,7 +11,7 @@ import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.dto.util.EndpointType;
 
 import java.io.IOException;
 import java.util.Map;

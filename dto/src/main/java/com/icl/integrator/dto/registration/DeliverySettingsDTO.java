@@ -1,9 +1,11 @@
 package com.icl.integrator.dto.registration;
 
+import java.io.Serializable;
+
 /**
  * Created by BigBlackBug on 2/11/14.
  */
-public class DeliverySettingsDTO {
+public class DeliverySettingsDTO implements Serializable {
 
 	private int retryNumber;
 

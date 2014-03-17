@@ -8,7 +8,6 @@ import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,12 +20,12 @@ public interface IntegratorAPI {
 
 	/**
 	 * Основной метод, используемый для доста
+	 *
 	 * @param delivery
-	 * @param <T>
 	 * @return Карта вида (название сервиса)->(ID запроса или ошибка)
 	 */
     public <T extends DestinationDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<UUID>>>
+    ResponseDTO<Map<String, ResponseDTO<String>>>
     deliver(IntegratorPacket<DeliveryDTO, T> delivery);
 
     public <T extends DestinationDescriptor>

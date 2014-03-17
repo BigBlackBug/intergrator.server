@@ -9,7 +9,7 @@ import com.icl.integrator.dto.registration.HttpActionDTO;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.services.validation.PacketValidationException;
 import com.icl.integrator.services.validation.ValidationService;
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.dto.util.EndpointType;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

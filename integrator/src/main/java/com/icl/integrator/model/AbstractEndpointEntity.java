@@ -1,6 +1,6 @@
 package com.icl.integrator.model;
 
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.dto.util.EndpointType;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;

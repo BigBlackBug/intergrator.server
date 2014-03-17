@@ -1,5 +1,7 @@
 package com.icl.integrator.dto.destination;
 
+import java.io.Serializable;
+
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -7,9 +9,9 @@ package com.icl.integrator.dto.destination;
  * Time: 16:01
  * To change this template use File | Settings | File Templates.
  */
-public abstract class DestinationDescriptor {
+public abstract class DestinationDescriptor implements Serializable {
 
-    private final DescriptorType descriptorType;
+    private DescriptorType descriptorType;
 
     protected DestinationDescriptor(DescriptorType descriptorType) {
         this.descriptorType = descriptorType;

@@ -2,12 +2,13 @@ package com.icl.integrator.dto.registration;
 
 import com.icl.integrator.dto.DeliveryPacketType;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by BigBlackBug on 2/12/14.
  */
-public class AutoDetectionRegistrationDTO<T> {
+public class AutoDetectionRegistrationDTO<T> implements Serializable {
 
 	private DeliveryPacketType deliveryPacketType;
 

@@ -1,6 +1,8 @@
 package com.icl.integrator.dto;
 
-import com.icl.integrator.util.Utils;
+import com.icl.integrator.dto.util.Utils;
+
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,7 +11,7 @@ import com.icl.integrator.util.Utils;
  * Time: 12:51
  * To change this template use File | Settings | File Templates.
  */
-public class ErrorDTO {
+public class ErrorDTO implements Serializable {
 
 	private String errorMessage;
 

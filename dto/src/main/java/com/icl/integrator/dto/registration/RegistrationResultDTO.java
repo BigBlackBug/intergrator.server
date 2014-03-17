@@ -2,12 +2,13 @@ package com.icl.integrator.dto.registration;
 
 import com.icl.integrator.dto.ResponseDTO;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Created by BigBlackBug on 3/6/14.
  */
-public class RegistrationResultDTO {
+public class RegistrationResultDTO implements Serializable {
 
 	private String serviceName;
 

@@ -20,7 +20,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -93,21 +92,21 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         return getServiceInfo(new IntegratorPacket<>(serviceDTO));
     }
 
-    public ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
+    public ResponseDTO<Map<String, ResponseDTO<String>>> deliver(
             DeliveryDTO delivery) {
         return deliver(new IntegratorPacket<>(delivery));
     }
 
     @Override
     public <T extends DestinationDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<UUID>>>
+    ResponseDTO<Map<String, ResponseDTO<String>>>
     deliver(IntegratorPacket<DeliveryDTO, T> delivery) {
         HttpMethodDescriptor methodPair = getMethodPath(
                 "deliver", IntegratorPacket.class);
-        ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<UUID>>>>
+        ParameterizedTypeReference<ResponseDTO<Map<String, ResponseDTO<String>>>>
                 type =
                 new ParameterizedTypeReference<ResponseDTO<Map<String,
-                        ResponseDTO<UUID>>>>() {
+                        ResponseDTO<String>>>>() {
                 };
         try {
             return sendRequest(delivery, type, methodPair);

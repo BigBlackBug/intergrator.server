@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,9 +31,9 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @RequestMapping(value = "deliver", method = RequestMethod.POST)
     public
     @ResponseBody  <T extends DestinationDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
-            @RequestBody
-            IntegratorPacket<DeliveryDTO, T> delivery);
+    ResponseDTO<Map<String, ResponseDTO<String>>> deliver(
+		    @RequestBody
+		    IntegratorPacket<DeliveryDTO, T> delivery);
 
     @Override
     @RequestMapping(value = "ping", method = RequestMethod.POST)

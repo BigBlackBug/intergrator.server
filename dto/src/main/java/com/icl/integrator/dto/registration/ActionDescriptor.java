@@ -1,6 +1,8 @@
 package com.icl.integrator.dto.registration;
 
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.dto.util.EndpointType;
+
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,11 +11,11 @@ import com.icl.integrator.util.EndpointType;
  * Time: 11:04
  * To change this template use File | Settings | File Templates.
  */
-public abstract class ActionDescriptor {
+public abstract class ActionDescriptor implements Serializable {
 
 	private ActionMethod actionMethod;
 
-	private final EndpointType endpointType;
+	private EndpointType endpointType;
 
 	protected ActionDescriptor(ActionMethod actionMethod,EndpointType endpointType) {
 		this.actionMethod = actionMethod;

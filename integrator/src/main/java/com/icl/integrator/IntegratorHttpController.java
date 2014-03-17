@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -49,7 +48,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	@Override
 	public <T extends DestinationDescriptor>
-	ResponseDTO<Map<String, ResponseDTO<UUID>>> deliver(
+	ResponseDTO<Map<String, ResponseDTO<String>>> deliver(
 			@RequestBody
 			IntegratorPacket<DeliveryDTO, T> delivery) {
 		TypeReference<IntegratorPacket<DeliveryDTO, DestinationDescriptor>>

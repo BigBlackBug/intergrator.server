@@ -1,4 +1,4 @@
-package com.icl.integrator.util;
+package com.icl.integrator.dto.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

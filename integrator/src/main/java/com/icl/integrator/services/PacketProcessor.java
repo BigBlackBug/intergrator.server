@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,13 +30,10 @@ public class PacketProcessor {
     @Autowired
     private DeliveryService deliveryService;
 
-	@Autowired
-	private DeliveryCreator deliveryCreator;
-
-    public Map<String, ResponseDTO<UUID>> process(List<Delivery> deliveries) {
-        Map<String, ResponseDTO<UUID>> serviceToRequestID = new HashMap<>();
+    public Map<String, ResponseDTO<String>> process(List<Delivery> deliveries) {
+        Map<String, ResponseDTO<String>> serviceToRequestID = new HashMap<>();
         for (Delivery delivery : deliveries) {
-            ResponseDTO<UUID> response;
+            ResponseDTO<String> response;
 	        String serviceName = delivery.getEndpoint().getServiceName();
 	        try {
 		        DefaultErrorConverter errorConverter = new DefaultErrorConverter();
@@ -45,7 +41,7 @@ public class PacketProcessor {
 				        new DefaultDeliverySuccessConverter(delivery);
 		        deliveryService.deliver(delivery,ResponseDTO.class,
 		                                new ResponseDeliveryDescriptor<>(errorConverter,successConverter));
-	            response = new ResponseDTO<>(delivery.getId(), UUID.class);
+	            response = new ResponseDTO<>(delivery.getId().toString(), String.class.toString());
             } catch (Exception ex) {
 	            ErrorDTO error = new ErrorDTO(ex);
 	            response = new ResponseDTO<>(error);

@@ -2,10 +2,12 @@ package com.icl.integrator.dto.registration;
 
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 
+import java.io.Serializable;
+
 /**
  * Created by BigBlackBug on 2/13/14.
  */
-public class RegistrationDestinationDescriptor {
+public class RegistrationDestinationDescriptor implements Serializable {
 
 	private DestinationDescriptor destinationDescriptor;
 

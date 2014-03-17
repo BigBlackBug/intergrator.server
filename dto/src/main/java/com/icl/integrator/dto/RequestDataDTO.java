@@ -1,5 +1,6 @@
 package com.icl.integrator.dto;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Map;
  * Time: 13:05
  * To change this template use File | Settings | File Templates.
  */
-public class RequestDataDTO {
+public class RequestDataDTO implements Serializable {
 
 	private DeliveryPacketType deliveryPacketType;
 

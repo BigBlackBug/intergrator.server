@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,11 +47,10 @@ public class IntegratorService implements IntegratorAPI {
 	private ValidationService validationService;
 
 	@Override
-    public  <T extends DestinationDescriptor> ResponseDTO<Map<String,
-            ResponseDTO<UUID>>> deliver(
-            IntegratorPacket<DeliveryDTO, T> delivery) {
+    public  <T extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<String>>> deliver(
+			IntegratorPacket<DeliveryDTO, T> delivery) {
         logger.info("Received a delivery request");
-        ResponseDTO<Map<String, ResponseDTO<UUID>>> response;
+        ResponseDTO<Map<String, ResponseDTO<String>>> response;
         try {
 	        DeliveryDTO packet = delivery.getPacket();
 	        validationService.validate(packet.getRequestData());
@@ -60,7 +58,7 @@ public class IntegratorService implements IntegratorAPI {
             Deliveries deliveries =
 		            deliveryCreator.createDeliveries(packet,packet.getResponseHandlerDescriptor());
             PacketProcessor processor = processorFactory.createProcessor();
-            Map<String, ResponseDTO<UUID>> serviceToRequestID =
+            Map<String, ResponseDTO<String>> serviceToRequestID =
                     processor.process(deliveries.getDeliveries());
             serviceToRequestID.putAll(deliveries.getErrorMap());
             response = new ResponseDTO<>(serviceToRequestID);
@@ -77,7 +75,7 @@ public class IntegratorService implements IntegratorAPI {
             IntegratorPacket<Void, T> responseHandler) {
         deliveryService.deliver(responseHandler.getResponseHandlerDescriptor(),
                      Boolean.TRUE);
-	    return new ResponseDTO<>(true,Boolean.TYPE);
+	    return new ResponseDTO<>(true,Boolean.TYPE.toString());
     }
 
     @Override
@@ -107,7 +105,7 @@ public class IntegratorService implements IntegratorAPI {
         ResponseDTO<Boolean> response;
         try {
             workerService.pingService(serviceDescriptor.getPacket());
-            response = new ResponseDTO<>(Boolean.TRUE, Boolean.class);
+            response = new ResponseDTO<>(Boolean.TRUE, Boolean.class.toString());
         } catch (Exception ex) {
 	        logger.error(ex);
             response = new ResponseDTO<>(new ErrorDTO(ex));

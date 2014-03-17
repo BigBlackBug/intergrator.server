@@ -3,6 +3,8 @@ package com.icl.integrator.dto.destination;
 import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 
+import java.io.Serializable;
+
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -10,7 +12,7 @@ import com.icl.integrator.dto.registration.ActionDescriptor;
  * Time: 11:31
  * To change this template use File | Settings | File Templates.
  */
-public class RawDestinationDescriptor extends DestinationDescriptor {
+public class RawDestinationDescriptor extends DestinationDescriptor implements Serializable {
 
 	private EndpointDTO endpoint;
 

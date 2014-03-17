@@ -1,5 +1,7 @@
 package com.icl.integrator.dto;
 
+import java.io.Serializable;
+
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -7,7 +9,7 @@ package com.icl.integrator.dto;
  * Time: 13:43
  * To change this template use File | Settings | File Templates.
  */
-public class ResponseDTO<T> {
+public class ResponseDTO<T> implements Serializable {
 
 	protected SuccessDTO<T> response;
 
@@ -20,7 +22,7 @@ public class ResponseDTO<T> {
 	}
 
 	// Да, нужен на сорсе, чтоб распарсить результат от таргета.
-	public ResponseDTO(T response, Class<T> responseClass) {
+	public ResponseDTO(T response, String responseClass) {
 		this(true);
 		this.response = new SuccessDTO<>(responseClass, response);
 	}

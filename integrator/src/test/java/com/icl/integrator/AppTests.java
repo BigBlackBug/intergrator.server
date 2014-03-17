@@ -20,7 +20,7 @@ import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
 import com.icl.integrator.task.retryhandler.DatabaseRetryHandler;
 import com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory;
-import com.icl.integrator.util.EndpointType;
+import com.icl.integrator.dto.util.EndpointType;
 import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
