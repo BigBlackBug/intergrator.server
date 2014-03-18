@@ -45,7 +45,7 @@ public interface IntegratorAPI {
     getServiceList(IntegratorPacket<Void, T> packet);
 
     public <T extends DestinationDescriptor>
-    ResponseDTO<List<String>>
+    ResponseDTO<List<ActionEndpointDTO>>
     getSupportedActions(IntegratorPacket<ServiceDTO, T> serviceDTO);
 
     public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,

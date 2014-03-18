@@ -39,21 +39,19 @@ public class ValidatorTests {
 	@Autowired
 	private ObjectMapper mapper;
 
-	@Test(expected = PacketValidationException.class)
-	public void testValidator() throws Exception {
-		HttpEndpointDescriptorDTO desr = new
-				HttpEndpointDescriptorDTO("localhost", 8080);
-		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-				new EndpointDTO<>(EndpointType.HTTP, desr);
-		RawDestinationDescriptor dd =
-				new RawDestinationDescriptor(
-
-				);
-		dd.setActionDescriptor(
-				new HttpActionDTO("/ext_source/handleGetServiceList", ActionMethod.HANDLE_DELIVERY));
-		IntegratorPacket p = new IntegratorPacket(dd);
-		serialize(p);
-	}
+    @Test(expected = PacketValidationException.class)
+    public void testValidator() throws Exception {
+        HttpEndpointDescriptorDTO desr = new
+                HttpEndpointDescriptorDTO(  "localhost", 8080);
+        EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
+                new EndpointDTO<>(EndpointType.HTTP, desr);
+        RawDestinationDescriptor dd =
+                new RawDestinationDescriptor(null
+                ,new HttpActionDTO("/ext_source/handleGetServiceList", ActionMethod.HANDLE_DELIVERY)
+                );
+        IntegratorPacket p = new IntegratorPacket(dd);
+        serialize(p);
+    }
 
 	@Test
 	public void testValidator3() throws Exception {
@@ -69,14 +67,15 @@ public class ValidatorTests {
 		IntegratorPacket p = new IntegratorPacket();
 		p.setMethod(IntegratorMethod.ADD_ACTION);
 		p.setResponseHandlerDescriptor(dd);
+        RequestDataDTO requestData = new RequestDataDTO(DeliveryPacketType.INCIDENT,
+                                                        new HashMap<String, Object>() {{
+                                                            put("a", "b");
+                                                        }});
 
-		DeliveryDTO deliveryDTO = new DeliveryDTO();
+		DeliveryDTO deliveryDTO = new DeliveryDTO("ACTION",null,requestData,null);
 		deliveryDTO.setAction("ACTION");
 		deliveryDTO.setDestinations(null);
-		deliveryDTO.setRequestData(new RequestDataDTO(DeliveryPacketType.INCIDENT,
-		                                              new HashMap<String, Object>() {{
-			                                              put("a", "b");
-		                                              }}));
+
 		serialize(p);
 		p.setResponseHandlerDescriptor(sdd);
 		try{

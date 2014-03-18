@@ -17,7 +17,7 @@ public class ServiceDTO implements Serializable {
 
     private EndpointType endpointType;
 
-    public ServiceDTO(){
+    ServiceDTO(){
 
     }
 

@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -126,7 +127,7 @@ public class PersistenceService {
 //    }
 
     @Transactional
-    public List<String> getActions(String serviceName) {
+    public List<String> getActionNames(String serviceName) {
         String query =
                 "select action.actionName from AbstractEndpointEntity ep join " +
                         "ep.actions action where ep.serviceName=:serviceName";
@@ -216,4 +217,12 @@ public class PersistenceService {
 				.getResultList();
 
 	}
+
+    @Transactional
+    public List<AbstractActionEntity> getActions(String serviceName) {
+        return em.createQuery("select ep.actions from AbstractEndpointEntity ep where ep" +
+                                      ".serviceName=:serviceName").setParameter(
+                "serviceName", serviceName).getResultList();
+    }
+
 }

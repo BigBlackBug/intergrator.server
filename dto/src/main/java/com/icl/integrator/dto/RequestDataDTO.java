@@ -16,7 +16,7 @@ public class RequestDataDTO implements Serializable {
 
 	private Map<String,Object> data;
 
-	public RequestDataDTO() {
+	RequestDataDTO() {
 	}
 
 	public RequestDataDTO(DeliveryPacketType deliveryPacketType, Map<String,Object> data) {

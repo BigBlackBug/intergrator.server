@@ -24,7 +24,7 @@ public class AutoDetectionRegistrationDTO<T> implements Serializable {
 		this.destinationDescriptors = destinationDescriptors;
 	}
 
-	public AutoDetectionRegistrationDTO() {
+	AutoDetectionRegistrationDTO() {
 
 	}
 

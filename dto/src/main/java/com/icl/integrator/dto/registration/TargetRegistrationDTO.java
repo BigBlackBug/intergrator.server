@@ -22,7 +22,7 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> implements Serial
 
 	private List<ActionRegistrationDTO<T>> actionRegistrations;
 
-	public TargetRegistrationDTO() {
+	TargetRegistrationDTO() {
 	}
 
 	public TargetRegistrationDTO(String serviceName,

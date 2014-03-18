@@ -34,12 +34,11 @@ public class EndpointDTODeserializer extends JsonDeserializer<EndpointDTO> {
 		JsonNode descriptor = treeNode.get("descriptor");
 		EndpointDescriptor endpointDescriptor = null;
 		if (type == EndpointType.HTTP) {
-			HttpEndpointDescriptorDTO dto = new HttpEndpointDescriptorDTO();
-			dto.setHost(descriptor.get("host").asText());
-			dto.setPort(descriptor.get("port").asInt());
+            String host = descriptor.get("host").asText();
+            int port = descriptor.get("port").asInt();
+			HttpEndpointDescriptorDTO dto = new HttpEndpointDescriptorDTO(host,port);
 			endpointDescriptor = dto;
 		} else if (type == EndpointType.JMS) {
-			JMSEndpointDescriptorDTO dto = new JMSEndpointDescriptorDTO();
 			String connectionFactory =
 					descriptor.get("connectionFactory").asText();
 			TypeReference<Map<String, String>> typeRef =
@@ -50,14 +49,11 @@ public class EndpointDTODeserializer extends JsonDeserializer<EndpointDTO> {
 					get("jndiProperties").toString();
 			Map<String, String> jndiProperties =
 					mapper.readValue(jndiPropsJson, typeRef);
-			dto.setConnectionFactory(connectionFactory);
-			dto.setJndiProperties(jndiProperties);
+            JMSEndpointDescriptorDTO dto = new JMSEndpointDescriptorDTO(connectionFactory,jndiProperties);
 			endpointDescriptor = dto;
 		}
 
-		EndpointDTO<EndpointDescriptor> endpointDTO = new EndpointDTO<>();
-		endpointDTO.setDescriptor(endpointDescriptor);
-		endpointDTO.setEndpointType(type);
+		EndpointDTO<EndpointDescriptor> endpointDTO = new EndpointDTO<>(type,endpointDescriptor);
 		return endpointDTO;
 	}
 

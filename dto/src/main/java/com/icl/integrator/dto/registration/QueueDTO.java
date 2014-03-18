@@ -19,7 +19,7 @@ public class QueueDTO extends ActionDescriptor implements Serializable {
 
 	private String queueName;
 
-	public QueueDTO() {
+	QueueDTO() {
 		super(null, EndpointType.JMS);
 	}
 

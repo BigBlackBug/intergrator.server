@@ -15,7 +15,7 @@ public class ActionRegistrationDTO<T extends ActionDescriptor> implements Serial
 
 	private boolean forceRegister;
 
-	public ActionRegistrationDTO() {
+	ActionRegistrationDTO() {
 	}
 
 	public ActionRegistrationDTO(ActionEndpointDTO<T> action,

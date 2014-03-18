@@ -17,7 +17,7 @@ public class AddActionDTO<T extends ActionDescriptor> implements Serializable {
 
     private ServiceDTO service;
 
-    public AddActionDTO() {
+    AddActionDTO() {
     }
 
     public AddActionDTO(ServiceDTO service,

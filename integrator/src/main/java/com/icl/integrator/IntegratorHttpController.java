@@ -102,7 +102,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	}
 
 	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<List<String>> getSupportedActions(
+	public <T extends DestinationDescriptor> ResponseDTO<List<ActionEndpointDTO>> getSupportedActions(
 			@RequestBody
 			IntegratorPacket<ServiceDTO, T> serviceDTO) {
 
@@ -115,7 +115,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 				serviceDTO, type));
 	}
 
-	@Override
+    @Override
 	public <T extends DestinationDescriptor,Y extends ActionDescriptor> ResponseDTO<Void> addAction(
 			@RequestBody
 			IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {

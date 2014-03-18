@@ -18,7 +18,7 @@ public class RawDestinationDescriptor extends DestinationDescriptor implements S
 
 	private ActionDescriptor actionDescriptor;
 
-	public RawDestinationDescriptor() {
+	RawDestinationDescriptor() {
 		super(DescriptorType.RAW);
 	}
 

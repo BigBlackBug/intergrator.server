@@ -15,7 +15,7 @@ public class JMSEndpointDescriptorDTO implements EndpointDescriptor {
 
     private String connectionFactory;
 
-    public JMSEndpointDescriptorDTO() {
+    JMSEndpointDescriptorDTO() {
     }
 
     public JMSEndpointDescriptorDTO(String connectionFactory,

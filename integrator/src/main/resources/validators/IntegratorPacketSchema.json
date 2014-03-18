@@ -120,7 +120,7 @@
         },
         "targetRegistrationDTO": {
             "type": "object",
-            "required": ["serviceName", "endpoint", "deliverySettings", "actionRegistrations"],
+            "required": ["serviceName", "endpoint", "deliverySettings"],
             "additionalProperties": false,
             "properties": {
                 "serviceName": {

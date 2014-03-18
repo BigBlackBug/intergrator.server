@@ -11,7 +11,7 @@ public class EndpointDTO<T extends EndpointDescriptor> implements Serializable {
 
     private T descriptor;
 
-    public EndpointDTO() {
+    EndpointDTO() {
     }
 
     public EndpointDTO(EndpointType endpointType, T descriptor) {

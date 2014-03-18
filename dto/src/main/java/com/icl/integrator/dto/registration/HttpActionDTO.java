@@ -15,11 +15,11 @@ public class HttpActionDTO extends ActionDescriptor implements Serializable {
 
     private String path;
 
-    public HttpActionDTO() {
+    HttpActionDTO() {
 	    super(null, EndpointType.HTTP);
     }
 
-    public HttpActionDTO(String path,ActionMethod actionMethod) {
+    public HttpActionDTO(String path, ActionMethod actionMethod) {
 	    super(actionMethod,EndpointType.HTTP);
         this.path = path;
     }

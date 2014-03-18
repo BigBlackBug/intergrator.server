@@ -13,7 +13,7 @@ public class HttpEndpointDescriptorDTO implements EndpointDescriptor {
 
     private int port;
 
-    public HttpEndpointDescriptorDTO() {
+    HttpEndpointDescriptorDTO() {
     }
 
     public HttpEndpointDescriptorDTO(String host, int port) {

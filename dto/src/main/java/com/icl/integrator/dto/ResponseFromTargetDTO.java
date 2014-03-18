@@ -22,7 +22,7 @@ public class ResponseFromTargetDTO implements Serializable {
         this(result, null, UUID.randomUUID().toString());
     }
 
-    public ResponseFromTargetDTO() {
+    ResponseFromTargetDTO() {
     }
 
     @Override

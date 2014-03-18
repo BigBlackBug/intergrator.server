@@ -23,7 +23,7 @@ public class FullServiceDTO<T extends EndpointDescriptor,
 
 	private List<ActionEndpointDTO<Y>> actions;
 
-	public FullServiceDTO() {
+    public FullServiceDTO() {
 	}
 
 	public String getServiceName() {

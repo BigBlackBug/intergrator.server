@@ -38,8 +38,6 @@ public class JMSEndpointConnector implements EndpointConnector {
     }
 
     JMSEndpointConnector(JMSServiceEndpoint endpoint, JMSAction action) {
-        connectionData = new JMSEndpointDescriptorDTO();
-        connectionData.setConnectionFactory(endpoint.getConnectionFactory());
         String jndiProperties = endpoint.getJndiProperties();
 
         Map<String, String> properties = null;
@@ -50,12 +48,10 @@ public class JMSEndpointConnector implements EndpointConnector {
             properties = serializer.readValue(jndiProperties, typeRef);
         } catch (IOException e) {
         }
-        connectionData.setJndiProperties(properties);
-        QueueDTO queueDescriptor = new QueueDTO();
-        queueDescriptor.setPassword(action.getPassword());
-        queueDescriptor.setQueueName(action.getQueueName());
-        queueDescriptor.setUsername(action.getUsername());
-        this.queueDescriptor = queueDescriptor;
+        this.connectionData =
+                new JMSEndpointDescriptorDTO(endpoint.getConnectionFactory(), properties);
+        this.queueDescriptor = new QueueDTO(action.getQueueName(), action.getUsername(),
+                                            action.getPassword(),action.getActionMethod());
     }
 
     @Override

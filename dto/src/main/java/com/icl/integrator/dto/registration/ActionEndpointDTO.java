@@ -15,7 +15,7 @@ public class ActionEndpointDTO<T extends ActionDescriptor> implements Serializab
 
     private T actionDescriptor;
 
-    public ActionEndpointDTO() {
+    ActionEndpointDTO() {
     }
 
     public ActionEndpointDTO(String actionName, T actionDescriptor) {

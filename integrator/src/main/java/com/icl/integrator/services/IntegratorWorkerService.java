@@ -63,7 +63,8 @@ public class IntegratorWorkerService {
 			HttpActionDTO httpActionDTO = (HttpActionDTO) action.getActionDescriptor();
 
 			HttpAction httpAction = persistenceService
-					.findHttpAction(serviceEndpoint.getId(), httpActionDTO.getPath());
+					.findHttpAction(serviceEndpoint.getId(),
+                                    httpActionDTO.getPath());
 			if (httpAction != null) {
 				if (httpAction.isGenerated()) {
 					httpAction.setGenerated(false);
@@ -86,9 +87,10 @@ public class IntegratorWorkerService {
 					persistenceService.getJmsService(service.getServiceName());
 			QueueDTO queueDTO = (QueueDTO) action.getActionDescriptor();
 			JMSAction jmsAction = persistenceService
-					.findJmsAction(serviceEndpoint.getId(), queueDTO.getQueueName(),
-					               queueDTO.getUsername(),
-					               queueDTO.getPassword());
+					.findJmsAction(serviceEndpoint.getId(),
+                                   queueDTO.getQueueName(),
+                                   queueDTO.getUsername(),
+                                   queueDTO.getPassword());
 
 			if (jmsAction != null) {
 				if (jmsAction.isGenerated()) {
@@ -112,9 +114,40 @@ public class IntegratorWorkerService {
 		}
 	}
 
-	public List<String> getSupportedActions(ServiceDTO serviceDTO) {
-		return persistenceService.getActions(serviceDTO.getServiceName());
-	}
+	public List<ActionEndpointDTO> getSupportedActions(ServiceDTO serviceDTO) {
+        List<AbstractActionEntity> actions =
+                persistenceService.getActions(serviceDTO.getServiceName());
+        List<ActionEndpointDTO> result = new ArrayList<>();
+        switch (serviceDTO.getEndpointType()) {
+            case HTTP: {
+                for (AbstractActionEntity actionEntity : actions) {
+                    HttpAction httpAction = (HttpAction) actionEntity;
+                    HttpActionDTO httpActionDTO = new HttpActionDTO(httpAction.getActionURL(),
+                                                                    actionEntity.getActionMethod());
+                    ActionEndpointDTO<HttpActionDTO> epdto =
+                            new ActionEndpointDTO<>(actionEntity.getActionName(),httpActionDTO);
+                    result.add(epdto);
+                }
+                return result;
+            }
+            case JMS: {
+                for (AbstractActionEntity actionEntity : actions) {
+                    JMSAction httpAction = (JMSAction) actionEntity;
+                    QueueDTO httpActionDTO = new QueueDTO(httpAction.getQueueName(),
+                                                          httpAction.getUsername(),
+                                                          httpAction.getPassword(),
+                                                          actionEntity.getActionMethod());
+                    ActionEndpointDTO<QueueDTO> epdto =
+                            new ActionEndpointDTO<>(actionEntity.getActionName(),httpActionDTO);
+                    result.add(epdto);
+                }
+                return result;
+            }
+            default: {
+                return null;
+            }
+        }
+    }
 
 	public Boolean pingService(ServiceDestinationDescriptor serviceDescriptor) {
 		EndpointConnector connector = connectorFactory.createEndpointConnector(serviceDescriptor);
@@ -169,7 +202,7 @@ public class IntegratorWorkerService {
 						};
 				props = objectMapper
 						.readValue(jmsService.getJndiProperties(),
-						           typeReference);
+                                   typeReference);
 			} catch (IOException e) {
 			}
 			JMSEndpointDescriptorDTO httpEndpointDescriptorDTO =
@@ -212,4 +245,5 @@ public class IntegratorWorkerService {
 		}
 		return result;
 	}
+
 }

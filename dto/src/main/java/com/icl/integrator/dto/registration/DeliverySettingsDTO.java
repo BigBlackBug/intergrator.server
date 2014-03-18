@@ -11,7 +11,7 @@ public class DeliverySettingsDTO implements Serializable {
 
 	private long retryDelay;
 
-	public DeliverySettingsDTO() {
+	DeliverySettingsDTO() {
 	}
 
 	public DeliverySettingsDTO(int retryNumber, long retryDelay) {

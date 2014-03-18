@@ -24,7 +24,7 @@ public class SuccessDTO<T> implements Serializable {
 		this.responseValue = responseValue;
 	}
 
-	public SuccessDTO() {
+	SuccessDTO() {
 	}
 
 	@Override

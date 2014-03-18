@@ -1,5 +1,207 @@
-{
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Dictionary",
-    "type": "object"
-}
+{"/properties/packet/oneOf/0": [
+    {
+        "level": "error",
+        "schema": {
+            "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+            "pointer": "/properties/packet/oneOf/0"
+        },
+        "instance": {
+            "pointer": "/packet"
+        },
+        "domain": "validation",
+        "keyword": "type",
+        "message": "instance type (object) does not match any allowed primitive type (allowed: [\"null\"])",
+        "found": "object",
+        "expected": ["null"]
+    }
+], "/properties/packet/oneOf/1": [
+    {
+        "level": "error",
+        "schema": {
+            "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+            "pointer": "/properties/packet/oneOf/1"
+        },
+        "instance": {
+            "pointer": "/packet"
+        },
+        "domain": "validation",
+        "keyword": "oneOf",
+        "message": "instance failed to match exactly one schema (matched 0 out of 6)",
+        "matched": 0,
+        "nrSchemas": 6,
+        "reports": {
+            "/properties/packet/oneOf/1/oneOf/0": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/deliveryDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"actionRegistrations\",\"deliverySettings\",\"endpoint\",\"serviceName\"]",
+                    "unwanted": ["actionRegistrations", "deliverySettings", "endpoint", "serviceName"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/deliveryDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"requestData\"])",
+                    "required": ["requestData"],
+                    "missing": ["requestData"]
+                }
+            ],
+            "/properties/packet/oneOf/1/oneOf/1": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/targetRegistrationDTO/properties/deliverySettings"
+                    },
+                    "instance": {
+                        "pointer": "/packet/deliverySettings"
+                    },
+                    "domain": "validation",
+                    "keyword": "type",
+                    "message": "instance type (null) does not match any allowed primitive type (allowed: [\"object\"])",
+                    "found": "null",
+                    "expected": ["object"]
+                }
+            ],
+            "/properties/packet/oneOf/1/oneOf/2": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/serviceDD"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"actionRegistrations\",\"deliverySettings\",\"endpoint\",\"serviceName\"]",
+                    "unwanted": ["actionRegistrations", "deliverySettings", "endpoint", "serviceName"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/serviceDD"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"action\",\"descriptorType\",\"endpointType\",\"service\"])",
+                    "required": ["action", "descriptorType", "endpointType", "service"],
+                    "missing": ["action", "descriptorType", "endpointType", "service"]
+                }
+            ],
+            "/properties/packet/oneOf/1/oneOf/3": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/serviceDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"actionRegistrations\",\"deliverySettings\",\"endpoint\"]",
+                    "unwanted": ["actionRegistrations", "deliverySettings", "endpoint"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/serviceDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"endpointType\"])",
+                    "required": ["endpointType", "serviceName"],
+                    "missing": ["endpointType"]
+                }
+            ],
+            "/properties/packet/oneOf/1/oneOf/4": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/addActionDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"actionRegistrations\",\"deliverySettings\",\"endpoint\",\"serviceName\"]",
+                    "unwanted": ["actionRegistrations", "deliverySettings", "endpoint", "serviceName"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/addActionDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"actionRegistration\",\"service\"])",
+                    "required": ["actionRegistration", "service"],
+                    "missing": ["actionRegistration", "service"]
+                }
+            ],
+            "/properties/packet/oneOf/1/oneOf/5": [
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/autoDetectionRegistrationDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "additionalProperties",
+                    "message": "object instance has properties which are not allowed by the schema: [\"actionRegistrations\",\"deliverySettings\",\"endpoint\",\"serviceName\"]",
+                    "unwanted": ["actionRegistrations", "deliverySettings", "endpoint", "serviceName"]
+                },
+                {
+                    "level": "error",
+                    "schema": {
+                        "loadingURI": "file:/C:/Users/e.shahmaev/IdeaProjects/Integrator/integrator/target/integrator/WEB-INF/classes/validators/IntegratorPacketSchema.json#",
+                        "pointer": "/definitions/autoDetectionRegistrationDTO"
+                    },
+                    "instance": {
+                        "pointer": "/packet"
+                    },
+                    "domain": "validation",
+                    "keyword": "required",
+                    "message": "object has missing required properties ([\"deliveryPacketType\",\"destinationDescriptors\",\"referenceObject\"])",
+                    "required": ["deliveryPacketType", "destinationDescriptors", "referenceObject"],
+                    "missing": ["deliveryPacketType", "destinationDescriptors", "referenceObject"]
+                }
+            ]
+        }
+    }
+]}

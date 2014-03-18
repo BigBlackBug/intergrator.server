@@ -34,9 +34,6 @@ public class RawDestinationDescriptorDeserializer
 //		}
 		ActionDescriptor sourceResponse = mapper.readValue(
 				treeNode.get("actionDescriptor").toString(),ActionDescriptor.class);
-		RawDestinationDescriptor result = new RawDestinationDescriptor();
-		result.setEndpoint(endpointDTO);
-		result.setActionDescriptor(sourceResponse);
-		return result;
+		return new RawDestinationDescriptor(endpointDTO,sourceResponse);
 	}
 }

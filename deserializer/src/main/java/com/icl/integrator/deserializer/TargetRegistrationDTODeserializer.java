@@ -28,20 +28,16 @@ public class TargetRegistrationDTODeserializer extends
             JsonParser jp, DeserializationContext ctxt) throws IOException {
         ObjectNode treeNode = jp.readValueAsTree();
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
-        TargetRegistrationDTO dto = new TargetRegistrationDTO();
-	    dto.setDeliverySettings(
-			    mapper.readValue(treeNode.get("deliverySettings").toString(),
-			                     DeliverySettingsDTO.class));
-	    dto.setServiceName(treeNode.get("serviceName").asText());
-        EndpointDTO endpoint =
-                mapper.readValue(treeNode.get("endpoint").toString(),
-                                 EndpointDTO.class);
-        dto.setEndpoint(endpoint);
 
+        DeliverySettingsDTO deliverySettings =
+                mapper.readValue(treeNode.get("deliverySettings").toString(),
+                                 DeliverySettingsDTO.class);
+        String serviceName = treeNode.get("serviceName").asText();
+        EndpointDTO endpoint =
+                mapper.readValue(treeNode.get("endpoint").toString(), EndpointDTO.class);
         List<ActionRegistrationDTO<ActionDescriptor>> actions =
                 getActions(treeNode.get("actionRegistrations"));
-        dto.setActionRegistrations(actions);
-        return dto;
+        return new TargetRegistrationDTO(serviceName, endpoint, deliverySettings, actions);
     }
 
     private <T extends ActionDescriptor>
@@ -53,8 +49,9 @@ public class TargetRegistrationDTODeserializer extends
             JsonNode node = actions.get(i);
             boolean forceRegister = node.get("forceRegister").asBoolean();
             ActionEndpointDTO action = mapper.readValue(
-                    node.get("action").toString(),new TypeReference<ActionEndpointDTO>(){});
-	        result.add(new ActionRegistrationDTO(action, forceRegister));
+                    node.get("action").toString(), new TypeReference<ActionEndpointDTO>() {
+            });
+            result.add(new ActionRegistrationDTO(action, forceRegister));
         }
         return result;
     }

@@ -19,7 +19,7 @@ public class ServiceDestinationDescriptor extends DestinationDescriptor implemen
 
 	private EndpointType endpointType;
 
-	public ServiceDestinationDescriptor() {
+	ServiceDestinationDescriptor() {
 		super(DescriptorType.SERVICE);
 	}
 

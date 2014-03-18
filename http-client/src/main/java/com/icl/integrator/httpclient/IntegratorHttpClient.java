@@ -1,5 +1,6 @@
 package com.icl.integrator.httpclient;
 
+import com.icl.integrator.deserializer.IntegratorObjectMapper;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
@@ -81,7 +82,7 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         return getServiceList(new IntegratorPacket<Void, DestinationDescriptor>());
     }
 
-    public ResponseDTO<List<String>> getSupportedActions(
+    public ResponseDTO<List<ActionEndpointDTO>> getSupportedActions(
             ServiceDTO serviceDTO) {
         return getSupportedActions(new IntegratorPacket<>(serviceDTO));
     }
@@ -177,14 +178,14 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public <T extends DestinationDescriptor> ResponseDTO<List<String>> getSupportedActions(
+    public <T extends DestinationDescriptor> ResponseDTO<List<ActionEndpointDTO>> getSupportedActions(
             IntegratorPacket<ServiceDTO, T> serviceDTO) {
         HttpMethodDescriptor methodPair = getMethodPath
                 ("getSupportedActions", IntegratorPacket.class);
         try {
-            ParameterizedTypeReference<ResponseDTO<List<String>>>
+            ParameterizedTypeReference<ResponseDTO<List<ActionEndpointDTO>>>
                     type =
-                    new ParameterizedTypeReference<ResponseDTO<List<String>>>() {
+                    new ParameterizedTypeReference<ResponseDTO<List<ActionEndpointDTO>>>() {
                     };
             return sendRequest(serviceDTO, type, methodPair);
         } catch (MalformedURLException e) {
@@ -266,8 +267,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
             throws RestClientException, MalformedURLException {
         RestTemplate restTemplate = new RestTemplate();
 
-        restTemplate.getMessageConverters().add(
-                new MappingJackson2HttpMessageConverter());
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(new IntegratorObjectMapper());
+        restTemplate.getMessageConverters().clear();
+        restTemplate.getMessageConverters().add(converter);
         RequestMethod methodType = methodDescriptor.getMethodType();
         URL url = new URL("HTTP", host, port,
                           path + methodDescriptor.getMethodPath());

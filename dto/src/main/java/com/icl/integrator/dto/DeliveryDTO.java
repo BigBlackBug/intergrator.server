@@ -42,8 +42,9 @@ public class DeliveryDTO implements Serializable{
 		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
 
-	public DeliveryDTO() {
-	}
+    DeliveryDTO(){
+
+    }
 
 	@Override
 	public boolean equals(Object o) {

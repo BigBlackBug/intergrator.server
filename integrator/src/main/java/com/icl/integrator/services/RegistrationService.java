@@ -55,18 +55,21 @@ public class RegistrationService {
 
         EndpointDTO endpoint = registrationDTO.getEndpoint();
         List<ActionEndpointDTO<T>> actions = new ArrayList<>();
-        for (ActionRegistrationDTO<T> actionRegistration :
-                registrationDTO.getActionRegistrations()) {
-            ActionEndpointDTO<T> action = actionRegistration.getAction();
-            try {
-                if (!actionRegistration.isForceRegister()) {
-                    testConnection(endpoint, action);
+        List<ActionRegistrationDTO<T>> actionRegistrations =
+                registrationDTO.getActionRegistrations();
+        if(actionRegistrations!=null){
+            for (ActionRegistrationDTO<T> actionRegistration :actionRegistrations) {
+                ActionEndpointDTO<T> action = actionRegistration.getAction();
+                try {
+                    if (!actionRegistration.isForceRegister()) {
+                        testConnection(endpoint, action);
+                    }
+                    actions.add(action);
+                } catch (ConnectionException ex) {
+                    ResponseDTO<Void> dto =
+                            new ResponseDTO<>(new ErrorDTO(ex));
+                    result.put(action.getActionName(), dto);
                 }
-                actions.add(action);
-            } catch (ConnectionException ex) {
-                ResponseDTO<Void> dto =
-                        new ResponseDTO<>(new ErrorDTO(ex));
-                result.put(action.getActionName(), dto);
             }
         }
         switch (endpoint.getEndpointType()) {

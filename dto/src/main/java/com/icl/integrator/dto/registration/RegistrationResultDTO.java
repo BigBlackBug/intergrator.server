@@ -14,7 +14,7 @@ public class RegistrationResultDTO implements Serializable {
 
 	private Map<String, ResponseDTO<Void>> actionRegistrationResponses;
 
-	public RegistrationResultDTO() {
+	RegistrationResultDTO() {
 
 	}
 

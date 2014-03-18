@@ -13,7 +13,7 @@ public class RegistrationDestinationDescriptor implements Serializable {
 
 	private boolean forceRegister;
 
-	public RegistrationDestinationDescriptor() {
+	RegistrationDestinationDescriptor() {
 	}
 
 	public RegistrationDestinationDescriptor(

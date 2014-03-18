@@ -131,11 +131,11 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public <T extends DestinationDescriptor> ResponseDTO<List<String>> getSupportedActions(
+    public <T extends DestinationDescriptor> ResponseDTO<List<ActionEndpointDTO>> getSupportedActions(
             IntegratorPacket<ServiceDTO, T> serviceDTO) {
-        ResponseDTO<List<String>> response;
+        ResponseDTO<List<ActionEndpointDTO>> response;
         try {
-            List<String> actions = workerService
+            List<ActionEndpointDTO> actions = workerService
                     .getSupportedActions(serviceDTO.getPacket());
             response = new ResponseDTO<>(actions);
         } catch (Exception ex) {
