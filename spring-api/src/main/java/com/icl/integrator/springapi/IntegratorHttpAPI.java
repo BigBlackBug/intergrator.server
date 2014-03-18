@@ -74,12 +74,13 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public
     @ResponseBody
     <T extends DestinationDescriptor>
-    ResponseDTO<List<String>> getSupportedActions(
+    ResponseDTO<List<ActionEndpointDTO>> getSupportedActions(
             @RequestBody
             IntegratorPacket<ServiceDTO, T> serviceDTO);
 
     @Override
     @RequestMapping(value = "addAction", method = RequestMethod.POST)
+    public
     @ResponseBody
     <T extends DestinationDescriptor,Y extends ActionDescriptor>
     ResponseDTO<Void> addAction(@RequestBody
@@ -87,7 +88,8 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
 
     @Override
     @RequestMapping(value = "getServiceInfo", method = RequestMethod.POST)
-    public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,
+    public @ResponseBody
+    <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,
             DDType extends DestinationDescriptor>
     ResponseDTO<FullServiceDTO<EDType, ADType>> getServiceInfo(
             @RequestBody
