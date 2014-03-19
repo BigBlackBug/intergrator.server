@@ -6,6 +6,7 @@ import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
+import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.services.validation.ValidationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,7 +64,7 @@ public class IntegratorService implements IntegratorAPI {
             serviceToRequestID.putAll(deliveries.getErrorMap());
             response = new ResponseDTO<>(serviceToRequestID);
         } catch (Exception ex) {
-	        logger.error(ex);
+	        logger.error(ex,ex);
 	        response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         deliveryService.deliver(delivery.getResponseHandlerDescriptor(), response);
@@ -85,12 +86,15 @@ public class IntegratorService implements IntegratorAPI {
         logger.info("Received a service registration request");
         ResponseDTO<RegistrationResultDTO> response;
         try {
+            TargetRegistrationDTO<T> packet = registrationDTO.getPacket();
             Map<String, ResponseDTO<Void>> result =
-                    registrationService.register(registrationDTO.getPacket());
+                    registrationService.register(packet);
+            String serviceName = packet.getServiceName();
+            EndpointType endpointType = packet.getEndpoint().getEndpointType();
             response = new ResponseDTO<>(new RegistrationResultDTO(
-		            registrationDTO.getPacket().getServiceName(),result));
+                    new ServiceDTO(serviceName,endpointType),result));
         } catch (Exception ex) {
-	        logger.error(ex);
+	        logger.error(ex,ex);
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
@@ -107,7 +111,7 @@ public class IntegratorService implements IntegratorAPI {
             workerService.pingService(serviceDescriptor.getPacket());
             response = new ResponseDTO<>(Boolean.TRUE, Boolean.class.toString());
         } catch (Exception ex) {
-	        logger.error(ex);
+	        logger.error(ex,ex);
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         deliveryService.deliver(serviceDescriptor.getResponseHandlerDescriptor(), response);
@@ -122,7 +126,7 @@ public class IntegratorService implements IntegratorAPI {
             List<ServiceDTO> serviceList = workerService.getServiceList();
             response = new ResponseDTO<>(serviceList);
         } catch (Exception ex) {
-	        logger.error(ex);
+	        logger.error(ex,ex);
 	        response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
@@ -139,7 +143,7 @@ public class IntegratorService implements IntegratorAPI {
                     .getSupportedActions(serviceDTO.getPacket());
             response = new ResponseDTO<>(actions);
         } catch (Exception ex) {
-	        logger.error(ex);
+	        logger.error(ex,ex);
 	        response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         deliveryService.deliver(serviceDTO.getResponseHandlerDescriptor(), response);
@@ -154,7 +158,7 @@ public class IntegratorService implements IntegratorAPI {
             workerService.addAction(actionDTO.getPacket());
             response = new ResponseDTO<>(true);
         } catch (Exception ex) {
-	        logger.error(ex);
+	        logger.error(ex,ex);
 	        response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         deliveryService.deliver(actionDTO.getResponseHandlerDescriptor(), response);
@@ -173,7 +177,7 @@ public class IntegratorService implements IntegratorAPI {
                             .getServiceInfo(serviceDTO.getPacket());
             response = new ResponseDTO<>(serviceInfo);
         } catch (Exception ex) {
-	        logger.error(ex);
+	        logger.error(ex,ex);
 	        response = new ResponseDTO<>(new ErrorDTO(ex));
         }
 
@@ -192,7 +196,7 @@ public class IntegratorService implements IntegratorAPI {
 					registrationService.register(autoDetectionDTO.getPacket());
 			response = new ResponseDTO<>(result);
 		} catch (Exception ex) {
-			logger.error(ex);
+			logger.error(ex,ex);
 			response = new ResponseDTO<>(new ErrorDTO(ex));
 		}
 

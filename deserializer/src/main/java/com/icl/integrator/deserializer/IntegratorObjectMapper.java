@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.dto.FullServiceDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
@@ -39,6 +40,8 @@ public class IntegratorObjectMapper extends ObjectMapper {
                                    new AddActionDTODeserializer());
         testModule.addDeserializer(RawDestinationDescriptor.class,
                                    new RawDestinationDescriptorDeserializer());
+        testModule.addDeserializer(FullServiceDTO.class,
+                                   new FullServiceDTODeserializer());
 	    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	    configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
         setSerializationInclusion(JsonInclude.Include.NON_NULL);

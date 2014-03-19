@@ -46,7 +46,7 @@ public class RegistrationService {
 	@Autowired
 	private DeliveryCreator deliveryCreator;
 
-	@Transactional
+    @Transactional(noRollbackFor=ConnectionException.class)
     public <T extends ActionDescriptor>
     Map<String, ResponseDTO<Void>> register(
             TargetRegistrationDTO<T> registrationDTO)
@@ -85,7 +85,7 @@ public class RegistrationService {
         return result;
     }
 
-    @Transactional
+    @Transactional(noRollbackFor=Exception.class)
     private <T extends ActionDescriptor>
     void processJMS(EndpointDTO endpoint,
                     TargetRegistrationDTO registrationDTO,
@@ -124,7 +124,7 @@ public class RegistrationService {
     }
 
 	//TODO refactor
-    @Transactional
+    @Transactional(noRollbackFor=Exception.class)
     private <T extends ActionDescriptor>
     void processHttp(EndpointDTO endpoint,
                      TargetRegistrationDTO registrationDTO,

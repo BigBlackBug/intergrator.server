@@ -26,7 +26,14 @@ public class FullServiceDTO<T extends EndpointDescriptor,
     public FullServiceDTO() {
 	}
 
-	public String getServiceName() {
+    public FullServiceDTO(String serviceName, EndpointDTO<T> serviceEndpoint,
+                          List<ActionEndpointDTO<Y>> actions) {
+        this.serviceName = serviceName;
+        this.serviceEndpoint = serviceEndpoint;
+        this.actions = actions;
+    }
+
+    public String getServiceName() {
 		return serviceName;
 	}
 

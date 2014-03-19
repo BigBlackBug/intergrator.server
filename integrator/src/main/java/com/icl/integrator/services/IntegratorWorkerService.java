@@ -55,10 +55,16 @@ public class IntegratorWorkerService {
 		EndpointType endpointType = service.getEndpointType();
 
 		ActionEndpointDTO<T> action = actionReg.getAction();
-		String actionName = action.getActionName();
+        EndpointType actionEndpointType = action.getActionDescriptor().getEndpointType();
+        if (endpointType != actionEndpointType) {
+            throw new IntegratorException(
+                    String.format("Тип добавляемого действия '%s' не совпадает с" +
+                                          " типом сервиса '%s'", actionEndpointType, endpointType));
+        }
+        String actionName = action.getActionName();
 
-		if (endpointType == EndpointType.HTTP) {
-			HttpServiceEndpoint serviceEndpoint =
+        if (endpointType == EndpointType.HTTP) {
+            HttpServiceEndpoint serviceEndpoint =
 					persistenceService.getHttpService(service.getServiceName());
 			HttpActionDTO httpActionDTO = (HttpActionDTO) action.getActionDescriptor();
 

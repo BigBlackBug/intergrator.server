@@ -9,7 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -181,8 +180,8 @@ public class PersistenceService {
                                    String password) {
         try {
             String query =
-                    "select action from JMSServiceEndpoint ep join " +
-                            "ep.actions action where ep.id=:endpointId and " +
+                    "select action from JMSAction action join " +
+                            "action.endpoint ep where ep.id=:endpointId and " +
                             "action.queueName=:queueName and " +
                             "action.username=:username and " +
                             "action.password=:password";

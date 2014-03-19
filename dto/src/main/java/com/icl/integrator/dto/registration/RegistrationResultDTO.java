@@ -1,6 +1,7 @@
 package com.icl.integrator.dto.registration;
 
 import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.dto.ServiceDTO;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.Map;
  */
 public class RegistrationResultDTO implements Serializable {
 
-	private String serviceName;
+	private ServiceDTO service;
 
 	private Map<String, ResponseDTO<Void>> actionRegistrationResponses;
 
@@ -18,18 +19,18 @@ public class RegistrationResultDTO implements Serializable {
 
 	}
 
-	public RegistrationResultDTO(String serviceName,
+	public RegistrationResultDTO(ServiceDTO service,
 	                             Map<String, ResponseDTO<Void>> actionRegistrationResponses) {
-		this.serviceName = serviceName;
+		this.service = service;
 		this.actionRegistrationResponses = actionRegistrationResponses;
 	}
 
-	public String getServiceName() {
-		return serviceName;
+	public ServiceDTO getService() {
+		return service;
 	}
 
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
+	public void setService(ServiceDTO service) {
+		this.service = service;
 	}
 
 	public Map<String, ResponseDTO<Void>> getActionRegistrationResponses() {
@@ -55,7 +56,7 @@ public class RegistrationResultDTO implements Serializable {
 		if (!actionRegistrationResponses.equals(that.actionRegistrationResponses)) {
 			return false;
 		}
-		if (!serviceName.equals(that.serviceName)) {
+		if (!service.equals(that.service)) {
 			return false;
 		}
 
@@ -64,7 +65,7 @@ public class RegistrationResultDTO implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int result = serviceName.hashCode();
+		int result = service.hashCode();
 		result = 31 * result + actionRegistrationResponses.hashCode();
 		return result;
 	}
