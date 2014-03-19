@@ -6,7 +6,6 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
-import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.services.IntegratorService;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.apache.commons.logging.Log;
@@ -102,7 +101,8 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	}
 
 	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<List<ActionEndpointDTO>> getSupportedActions(
+	public <T extends DestinationDescriptor,Y extends ActionDescriptor>
+    ResponseDTO<List<ActionEndpointDTO<Y>>> getSupportedActions(
 			@RequestBody
 			IntegratorPacket<ServiceDTO, T> serviceDTO) {
 
@@ -127,10 +127,9 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	}
 
 	@Override
-	public <EDType extends EndpointDescriptor,
-			ADType extends ActionDescriptor,
+	public <ADType extends ActionDescriptor,
 			DDType extends DestinationDescriptor>
-	ResponseDTO<FullServiceDTO<EDType, ADType>>
+	ResponseDTO<FullServiceDTO<ADType>>
 	getServiceInfo(@RequestBody
 	               IntegratorPacket<ServiceDTO, DDType> serviceDTO) {
 		TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>

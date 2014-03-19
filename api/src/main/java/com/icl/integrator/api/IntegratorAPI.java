@@ -4,7 +4,6 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
-import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.util.List;
 import java.util.Map;
@@ -44,13 +43,13 @@ public interface IntegratorAPI {
     ResponseDTO<List<ServiceDTO>>
     getServiceList(IntegratorPacket<Void, T> packet);
 
-    public <T extends DestinationDescriptor>
-    ResponseDTO<List<ActionEndpointDTO>>
+    public <T extends DestinationDescriptor,Y extends ActionDescriptor>
+    ResponseDTO<List<ActionEndpointDTO<Y>>>
     getSupportedActions(IntegratorPacket<ServiceDTO, T> serviceDTO);
 
-    public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,
+    public <ADType extends ActionDescriptor,
             DDType extends DestinationDescriptor>
-    ResponseDTO<FullServiceDTO<EDType, ADType>>
+    ResponseDTO<FullServiceDTO<ADType>>
     getServiceInfo(IntegratorPacket<ServiceDTO, DDType> serviceDTO);
 
     public <T extends DestinationDescriptor,Y extends ActionDescriptor>

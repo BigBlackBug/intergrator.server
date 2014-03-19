@@ -5,7 +5,6 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
-import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.services.validation.ValidationService;
 import org.apache.commons.logging.Log;
@@ -13,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -135,13 +135,18 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public <T extends DestinationDescriptor> ResponseDTO<List<ActionEndpointDTO>> getSupportedActions(
+    public <T extends DestinationDescriptor,Y extends ActionDescriptor>
+    ResponseDTO<List<ActionEndpointDTO<Y>>> getSupportedActions(
             IntegratorPacket<ServiceDTO, T> serviceDTO) {
-        ResponseDTO<List<ActionEndpointDTO>> response;
+        ResponseDTO<List<ActionEndpointDTO<Y>>> response;
         try {
-            List<ActionEndpointDTO> actions = workerService
+            List<ActionEndpointDTO> supportedActions = workerService
                     .getSupportedActions(serviceDTO.getPacket());
-            response = new ResponseDTO<>(actions);
+            List<ActionEndpointDTO<Y>> result = new ArrayList<>();
+            for(ActionEndpointDTO actionEndpoint :supportedActions){
+                result.add(actionEndpoint);
+            }
+            response = new ResponseDTO<>(result);
         } catch (Exception ex) {
 	        logger.error(ex,ex);
 	        response = new ResponseDTO<>(new ErrorDTO(ex));
@@ -166,15 +171,14 @@ public class IntegratorService implements IntegratorAPI {
     }
 
     @Override
-    public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,
-            DDType extends DestinationDescriptor> ResponseDTO<FullServiceDTO<EDType, ADType>>
+    public <ADType extends ActionDescriptor,
+            DDType extends DestinationDescriptor> ResponseDTO<FullServiceDTO<ADType>>
     getServiceInfo(
             IntegratorPacket<ServiceDTO, DDType> serviceDTO) {
-        ResponseDTO<FullServiceDTO<EDType, ADType>> response;
+        ResponseDTO<FullServiceDTO<ADType>> response;
         try {
-            FullServiceDTO<EDType, ADType> serviceInfo =
-                    workerService
-                            .getServiceInfo(serviceDTO.getPacket());
+            FullServiceDTO<ADType> serviceInfo =
+                    workerService.getServiceInfo(serviceDTO.getPacket());
             response = new ResponseDTO<>(serviceInfo);
         } catch (Exception ex) {
 	        logger.error(ex,ex);

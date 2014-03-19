@@ -14,22 +14,21 @@ import java.util.List;
  * Time: 11:39
  * To change this template use File | Settings | File Templates.
  */
-public class FullServiceDTO<T extends EndpointDescriptor,
-		Y extends ActionDescriptor> implements Serializable {
+public class FullServiceDTO<Y extends ActionDescriptor> implements Serializable {
 
 	private String serviceName;
 
-	private EndpointDTO<T> serviceEndpoint;
+	private EndpointDescriptor endpoint;
 
 	private List<ActionEndpointDTO<Y>> actions;
 
     public FullServiceDTO() {
 	}
 
-    public FullServiceDTO(String serviceName, EndpointDTO<T> serviceEndpoint,
+    public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
                           List<ActionEndpointDTO<Y>> actions) {
         this.serviceName = serviceName;
-        this.serviceEndpoint = serviceEndpoint;
+        this.endpoint = endpoint;
         this.actions = actions;
     }
 
@@ -41,12 +40,12 @@ public class FullServiceDTO<T extends EndpointDescriptor,
 		this.serviceName = serviceName;
 	}
 
-	public EndpointDTO<T> getServiceEndpoint() {
-		return serviceEndpoint;
+	public EndpointDescriptor getEndpoint() {
+		return endpoint;
 	}
 
-	public void setServiceEndpoint(EndpointDTO<T> serviceEndpoint) {
-		this.serviceEndpoint = serviceEndpoint;
+	public void setEndpoint(EndpointDescriptor endpoint) {
+		this.endpoint = endpoint;
 	}
 
 	public List<ActionEndpointDTO<Y>> getActions() {
@@ -75,7 +74,7 @@ public class FullServiceDTO<T extends EndpointDescriptor,
 		if (!actions.equals(that.actions)) {
 			return false;
 		}
-		if (!serviceEndpoint.equals(that.serviceEndpoint)) {
+		if (!endpoint.equals(that.endpoint)) {
 			return false;
 		}
 		if (!serviceName.equals(that.serviceName)) {
@@ -88,7 +87,7 @@ public class FullServiceDTO<T extends EndpointDescriptor,
 	@Override
 	public int hashCode() {
 		int result = serviceName.hashCode();
-		result = 31 * result + serviceEndpoint.hashCode();
+		result = 31 * result + endpoint.hashCode();
 		result = 31 * result + actions.hashCode();
 		return result;
 	}

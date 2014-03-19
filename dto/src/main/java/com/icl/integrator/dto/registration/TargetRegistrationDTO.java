@@ -1,6 +1,6 @@
 package com.icl.integrator.dto.registration;
 
-import com.icl.integrator.dto.EndpointDTO;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,7 +16,7 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> implements Serial
 
 	private String serviceName;
 
-	private EndpointDTO endpoint;
+	private EndpointDescriptor endpoint;
 
 	private DeliverySettingsDTO deliverySettings;
 
@@ -26,7 +26,7 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> implements Serial
 	}
 
 	public TargetRegistrationDTO(String serviceName,
-	                             EndpointDTO endpoint,
+                                 EndpointDescriptor endpoint,
 	                             DeliverySettingsDTO deliverySettings,
 	                             List<ActionRegistrationDTO<T>> actions) {
 		this(serviceName, endpoint, deliverySettings);
@@ -34,7 +34,7 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> implements Serial
 	}
 
 	public TargetRegistrationDTO(String serviceName,
-	                             EndpointDTO endpoint,
+                                 EndpointDescriptor endpoint,
 	                             DeliverySettingsDTO deliverySettings) {
 		this.serviceName = serviceName;
 		this.endpoint = endpoint;
@@ -49,11 +49,11 @@ public class TargetRegistrationDTO<T extends ActionDescriptor> implements Serial
 		this.deliverySettings = deliverySettings;
 	}
 
-	public EndpointDTO getEndpoint() {
+	public EndpointDescriptor getEndpoint() {
 		return endpoint;
 	}
 
-	public void setEndpoint(EndpointDTO endpoint) {
+	public void setEndpoint(EndpointDescriptor endpoint) {
 		this.endpoint = endpoint;
 	}
 

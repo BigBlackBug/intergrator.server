@@ -1,5 +1,7 @@
 package com.icl.integrator.dto.source;
 
+import com.icl.integrator.dto.util.EndpointType;
+
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -7,16 +9,18 @@ package com.icl.integrator.dto.source;
  * Time: 16:00
  * To change this template use File | Settings | File Templates.
  */
-public class HttpEndpointDescriptorDTO implements EndpointDescriptor {
+public class HttpEndpointDescriptorDTO extends EndpointDescriptor {
 
     private String host;
 
     private int port;
 
     HttpEndpointDescriptorDTO() {
+        super(EndpointType.HTTP);
     }
 
     public HttpEndpointDescriptorDTO(String host, int port) {
+        this();
         this.host = host;
         this.port = port;
     }

@@ -1,7 +1,7 @@
 package com.icl.integrator.dto.destination;
 
-import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.io.Serializable;
 
@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 public class RawDestinationDescriptor extends DestinationDescriptor implements Serializable {
 
-	private EndpointDTO endpoint;
+	private EndpointDescriptor endpoint;
 
 	private ActionDescriptor actionDescriptor;
 
@@ -22,7 +22,7 @@ public class RawDestinationDescriptor extends DestinationDescriptor implements S
 		super(DescriptorType.RAW);
 	}
 
-	public RawDestinationDescriptor(EndpointDTO endpoint,
+	public RawDestinationDescriptor(EndpointDescriptor endpoint,
 	                                ActionDescriptor actionDescriptor) {
 		this();
 		this.endpoint = endpoint;
@@ -37,11 +37,11 @@ public class RawDestinationDescriptor extends DestinationDescriptor implements S
 		this.actionDescriptor = actionDescriptor;
 	}
 
-	public EndpointDTO getEndpoint() {
+	public EndpointDescriptor getEndpoint() {
 		return endpoint;
 	}
 
-	public void setEndpoint(EndpointDTO endpoint) {
+	public void setEndpoint(EndpointDescriptor endpoint) {
 		this.endpoint = endpoint;
 	}
 

@@ -127,7 +127,15 @@
                     "type": "string"
                 },
                 "endpoint": {
-                    "$ref": "#/definitions/endpointDTO"
+                    "type": "object",
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/httpDesc"
+                        },
+                        {
+                            "$ref": "#/definitions/jmsDesc"
+                        }
+                    ]
                 },
                 "deliverySettings": {
                     "required": ["retryDelay", "retryNumber"],
@@ -276,7 +284,15 @@
                             "enum": [ "RAW" ]
                         },
                         "endpoint": {
-                            "$ref": "#/definitions/endpointDTO"
+                            "type": "object",
+                            "oneOf": [
+                                {
+                                    "$ref": "#/definitions/httpDesc"
+                                },
+                                {
+                                    "$ref": "#/definitions/jmsDesc"
+                                }
+                            ]
                         },
                         "actionDescriptor": {
                             "$ref": "#/definitions/actionDesc"
@@ -356,31 +372,9 @@
                 }
             ]
         },
-        "endpointDTO": {
-            "type": "object",
-            "required": ["endpointType", "descriptor"],
-            "additionalProperties": false,
-            "properties": {
-                "endpointType": {
-                    "type": "string",
-                    "enum": [ "HTTP", "JMS" ]
-                },
-                "descriptor": {
-                    "type": "object",
-                    "oneOf": [
-                        {
-                            "$ref": "#/definitions/httpDesc"
-                        },
-                        {
-                            "$ref": "#/definitions/jmsDesc"
-                        }
-                    ]
-                }
-            }
-        },
         "httpDesc": {
             "type": "object",
-            "required": ["host", "port"],
+            "required": ["host", "port","endpointType"],
             "additionalProperties": false,
             "properties": {
                 "host": {
@@ -390,13 +384,16 @@
                     "type": "number",
                     "minimum": 0,
                     "exclusiveMinimum": true
+                },"endpointType": {
+                    "type": "string",
+                    "enum": [ "HTTP" ]
                 }
             }
         },
         "jmsDesc": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["connectionFactory", "jndiProperties"],
+            "required": ["connectionFactory", "jndiProperties","endpointType"],
             "properties": {
                 "connectionFactory": {
                     "type": "string"
@@ -404,6 +401,10 @@
                 "jndiProperties": {
                     "type": "object",
                     "default": {}
+                } ,
+                "endpointType": {
+                    "type": "string",
+                    "enum": [ "JMS" ]
                 }
             }
         }

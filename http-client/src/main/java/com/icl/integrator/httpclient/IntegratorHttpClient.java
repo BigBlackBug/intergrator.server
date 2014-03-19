@@ -5,7 +5,6 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
-import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -82,13 +81,14 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         return getServiceList(new IntegratorPacket<Void, DestinationDescriptor>());
     }
 
-    public ResponseDTO<List<ActionEndpointDTO>> getSupportedActions(
-            ServiceDTO serviceDTO) {
+    public <T extends ActionDescriptor>
+    ResponseDTO<List<ActionEndpointDTO<T>>>
+    getSupportedActions(ServiceDTO serviceDTO) {
         return getSupportedActions(new IntegratorPacket<>(serviceDTO));
     }
 
-    public <T extends EndpointDescriptor, Y extends ActionDescriptor>
-    ResponseDTO<FullServiceDTO<T, Y>>
+    public <Y extends ActionDescriptor>
+    ResponseDTO<FullServiceDTO<Y>>
     getServiceInfo(ServiceDTO serviceDTO) {
         return getServiceInfo(new IntegratorPacket<>(serviceDTO));
     }
@@ -178,14 +178,15 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
     }
 
     @Override
-    public <T extends DestinationDescriptor> ResponseDTO<List<ActionEndpointDTO>> getSupportedActions(
+    public <T extends DestinationDescriptor,Y extends ActionDescriptor>
+    ResponseDTO<List<ActionEndpointDTO<Y>>> getSupportedActions(
             IntegratorPacket<ServiceDTO, T> serviceDTO) {
         HttpMethodDescriptor methodPair = getMethodPath
                 ("getSupportedActions", IntegratorPacket.class);
         try {
-            ParameterizedTypeReference<ResponseDTO<List<ActionEndpointDTO>>>
+            ParameterizedTypeReference<ResponseDTO<List<ActionEndpointDTO<Y>>>>
                     type =
-                    new ParameterizedTypeReference<ResponseDTO<List<ActionEndpointDTO>>>() {
+                    new ParameterizedTypeReference<ResponseDTO<List<ActionEndpointDTO<Y>>>>() {
                     };
             return sendRequest(serviceDTO, type, methodPair);
         } catch (MalformedURLException e) {
@@ -213,14 +214,15 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
 	}
 
     @Override
-    public <EDType extends EndpointDescriptor, ADType extends ActionDescriptor, DDType extends DestinationDescriptor> ResponseDTO<FullServiceDTO<EDType, ADType>> getServiceInfo(
+    public <ADType extends ActionDescriptor, DDType extends DestinationDescriptor>
+    ResponseDTO<FullServiceDTO<ADType>> getServiceInfo(
             IntegratorPacket<ServiceDTO, DDType> serviceDTO) {
         HttpMethodDescriptor methodPair = getMethodPath
                 ("getServiceInfo", IntegratorPacket.class);
         try {
-            ParameterizedTypeReference<ResponseDTO<FullServiceDTO<EDType, ADType>>>
+            ParameterizedTypeReference<ResponseDTO<FullServiceDTO<ADType>>>
                     type =
-                    new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<EDType, ADType>>>() {
+                    new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<ADType>>>() {
                     };
             return sendRequest(serviceDTO, type, methodPair);
         } catch (MalformedURLException e) {

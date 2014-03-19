@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.FullServiceDTO;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,14 +25,15 @@ public class FullServiceDTODeserializer extends JsonDeserializer<FullServiceDTO>
             throws IOException, JsonProcessingException {
         ObjectNode treeNode = jp.readValueAsTree();
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
-        JsonNode serviceEndpoint = treeNode.get("serviceEndpoint");
-        EndpointDTO endpointDTO = mapper.readValue(serviceEndpoint.toString(), EndpointDTO.class);
+        JsonNode serviceEndpoint = treeNode.get("endpoint");
+        EndpointDescriptor endpointDTO = mapper.readValue(serviceEndpoint.toString(),
+                                                          EndpointDescriptor.class);
         String serviceName = treeNode.get("serviceName").asText();
         ArrayNode actions = (ArrayNode) treeNode.get("actions");
-        List<ActionEndpointDTO> actionList=  new ArrayList<>();
-        for(JsonNode action:actions){
+        List<ActionEndpointDTO> actionList = new ArrayList<>();
+        for (JsonNode action : actions) {
             actionList.add(mapper.readValue(action.toString(), ActionEndpointDTO.class));
         }
-        return  new FullServiceDTO(serviceName,endpointDTO,actionList);
+        return new FullServiceDTO(serviceName, endpointDTO, actionList);
     }
 }

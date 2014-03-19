@@ -5,7 +5,6 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
-import com.icl.integrator.dto.source.EndpointDescriptor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,8 +72,8 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @RequestMapping(value = "getSupportedActions", method = RequestMethod.POST)
     public
     @ResponseBody
-    <T extends DestinationDescriptor>
-    ResponseDTO<List<ActionEndpointDTO>> getSupportedActions(
+    <T extends DestinationDescriptor,Y extends ActionDescriptor>
+    ResponseDTO<List<ActionEndpointDTO<Y>>> getSupportedActions(
             @RequestBody
             IntegratorPacket<ServiceDTO, T> serviceDTO);
 
@@ -89,9 +88,9 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @Override
     @RequestMapping(value = "getServiceInfo", method = RequestMethod.POST)
     public @ResponseBody
-    <EDType extends EndpointDescriptor, ADType extends ActionDescriptor,
+    <ADType extends ActionDescriptor,
             DDType extends DestinationDescriptor>
-    ResponseDTO<FullServiceDTO<EDType, ADType>> getServiceInfo(
+    ResponseDTO<FullServiceDTO<ADType>> getServiceInfo(
             @RequestBody
             IntegratorPacket<ServiceDTO, DDType> serviceDTO);
 

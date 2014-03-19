@@ -43,8 +43,6 @@ public class ValidatorTests {
     public void testValidator() throws Exception {
         HttpEndpointDescriptorDTO desr = new
                 HttpEndpointDescriptorDTO(  "localhost", 8080);
-        EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-                new EndpointDTO<>(EndpointType.HTTP, desr);
         RawDestinationDescriptor dd =
                 new RawDestinationDescriptor(null
                 ,new HttpActionDTO("/ext_source/handleGetServiceList", ActionMethod.HANDLE_DELIVERY)
@@ -57,11 +55,10 @@ public class ValidatorTests {
 	public void testValidator3() throws Exception {
 		HttpEndpointDescriptorDTO desr = new
 				HttpEndpointDescriptorDTO("localhost", 8080);
-		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-				new EndpointDTO<>(EndpointType.HTTP, desr);
 		RawDestinationDescriptor dd =
 				new RawDestinationDescriptor(
-						endpoint, new HttpActionDTO("/ext_source/handleGetServiceList",ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE)
+						desr, new HttpActionDTO("/ext_source/handleGetServiceList",
+                                             ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE)
 				);
 		ServiceDestinationDescriptor sdd = new ServiceDestinationDescriptor("a",null,EndpointType.HTTP);
 		IntegratorPacket p = new IntegratorPacket();
@@ -90,11 +87,10 @@ public class ValidatorTests {
 	public void testValidator2() throws Exception {
 		HttpEndpointDescriptorDTO desr = new
 				HttpEndpointDescriptorDTO("localhost", 8080);
-		EndpointDTO<HttpEndpointDescriptorDTO> endpoint =
-				new EndpointDTO<>(EndpointType.HTTP, desr);
 		RawDestinationDescriptor dd =
 				new RawDestinationDescriptor(
-						endpoint, new HttpActionDTO("/ext_source/handleGetServiceList",ActionMethod.HANDLE_GET_SERVER_LIST)
+						desr, new HttpActionDTO("/ext_source/handleGetServiceList",
+                                             ActionMethod.HANDLE_GET_SERVER_LIST)
 				);
 		IntegratorPacket p = new IntegratorPacket();
 		p.setMethod(null);

@@ -92,9 +92,8 @@ public class DeliveryCreator {
 		if (descriptorType == DestinationDescriptor.DescriptorType.RAW) {
 			RawDestinationDescriptor realSourceService =
 					(RawDestinationDescriptor) destination;
-			EndpointDTO endpoint = realSourceService.getEndpoint();
-			EndpointType endpointType = endpoint.getEndpointType();
-			EndpointDescriptor descriptor = endpoint.getDescriptor();
+			EndpointDescriptor descriptor = realSourceService.getEndpoint();
+			EndpointType endpointType = descriptor.getEndpointType();
 
 			if (endpointType == EndpointType.HTTP) {
 				HttpEndpointDescriptorDTO realDescriptor =

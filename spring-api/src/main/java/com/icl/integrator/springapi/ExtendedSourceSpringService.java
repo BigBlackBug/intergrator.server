@@ -7,7 +7,6 @@ import com.icl.integrator.dto.ResponseFromTargetDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.RegistrationResultDTO;
-import com.icl.integrator.dto.source.EndpointDescriptor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,7 +88,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleGetServiceInfo(@RequestBody
-	                          ResponseDTO<FullServiceDTO<EndpointDescriptor, ActionDescriptor>> response);
+	                          ResponseDTO<FullServiceDTO<ActionDescriptor>> response);
 
 	@Override
 	@RequestMapping(value = "/handleResponseFromTarget",

@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.FullServiceDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,8 +31,8 @@ public class IntegratorObjectMapper extends ObjectMapper {
                                    new DestinationDescriptorDeserializer());
         testModule.addDeserializer(TargetRegistrationDTO.class,
                                    new TargetRegistrationDTODeserializer());
-        testModule.addDeserializer(EndpointDTO.class,
-                                   new EndpointDTODeserializer());
+        testModule.addDeserializer(EndpointDescriptor.class,
+                                   new EndpointDescriptorDeserializer());
 
 	    testModule.addDeserializer(ActionDescriptor.class,
 	                               new ActionDescriptorDeserializer());

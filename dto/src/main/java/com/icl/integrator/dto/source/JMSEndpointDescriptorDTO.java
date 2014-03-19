@@ -1,5 +1,7 @@
 package com.icl.integrator.dto.source;
 
+import com.icl.integrator.dto.util.EndpointType;
+
 import java.util.Map;
 
 /**
@@ -9,17 +11,19 @@ import java.util.Map;
  * Time: 10:39
  * To change this template use File | Settings | File Templates.
  */
-public class JMSEndpointDescriptorDTO implements EndpointDescriptor {
+public class JMSEndpointDescriptorDTO extends EndpointDescriptor {
 
     private Map<String, String> jndiProperties;
 
     private String connectionFactory;
 
     JMSEndpointDescriptorDTO() {
+        super(EndpointType.JMS);
     }
 
     public JMSEndpointDescriptorDTO(String connectionFactory,
                                     Map<String, String> jndiProperties) {
+        this();
         this.connectionFactory = connectionFactory;
         this.jndiProperties = jndiProperties;
     }

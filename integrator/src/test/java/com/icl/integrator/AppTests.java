@@ -290,27 +290,24 @@ public class AppTests {
 		return dto;
 	}
 
-	private EndpointDTO<EndpointDescriptor> getJMSDTO() {
+	private EndpointDescriptor getJMSDTO() {
         EndpointDescriptor d = new JMSEndpointDescriptorDTO("CONNFACTORY",new HashMap<String, String>() {{
             put("a", "1");
         }});
-		EndpointDTO<EndpointDescriptor> dto = new EndpointDTO<>(EndpointType.JMS,d);
-		return dto;
+		return d;
 	}
 
-	private EndpointDTO<EndpointDescriptor> getHttpDTO() {
-        EndpointDescriptor d = new HttpEndpointDescriptorDTO("host",1001);
-		EndpointDTO<EndpointDescriptor> dto = new EndpointDTO<>(EndpointType.HTTP,d);
-		return dto;
+	private EndpointDescriptor getHttpDTO() {
+        return new HttpEndpointDescriptorDTO("host",1001);
 	}
 
 	@Test
 	@Ignore
 	public void testMvc() throws Exception {
 		RawDestinationDescriptor targetResponseHandler =
-				new RawDestinationDescriptor(new EndpointDTO<>(EndpointType.JMS, new
+				new RawDestinationDescriptor(new
                         JMSEndpointDescriptorDTO("ConnectionFactory", null)
-                ),new QueueDTO
+                ,new QueueDTO
                         ("SourceQueue",ActionMethod.HANDLE_GET_SERVER_LIST));
 		IntegratorPacket<Void, DestinationDescriptor>
 				packet =
@@ -325,11 +322,11 @@ public class AppTests {
 	@Test
 	public void testRawDDDeserializer() throws Exception {
 		RawDestinationDescriptor targetResponseHandler =
-				new RawDestinationDescriptor(new EndpointDTO<>(EndpointType.JMS, new
+				new RawDestinationDescriptor(new
                         JMSEndpointDescriptorDTO("ConnectionFactory",
                                                  Collections.<String,
                                                          String>emptyMap())
-                ),new QueueDTO
+                ,new QueueDTO
                         ("SourceQueue",ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE));
 		IntegratorPacket<Void, DestinationDescriptor>
 				packet =
@@ -368,8 +365,6 @@ public class AppTests {
 		//----------------------------------------------------------------------
 		HttpEndpointDescriptorDTO descr = new HttpEndpointDescriptorDTO("192.168.84.142",8080);
 
-        EndpointDTO<HttpEndpointDescriptorDTO>
-                endpointDTO = new EndpointDTO<>(EndpointType.HTTP,descr);
 		//----------------------------------------------------------------------
 		HttpActionDTO actionDescriptor = new HttpActionDTO("/destination/handleDelivery",
 		                                                   ActionMethod.HANDLE_DELIVERY);
@@ -379,7 +374,8 @@ public class AppTests {
                 Arrays.asList(new ActionRegistrationDTO<>(actionDTO, true));
         DeliverySettingsDTO deliverySettingsDTO = new DeliverySettingsDTO(100, 500);
         TargetRegistrationDTO<HttpActionDTO> expected =
-                new TargetRegistrationDTO<>("SERVICE",endpointDTO,deliverySettingsDTO,actionRegistrationDTOs);
+                new TargetRegistrationDTO<>("SERVICE",descr,deliverySettingsDTO,
+                                            actionRegistrationDTOs);
 		String sstring = mapper.writeValueAsString(expected);
 		TargetRegistrationDTO result =
 				mapper.readValue(sstring, TargetRegistrationDTO.class);
@@ -401,11 +397,9 @@ public class AppTests {
     @Test
     public void testHttpFSERVDeserializer() throws Exception {
 
-        FullServiceDTO<HttpEndpointDescriptorDTO,HttpActionDTO> serviceDTO = new FullServiceDTO<>();
+        FullServiceDTO<HttpActionDTO> serviceDTO = new FullServiceDTO<>();
         serviceDTO.setServiceName("SAD");
-        serviceDTO.setServiceEndpoint(new EndpointDTO<>(EndpointType.HTTP,
-                                                      new HttpEndpointDescriptorDTO("host",
-                                                                                    65468)));
+        serviceDTO.setEndpoint(new HttpEndpointDescriptorDTO("host",65468));
         ActionEndpointDTO<HttpActionDTO> actionEndpointDTO =
                 new ActionEndpointDTO<>("actionname",new HttpActionDTO("path",
                                                                       ActionMethod.HANDLE_ADD_ACTION));
@@ -413,22 +407,8 @@ public class AppTests {
         String s = mapper.writeValueAsString(serviceDTO);
         FullServiceDTO
                 serviceDTO1 =
-                mapper.readValue(s, new TypeReference<FullServiceDTO<EndpointDescriptor,
-                        ActionDescriptor>>(){});
+                mapper.readValue(s, new TypeReference<FullServiceDTO<ActionDescriptor>>(){});
         Assert.assertEquals(serviceDTO, serviceDTO1);
-    }
-    @Test
-    public void testS() throws Exception{
-        String str = "{\"response\":{\"responseClass\":null," +
-                "\"responseValue\":{\"serviceName\":\"SERVICE\"," +
-                "\"serviceEndpoint\":{\"endpointType\":\"HTTP\",\"descriptor\":{\"host\":\"192" +
-                ".168.84.142\",\"port\":8080}},\"actions\":[{\"actionName\":\"ACTION\"," +
-                "\"actionDescriptor\":{\"actionMethod\":\"handleDelivery:HANDLE_DELIVERY\"," +
-                "\"endpointType\":\"HTTP\",\"path\":\"/destination/handleDelivery\"}}]}},\"success\":true,\"error\":null}";
-
-        ResponseDTO<FullServiceDTO> serviceDTO = mapper.readValue(str,
-                                                      new TypeReference<ResponseDTO<FullServiceDTO>>(){});
-        Assert.assertEquals(str,mapper.writeValueAsString(serviceDTO));
     }
 
 	@Test

@@ -2,11 +2,11 @@ package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
@@ -53,7 +53,7 @@ public class RegistrationService {
             throws TargetRegistrationException {
         Map<String, ResponseDTO<Void>> result = new HashMap<>();
 
-        EndpointDTO endpoint = registrationDTO.getEndpoint();
+        EndpointDescriptor endpoint = registrationDTO.getEndpoint();
         List<ActionEndpointDTO<T>> actions = new ArrayList<>();
         List<ActionRegistrationDTO<T>> actionRegistrations =
                 registrationDTO.getActionRegistrations();
@@ -87,14 +87,13 @@ public class RegistrationService {
 
     @Transactional(noRollbackFor=Exception.class)
     private <T extends ActionDescriptor>
-    void processJMS(EndpointDTO endpoint,
+    void processJMS(EndpointDescriptor endpoint,
                     TargetRegistrationDTO registrationDTO,
                     List<ActionEndpointDTO<T>> actions,
                     Map<String, ResponseDTO<Void>> result)
             throws TargetRegistrationException {
         String serviceName = registrationDTO.getServiceName();
-        JMSEndpointDescriptorDTO descriptor =
-                (JMSEndpointDescriptorDTO) endpoint.getDescriptor();
+        JMSEndpointDescriptorDTO descriptor = (JMSEndpointDescriptorDTO) endpoint;
 	    JMSServiceEndpoint serviceEntity =
 			    createJmsEntity(descriptor, serviceName,
 			                    registrationDTO.getDeliverySettings());
@@ -126,14 +125,14 @@ public class RegistrationService {
 	//TODO refactor
     @Transactional(noRollbackFor=Exception.class)
     private <T extends ActionDescriptor>
-    void processHttp(EndpointDTO endpoint,
+    void processHttp(EndpointDescriptor endpoint,
                      TargetRegistrationDTO registrationDTO,
                      List<ActionEndpointDTO<T>> actions,
                      Map<String, ResponseDTO<Void>> result)
             throws TargetRegistrationException {
         String serviceName = registrationDTO.getServiceName();
         HttpEndpointDescriptorDTO descriptor =
-                (HttpEndpointDescriptorDTO) endpoint.getDescriptor();
+                (HttpEndpointDescriptorDTO) endpoint;
 
 	    DeliverySettingsDTO deliverySettings =
 			    registrationDTO.getDeliverySettings();
@@ -366,7 +365,7 @@ public class RegistrationService {
 	}
 
     private <T extends ActionDescriptor>
-    void testConnection(EndpointDTO endpoint, ActionEndpointDTO<T> action)
+    void testConnection(EndpointDescriptor endpoint, ActionEndpointDTO<T> action)
             throws ConnectionException {
         EndpointConnector connector =
                 connectorFactory.createEndpointConnector(

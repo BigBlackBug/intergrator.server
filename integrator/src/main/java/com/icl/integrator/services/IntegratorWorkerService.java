@@ -2,16 +2,14 @@ package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.FullServiceDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
-import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
-import com.icl.integrator.model.*;
 import com.icl.integrator.dto.util.EndpointType;
+import com.icl.integrator.model.*;
 import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
@@ -178,27 +176,22 @@ public class IntegratorWorkerService {
 		return result;
 	}
 
-	public <T extends EndpointDescriptor,
-			Y extends ActionDescriptor> FullServiceDTO<T, Y>
+	public <Y extends ActionDescriptor> FullServiceDTO<Y>
 	getServiceInfo(ServiceDTO serviceDTO) {
-		FullServiceDTO<T, Y> result = null;
+		FullServiceDTO< Y> result = null;
 		EndpointType endpointType = serviceDTO.getEndpointType();
 		if (endpointType == EndpointType.HTTP) {
-			FullServiceDTO<HttpEndpointDescriptorDTO,
-					HttpActionDTO> httpResult = new FullServiceDTO<>();
+			FullServiceDTO<HttpActionDTO> httpResult = new FullServiceDTO<>();
 			HttpServiceEndpoint httpService = persistenceService
 					.getHttpService(serviceDTO.getServiceName());
 			HttpEndpointDescriptorDTO httpEndpointDescriptorDTO =
 					new HttpEndpointDescriptorDTO(httpService.getServiceURL()
 							, httpService.getServicePort());
-			EndpointDTO<HttpEndpointDescriptorDTO> endpointDTO =
-					new EndpointDTO<>(endpointType, httpEndpointDescriptorDTO);
-			httpResult.setServiceEndpoint(endpointDTO);
+			httpResult.setEndpoint(httpEndpointDescriptorDTO);
 			httpResult.setActions(getHttpActionDTOs(httpService));
-			result = (FullServiceDTO<T, Y>) httpResult;
+			result = (FullServiceDTO<Y>) httpResult;
 		} else if (endpointType == EndpointType.JMS) {
-			FullServiceDTO<JMSEndpointDescriptorDTO,
-					QueueDTO> jmsResult = new FullServiceDTO<>();
+			FullServiceDTO<QueueDTO> jmsResult = new FullServiceDTO<>();
 			JMSServiceEndpoint jmsService = persistenceService
 					.getJmsService(serviceDTO.getServiceName());
 			Map<String, String> props = null;
@@ -214,11 +207,9 @@ public class IntegratorWorkerService {
 			JMSEndpointDescriptorDTO httpEndpointDescriptorDTO =
 					new JMSEndpointDescriptorDTO(
 							jmsService.getConnectionFactory(), props);
-			EndpointDTO<JMSEndpointDescriptorDTO> endpointDTO =
-					new EndpointDTO<>(endpointType, httpEndpointDescriptorDTO);
-			jmsResult.setServiceEndpoint(endpointDTO);
+			jmsResult.setEndpoint(httpEndpointDescriptorDTO);
 			jmsResult.setActions(getJmsActionDTOs(jmsService));
-			result = (FullServiceDTO<T, Y>) jmsResult;
+			result = (FullServiceDTO<Y>) jmsResult;
 		}
 		result.setServiceName(serviceDTO.getServiceName());
 		return result;

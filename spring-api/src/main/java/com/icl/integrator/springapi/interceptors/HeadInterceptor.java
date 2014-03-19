@@ -4,7 +4,6 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.ActionMethod;
 import com.icl.integrator.dto.registration.RegistrationResultDTO;
-import com.icl.integrator.dto.source.EndpointDescriptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -54,7 +53,7 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 		          new ParameterizedTypeReference<ResponseDTO<Void>>() {
 		          }.getType());
 		types.put(ActionMethod.HANDLE_GET_SERVICE_INFO,
-		          new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<EndpointDescriptor, ActionDescriptor>>>() {
+		          new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<ActionDescriptor>>>() {
 		          }.getType());
 		types.put(ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE,
 		          new ParameterizedTypeReference<ResponseDTO<List<ResponseDTO<Void>>>>() {

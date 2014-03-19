@@ -1,6 +1,5 @@
 package com.icl.integrator.util.connectors;
 
-import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
@@ -8,6 +7,7 @@ import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.HttpActionDTO;
 import com.icl.integrator.dto.registration.QueueDTO;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
@@ -61,13 +61,13 @@ public class EndpointConnectorFactory {
 		}
 	}
 
-	public EndpointConnector createEndpointConnector(EndpointDTO endpoint,
+	public EndpointConnector createEndpointConnector(EndpointDescriptor endpoint,
 	                                                 ActionDescriptor descriptor) {
 		EndpointType endpointType = endpoint.getEndpointType();
 		switch (endpointType) {
 			case HTTP: {
 				HttpEndpointDescriptorDTO endpointDescriptor =
-						(HttpEndpointDescriptorDTO) endpoint.getDescriptor();
+						(HttpEndpointDescriptorDTO) endpoint;
 				HttpActionDTO actionDescriptor = (HttpActionDTO) descriptor;
 				try {
 					URL url = new URL("HTTP", endpointDescriptor.getHost(),
@@ -80,7 +80,7 @@ public class EndpointConnectorFactory {
 			}
 			case JMS: {
 				JMSEndpointDescriptorDTO endpointDescriptor =
-						(JMSEndpointDescriptorDTO) endpoint.getDescriptor();
+						(JMSEndpointDescriptorDTO) endpoint;
 				QueueDTO actionDescriptor = (QueueDTO) descriptor;
 				return new JMSEndpointConnector(endpointDescriptor,
 				                                actionDescriptor);

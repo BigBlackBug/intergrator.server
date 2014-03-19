@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.io.IOException;
 
@@ -26,12 +26,8 @@ public class RawDestinationDescriptorDeserializer
 			throws IOException {
 		JsonNode treeNode = jp.readValueAsTree();
 		IntegratorObjectMapper mapper = new IntegratorObjectMapper();
-		EndpointDTO endpointDTO = mapper.readValue(treeNode.get("endpoint").toString(),
-		                                           EndpointDTO.class);
-
-//		if (endpointDTO == null) {
-//			return result;
-//		}
+		EndpointDescriptor endpointDTO = mapper.readValue(treeNode.get("endpoint").toString(),
+		                                           EndpointDescriptor.class);
 		ActionDescriptor sourceResponse = mapper.readValue(
 				treeNode.get("actionDescriptor").toString(),ActionDescriptor.class);
 		return new RawDestinationDescriptor(endpointDTO,sourceResponse);

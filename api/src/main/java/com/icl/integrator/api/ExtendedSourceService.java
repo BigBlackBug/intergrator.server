@@ -5,7 +5,6 @@ import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.RegistrationResultDTO;
-import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.util.List;
 import java.util.Map;
@@ -33,8 +32,7 @@ public interface ExtendedSourceService extends SourceService {
 
 	public void handleAddAction(ResponseDTO<Void> response);
 
-	public void handleGetServiceInfo(
-			ResponseDTO<FullServiceDTO<EndpointDescriptor, ActionDescriptor>> response);
+	public void handleGetServiceInfo(ResponseDTO<FullServiceDTO<ActionDescriptor>> response);
 
 	public void handleAutoDetectionRegistration(ResponseDTO<List<ResponseDTO<Void>>> response);
 

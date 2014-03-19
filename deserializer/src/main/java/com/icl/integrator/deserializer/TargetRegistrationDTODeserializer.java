@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.icl.integrator.dto.EndpointDTO;
 import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,10 +33,13 @@ public class TargetRegistrationDTODeserializer extends
                 mapper.readValue(treeNode.get("deliverySettings").toString(),
                                  DeliverySettingsDTO.class);
         String serviceName = treeNode.get("serviceName").asText();
-        EndpointDTO endpoint =
-                mapper.readValue(treeNode.get("endpoint").toString(), EndpointDTO.class);
-        List<ActionRegistrationDTO<ActionDescriptor>> actions =
-                getActions(treeNode.get("actionRegistrations"));
+        EndpointDescriptor endpoint =
+                mapper.readValue(treeNode.get("endpoint").toString(), EndpointDescriptor.class);
+        JsonNode actionRegistrations = treeNode.get("actionRegistrations");
+        List<ActionRegistrationDTO<ActionDescriptor>> actions = new ArrayList<>();
+        if(actionRegistrations!=null){
+            actions.addAll(getActions(actionRegistrations));
+        }
         return new TargetRegistrationDTO(serviceName, endpoint, deliverySettings, actions);
     }
 
