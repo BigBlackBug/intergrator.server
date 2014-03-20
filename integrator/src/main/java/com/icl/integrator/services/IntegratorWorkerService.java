@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -242,5 +243,20 @@ public class IntegratorWorkerService {
 		}
 		return result;
 	}
+
+    public Map<String, List<ServiceDTO>> getAllActionMap() {
+        Map<String, List<AbstractEndpointEntity>> allActionMap =
+                persistenceService.getAllActionMap();
+        Map<String, List<ServiceDTO>> result = new HashMap<>();
+        for (Map.Entry<String, List<AbstractEndpointEntity>> entry : allActionMap.entrySet()) {
+            List<AbstractEndpointEntity> endpoints = entry.getValue();
+            List<ServiceDTO> serviceList = new ArrayList<>();
+            for (AbstractEndpointEntity endpoint : endpoints) {
+                serviceList.add(new ServiceDTO(endpoint.getServiceName(), endpoint.getType()));
+            }
+            result.put(entry.getKey(), serviceList);
+        }
+        return result;
+    }
 
 }

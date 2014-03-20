@@ -42,6 +42,14 @@ public class DeliveryDTO implements Serializable{
 		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
 
+    public DeliveryDTO(String action,
+                       List<ServiceDTO> destinations,
+                       RequestDataDTO requestData) {
+        this.destinations = destinations;
+        this.requestData = requestData;
+        this.action = action;
+    }
+
     DeliveryDTO(){
 
     }

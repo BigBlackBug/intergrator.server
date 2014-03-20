@@ -8,7 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -222,6 +224,25 @@ public class PersistenceService {
         return em.createQuery("select ep.actions from AbstractEndpointEntity ep where ep" +
                                       ".serviceName=:serviceName").setParameter(
                 "serviceName", serviceName).getResultList();
+    }
+
+    @Transactional
+    public Map<String, List<AbstractEndpointEntity>> getAllActionMap() {
+        Map<String, List<AbstractEndpointEntity>> result = new HashMap<>();
+        List<String> actions =
+                em.createQuery("select action.actionName from AbstractActionEntity action",
+                               String.class).getResultList();
+        if (!actions.isEmpty()) {
+            for (String actionName : actions) {
+                List<AbstractEndpointEntity> endpoints = em.createQuery(
+                        "select ep from AbstractActionEntity a join a.endpoint ep where a" +
+                                ".actionName=:actionName", AbstractEndpointEntity.class)
+                        .setParameter("actionName", actionName)
+                        .getResultList();
+                result.put(actionName, endpoints);
+            }
+        }
+        return result;
     }
 
 }

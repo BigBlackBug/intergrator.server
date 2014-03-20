@@ -152,7 +152,17 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 		return integratorService.registerAutoDetection(fixConversion(autoDetectionDTO, type));
 	}
 
-	@ExceptionHandler(Exception.class)
+    @Override
+    public <T extends DestinationDescriptor> ResponseDTO<Map<String, List<ServiceDTO>>> getAllActionsMap(
+            @RequestBody IntegratorPacket<Void, T> packet) {
+        TypeReference<IntegratorPacket<Void, DestinationDescriptor>>
+                type =
+                new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
+                };
+        return integratorService.getAllActionsMap(fixConversion(packet, type));
+    }
+
+    @ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> handleNotAuthenticatedException(
 			Exception ex,
 			HttpServletRequest request) {

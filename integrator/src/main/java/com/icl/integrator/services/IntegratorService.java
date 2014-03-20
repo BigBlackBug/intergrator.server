@@ -208,4 +208,22 @@ public class IntegratorService implements IntegratorAPI {
 		return response;
 	}
 
+    @Override
+    public <T extends DestinationDescriptor>
+    ResponseDTO<Map<String, List<ServiceDTO>>> getAllActionsMap(
+            IntegratorPacket<Void, T> packet) {
+        logger.info("Received a getAllActionMap request");
+        ResponseDTO<Map<String, List<ServiceDTO>>> response;
+        try {
+            Map<String, List<ServiceDTO>> result = workerService.getAllActionMap();
+            response = new ResponseDTO<>(result);
+        } catch (Exception ex) {
+            logger.error(ex, ex);
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
+
+        deliveryService.deliver(packet.getResponseHandlerDescriptor(), response);
+        return response;
+    }
+
 }

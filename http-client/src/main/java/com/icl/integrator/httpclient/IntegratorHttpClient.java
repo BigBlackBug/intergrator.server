@@ -246,7 +246,23 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
 		}
 	}
 
-	public <Y> ResponseDTO<List<ResponseDTO<Void>>>
+    @Override
+    public <T extends DestinationDescriptor> ResponseDTO<Map<String, List<ServiceDTO>>> getAllActionsMap(
+            IntegratorPacket<Void, T> packet) {
+        HttpMethodDescriptor methodPair = getMethodPath(
+                "getAllActionsMap", IntegratorPacket.class);
+        try {
+            ParameterizedTypeReference<ResponseDTO<Map<String, List<ServiceDTO>>>>
+                    type =
+                    new ParameterizedTypeReference<ResponseDTO<Map<String, List<ServiceDTO>>>>() {
+                    };
+            return sendRequest(packet, type, methodPair);
+        } catch (MalformedURLException e) {
+            throw new IntegratorClientException(e);
+        }
+    }
+
+    public <Y> ResponseDTO<List<ResponseDTO<Void>>>
 	registerAutoDetection(AutoDetectionRegistrationDTO<Y> autoDetectionDTO) {
 		return registerAutoDetection(new IntegratorPacket<>(autoDetectionDTO));
 	}

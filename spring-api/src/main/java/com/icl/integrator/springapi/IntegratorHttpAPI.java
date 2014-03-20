@@ -102,4 +102,12 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
 	ResponseDTO<List<ResponseDTO<Void>>> registerAutoDetection(
 			@RequestBody
 			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);
+
+    @Override
+    @RequestMapping(value = "getAllActionsMap", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    <T extends DestinationDescriptor>
+    ResponseDTO<Map<String, List<ServiceDTO>>>
+    getAllActionsMap(@RequestBody IntegratorPacket<Void, T> packet);
 }

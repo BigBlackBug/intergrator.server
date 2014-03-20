@@ -59,4 +59,8 @@ public interface IntegratorAPI {
 	public <T extends DestinationDescriptor,Y>
 	ResponseDTO<List<ResponseDTO<Void>>>
 	registerAutoDetection(IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);
+
+    public <T extends DestinationDescriptor>
+    ResponseDTO<Map<String,List<ServiceDTO>>>
+    getAllActionsMap(IntegratorPacket<Void, T> packet);
 }
