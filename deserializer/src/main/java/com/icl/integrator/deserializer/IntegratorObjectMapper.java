@@ -9,6 +9,7 @@ import com.icl.integrator.dto.FullServiceDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.registration.ActionEndpointDTO;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
@@ -42,6 +43,8 @@ public class IntegratorObjectMapper extends ObjectMapper {
                                    new RawDestinationDescriptorDeserializer());
         testModule.addDeserializer(FullServiceDTO.class,
                                    new FullServiceDTODeserializer());
+        testModule.addDeserializer(ActionEndpointDTO.class,
+                                   new ActionEndpointDTODeserializer());
 	    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	    configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
         setSerializationInclusion(JsonInclude.Include.NON_NULL);

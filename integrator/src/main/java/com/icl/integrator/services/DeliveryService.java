@@ -97,8 +97,7 @@ public class DeliveryService {
 		deliveryTaskCreator.setCallback(new DeliverySuccessCallback<>(delivery, deliverySuccess));
 
 		scheduler.scheduleDelivery(new Schedulable<>(deliveryTaskCreator,
-		                                             delivery),
-		                           deliveryFailed);
+		                                             delivery), deliveryFailed);
 	}
 
 	public <T> void deliver(Delivery delivery,Class<T> responseClass) {
@@ -199,8 +198,7 @@ public class DeliveryService {
 	        }
             DeliveryCallable<ResponseClass, Void>
                     successCallable =
-                    new DeliveryCallable<>(sourceConnector, data,
-                                           Void.class);
+                    new DeliveryCallable<>(sourceConnector, data, Void.class);
 
             TaskCreator<Void> deliveryToSource =
                     new TaskCreator<>(successCallable);

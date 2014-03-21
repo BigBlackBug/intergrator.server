@@ -2,7 +2,9 @@ package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.dto.DeliveryActionsDTO;
 import com.icl.integrator.dto.FullServiceDTO;
+import com.icl.integrator.dto.ServiceAndActions;
 import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
@@ -123,35 +125,10 @@ public class IntegratorWorkerService {
         List<AbstractActionEntity> actions =
                 persistenceService.getActions(serviceDTO.getServiceName());
         List<ActionEndpointDTO> result = new ArrayList<>();
-        switch (serviceDTO.getEndpointType()) {
-            case HTTP: {
-                for (AbstractActionEntity actionEntity : actions) {
-                    HttpAction httpAction = (HttpAction) actionEntity;
-                    HttpActionDTO httpActionDTO = new HttpActionDTO(httpAction.getActionURL(),
-                                                                    actionEntity.getActionMethod());
-                    ActionEndpointDTO<HttpActionDTO> epdto =
-                            new ActionEndpointDTO<>(actionEntity.getActionName(),httpActionDTO);
-                    result.add(epdto);
-                }
-                return result;
-            }
-            case JMS: {
-                for (AbstractActionEntity actionEntity : actions) {
-                    JMSAction httpAction = (JMSAction) actionEntity;
-                    QueueDTO httpActionDTO = new QueueDTO(httpAction.getQueueName(),
-                                                          httpAction.getUsername(),
-                                                          httpAction.getPassword(),
-                                                          actionEntity.getActionMethod());
-                    ActionEndpointDTO<QueueDTO> epdto =
-                            new ActionEndpointDTO<>(actionEntity.getActionName(),httpActionDTO);
-                    result.add(epdto);
-                }
-                return result;
-            }
-            default: {
-                return null;
-            }
+        for (AbstractActionEntity actionEntity : actions) {
+            result.add(convertActionToDTO(actionEntity));
         }
+        return result;
     }
 
 	public Boolean pingService(ServiceDestinationDescriptor serviceDescriptor) {
@@ -244,19 +221,64 @@ public class IntegratorWorkerService {
 		return result;
 	}
 
-    public Map<String, List<ServiceDTO>> getAllActionMap() {
+
+    public List<DeliveryActionsDTO> getAllActionMap() {
         Map<String, List<AbstractEndpointEntity>> allActionMap =
                 persistenceService.getAllActionMap();
-        Map<String, List<ServiceDTO>> result = new HashMap<>();
+        List<DeliveryActionsDTO> list = new ArrayList<>();
         for (Map.Entry<String, List<AbstractEndpointEntity>> entry : allActionMap.entrySet()) {
             List<AbstractEndpointEntity> endpoints = entry.getValue();
             List<ServiceDTO> serviceList = new ArrayList<>();
             for (AbstractEndpointEntity endpoint : endpoints) {
                 serviceList.add(new ServiceDTO(endpoint.getServiceName(), endpoint.getType()));
             }
-            result.put(entry.getKey(), serviceList);
+            list.add(new DeliveryActionsDTO(entry.getKey(), serviceList));
+        }
+        return list;
+    }
+
+    public <T extends ActionDescriptor>
+    Map<String, ServiceAndActions<T>> get(ActionMethod actionMethod) {
+        Map<AbstractEndpointEntity, List<AbstractActionEntity>> servicesSupportingActionType =
+                persistenceService.getServicesSupportingActionType(actionMethod);
+        Map<String, ServiceAndActions<T>> result = new HashMap<>();
+        for (Map.Entry<AbstractEndpointEntity, List<AbstractActionEntity>>
+                entry : servicesSupportingActionType.entrySet()) {
+            List<AbstractActionEntity> actions = entry.getValue();
+            List<ActionEndpointDTO<T>> actionDTOs = new ArrayList<>();
+            for (AbstractActionEntity e : actions) {
+                actionDTOs.add((ActionEndpointDTO<T>) convertActionToDTO(e));
+            }
+            result.put(entry.getKey().getServiceName(),
+                       new ServiceAndActions<>(entityToDTO(entry.getKey()),actionDTOs));
         }
         return result;
     }
 
+    private ServiceDTO entityToDTO(AbstractEndpointEntity key) {
+        return new ServiceDTO(key.getServiceName(), key.getType());
+    }
+
+    private ActionEndpointDTO<ActionDescriptor> convertActionToDTO
+            (AbstractActionEntity
+                     actionEntity) {
+        EndpointType type = actionEntity.getType();
+        switch (type) {
+            case HTTP: {
+                HttpAction httpAction = (HttpAction) actionEntity;
+                ActionDescriptor httpActionDTO = new HttpActionDTO(httpAction.getActionURL(),
+                                                                   actionEntity.getActionMethod());
+                return new ActionEndpointDTO<>(actionEntity.getActionName(), httpActionDTO);
+            }
+            case JMS: {
+                JMSAction httpAction = (JMSAction) actionEntity;
+                ActionDescriptor httpActionDTO = new QueueDTO(httpAction.getQueueName(),
+                                                              httpAction.getUsername(),
+                                                              httpAction.getPassword(),
+                                                              actionEntity.getActionMethod());
+                return new ActionEndpointDTO<>(actionEntity.getActionName(), httpActionDTO);
+            }
+        }
+        return null;
+    }
 }

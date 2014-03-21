@@ -153,13 +153,24 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	}
 
     @Override
-    public <T extends DestinationDescriptor> ResponseDTO<Map<String, List<ServiceDTO>>> getAllActionsMap(
+    public <T extends DestinationDescriptor> ResponseDTO<List<DeliveryActionsDTO>> getActionsForDelivery(
             @RequestBody IntegratorPacket<Void, T> packet) {
         TypeReference<IntegratorPacket<Void, DestinationDescriptor>>
                 type =
                 new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
                 };
-        return integratorService.getAllActionsMap(fixConversion(packet, type));
+        return integratorService.getActionsForDelivery(fixConversion(packet, type));
+    }
+
+    @Override
+    public <T extends DestinationDescriptor, Y extends ActionDescriptor>
+    ResponseDTO<Map<String, ServiceAndActions<Y>>> getServicesSupportingActionType(
+            @RequestBody IntegratorPacket<ActionMethod, T> packet) {
+        TypeReference<IntegratorPacket<ActionMethod, DestinationDescriptor>>
+                type =
+                new TypeReference<IntegratorPacket<ActionMethod, DestinationDescriptor>>() {
+                };
+        return integratorService.getServicesSupportingActionType(fixConversion(packet, type));
     }
 
     @ExceptionHandler(Exception.class)

@@ -210,13 +210,32 @@ public class IntegratorService implements IntegratorAPI {
 
     @Override
     public <T extends DestinationDescriptor>
-    ResponseDTO<Map<String, List<ServiceDTO>>> getAllActionsMap(
+    ResponseDTO<List<DeliveryActionsDTO>> getActionsForDelivery(
             IntegratorPacket<Void, T> packet) {
-        logger.info("Received a getAllActionMap request");
-        ResponseDTO<Map<String, List<ServiceDTO>>> response;
+        logger.info("Received a getActionsForDelivery request");
+        ResponseDTO<List<DeliveryActionsDTO>> response;
         try {
-            Map<String, List<ServiceDTO>> result = workerService.getAllActionMap();
+            List<DeliveryActionsDTO> result = workerService.getAllActionMap();
             response = new ResponseDTO<>(result);
+        } catch (Exception ex) {
+            logger.error(ex, ex);
+            response = new ResponseDTO<>(new ErrorDTO(ex));
+        }
+
+        deliveryService.deliver(packet.getResponseHandlerDescriptor(), response);
+        return response;
+    }
+
+    @Override
+    public <T extends DestinationDescriptor, Y extends ActionDescriptor>
+    ResponseDTO<Map<String, ServiceAndActions<Y>>>
+    getServicesSupportingActionType(IntegratorPacket<ActionMethod, T> packet) {
+        logger.info("Received a getServicesSupportingActionType request");
+        ResponseDTO<Map<String, ServiceAndActions<Y>>> response;
+        try {
+            Map<String, ServiceAndActions<Y>>
+                    serviceDTOListMap = workerService.get(packet.getPacket());
+            response = new ResponseDTO<>(serviceDTOListMap);
         } catch (Exception ex) {
             logger.error(ex, ex);
             response = new ResponseDTO<>(new ErrorDTO(ex));

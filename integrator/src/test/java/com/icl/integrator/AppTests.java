@@ -4,7 +4,11 @@ package com.icl.integrator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.*;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.type.MapType;
+import com.icl.integrator.dto.FullServiceDTO;
+import com.icl.integrator.dto.IntegratorPacket;
+import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
@@ -12,6 +16,7 @@ import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
+import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.model.*;
 import com.icl.integrator.services.EndpointResolverService;
 import com.icl.integrator.services.JsonMatcher;
@@ -21,7 +26,6 @@ import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
 import com.icl.integrator.task.retryhandler.DatabaseRetryHandler;
 import com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory;
-import com.icl.integrator.dto.util.EndpointType;
 import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -439,6 +443,32 @@ public class AppTests {
 				mapper.readValue(s, RawDestinationDescriptor.class);
 		Assert.assertEquals(serviceDTO, serviceDTO1);
 	}
+    @Test
+    public void tesMapsErvicetDeserializer() throws Exception {
+        final Map<ServiceDTO,Integer> map = new HashMap<>(4);
+        map.put(new ServiceDTO("ser",EndpointType.HTTP),5);
+
+        final MapType type = mapper.getTypeFactory().constructMapType(
+                Map.class, ServiceDTO.class, Integer.class);
+        final ObjectWriter writer = mapper.writerWithType(type);
+        final String json = writer.writeValueAsString(map);
+
+        Map<ServiceDTO,Integer>
+        resultMap =
+        mapper.readValue(json, new TypeReference<Map<ServiceDTO,Integer>>(){});
+
+        Assert.assertEquals(map, resultMap);
+    }
+
+    @Test
+    public void testDeserializerSericeDTO() throws Exception {
+        ServiceDTO serviceDTO= new ServiceDTO("ser",EndpointType.HTTP);
+        String s = mapper.writeValueAsString(serviceDTO);
+        ServiceDTO
+                serviceDTO1 =
+                mapper.readValue(s, ServiceDTO.class);
+        Assert.assertEquals(serviceDTO, serviceDTO1);
+    }
 
 	@Test
 	public void testHandler() throws Exception {

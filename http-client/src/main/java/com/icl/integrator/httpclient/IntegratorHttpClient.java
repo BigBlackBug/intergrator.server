@@ -247,14 +247,31 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
 	}
 
     @Override
-    public <T extends DestinationDescriptor> ResponseDTO<Map<String, List<ServiceDTO>>> getAllActionsMap(
-            IntegratorPacket<Void, T> packet) {
+    public <T extends DestinationDescriptor> ResponseDTO<List<DeliveryActionsDTO>>
+    getActionsForDelivery(IntegratorPacket<Void, T> packet) {
         HttpMethodDescriptor methodPair = getMethodPath(
-                "getAllActionsMap", IntegratorPacket.class);
+                "getActionsForDelivery", IntegratorPacket.class);
         try {
-            ParameterizedTypeReference<ResponseDTO<Map<String, List<ServiceDTO>>>>
+            ParameterizedTypeReference<ResponseDTO<List<DeliveryActionsDTO>>>
                     type =
-                    new ParameterizedTypeReference<ResponseDTO<Map<String, List<ServiceDTO>>>>() {
+                    new ParameterizedTypeReference<ResponseDTO<List<DeliveryActionsDTO>>>() {
+                    };
+            return sendRequest(packet, type, methodPair);
+        } catch (MalformedURLException e) {
+            throw new IntegratorClientException(e);
+        }
+    }
+
+    @Override
+    public <T extends DestinationDescriptor, Y extends ActionDescriptor>
+    ResponseDTO<Map<String, ServiceAndActions<Y>>> getServicesSupportingActionType(
+            IntegratorPacket<ActionMethod, T> packet) {
+        HttpMethodDescriptor methodPair = getMethodPath(
+                "getServicesSupportingActionType", IntegratorPacket.class);
+        try {
+            ParameterizedTypeReference<ResponseDTO<Map<String, ServiceAndActions<Y>>>>
+                    type =
+                    new ParameterizedTypeReference<ResponseDTO<Map<String, ServiceAndActions<Y>>>>() {
                     };
             return sendRequest(packet, type, methodPair);
         } catch (MalformedURLException e) {

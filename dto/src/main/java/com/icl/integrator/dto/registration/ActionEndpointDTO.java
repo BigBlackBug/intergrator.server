@@ -66,6 +66,14 @@ public class ActionEndpointDTO<T extends ActionDescriptor> implements Serializab
         result = 31 * result + actionDescriptor.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("actionName: ").append(actionName)
+                .append(" ActionDescriptor: '").append(actionDescriptor);
+        return sb.toString();
+    }
 }
 
 

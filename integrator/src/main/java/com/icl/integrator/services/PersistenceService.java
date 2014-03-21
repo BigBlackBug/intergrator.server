@@ -1,6 +1,7 @@
 package com.icl.integrator.services;
 
 import com.icl.integrator.dto.DeliveryPacketType;
+import com.icl.integrator.dto.registration.ActionMethod;
 import com.icl.integrator.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,10 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -230,8 +228,12 @@ public class PersistenceService {
     public Map<String, List<AbstractEndpointEntity>> getAllActionMap() {
         Map<String, List<AbstractEndpointEntity>> result = new HashMap<>();
         List<String> actions =
-                em.createQuery("select action.actionName from AbstractActionEntity action",
-                               String.class).getResultList();
+                em.createQuery(
+                        "select action.actionName from AbstractActionEntity action where action" +
+                                ".actionMethod=:actionMethod",
+                        String.class)
+                        .setParameter("actionMethod", ActionMethod.HANDLE_DELIVERY)
+                        .getResultList();
         if (!actions.isEmpty()) {
             for (String actionName : actions) {
                 List<AbstractEndpointEntity> endpoints = em.createQuery(
@@ -243,6 +245,31 @@ public class PersistenceService {
             }
         }
         return result;
+    }
+
+    @Transactional
+    public Map<AbstractEndpointEntity, List<AbstractActionEntity>>
+    getServicesSupportingActionType(ActionMethod actionMethod) {
+        List<AbstractActionEntity> actions =
+                em.createQuery(
+                        "select action from AbstractActionEntity action where action" +
+                                ".actionMethod=:actionMethod",
+                        AbstractActionEntity.class)
+                        .setParameter("actionMethod", actionMethod)
+                        .getResultList();
+        Map<AbstractEndpointEntity, List<AbstractActionEntity>> map = new HashMap<>();
+        for (AbstractActionEntity action : actions) {
+            AbstractEndpointEntity endpoint = action.getEndpoint();
+            List<AbstractActionEntity> savedActions = map.get(endpoint);
+            if (savedActions == null) {
+                savedActions = new ArrayList<>();
+                savedActions.add(action);
+                map.put(endpoint, savedActions);
+            } else {
+                savedActions.add(action);
+            }
+        }
+        return map;
     }
 
 }
