@@ -55,15 +55,15 @@
    -->
     <context:component-scan base-package="com.icl.integrator"/>
 
-    <bean id="packetProcessorFactory"
-          class="com.icl.integrator.services.PacketProcessorFactory">
-        <lookup-method name="createProcessor" bean="asyncProcessor"/>
-    </bean>
+    <!--<bean id="packetProcessorFactory"-->
+          <!--class="com.icl.integrator.services.PacketProcessorFactory">-->
+        <!--<lookup-method name="createProcessor" bean="asyncProcessor"/>-->
+    <!--</bean>-->
 
-    <bean id="asyncProcessor"
-          class="com.icl.integrator.services.PacketProcessor"
-          scope="prototype">
-    </bean>
+    <!--<bean id="asyncProcessor"-->
+          <!--class="com.icl.integrator.services.PacketProcessor"-->
+          <!--scope="prototype">-->
+    <!--</bean>-->
     <bean id="limitHandler"
           class="com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler"
           scope="prototype">

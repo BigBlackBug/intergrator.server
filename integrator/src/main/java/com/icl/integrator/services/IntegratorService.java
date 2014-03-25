@@ -26,14 +26,13 @@ import java.util.Map;
 @Service
 public class IntegratorService implements IntegratorAPI {
 
-    private static Log logger =
-            LogFactory.getLog(IntegratorService.class);
+    private static Log logger = LogFactory.getLog(IntegratorService.class);
 
     @Autowired
     private RegistrationService registrationService;
 
     @Autowired
-    private PacketProcessorFactory processorFactory;
+    private PacketProcessor packetProcessor;
 
     @Autowired
     private IntegratorWorkerService workerService;
@@ -58,9 +57,8 @@ public class IntegratorService implements IntegratorAPI {
 
             Deliveries deliveries =
 		            deliveryCreator.createDeliveries(packet,packet.getResponseHandlerDescriptor());
-            PacketProcessor processor = processorFactory.createProcessor();
             Map<String, ResponseDTO<String>> serviceToRequestID =
-                    processor.process(deliveries.getDeliveries());
+                    packetProcessor.process(deliveries.getDeliveries());
             serviceToRequestID.putAll(deliveries.getErrorMap());
             response = new ResponseDTO<>(serviceToRequestID);
         } catch (Exception ex) {

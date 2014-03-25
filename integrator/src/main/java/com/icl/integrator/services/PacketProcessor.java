@@ -2,15 +2,14 @@ package com.icl.integrator.services;
 
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.model.Delivery;
-import com.icl.integrator.model.DestinationEntity;
 import com.icl.integrator.services.converters.DefaultDeliverySuccessConverter;
 import com.icl.integrator.services.converters.DefaultErrorConverter;
 import com.icl.integrator.services.utils.ResponseDeliveryDescriptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +22,7 @@ import java.util.Map;
  * Time: 10:01
  * To change this template use File | Settings | File Templates.
  */
+@Service
 public class PacketProcessor {
 
     private static Log logger = LogFactory.getLog(PacketProcessor.class);
