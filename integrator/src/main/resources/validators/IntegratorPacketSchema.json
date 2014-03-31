@@ -313,7 +313,7 @@
                 "HANDLE_SERVER_REGISTRATION_RESPONSE",
                 "HANDLE_SERVICE_IS_AVAILABLE",
                 "HANDLE_GET_SERVER_LIST",
-                "HANDLER_GET_SUPPORTED_ACTIONS",
+                "HANDLE_GET_SUPPORTED_ACTIONS",
                 "HANDLE_ADD_ACTION",
                 "HANDLE_GET_SERVICE_INFO",
                 "HANDLE_PING",

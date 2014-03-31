@@ -69,10 +69,6 @@ public class ValidatorTests {
                                                             put("a", "b");
                                                         }});
 
-		DeliveryDTO deliveryDTO = new DeliveryDTO("ACTION",null,requestData,null);
-		deliveryDTO.setAction("ACTION");
-		deliveryDTO.setDestinations(null);
-
 		serialize(p);
 		p.setResponseHandlerDescriptor(sdd);
 		try{

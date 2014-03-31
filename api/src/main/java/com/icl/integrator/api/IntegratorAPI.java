@@ -18,15 +18,17 @@ import java.util.Map;
 public interface IntegratorAPI {
 
 	/**
-	 * Основной метод, используемый для доста
+	 * Основной метод, используемый для доставки
 	 *
-	 * @param delivery
 	 * @return Карта вида (название сервиса)->(ID запроса или ошибка)
 	 */
     public <T extends DestinationDescriptor>
     ResponseDTO<Map<String, ResponseDTO<String>>>
     deliver(IntegratorPacket<DeliveryDTO, T> delivery);
 
+    /**
+     * Проверяет, доступен ли в данный момент интегратор
+     */
     public <T extends DestinationDescriptor>
     ResponseDTO<Boolean>
     ping(IntegratorPacket<Void, T> packet);
@@ -35,6 +37,9 @@ public interface IntegratorAPI {
     ResponseDTO<RegistrationResultDTO>
     registerService(IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
 
+    /**
+     * Проверяет доступность указанного сервиса
+     */
     public <T extends DestinationDescriptor>
     ResponseDTO<Boolean>
     isAvailable(IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO);
@@ -43,10 +48,16 @@ public interface IntegratorAPI {
     ResponseDTO<List<ServiceDTO>>
     getServiceList(IntegratorPacket<Void, T> packet);
 
+    /**
+     * Возвращает список действий, зарегистрированных на сервисе
+     */
     public <T extends DestinationDescriptor,Y extends ActionDescriptor>
     ResponseDTO<List<ActionEndpointDTO<Y>>>
     getSupportedActions(IntegratorPacket<ServiceDTO, T> serviceDTO);
 
+    /**
+     * Возвращает полную информацию о сервисе, включая информацию о действиях
+     */
     public <ADType extends ActionDescriptor,
             DDType extends DestinationDescriptor>
     ResponseDTO<FullServiceDTO<ADType>>
@@ -56,14 +67,27 @@ public interface IntegratorAPI {
     ResponseDTO<Void>
     addAction(IntegratorPacket<AddActionDTO<Y>, T> actionDTO);
 
+    /**
+     * Добавляет правило автоматического определения таргета по сообщению
+     */
 	public <T extends DestinationDescriptor,Y>
 	ResponseDTO<List<ResponseDTO<Void>>>
 	registerAutoDetection(IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);
 
+    /**
+     * Получает список таргетов, на которые можно отправить сообщения.
+     * Не проверяет доступность этих таргетов.
+     * @return список соответствий: действие - [сервисы, поддерживающие это действие].
+     */
     public <T extends DestinationDescriptor>
     ResponseDTO<List<DeliveryActionsDTO>>
     getActionsForDelivery(IntegratorPacket<Void, T> packet);
 
+    /**
+     * Получает инфу о сервисах и действиях определённого типа
+     * @param packet тип действия
+     * @return карту название_сервиса - {сервис и инфа о действиях}
+     */
     public <T extends DestinationDescriptor, Y extends ActionDescriptor>
     ResponseDTO<Map<String, ServiceAndActions<Y>>>
     getServicesSupportingActionType(IntegratorPacket<ActionMethod, T> packet);

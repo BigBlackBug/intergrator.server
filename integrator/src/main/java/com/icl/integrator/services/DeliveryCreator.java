@@ -260,17 +260,19 @@ public class DeliveryCreator {
 	@Transactional
 	public Deliveries createDeliveries(DeliveryDTO deliveryDTO,
 	                                   DestinationDescriptor responseHandlerDescriptor)
-			throws JsonProcessingException {
+			throws JsonProcessingException, IntegratorException {
 		logger.info("Creating a delivery packet");
 
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
 		Deliveries deliveries;
 		if (requestData.getDeliveryPacketType() == DeliveryPacketType.UNDEFINED) {
+            if(deliveryDTO.getDestinations().isEmpty()){
+                throw new IntegratorException("Вы не указали ни один таргет");
+            }
 			deliveries = createDeliveries(deliveryDTO, requestData, responseHandlerDescriptor);
 		} else {
 			if (deliveryDTO.getDestinations() != null) {
-				deliveries =
-						createDeliveries(deliveryDTO, requestData, responseHandlerDescriptor);
+				deliveries = createDeliveries(deliveryDTO, requestData, responseHandlerDescriptor);
 			} else {
 				deliveries = createAutoDetectedDeliveries(deliveryDTO, responseHandlerDescriptor);
 			}

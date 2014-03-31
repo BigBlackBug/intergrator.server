@@ -3,6 +3,7 @@ package com.icl.integrator.dto.registration;
 import com.icl.integrator.dto.DeliveryPacketType;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,6 +24,18 @@ public class AutoDetectionRegistrationDTO<T> implements Serializable {
 		this.referenceObject = referenceObject;
 		this.destinationDescriptors = destinationDescriptors;
 	}
+
+    public AutoDetectionRegistrationDTO(
+            DeliveryPacketType deliveryPacketType, T referenceObject,
+            RegistrationDestinationDescriptor... destinationDescriptors) {
+        this(deliveryPacketType,referenceObject,Arrays.asList(destinationDescriptors));
+    }
+
+    public AutoDetectionRegistrationDTO(
+            DeliveryPacketType deliveryPacketType, T referenceObject,
+            RegistrationDestinationDescriptor destinationDescriptor) {
+        this(deliveryPacketType,referenceObject,Arrays.asList(destinationDescriptor));
+    }
 
 	AutoDetectionRegistrationDTO() {
 

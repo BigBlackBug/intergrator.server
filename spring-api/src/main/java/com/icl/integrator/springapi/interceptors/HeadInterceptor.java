@@ -46,7 +46,7 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 		types.put(ActionMethod.HANDLE_GET_SERVER_LIST,
 		          new ParameterizedTypeReference<ResponseDTO<List<ServiceDTO>>>() {
 		          }.getType());
-		types.put(ActionMethod.HANDLER_GET_SUPPORTED_ACTIONS,
+		types.put(ActionMethod.HANDLE_GET_SUPPORTED_ACTIONS,
 		          new ParameterizedTypeReference<ResponseDTO<List<String>>>() {
 		          }.getType());
 		types.put(ActionMethod.HANDLE_ADD_ACTION,

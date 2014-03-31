@@ -5,6 +5,7 @@ import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 public class ServiceAndActions<Y extends ActionDescriptor> implements Serializable {
@@ -16,10 +17,17 @@ public class ServiceAndActions<Y extends ActionDescriptor> implements Serializab
     ServiceAndActions() {
     }
 
-    public ServiceAndActions(ServiceDTO service,
-                             List<ActionEndpointDTO<Y>> actions) {
+    public ServiceAndActions(ServiceDTO service, List<ActionEndpointDTO<Y>> actions) {
         this.service = service;
         this.actions = actions;
+    }
+
+    public ServiceAndActions(ServiceDTO service, ActionEndpointDTO<Y>... actions) {
+        this(service, Arrays.asList(actions));
+    }
+
+    public ServiceAndActions(ServiceDTO service, ActionEndpointDTO<Y> action) {
+        this(service, Arrays.asList(action));
     }
 
     @Override

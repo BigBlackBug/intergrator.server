@@ -58,6 +58,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws IntegratorClientException
+     */
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<Boolean> ping(
             IntegratorPacket<Void, T> responseHandler) throws IntegratorClientException {
@@ -72,26 +76,46 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * @see IntegratorHttpClient#ping(IntegratorPacket)
+     * @throws IntegratorClientException
+     */
     public ResponseDTO<Boolean> ping() throws IntegratorClientException {
         return ping(new IntegratorPacket<Void, DestinationDescriptor>());
     }
 
+    /**
+     * @see IntegratorHttpClient#getServiceList(IntegratorPacket)
+     * @throws IntegratorClientException
+     */
     public ResponseDTO<List<ServiceDTO>> getServiceList() throws IntegratorClientException {
         return getServiceList(new IntegratorPacket<Void, DestinationDescriptor>());
     }
 
+    /**
+     * @see IntegratorHttpClient#getSupportedActions(IntegratorPacket)
+     * @throws IntegratorClientException
+     */
     public <T extends ActionDescriptor>
     ResponseDTO<List<ActionEndpointDTO<T>>>
     getSupportedActions(ServiceDTO serviceDTO) throws IntegratorClientException {
         return getSupportedActions(new IntegratorPacket<>(serviceDTO));
     }
 
+    /**
+     * @see IntegratorHttpClient#getServiceInfo(IntegratorPacket)
+     * @throws IntegratorClientException
+     */
     public <Y extends ActionDescriptor>
     ResponseDTO<FullServiceDTO<Y>>
     getServiceInfo(ServiceDTO serviceDTO) throws IntegratorClientException {
         return getServiceInfo(new IntegratorPacket<>(serviceDTO));
     }
 
+    /**
+     * @see IntegratorHttpClient#deliver(IntegratorPacket)
+     * @throws IntegratorClientException
+     */
     public ResponseDTO<Map<String, ResponseDTO<String>>> deliver(
             DeliveryDTO delivery) throws IntegratorClientException {
         return deliver(new IntegratorPacket<>(delivery));
@@ -115,12 +139,20 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * @see IntegratorHttpClient#registerService(IntegratorPacket)
+     * @throws IntegratorClientException
+     */
     public <T extends ActionDescriptor>
     ResponseDTO<RegistrationResultDTO> registerService(
             TargetRegistrationDTO<T> registrationDTO) throws IntegratorClientException {
         return registerService(new IntegratorPacket<>(registrationDTO));
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws IntegratorClientException
+     */
     @Override
     public <T extends ActionDescriptor, Y extends DestinationDescriptor>
     ResponseDTO<RegistrationResultDTO>
@@ -139,6 +171,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * @see IntegratorHttpClient#isAvailable(IntegratorPacket)
+     * @throws IntegratorClientException
+     */
     public ResponseDTO<Boolean> isAvailable(ServiceDestinationDescriptor serviceDescriptor)
             throws IntegratorClientException {
         IntegratorPacket<ServiceDestinationDescriptor, DestinationDescriptor>
@@ -148,6 +184,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         return isAvailable(integratorPacket);
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws IntegratorClientException
+     */
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
             IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO)
@@ -163,6 +203,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws IntegratorClientException
+     */
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>> getServiceList(
             IntegratorPacket<Void, T> responseHandler) throws IntegratorClientException {
@@ -180,6 +224,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws IntegratorClientException
+     */
     @Override
     public <T extends DestinationDescriptor, Y extends ActionDescriptor>
     ResponseDTO<List<ActionEndpointDTO<Y>>> getSupportedActions(
@@ -198,11 +246,19 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * @see IntegratorHttpClient#addAction(IntegratorPacket)
+     * @throws IntegratorClientException
+     */
     public <T extends ActionDescriptor> ResponseDTO<Void> addAction(AddActionDTO<T> actionDTO)
             throws IntegratorClientException {
         return addAction(new IntegratorPacket<>(actionDTO));
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws IntegratorClientException
+     */
 	@Override
 	public <T extends DestinationDescriptor, Y extends ActionDescriptor> ResponseDTO<Void> addAction(
             IntegratorPacket<AddActionDTO<Y>, T> actionDTO) throws IntegratorClientException {
@@ -218,6 +274,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws IntegratorClientException
+     */
     @Override
     public <ADType extends ActionDescriptor, DDType extends DestinationDescriptor>
     ResponseDTO<FullServiceDTO<ADType>> getServiceInfo(
@@ -235,6 +295,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws IntegratorClientException
+     */
 	@Override
 	public <T extends DestinationDescriptor, Y> ResponseDTO<List<ResponseDTO<Void>>>
     registerAutoDetection(IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO)
@@ -253,6 +317,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws IntegratorClientException
+     */
     @Override
     public <T extends DestinationDescriptor> ResponseDTO<List<DeliveryActionsDTO>>
     getActionsForDelivery(IntegratorPacket<Void, T> packet) throws IntegratorClientException {
@@ -269,6 +337,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws IntegratorClientException
+     */
     @Override
     public <T extends DestinationDescriptor, Y extends ActionDescriptor>
     ResponseDTO<Map<String, ServiceAndActions<Y>>> getServicesSupportingActionType(
@@ -286,6 +358,10 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
         }
     }
 
+    /**
+     * @see IntegratorHttpClient#registerAutoDetection(IntegratorPacket)
+     * @throws IntegratorClientException
+     */
     public <Y> ResponseDTO<List<ResponseDTO<Void>>>
     registerAutoDetection(AutoDetectionRegistrationDTO<Y> autoDetectionDTO)
             throws IntegratorClientException {

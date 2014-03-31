@@ -1,6 +1,8 @@
 package com.icl.integrator.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,6 +21,19 @@ public class DeliveryActionsDTO implements Serializable{
                               List<ServiceDTO> services) {
         this.actionName = actionName;
         this.services = services;
+    }
+
+    public DeliveryActionsDTO(String actionName,
+                              ServiceDTO service) {
+        this.actionName = actionName;
+        this.services = new ArrayList<>();
+        services.add(service);
+    }
+
+    public DeliveryActionsDTO(String actionName,
+                              ServiceDTO... services) {
+        this.actionName = actionName;
+        this.services = Arrays.asList(services);
     }
 
     @Override

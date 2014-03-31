@@ -3,6 +3,7 @@ package com.icl.integrator.dto;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,22 +33,39 @@ public class DeliveryDTO implements Serializable{
 		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
 
-	public DeliveryDTO(String action,
-	                   List<ServiceDTO> destinations,
-	                   RequestDataDTO requestData,
-	                   DestinationDescriptor responseHandlerDescriptor) {
-		this.destinations = destinations;
+    public DeliveryDTO(RequestDataDTO requestData,
+                       DestinationDescriptor responseHandlerDescriptor,
+                       String action,
+                       List<ServiceDTO> destinations) {
+        this.destinations = destinations;
 		this.requestData = requestData;
 		this.action = action;
 		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
 
-    public DeliveryDTO(String action,
-                       List<ServiceDTO> destinations,
-                       RequestDataDTO requestData) {
+    public DeliveryDTO(RequestDataDTO requestData,
+                       DestinationDescriptor responseHandlerDescriptor,
+                       String action,
+                       ServiceDTO destination) {
+        this(requestData,responseHandlerDescriptor,action,Arrays.asList(destination));
+    }
+
+    public DeliveryDTO(RequestDataDTO requestData,
+                       DestinationDescriptor responseHandlerDescriptor,
+                       String action,
+                       ServiceDTO... destinations) {
+        this(requestData,responseHandlerDescriptor,action,Arrays.asList(destinations));
+    }
+
+    public DeliveryDTO(RequestDataDTO requestData, String action, List<ServiceDTO> destinations) {
         this.destinations = destinations;
         this.requestData = requestData;
         this.action = action;
+    }
+
+    public DeliveryDTO(RequestDataDTO requestData, String action, ServiceDTO destination, ServiceDTO... destinations) {
+        this(requestData,action, Arrays.asList(destinations));
+        this.destinations.add(destination);
     }
 
     DeliveryDTO(){

@@ -5,6 +5,7 @@ import com.icl.integrator.dto.registration.ActionEndpointDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,6 +31,16 @@ public class FullServiceDTO<Y extends ActionDescriptor> implements Serializable 
         this.serviceName = serviceName;
         this.endpoint = endpoint;
         this.actions = actions;
+    }
+
+    public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
+                          ActionEndpointDTO<Y>... actions) {
+        this(serviceName, endpoint, Arrays.asList(actions));
+    }
+
+    public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
+                          ActionEndpointDTO<Y> action) {
+        this(serviceName, endpoint, Arrays.asList(action));
     }
 
     public String getServiceName() {
