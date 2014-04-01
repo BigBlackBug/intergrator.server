@@ -9,6 +9,7 @@ import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,6 +30,8 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class IntegratorHttpClient implements IntegratorHttpAPI {
+
+    public static final int CONNECT_TIMEOUT = 5000;
 
     private final String host;
 
@@ -384,15 +387,18 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
             Request data, ParameterizedTypeReference<Response> responseType,
             HttpMethodDescriptor methodDescriptor)
             throws RestClientException, MalformedURLException {
-        RestTemplate restTemplate = new RestTemplate();
+
+        HttpComponentsClientHttpRequestFactory rf =new HttpComponentsClientHttpRequestFactory();
+        rf.setReadTimeout(CONNECT_TIMEOUT);
+        rf.setConnectTimeout(CONNECT_TIMEOUT);
+        RestTemplate restTemplate = new RestTemplate(rf);
 
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(new IntegratorObjectMapper());
         restTemplate.getMessageConverters().clear();
         restTemplate.getMessageConverters().add(converter);
         RequestMethod methodType = methodDescriptor.getMethodType();
-        URL url = new URL("HTTP", host, port,
-                          path + methodDescriptor.getMethodPath());
+        URL url = new URL("HTTP", host, port, path + methodDescriptor.getMethodPath());
 
         String urlString = url.toString();
         HttpEntity<Request> requestEntity = new HttpEntity<>(data);

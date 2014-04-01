@@ -7,6 +7,7 @@ import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.services.validation.ValidationService;
+import com.icl.integrator.util.connectors.ConnectionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,8 +109,11 @@ public class IntegratorService implements IntegratorAPI {
         try {
             workerService.pingService(serviceDescriptor.getPacket());
             response = new ResponseDTO<>(Boolean.TRUE, Boolean.class.toString());
+        } catch (ConnectionException ex) {
+            logger.error(ex, ex);
+            response = new ResponseDTO<>(new ErrorDTO(ex, ErrorCode.SERVICE_NOT_AVAILABLE));
         } catch (Exception ex) {
-	        logger.error(ex,ex);
+            logger.error(ex, ex);
             response = new ResponseDTO<>(new ErrorDTO(ex));
         }
         deliveryService.deliver(serviceDescriptor.getResponseHandlerDescriptor(), response);

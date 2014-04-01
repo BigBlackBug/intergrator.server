@@ -17,42 +17,46 @@ public class ErrorDTO implements Serializable {
 
 	private String developerMessage;
 
-	private int errorCode;
+    private ErrorCode errorCode;
 
-	public ErrorDTO(String errorMessage, String developerMessage,
-	                int errorCode) {
-		this.errorMessage = errorMessage;
-		this.developerMessage = developerMessage;
+    public ErrorDTO(String errorMessage, String developerMessage,
+                    ErrorCode errorCode) {
+        this.errorMessage = errorMessage;
+        this.developerMessage = developerMessage;
 		this.errorCode = errorCode;
 	}
 
 	public ErrorDTO(String errorMessage, String developerMessage) {
-		this(errorMessage, developerMessage, -1);
-	}
+        this(errorMessage, developerMessage, ErrorCode.DEFAULT);
+    }
 
-	public ErrorDTO(Throwable ex) {
-		String message = ex.getMessage();
-		if (message == null) {
-			message = ex.getClass().getSimpleName();
-		}
-		this.errorMessage = message;
-		this.developerMessage = Utils.getStackTraceAsString(ex);
-		this.errorCode = -1;
-	}
+    public ErrorDTO(Throwable ex) {
+        this(ex, ErrorCode.DEFAULT);
+    }
 
-	public ErrorDTO(String errorMessage, int errorCode) {
-		this(errorMessage, "", errorCode);
-	}
+    public ErrorDTO(String errorMessage, ErrorCode errorCode) {
+        this(errorMessage, "", errorCode);
+    }
 
 	public ErrorDTO(String errorMessage) {
-		this(errorMessage, -1);
+        this(errorMessage, ErrorCode.DEFAULT);
+    }
+
+    public ErrorDTO() {
 	}
 
-	public ErrorDTO() {
-	}
+    public ErrorDTO(Throwable ex, ErrorCode errorCode) {
+        String message = ex.getMessage();
+        if (message == null) {
+            message = ex.getClass().getSimpleName();
+        }
+        this.errorMessage = message;
+        this.developerMessage = Utils.getStackTraceAsString(ex);
+        this.errorCode = errorCode;
+    }
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 		if (this == o) {
 			return true;
 		}
@@ -73,26 +77,25 @@ public class ErrorDTO implements Serializable {
 		return errorMessage.equals(errorDTO.errorMessage);
 	}
 
-	@Override
-	public int hashCode() {
-		int result = errorMessage.hashCode();
-		result = 31 * result + (developerMessage != null ? developerMessage
-				.hashCode() : 0);
-		result = 31 * result + errorCode;
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        int result = errorMessage.hashCode();
+        result = 31 * result + (developerMessage != null ? developerMessage.hashCode() : 0);
+        result = 31 * result + errorCode.hashCode();
+        return result;
+    }
 
-	public int getErrorCode() {
-		return errorCode;
-	}
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 
-	public void setErrorCode(int errorCode) {
-		this.errorCode = errorCode;
-	}
+    public void setErrorCode(ErrorCode errorCode) {
+        this.errorCode = errorCode;
+    }
 
-	public String getErrorMessage() {
-		return errorMessage;
-	}
+    public String getErrorMessage() {
+        return errorMessage;
+    }
 
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;

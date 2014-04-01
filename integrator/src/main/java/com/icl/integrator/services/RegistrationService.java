@@ -210,8 +210,13 @@ public class RegistrationService {
         AbstractEndpointEntity endpoint;
         if (descriptor instanceof HttpEndpointDescriptorDTO) {
             HttpEndpointDescriptorDTO realDescriptor = (HttpEndpointDescriptorDTO) descriptor;
+            String host = realDescriptor.getHost();
+            if (host.equalsIgnoreCase("localhost") || host.equalsIgnoreCase("127.0.0.1")) {
+                throw new TargetRegistrationException(
+                        "Пожалуйста, используйте реальный адрес машины, а не localhost");
+            }
             endpoint = persistenceService
-                    .findHttpService(realDescriptor.getHost(), realDescriptor.getPort());
+                    .findHttpService(host, realDescriptor.getPort());
             if (endpoint != null) {
                 updateEndpoint(endpoint, serviceName, deliverySettings);
             } else {

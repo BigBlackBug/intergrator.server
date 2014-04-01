@@ -13,6 +13,7 @@ import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.model.*;
 import com.icl.integrator.util.IntegratorException;
+import com.icl.integrator.util.connectors.ConnectionException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,7 +132,8 @@ public class IntegratorWorkerService {
         return result;
     }
 
-	public Boolean pingService(ServiceDestinationDescriptor serviceDescriptor) {
+	public Boolean pingService(ServiceDestinationDescriptor serviceDescriptor)
+            throws ConnectionException{
 		EndpointConnector connector = connectorFactory.createEndpointConnector(serviceDescriptor);
 		connector.testConnection();
 		return true;

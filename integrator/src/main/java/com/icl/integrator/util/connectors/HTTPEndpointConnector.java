@@ -45,14 +45,14 @@ public class HTTPEndpointConnector implements EndpointConnector {
 			throw new ConnectionException("URL не валиден", e);
 		} catch (HttpClientErrorException ex) {
 			String message = MessageFormat.format(
-					"Сервер вернул код {0}. Сообщение об ошибке: {1} ",
+					"Пингуемый сервис вернул код {0}. Сообщение об ошибке: {1} ",
 					ex.getStatusCode(),
 					ex.getStatusText());
 			throw new ConnectionException(message, ex);
 		} catch (ResourceAccessException ex) {
 			throw new ConnectionException("Ошибка I/O", ex);
 		} catch (Exception ex) {
-			throw new ConnectionException("Необъяснимая ошибка", ex);
+			throw new ConnectionException("Неожиданная ошибка", ex);
 		}
 	}
 
