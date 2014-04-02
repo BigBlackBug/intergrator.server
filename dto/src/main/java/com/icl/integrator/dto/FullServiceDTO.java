@@ -2,6 +2,7 @@ package com.icl.integrator.dto;
 
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
+import com.icl.integrator.dto.registration.DeliverySettingsDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.io.Serializable;
@@ -23,24 +24,38 @@ public class FullServiceDTO<Y extends ActionDescriptor> implements Serializable 
 
 	private List<ActionEndpointDTO<Y>> actions;
 
+    private DeliverySettingsDTO deliverySettings;
+
     public FullServiceDTO() {
 	}
 
     public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
+                          DeliverySettingsDTO deliverySettings,
                           List<ActionEndpointDTO<Y>> actions) {
         this.serviceName = serviceName;
         this.endpoint = endpoint;
         this.actions = actions;
+        this.deliverySettings = deliverySettings;
     }
 
     public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
+                          DeliverySettingsDTO deliverySettings,
                           ActionEndpointDTO<Y>... actions) {
-        this(serviceName, endpoint, Arrays.asList(actions));
+        this(serviceName, endpoint, deliverySettings, Arrays.asList(actions));
     }
 
     public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
+                          DeliverySettingsDTO deliverySettings,
                           ActionEndpointDTO<Y> action) {
-        this(serviceName, endpoint, Arrays.asList(action));
+        this(serviceName, endpoint, deliverySettings, Arrays.asList(action));
+    }
+
+    public DeliverySettingsDTO getDeliverySettings() {
+        return deliverySettings;
+    }
+
+    public void setDeliverySettings(DeliverySettingsDTO deliverySettings) {
+        this.deliverySettings = deliverySettings;
     }
 
     public String getServiceName() {

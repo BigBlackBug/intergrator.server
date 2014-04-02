@@ -275,6 +275,9 @@ public class DeliveryCreator {
 				deliveries = createDeliveries(deliveryDTO, requestData, responseHandlerDescriptor);
 			} else {
 				deliveries = createAutoDetectedDeliveries(deliveryDTO, responseHandlerDescriptor);
+                if(deliveries.isEmpty()){
+                    throw new IntegratorException("Не получилось найти ни один подходящий сервис");
+                }
 			}
 		}
 		return deliveries;

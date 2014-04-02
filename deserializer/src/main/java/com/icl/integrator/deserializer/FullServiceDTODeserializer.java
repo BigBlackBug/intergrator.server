@@ -1,7 +1,6 @@
 package com.icl.integrator.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.FullServiceDTO;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
+import com.icl.integrator.dto.registration.DeliverySettingsDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class FullServiceDTODeserializer extends JsonDeserializer<FullServiceDTO>
 
     @Override
     public FullServiceDTO deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
+            throws IOException {
         ObjectNode treeNode = jp.readValueAsTree();
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
         JsonNode serviceEndpoint = treeNode.get("endpoint");
@@ -34,6 +34,9 @@ public class FullServiceDTODeserializer extends JsonDeserializer<FullServiceDTO>
         for (JsonNode action : actions) {
             actionList.add(mapper.readValue(action.toString(), ActionEndpointDTO.class));
         }
-        return new FullServiceDTO(serviceName, endpointDTO, actionList);
+        JsonNode deliverySettings = treeNode.get("deliverySettings");
+        DeliverySettingsDTO deliverySettingsDTO = mapper.readValue(deliverySettings.toString(),
+                                                                   DeliverySettingsDTO.class);
+        return new FullServiceDTO(serviceName, endpointDTO, deliverySettingsDTO, actionList);
     }
 }

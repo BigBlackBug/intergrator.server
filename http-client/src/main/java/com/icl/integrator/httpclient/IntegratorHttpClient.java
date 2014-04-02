@@ -31,22 +31,39 @@ import java.util.Map;
  */
 public class IntegratorHttpClient implements IntegratorHttpAPI {
 
-    public static final int CONNECT_TIMEOUT = 5000;
-
     private final String host;
 
     private final String path;
 
     private final int port;
 
-    public IntegratorHttpClient(String host, String deployPath, int port) {
+    private final RestTemplate restTemplate;
+
+    public IntegratorHttpClient(String host, String deployPath, int port,
+                                IntegratorClientSettings clientSettings) {
         this.path = createControllerPath(deployPath);
         this.host = host;
         this.port = port;
+        HttpComponentsClientHttpRequestFactory rf = new HttpComponentsClientHttpRequestFactory();
+        rf.setReadTimeout(clientSettings.getReadTimeout());
+        rf.setConnectTimeout(clientSettings.getConnectionTimeout());
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(new IntegratorObjectMapper());
+        this.restTemplate = new RestTemplate(rf);
+        restTemplate.getMessageConverters().clear();
+        restTemplate.getMessageConverters().add(converter);
+    }
+
+    public IntegratorHttpClient(String host, int port, IntegratorClientSettings clientSettings) {
+        this(host, "", port, clientSettings);
+    }
+
+    public IntegratorHttpClient(String host, String deployPath, int port) {
+        this(host, deployPath, port, IntegratorClientSettings.createDefaultSettings());
     }
 
     public IntegratorHttpClient(String host, int port) {
-        this(host, "", port);
+        this(host, port, IntegratorClientSettings.createDefaultSettings());
     }
 
     private String createControllerPath(String deployPath) {
@@ -388,15 +405,6 @@ public class IntegratorHttpClient implements IntegratorHttpAPI {
             HttpMethodDescriptor methodDescriptor)
             throws RestClientException, MalformedURLException {
 
-        HttpComponentsClientHttpRequestFactory rf =new HttpComponentsClientHttpRequestFactory();
-        rf.setReadTimeout(CONNECT_TIMEOUT);
-        rf.setConnectTimeout(CONNECT_TIMEOUT);
-        RestTemplate restTemplate = new RestTemplate(rf);
-
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(new IntegratorObjectMapper());
-        restTemplate.getMessageConverters().clear();
-        restTemplate.getMessageConverters().add(converter);
         RequestMethod methodType = methodDescriptor.getMethodType();
         URL url = new URL("HTTP", host, port, path + methodDescriptor.getMethodPath());
 

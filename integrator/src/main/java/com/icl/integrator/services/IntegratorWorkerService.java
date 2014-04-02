@@ -164,6 +164,10 @@ public class IntegratorWorkerService {
 			FullServiceDTO<HttpActionDTO> httpResult = new FullServiceDTO<>();
 			HttpServiceEndpoint httpService = persistenceService
 					.getHttpService(serviceDTO.getServiceName());
+            DeliverySettings deliverySettings = httpService.getDeliverySettings();
+            DeliverySettingsDTO deliverySettingsDTO = new DeliverySettingsDTO(
+                    deliverySettings.getRetryNumber(), deliverySettings.getRetryDelay());
+            httpResult.setDeliverySettings(deliverySettingsDTO);
 			HttpEndpointDescriptorDTO httpEndpointDescriptorDTO =
 					new HttpEndpointDescriptorDTO(httpService.getServiceURL()
 							, httpService.getServicePort());
@@ -174,6 +178,10 @@ public class IntegratorWorkerService {
 			FullServiceDTO<QueueDTO> jmsResult = new FullServiceDTO<>();
 			JMSServiceEndpoint jmsService = persistenceService
 					.getJmsService(serviceDTO.getServiceName());
+            DeliverySettings deliverySettings = jmsService.getDeliverySettings();
+            DeliverySettingsDTO deliverySettingsDTO = new DeliverySettingsDTO(
+                    deliverySettings.getRetryNumber(), deliverySettings.getRetryDelay());
+            jmsResult.setDeliverySettings(deliverySettingsDTO);
 			Map<String, String> props = null;
 			try {
 				TypeReference<Map<String, String>> typeReference =
