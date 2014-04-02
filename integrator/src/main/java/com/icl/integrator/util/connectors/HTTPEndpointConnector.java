@@ -2,6 +2,7 @@ package com.icl.integrator.util.connectors;
 
 import com.icl.integrator.dto.registration.ActionMethod;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -22,18 +23,25 @@ public class HTTPEndpointConnector implements EndpointConnector {
 
 	public static final String CONTENT_TYPE = "Content-Type";
 
-	private final URL url;
+    public static final int DEFAULT_TIMEOUT = 5000;
+
+    private final URL url;
 
 	private final ActionMethod actionMethod;
+
+    private final RestTemplate restTemplate;
 
 	HTTPEndpointConnector(URL url,ActionMethod actionMethod) {
 		this.url = url;
 		this.actionMethod = actionMethod;
+        HttpComponentsClientHttpRequestFactory rf = new HttpComponentsClientHttpRequestFactory();
+        rf.setReadTimeout(DEFAULT_TIMEOUT);
+        rf.setConnectTimeout(DEFAULT_TIMEOUT);
+        this.restTemplate = new RestTemplate(rf);
 	}
 
 	@Override
 	public void testConnection() throws ConnectionException {
-		RestTemplate restTemplate = new RestTemplate();
 		try {
 			HttpHeaders headers = new HttpHeaders();
 			headers.add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
@@ -60,7 +68,6 @@ public class HTTPEndpointConnector implements EndpointConnector {
 	public <Request, Response> Response sendRequest(
 			Request data, Class<Response> responseClass) throws
 			EndpointConnectorExceptions.HttpConnectorException {
-		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 		HttpEntity<Request> entity = new HttpEntity<>(data, headers);

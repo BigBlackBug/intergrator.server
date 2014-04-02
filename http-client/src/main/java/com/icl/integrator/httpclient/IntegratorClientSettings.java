@@ -5,7 +5,7 @@ package com.icl.integrator.httpclient;
  */
 public class IntegratorClientSettings {
 
-    public static final int DEFAULT_TIMEOUT = 5000;
+    public static final int DEFAULT_TIMEOUT = 7500;
 
     private final int connectionTimeout;
 
