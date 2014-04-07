@@ -5,7 +5,6 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
         http://activemq.apache.org/schema/core
@@ -15,7 +14,7 @@
         http://www.springframework.org/schema/jms
         http://www.springframework.org/schema/jms/spring-jms-2.5.xsd
         http://www.springframework.org/schema/tx
-        http://www.springframework.org/schema/tx/spring-tx-3.1.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+        http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
     <!--
        Turn on AspectJ @Configurable support. As a result, any time you
        instantiate an object, Spring will attempt to perform dependency
@@ -30,31 +29,8 @@
        areas, such as @PersistenceContext injection into entities.
    -->
     <context:spring-configured/>
-
-
-    <!--
-       This declaration will cause Spring to locate every @Component,
-       @Repository and @Service in your application. In practical terms this
-       allows you to write a POJO and then simply annotate the new POJO as an
-       @Service and Spring will automatically detect, instantiate and
-       dependency inject your service at startup time. Importantly, you can
-       then also have your new service injected into any other class that
-       requires it simply by declaring a field for your service inside the
-       relying class and Spring will inject it. Note that two exclude filters
-       are declared. The first ensures that Spring doesn't spend time
-       introspecting Roo-specific ITD aspects. The second ensures Roo doesn't
-       instantiate your @Controller classes, as these should be instantiated
-       by a web tier application context. Refer to web.xml for more details
-       about the web tier application context setup services.
-
-       Furthermore, this turns on @Autowired, @PostConstruct etc support. These
-       annotations allow you to use common Spring and Java Enterprise Edition
-       annotations in your classes without needing to do any special configuration.
-       The most commonly used annotation is @Autowired, which instructs Spring to
-       dependency inject an object into your class.
-   -->
     <context:component-scan base-package="com.icl.integrator"/>
-
+    <tx:annotation-driven transaction-manager="transactionManager"/>
     <!--<bean id="packetProcessorFactory"-->
           <!--class="com.icl.integrator.services.PacketProcessorFactory">-->
         <!--<lookup-method name="createProcessor" bean="asyncProcessor"/>-->
@@ -64,32 +40,12 @@
           <!--class="com.icl.integrator.services.PacketProcessor"-->
           <!--scope="prototype">-->
     <!--</bean>-->
-    <bean id="limitHandler"
-          class="com.icl.integrator.task.retryhandler.DatabaseRetryLimitHandler"
-          scope="prototype">
-        <!--<aop:scoped-proxy proxy-target-class="true"/>-->
-    </bean>
-
-    <bean id="limitHandlerFactory"
-          class="com.icl.integrator.task.retryhandler.DatabaseRetryHandlerFactory">
-        <lookup-method name="createHandler" bean="limitHandler"/>
-    </bean>
 
     <!--Jackson configuration-->
-    <!--<bean id="objectMapper"-->
-          <!--class="com.icl.integrator.util.com.icl.integrator.deserializer.IntegratorObjectMapper"/>-->
     <bean id="jacksonMessageConverter"
           class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
         <property name="objectMapper" ref="objectMapper"/>
     </bean>
-    <!--<mvc:annotation-driven />-->
-    <!--<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">-->
-        <!--<property name="messageConverters">-->
-            <!--<list>-->
-                <!--<ref bean="jacksonMessageConverter"/>-->
-            <!--</list>-->
-        <!--</property>-->
-    <!--</bean>-->
     <bean class="com.icl.integrator.util.patch.PatchedAnnotationMethodHandlerAdapter">
         <property name="messageConverters">
             <list>
@@ -97,8 +53,6 @@
             </list>
         </property>
     </bean>
-    <!--Jackson configuration-->
-
     <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
           id="entityManagerFactory">
         <property name="persistenceUnitName" value="develop"/>
@@ -108,8 +62,7 @@
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
         </property>
 
-        <property name="persistenceProvider"
-                  ref="hibernatePersistenceProvider"/>
+        <property name="persistenceProvider" ref="hibernatePersistenceProvider"/>
     </bean>
 
     <bean id="hibernatePersistenceProvider"
@@ -121,55 +74,29 @@
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
 
-    <!-- mode aspect-->
-    <tx:annotation-driven transaction-manager="transactionManager"/>
-
-    <!--<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver"-->
-    <!--id="tilesViewResolver">-->
-    <!--<property name="viewClass"-->
-    <!--value="org.springframework.web.servlet.view.tiles2.TilesView"/>-->
-    <!--</bean>-->
     <bean id="cnManager"
           class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
         <property name="ignoreAcceptHeader" value="true"/>
         <property name="defaultContentType" value="application/json"/>
     </bean>
+
     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="contentNegotiationManager" ref="cnManager"/>
-        <!--<property name="viewResolvers">-->
-        <!--<list>-->
-        <!--<ref bean="tilesViewResolver"/>-->
-        <!--</list>-->
-        <!--</property>-->
         <property name="defaultViews">
             <list>
-                <bean
-                        class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
-                    <property name="prefixJson" value="false"/>
+                <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+                <property name="prefixJson" value="false"/>
                 </bean>
             </list>
         </property>
     </bean>
-    <!--<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
-    <!--<property name="viewClass"-->
-    <!--value="org.springframework.web.servlet.view.JstlView"/>-->
-    <!--<property name="prefix" value="/WEB-INF/views/"/>-->
-    <!--<property name="suffix" value=".jsp"/>-->
-    <!--</bean>-->
-
-    <!--<amq:connectionFactory id="amqConnectionFactory" brokerURL="${jms.url}"-->
-    <!--userName="${jms.username}"-->
-    <!--password="${jms.password}"/>-->
-    <!--<bean id="jmsConnectorController"-->
-    <!--class="com.icl.integrator.JmsController">-->
-    <!--<lookup-method name="createProcessor" bean="asyncProcessor"/>-->
-    <!--</bean>-->
 
     <amq:broker useJmx="false" persistent="false">
         <amq:transportConnectors>
             <amq:transportConnector uri="tcp://localhost:0"/>
         </amq:transportConnectors>
     </amq:broker>
+
     <amq:connectionFactory id="amqConnectionFactory"
                            brokerURL="tcp://localhost:61616"/>
     <!-- CachingConnectionFactory Definition, sessionCacheSize property is the number of sessions to cache -->
@@ -189,16 +116,5 @@
         <jms:listener id="IntegratorQueueListener"
                       destination="IntegratorQueue"
                       ref="integratorJmsController"/>
-        <!--<jms:listener id="TargetQueueListener" destination="SourceQueue"-->
-                      <!--ref="sourceJmsController"/>-->
     </jms:listener-container>
-
-
-    <!--<mvc:interceptors>-->
-        <!--<mvc:interceptor>-->
-            <!--<mvc:mapping path="/source/**"/>-->
-            <!--<mvc:mapping path="/ext_source/**"/>-->
-            <!--<bean class="com.icl.integrator.springapi.interceptors.HeadInterceptor" />-->
-        <!--</mvc:interceptor>-->
-    <!--</mvc:interceptors>-->
 </beans>

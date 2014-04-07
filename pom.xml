@@ -23,12 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hibernate.version>3.6.9.Final</hibernate.version>
         <stable.integrator.version>1.5</stable.integrator.version>
-        <!--<slf4j.version>1.7.2</slf4j.version>-->
         <spring.version>3.2.6.RELEASE</spring.version>
-        <!--<spring.orm.version>3.1.1.RELEASE</spring.orm.version>-->
-        <!--<querydsl.version>2.9.0</querydsl.version>-->
-        <!--<spring.ws.version>2.1.0.RELEASE</spring.ws.version>-->
-        <!--<spring-security.version>3.1.0.RELEASE</spring-security.version>-->
     </properties>
     <dependencyManagement>
         <dependencies>
