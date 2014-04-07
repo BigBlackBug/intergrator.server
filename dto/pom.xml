@@ -4,10 +4,10 @@
     <parent>
         <artifactId>root</artifactId>
         <groupId>com.icl.integrator</groupId>
-        <version>1.5</version>
+        <version>1.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <version>1.5</version>
     <artifactId>dto</artifactId>
     <packaging>jar</packaging>
     <name>dto</name>
