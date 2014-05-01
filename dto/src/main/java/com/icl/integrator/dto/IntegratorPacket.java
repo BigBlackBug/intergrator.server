@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class IntegratorPacket<T, Y extends DestinationDescriptor> implements Serializable {
 
-    private T packet;
+    private T data;
 
     private IntegratorMethod method;
 
@@ -25,19 +25,19 @@ public class IntegratorPacket<T, Y extends DestinationDescriptor> implements Ser
         this.responseHandlerDescriptor = responseHandlerDescriptor;
     }
 
-    public IntegratorPacket(T packet,
+    public IntegratorPacket(T data,
                             Y responseHandlerDescriptor) {
-        this.packet = packet;
+        this.data = data;
         this.responseHandlerDescriptor = responseHandlerDescriptor;
     }
 
-    public IntegratorPacket(T packet) {
-        this.packet = packet;
+    public IntegratorPacket(T data) {
+        this.data = data;
     }
 
-	public IntegratorPacket(IntegratorMethod method, T packet, Y responseHandlerDescriptor) {
+	public IntegratorPacket(IntegratorMethod method, T data, Y responseHandlerDescriptor) {
 		this.method = method;
-		this.packet = packet;
+		this.data = data;
 		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
 
@@ -49,12 +49,12 @@ public class IntegratorPacket<T, Y extends DestinationDescriptor> implements Ser
         this.method = method;
     }
 
-    public T getPacket() {
-        return packet;
+    public T getData() {
+        return data;
     }
 
-    public void setPacket(T packet) {
-        this.packet = packet;
+    public void setData(T data) {
+        this.data = data;
     }
 
     public Y getResponseHandlerDescriptor() {
@@ -79,8 +79,8 @@ public class IntegratorPacket<T, Y extends DestinationDescriptor> implements Ser
         if (method != that.method) {
             return false;
         }
-        if (packet != null ? !packet
-                .equals(that.packet) : that.packet != null) {
+        if (data != null ? !data
+                .equals(that.data) : that.data != null) {
             return false;
         }
         if (responseHandlerDescriptor != null ? !responseHandlerDescriptor
@@ -93,7 +93,7 @@ public class IntegratorPacket<T, Y extends DestinationDescriptor> implements Ser
 
     @Override
     public int hashCode() {
-        int result = packet != null ? packet.hashCode() : 0;
+        int result = data != null ? data.hashCode() : 0;
         result = 31 * result + (method != null ? method.hashCode() : 0);
         result =
                 31 * result + (responseHandlerDescriptor != null ? responseHandlerDescriptor

@@ -47,7 +47,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     public
     @ResponseBody
     <T extends ActionDescriptor, Y extends DestinationDescriptor>
-    ResponseDTO<RegistrationResultDTO> registerService(
+    ResponseDTO<List<ActionRegistrationResultDTO>> registerService(
 		    @RequestBody
 		    IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
 
@@ -75,7 +75,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     <T extends DestinationDescriptor,Y extends ActionDescriptor>
     ResponseDTO<List<ActionEndpointDTO<Y>>> getSupportedActions(
             @RequestBody
-            IntegratorPacket<ServiceDTO, T> serviceDTO);
+            IntegratorPacket<String, T> serviceName);
 
     @Override
     @RequestMapping(value = "addAction", method = RequestMethod.POST)
@@ -92,7 +92,7 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
             DDType extends DestinationDescriptor>
     ResponseDTO<FullServiceDTO<ADType>> getServiceInfo(
             @RequestBody
-            IntegratorPacket<ServiceDTO, DDType> serviceDTO);
+            IntegratorPacket<String, DDType> serviceName);
 
 	@Override
 	@RequestMapping(value = "registerAutoDetection", method = RequestMethod.POST)
@@ -115,6 +115,6 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @RequestMapping(value = "getServicesSupportingActionType", method = RequestMethod.POST)
     public
     @ResponseBody <T extends DestinationDescriptor,Y extends ActionDescriptor>
-    ResponseDTO<Map<String, ServiceAndActions<Y>>>
+    ResponseDTO<List<ServiceAndActions<Y>>>
     getServicesSupportingActionType(@RequestBody IntegratorPacket<ActionMethod, T> packet);
 }

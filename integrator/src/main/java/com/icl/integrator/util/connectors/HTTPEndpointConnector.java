@@ -53,7 +53,8 @@ public class HTTPEndpointConnector implements EndpointConnector {
 			throw new ConnectionException("URL не валиден", e);
 		} catch (HttpClientErrorException ex) {
 			String message = MessageFormat.format(
-					"Пингуемый сервис вернул код {0}. Сообщение об ошибке: {1} ",
+					"Пингуемый сервис \"{0}\" вернул код {1}. Сообщение об ошибке: {2} ",
+					url.toString(),
 					ex.getStatusCode(),
 					ex.getStatusText());
 			throw new ConnectionException(message, ex);

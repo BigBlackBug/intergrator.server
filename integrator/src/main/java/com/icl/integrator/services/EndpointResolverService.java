@@ -37,9 +37,7 @@ public class EndpointResolverService {
 						"join address.actions action " +
 						"where address.serviceName=:serviceName " +
 						"and action.actionName=:actionName")
-				.setParameter("actionName",
-				              action).setParameter
-						("serviceName", serviceName);
+				.setParameter("actionName", action).setParameter("serviceName", serviceName);
 		QueryResult queryResult;
 		try {
 			queryResult =

@@ -2,8 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
     <context:annotation-config/>
+    <import resource="security.xml"/>
     <!--
             This will automatically locate any and all property files you have
             within your classpath, provided they fall under the META-INF
@@ -11,11 +15,37 @@
             then be used within application context files in the form of
             ${propertyKey}.
     -->
-    <bean id="validationService" class="com.icl.integrator.services.validation.ValidationService"/>
+    <context:component-scan base-package="com.icl.integrator">
+        <context:exclude-filter type="regex" expression="com\.icl\.integrator\.controllers\..*"/>
+    </context:component-scan>
+    <!--<bean id="validationService" class="com.icl.integrator.services.validation.ValidationService"/>-->
 
-    <bean id="validationFilter"
-          class="com.icl.integrator.ValidationFilter"/>
+    <!--<bean id="validationFilter"-->
+          <!--class="com.icl.integrator.ValidationFilter"/>-->
 
     <bean id="objectMapper"
           class="com.icl.integrator.deserializer.IntegratorObjectMapper"/>
+
+
+    <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+          id="entityManagerFactory">
+        <property name="persistenceUnitName" value="develop"/>
+
+        <!-- Необходимо для использования Pageable в параметрах методов JpaRepository'ев -->
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        </property>
+
+        <property name="persistenceProvider" ref="hibernatePersistenceProvider"/>
+    </bean>
+
+    <bean id="hibernatePersistenceProvider" class="org.hibernate.ejb.HibernatePersistence">
+    </bean>
+
+    <bean id="transactionManager"
+          class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+    
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 </beans>

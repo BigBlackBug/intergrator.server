@@ -1,12 +1,9 @@
 package com.icl.integrator.springapi;
 
 import com.icl.integrator.api.ExtendedSourceService;
-import com.icl.integrator.dto.FullServiceDTO;
-import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.ResponseFromTargetDTO;
-import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.dto.registration.RegistrationResultDTO;
+import com.icl.integrator.dto.registration.ActionRegistrationResultDTO;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +40,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	@ResponseBody
 	void handleServiceRegistrationResponse(
 			@RequestBody
-			ResponseDTO<RegistrationResultDTO> response);
+			ResponseDTO<List<ActionRegistrationResultDTO>> response);
 
 	@Override
 	@RequestMapping(value = "/handleServiceIsAvailableResponse",
@@ -98,4 +95,20 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	@ResponseBody
 	void handleResponseFromTarget(@RequestBody
 	                              ResponseDTO<ResponseFromTargetDTO> responseDTO);
+	@Override
+	@RequestMapping(value = "/handleGetActionsForDelivery",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleGetActionsForDelivery(@RequestBody ResponseDTO<List<DeliveryActionsDTO>> response);
+
+	@Override
+	@RequestMapping(value = "/handleGetServicesSupportingActionType",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleGetServicesSupportingActionType(
+			@RequestBody ResponseDTO<List<ServiceAndActions<ActionDescriptor>>> response);
 }

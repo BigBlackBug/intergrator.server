@@ -17,10 +17,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,10 +52,10 @@ public class RegistrationService {
 
     @Transactional(noRollbackFor = ConnectionException.class)
     public <T extends ActionDescriptor>
-    Map<String, ResponseDTO<Void>> register(
+    List<ActionRegistrationResultDTO> register(
             TargetRegistrationDTO<T> registrationDTO)
             throws TargetRegistrationException {
-        Map<String, ResponseDTO<Void>> result = new HashMap<>();
+	    List<ActionRegistrationResultDTO> result = new ArrayList<>();
 
         EndpointDescriptor endpoint = registrationDTO.getEndpoint();
         List<ActionEndpointDTO<T>> actions = new ArrayList<>();
@@ -66,40 +70,42 @@ public class RegistrationService {
                     }
                     actions.add(action);
                 } catch (ConnectionException ex) {
-                    ResponseDTO<Void> dto =
-                            new ResponseDTO<>(new ErrorDTO(ex));
-                    result.put(action.getActionName(), dto);
+                    ResponseDTO<Void> dto = new ResponseDTO<>(new ErrorDTO(ex));
+                    result.add(new ActionRegistrationResultDTO(action.getActionName(), dto));
                 }
             }
         }
-        process(endpoint, registrationDTO, actions, result);
-        return result;
+	    List<ActionRegistrationResultDTO> regResult =
+			    registerService(endpoint, registrationDTO, actions);
+	    regResult.addAll(result);
+	    return regResult;
     }
 
     @Transactional(noRollbackFor = Exception.class)
     private <T extends ActionDescriptor>
-    void process(EndpointDescriptor endpoint,
-                 TargetRegistrationDTO registrationDTO,
-                 List<ActionEndpointDTO<T>> actions,
-                 Map<String, ResponseDTO<Void>> result)
+    List<ActionRegistrationResultDTO> registerService(EndpointDescriptor endpoint,
+                                                   TargetRegistrationDTO registrationDTO,
+                                                   List<ActionEndpointDTO<T>> actions)
     throws TargetRegistrationException {
         String serviceName = registrationDTO.getServiceName();
-
-        DeliverySettingsDTO deliverySettings =
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    IntegratorUser creator = (IntegratorUser) authentication.getPrincipal();
+	    DeliverySettingsDTO deliverySettings =
                 registrationDTO.getDeliverySettings();
         AbstractEndpointEntity serviceEntity =
-                createEntity(endpoint, serviceName, deliverySettings);
+                createEntity(endpoint, serviceName, deliverySettings, creator);
         try {
             serviceEntity = persistenceService.saveOrUpdate(serviceEntity);
         } catch (DataAccessException ex) {
             logger.error("GG", ex);
             throw new TargetRegistrationException("Ошибка регистрации", ex);
         }
+	    List<ActionRegistrationResultDTO> result = new ArrayList<>();
         for (ActionEndpointDTO<T> actionDTO : actions) {
             ResponseDTO<Void> responseDTO;
             AbstractActionEntity action;
             try {
-                action = getAction(actionDTO, serviceEntity.getId());
+                action = getAction(actionDTO, serviceEntity.getId(), creator);
                 action.setEndpoint(serviceEntity);
                 serviceEntity.addAction(action);
                 persistenceService.saveOrUpdate(action);
@@ -110,40 +116,14 @@ public class RegistrationService {
                 errorDTO.setDeveloperMessage(ex.getMessage());
                 responseDTO = new ResponseDTO<>(errorDTO);
             }
-            result.put(actionDTO.getActionName(), responseDTO);
+            result.add(new ActionRegistrationResultDTO(actionDTO.getActionName(), responseDTO));
         }
-    }
-
-    @Transactional
-    private <T extends ActionDescriptor> HttpAction getHttpAction(
-            ActionEndpointDTO<T> actionDescriptor, UUID serviceID)
-            throws TargetRegistrationException {
-        HttpActionDTO httpActionDTO =
-                (HttpActionDTO) actionDescriptor.getActionDescriptor();
-        String actionName = actionDescriptor.getActionName();
-        HttpAction httpAction = persistenceService
-                .findHttpAction(serviceID, httpActionDTO.getPath());
-        if (httpAction != null) {
-            if (httpAction.isGenerated()) {
-                httpAction.setGenerated(false);
-                httpAction.setActionName(actionName);
-            } else {
-                throw new TargetRegistrationException(
-                        "Такое действие уже зарегистрировано под именем '" + actionName + "'");
-            }
-        } else {
-            httpAction = new HttpAction();
-            httpAction.setActionURL(httpActionDTO.getPath());
-            httpAction.setActionName(actionName);
-            httpAction.setActionMethod(httpActionDTO.getActionMethod());
-            httpAction.setGenerated(false);
-        }
-        return httpAction;
+	    return result;
     }
 
     @Transactional
     private <T extends ActionDescriptor> AbstractActionEntity getAction(
-            ActionEndpointDTO<T> actionEndpoint, UUID serviceID)
+            ActionEndpointDTO<T> actionEndpoint, UUID serviceID, IntegratorUser creator)
             throws TargetRegistrationException {
         AbstractActionEntity actionEntity;
         T actionDescriptor = actionEndpoint.getActionDescriptor();
@@ -152,9 +132,9 @@ public class RegistrationService {
             HttpActionDTO httpActionDTO = (HttpActionDTO) actionDescriptor;
             actionEntity = persistenceService.findHttpAction(serviceID, httpActionDTO.getPath());
             if (actionEntity != null) {
-                updateAction(actionEntity, actionName);
+                updateAction(actionEntity, actionName, creator);
             } else {
-                actionEntity = createHttpAction(actionName, httpActionDTO);
+                actionEntity = createHttpAction(actionName, httpActionDTO, creator);
             }
         } else {
             QueueDTO queueDTO = (QueueDTO) actionDescriptor;
@@ -163,38 +143,38 @@ public class RegistrationService {
                                    queueDTO.getUsername(),
                                    queueDTO.getPassword());
             if (actionEntity != null) {
-                updateAction(actionEntity, actionName);
+                updateAction(actionEntity, actionName, creator);
             } else {
-                actionEntity = createJmsAction(actionName, queueDTO);
+                actionEntity = createJmsAction(actionName, queueDTO, creator);
             }
         }
         return actionEntity;
     }
 
-    private JMSAction createJmsAction(String actionName, QueueDTO queueDTO) {
+    private JMSAction createJmsAction(String actionName, QueueDTO queueDTO, IntegratorUser creator) {
         JMSAction jmsAction = new JMSAction();
         jmsAction.setActionMethod(queueDTO.getActionMethod());
         jmsAction.setUsername(queueDTO.getUsername());
         jmsAction.setPassword(queueDTO.getPassword());
         jmsAction.setQueueName(queueDTO.getQueueName());
         jmsAction.setActionName(actionName);
-        jmsAction.setGenerated(false);
+        jmsAction.setCreator(creator);
         return jmsAction;
     }
 
-    private HttpAction createHttpAction(String actionName, HttpActionDTO httpActionDTO) {
+    private HttpAction createHttpAction(String actionName, HttpActionDTO httpActionDTO, IntegratorUser creator) {
         HttpAction httpAction = new HttpAction();
         httpAction.setActionURL(httpActionDTO.getPath());
         httpAction.setActionName(actionName);
         httpAction.setActionMethod(httpActionDTO.getActionMethod());
-        httpAction.setGenerated(false);
+        httpAction.setCreator(creator);
         return httpAction;
     }
 
-    private void updateAction(AbstractActionEntity actionEntity, String actionName)
+    private void updateAction(AbstractActionEntity actionEntity, String actionName, IntegratorUser creator)
             throws TargetRegistrationException {
         if (actionEntity.isGenerated()) {
-            actionEntity.setGenerated(false);
+            actionEntity.setCreator(creator);
             actionEntity.setActionName(actionName);
         } else {
             throw new TargetRegistrationException(
@@ -205,7 +185,7 @@ public class RegistrationService {
     @Transactional
     private AbstractEndpointEntity createEntity(
             EndpointDescriptor descriptor,
-            String serviceName, DeliverySettingsDTO deliverySettings)
+            String serviceName, DeliverySettingsDTO deliverySettings, IntegratorUser creator)
             throws TargetRegistrationException {
         AbstractEndpointEntity endpoint;
         if (descriptor instanceof HttpEndpointDescriptorDTO) {
@@ -218,9 +198,9 @@ public class RegistrationService {
             endpoint = persistenceService
                     .findHttpService(host, realDescriptor.getPort());
             if (endpoint != null) {
-                updateEndpoint(endpoint, serviceName, deliverySettings);
+                updateEndpoint(endpoint, serviceName, deliverySettings,creator);
             } else {
-                endpoint = createHttp(serviceName, realDescriptor, deliverySettings);
+                endpoint = createHttp(serviceName, realDescriptor, deliverySettings,creator);
             }
         } else {
             JMSEndpointDescriptorDTO realDescriptor = (JMSEndpointDescriptorDTO) descriptor;
@@ -234,11 +214,11 @@ public class RegistrationService {
             endpoint = persistenceService
                     .findJmsService(realDescriptor.getConnectionFactory(), jndiProperties);
             if (endpoint != null) {
-                updateEndpoint(endpoint, serviceName, deliverySettings);
+                updateEndpoint(endpoint, serviceName, deliverySettings,creator);
             } else {
                 endpoint = createJms(serviceName, realDescriptor.getConnectionFactory(),
                                      jndiProperties,
-                                     deliverySettings);
+                                     deliverySettings,creator);
             }
         }
         return endpoint;
@@ -246,9 +226,9 @@ public class RegistrationService {
 
     private JMSServiceEndpoint createJms(String serviceName, String connectionFactory,
                                          String jndiProperties,
-                                         DeliverySettingsDTO deliverySettings) {
+                                         DeliverySettingsDTO deliverySettings, IntegratorUser creator) {
         JMSServiceEndpoint endpoint = new JMSServiceEndpoint();
-        endpoint.setGenerated(false);
+        endpoint.setCreator(creator);
         endpoint.setConnectionFactory(connectionFactory);
         endpoint.setJndiProperties(jndiProperties);
         endpoint.setServiceName(serviceName);
@@ -266,10 +246,10 @@ public class RegistrationService {
     }
 
     private HttpServiceEndpoint createHttp(String serviceName, HttpEndpointDescriptorDTO descriptor,
-                                           DeliverySettingsDTO deliverySettings) {
+                                           DeliverySettingsDTO deliverySettings, IntegratorUser creator) {
         HttpServiceEndpoint endpoint = new HttpServiceEndpoint();
         endpoint.setServiceName(serviceName);
-        endpoint.setGenerated(false);
+        endpoint.setCreator(creator);
         endpoint.setServiceURL(descriptor.getHost());
         endpoint.setServicePort(descriptor.getPort());
         DeliverySettings settings;
@@ -286,11 +266,11 @@ public class RegistrationService {
     }
 
     private void updateEndpoint(AbstractEndpointEntity endpoint,
-                                String serviceName, DeliverySettingsDTO deliverySettings)
+                                String serviceName, DeliverySettingsDTO deliverySettings, IntegratorUser creator)
             throws TargetRegistrationException {
         if (endpoint.isGenerated()) {
             endpoint.setServiceName(serviceName);
-            endpoint.setGenerated(false);
+            endpoint.setCreator(creator);
             DeliverySettings settings;
             if (deliverySettings != null) {
                 settings = new DeliverySettings();
@@ -328,28 +308,24 @@ public class RegistrationService {
         AutoDetectionPacket autoDetectionPacket = new AutoDetectionPacket();
         autoDetectionPacket.setDeliveryPacketType(packet.getDeliveryPacketType());
         List<ResponseDTO<Void>> result = new ArrayList<>();
-        String referenceObject =
-                mapper.writeValueAsString(packet.getReferenceObject());
+        String referenceObject = mapper.writeValueAsString(packet.getReferenceObject());
 
         autoDetectionPacket.setReferenceObject(referenceObject);
         List<RegistrationDestinationDescriptor> destinationDescriptors =
                 packet.getDestinationDescriptors();
         for (RegistrationDestinationDescriptor regDD : destinationDescriptors) {
-            DestinationDescriptor destinationDescriptor =
-                    regDD.getDestinationDescriptor();
+            DestinationDescriptor destinationDescriptor = regDD.getDestinationDescriptor();
             DestinationEntity persistentDestination;
             try {
                 if (!regDD.isForceRegister()) {
                     testConnection(destinationDescriptor);
                 }
 
-                persistentDestination = deliveryCreator
-                        .persistDestination(destinationDescriptor);
+                persistentDestination = deliveryCreator.persistDestination(destinationDescriptor);
                 autoDetectionPacket.addDestination(
                         new DestinationEntity(
                                 persistentDestination.getService(),
-                                persistentDestination.getAction())
-                                                  );
+                                persistentDestination.getAction()));
                 result.add(new ResponseDTO<Void>(true));
             } catch (Exception ex) {
                 result.add(new ResponseDTO<Void>(new ErrorDTO(ex)));

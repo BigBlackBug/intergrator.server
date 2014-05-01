@@ -20,23 +20,25 @@ import java.util.List;
  */
 public class FullServiceDTODeserializer extends JsonDeserializer<FullServiceDTO> {
 
-    @Override
-    public FullServiceDTO deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException {
-        ObjectNode treeNode = jp.readValueAsTree();
-        IntegratorObjectMapper mapper = new IntegratorObjectMapper();
-        JsonNode serviceEndpoint = treeNode.get("endpoint");
-        EndpointDescriptor endpointDTO = mapper.readValue(serviceEndpoint.toString(),
-                                                          EndpointDescriptor.class);
-        String serviceName = treeNode.get("serviceName").asText();
-        ArrayNode actions = (ArrayNode) treeNode.get("actions");
-        List<ActionEndpointDTO> actionList = new ArrayList<>();
-        for (JsonNode action : actions) {
-            actionList.add(mapper.readValue(action.toString(), ActionEndpointDTO.class));
-        }
-        JsonNode deliverySettings = treeNode.get("deliverySettings");
-        DeliverySettingsDTO deliverySettingsDTO = mapper.readValue(deliverySettings.toString(),
-                                                                   DeliverySettingsDTO.class);
-        return new FullServiceDTO(serviceName, endpointDTO, deliverySettingsDTO, actionList);
-    }
+	@Override
+	public FullServiceDTO deserialize(JsonParser jp, DeserializationContext ctxt)
+			throws IOException {
+		ObjectNode treeNode = jp.readValueAsTree();
+		IntegratorObjectMapper mapper = new IntegratorObjectMapper();
+		JsonNode serviceEndpoint = treeNode.get("endpoint");
+		EndpointDescriptor endpointDTO = mapper.readValue(serviceEndpoint.toString(),
+		                                                  EndpointDescriptor.class);
+		String serviceName = treeNode.get("serviceName").asText();
+		String creatorName = treeNode.get("creatorName").asText();
+		ArrayNode actions = (ArrayNode) treeNode.get("actions");
+		List<ActionEndpointDTO> actionList = new ArrayList<>();
+		for (JsonNode action : actions) {
+			actionList.add(mapper.readValue(action.toString(), ActionEndpointDTO.class));
+		}
+		JsonNode deliverySettings = treeNode.get("deliverySettings");
+		DeliverySettingsDTO deliverySettingsDTO = mapper.readValue(deliverySettings.toString(),
+		                                                           DeliverySettingsDTO.class);
+		return new FullServiceDTO(serviceName, endpointDTO, deliverySettingsDTO, creatorName,
+		                          actionList);
+	}
 }

@@ -35,4 +35,32 @@ public class DeliverySettingsDTO implements Serializable {
 	public void setRetryNumber(int retryNumber) {
 		this.retryNumber = retryNumber;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		DeliverySettingsDTO that = (DeliverySettingsDTO) o;
+
+		if (retryDelay != that.retryDelay) {
+			return false;
+		}
+		if (retryNumber != that.retryNumber) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = retryNumber;
+		result = 31 * result + (int) (retryDelay ^ (retryDelay >>> 32));
+		return result;
+	}
 }

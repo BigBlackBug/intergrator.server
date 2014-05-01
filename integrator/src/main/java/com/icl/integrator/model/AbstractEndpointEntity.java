@@ -20,75 +20,80 @@ import java.util.Set;
 @DiscriminatorColumn(name = "ENDPOINT_TYPE",
                      discriminatorType = DiscriminatorType.STRING)
 public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
-        extends AbstractEntity {
+		extends AbstractEntity implements HasCreator {
 
-    @Column(unique = true, nullable = false, length = 255,
-            name = "SERVICE_NAME")
-    private String serviceName;
-
-	@OneToMany(mappedBy = "endpoint",
-	           fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "endpoint", fetch = FetchType.EAGER)
 	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
 	protected Set<AbstractActionEntity> actions = new HashSet<>();
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
-            insertable = false)
-    private EndpointType type;
+	@Column(unique = true, nullable = false, length = 255,
+	        name = "SERVICE_NAME")
+	private String serviceName;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "ENDPOINT_TYPE", nullable = false, updatable = false,
+	        insertable = false)
+	private EndpointType type;
 
 	@OneToOne
 	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
 	private DeliverySettings deliverySettings = DeliverySettings.createDefaultSettings();
 
-	@Column(nullable = false, name = "GENERATED")
-	private boolean generated;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "CREATOR_ID")
+	private IntegratorUser creator;
 
 	protected AbstractEndpointEntity() {
 
-    }
+	}
 
-    public DeliverySettings getDeliverySettings() {
-        return deliverySettings;
-    }
+	protected AbstractEndpointEntity(EndpointType endpointType) {
+		this.type = endpointType;
+	}
 
-    public void setDeliverySettings(DeliverySettings deliverySettings) {
-        this.deliverySettings = deliverySettings;
-    }
+	@Override
+	public IntegratorUser getCreator() {
+		return creator;
+	}
 
-    protected AbstractEndpointEntity(EndpointType endpointType) {
-        this.type = endpointType;
-    }
+	public void setCreator(IntegratorUser creator) {
+		this.creator = creator;
+	}
 
-    public Set<AbstractActionEntity> getActions() {
-        return actions;
-    }
+	public DeliverySettings getDeliverySettings() {
+		return deliverySettings;
+	}
 
-    public abstract void setActions(Set<T> actions);
+	public void setDeliverySettings(DeliverySettings deliverySettings) {
+		this.deliverySettings = deliverySettings;
+	}
 
-    public abstract T getActionByName(String actionName);
+	public Set<AbstractActionEntity> getActions() {
+		return actions;
+	}
 
-    public void addAction(T action) {
-        this.actions.add(action);
-    }
+	public abstract void setActions(Set<T> actions);
 
-    public EndpointType getType() {
-        return type;
-    }
+	public abstract T getActionByName(String actionName);
 
-    public String getServiceName() {
-        return serviceName;
-    }
+	public void addAction(T action) {
+		this.actions.add(action);
+	}
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
+	public EndpointType getType() {
+		return type;
+	}
 
-	public void setGenerated(boolean generated) {
-		this.generated = generated;
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
 	}
 
 	public boolean isGenerated() {
-		return generated;
+		return creator == null;
 	}
 }
 

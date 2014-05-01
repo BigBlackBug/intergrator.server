@@ -24,8 +24,7 @@ import java.util.List;
  * Created by BigBlackBug on 2/13/14.
  */
 @Component
-public class DeliveryBootstrap implements
-		ApplicationListener<ContextRefreshedEvent> {
+public class DeliveryBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
 	public static final String BASE_PACKAGE =
 			"com.icl.ios.registration.card.model.dataBase";
@@ -47,6 +46,14 @@ public class DeliveryBootstrap implements
 		if (isInitialized) {
 			return;
 		}
+//		Role role = new Role();
+//		role.setRole(RoleEnum.ROLE_USER);
+//		final IntegratorUser user = new IntegratorUser();
+//		user.setUsername("user");
+//		user.setPassword("1a1dc91c907325c69271ddf0c944bc72");
+//		user.setRole(role);
+//		role.setUserRoles(new HashSet<IntegratorUser>(){{add(user);}});
+//		persistenceService.persist(user);
 		List<Delivery> deliveries = persistenceService.findAllUnfinishedDeliveries();
 		for (Delivery delivery : deliveries) {
 			delivery.setRequestDate(new Date());

@@ -90,7 +90,7 @@ public class ValidatorTests {
 				);
 		IntegratorPacket p = new IntegratorPacket();
 		p.setMethod(null);
-		p.setPacket(null);
+		p.setData(null);
 		p.setResponseHandlerDescriptor(null);
 		serialize(p);
 	}

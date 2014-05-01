@@ -13,40 +13,48 @@ import java.io.Serializable;
  */
 public class ServiceDTO implements Serializable {
 
-    private String serviceName;
+	private String serviceName;
 
-    private EndpointType endpointType;
+	private EndpointType endpointType;
 
-    ServiceDTO(){
+	private String creator;
 
-    }
+	ServiceDTO() {
 
-    public ServiceDTO(String serviceName,
-                      EndpointType endpointType) {
-        this.serviceName = serviceName;
-        this.endpointType = endpointType;
-    }
+	}
 
-    public String getServiceName() {
-        return serviceName;
-    }
+	public ServiceDTO(String serviceName,
+	                  EndpointType endpointType,
+	                  String creator) {
+		this.serviceName = serviceName;
+		this.creator = creator;
+		this.endpointType = endpointType;
+	}
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
+	public String getCreator() {
+		return creator;
+	}
 
-    public EndpointType getEndpointType() {
-        return endpointType;
-    }
+	public String getServiceName() {
+		return serviceName;
+	}
 
-    public void setEndpointType(EndpointType endpointType) {
-        this.endpointType = endpointType;
-    }
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
 
-    @Override
-    public String toString() {
-        return "type: "+endpointType+" service_name:"+serviceName;
-    }
+	public EndpointType getEndpointType() {
+		return endpointType;
+	}
+
+	public void setEndpointType(EndpointType endpointType) {
+		this.endpointType = endpointType;
+	}
+
+	@Override
+	public String toString() {
+		return "type: " + endpointType + " service_name: " + serviceName + " creator: " + creator;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -59,6 +67,9 @@ public class ServiceDTO implements Serializable {
 
 		ServiceDTO that = (ServiceDTO) o;
 
+		if (!creator.equals(that.creator)) {
+			return false;
+		}
 		if (endpointType != that.endpointType) {
 			return false;
 		}
@@ -73,6 +84,7 @@ public class ServiceDTO implements Serializable {
 	public int hashCode() {
 		int result = serviceName.hashCode();
 		result = 31 * result + endpointType.hashCode();
+		result = 31 * result + creator.hashCode();
 		return result;
 	}
 }

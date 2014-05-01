@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class ResponseDTO<T> implements Serializable {
 
-	protected SuccessDTO<T> response;
+	protected T response;
 
 	protected boolean success;
 
@@ -21,15 +21,9 @@ public class ResponseDTO<T> implements Serializable {
 		this(true);
 	}
 
-	// Да, нужен на сорсе, чтоб распарсить результат от таргета.
-	public ResponseDTO(T response, String responseClass) {
-		this(true);
-		this.response = new SuccessDTO<>(responseClass, response);
-	}
-
 	public ResponseDTO(T response) {
 		this(true);
-		this.response = new SuccessDTO<>(response);
+		this.response = response;
 	}
 
 	public ResponseDTO(boolean success) {
@@ -79,12 +73,8 @@ public class ResponseDTO<T> implements Serializable {
 		return result;
 	}
 
-	public SuccessDTO<T> getResponse() {
+	public T getResponse() {
 		return response;
-	}
-
-	public T responseValue() {
-		return response.getResponseValue();
 	}
 
 	public ErrorDTO getError() {

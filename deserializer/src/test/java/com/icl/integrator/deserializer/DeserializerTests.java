@@ -47,8 +47,7 @@ public class DeserializerTests {
                 new IntegratorPacket<Void, DestinationDescriptor>(
                         targetResponseHandler);
         String expected = mapper.writeValueAsString(packet);
-        IntegratorPacket integratorPacket =
-                mapper.readValue(expected, IntegratorPacket.class);
+        IntegratorPacket integratorPacket = mapper.readValue(expected, IntegratorPacket.class);
         Assert.assertEquals(packet, integratorPacket);
     }
 
@@ -61,17 +60,15 @@ public class DeserializerTests {
                                 "ser", "actuin", EndpointType.HTTP)
                 );
         String expected = mapper.writeValueAsString(packet);
-        IntegratorPacket integratorPacket =
-                mapper.readValue(expected, IntegratorPacket.class);
+        IntegratorPacket integratorPacket = mapper.readValue(expected, IntegratorPacket.class);
         Assert.assertEquals(packet, integratorPacket);
     }
 
     @Test
     public void testServiceDTODes() throws Exception {
-        ServiceDTO s = new ServiceDTO("NAME", EndpointType.HTTP);
+        ServiceDTO s = new ServiceDTO("NAME", EndpointType.HTTP,"creator");
         String expected = mapper.writeValueAsString(s);
-        ServiceDTO integratorPacket =
-                mapper.readValue(expected, ServiceDTO.class);
+        ServiceDTO integratorPacket = mapper.readValue(expected, ServiceDTO.class);
         Assert.assertEquals(s, integratorPacket);
     }
 
@@ -105,27 +102,22 @@ public class DeserializerTests {
         RawDestinationDescriptor
                 serviceDTO = new RawDestinationDescriptor(getHttpDTO(), descriptor);
         String s = mapper.writeValueAsString(serviceDTO);
-        RawDestinationDescriptor
-                serviceDTO1 =
-                mapper.readValue(s, RawDestinationDescriptor.class);
+        RawDestinationDescriptor serviceDTO1 = mapper.readValue(s, RawDestinationDescriptor.class);
         Assert.assertEquals(serviceDTO, serviceDTO1);
     }
 
     @Test
     public void testHttpFSERVDeserializer() throws Exception {
-
-        FullServiceDTO<HttpActionDTO> serviceDTO = new FullServiceDTO<>();
-        serviceDTO.setServiceName("SAD");
-        serviceDTO.setEndpoint(new HttpEndpointDescriptorDTO("host", 65468));
-        ActionEndpointDTO<HttpActionDTO> actionEndpointDTO =
-                new ActionEndpointDTO<>("actionname", new HttpActionDTO("path",
-                                                                        ActionMethod.HANDLE_ADD_ACTION));
-        serviceDTO.setActions(Arrays.asList(actionEndpointDTO));
-        serviceDTO.setDeliverySettings(new DeliverySettingsDTO(456, 456));
-        String s = mapper.writeValueAsString(serviceDTO);
-        FullServiceDTO
-                serviceDTO1 =
-                mapper.readValue(s, new TypeReference<FullServiceDTO<ActionDescriptor>>() {
+	    HttpEndpointDescriptorDTO endpoint = new HttpEndpointDescriptorDTO("host", 65468);
+	    ActionEndpointDTO<HttpActionDTO> actionEndpointDTO =
+			    new ActionEndpointDTO<>("actionname",
+			                            new HttpActionDTO("path", ActionMethod.HANDLE_ADD_ACTION));
+	    DeliverySettingsDTO ds = new DeliverySettingsDTO(456, 456);
+	    FullServiceDTO<HttpActionDTO> serviceDTO =
+			    new FullServiceDTO<>("SAD", endpoint, ds, "creator", actionEndpointDTO);
+	    String s = mapper.writeValueAsString(serviceDTO);
+	    FullServiceDTO serviceDTO1 =
+			    mapper.readValue(s, new TypeReference<FullServiceDTO<ActionDescriptor>>() {
                 });
         Assert.assertEquals(serviceDTO, serviceDTO1);
     }
@@ -141,12 +133,9 @@ public class DeserializerTests {
                         ),
                         false
                 );
-        AddActionDTO<ActionDescriptor> dto = new AddActionDTO<>(
-                new ServiceDTO("SERVICE2", EndpointType.HTTP), a);
+        AddActionDTO<ActionDescriptor> dto = new AddActionDTO<>("SERVICE2", a);
         String s = mapper.writeValueAsString(dto);
-        AddActionDTO
-                serviceDTO1 =
-                mapper.readValue(s, AddActionDTO.class);
+        AddActionDTO serviceDTO1 = mapper.readValue(s, AddActionDTO.class);
         Assert.assertEquals(dto, serviceDTO1);
     }
 
@@ -155,19 +144,15 @@ public class DeserializerTests {
         RawDestinationDescriptor
                 serviceDTO = new RawDestinationDescriptor(getJMSDTO(), getQueueDTO());
         String s = mapper.writeValueAsString(serviceDTO);
-        RawDestinationDescriptor
-                serviceDTO1 =
-                mapper.readValue(s, RawDestinationDescriptor.class);
+        RawDestinationDescriptor serviceDTO1 = mapper.readValue(s, RawDestinationDescriptor.class);
         Assert.assertEquals(serviceDTO, serviceDTO1);
     }
 
     @Test
     public void testDeserializerSericeDTO() throws Exception {
-        ServiceDTO serviceDTO = new ServiceDTO("ser", EndpointType.HTTP);
+        ServiceDTO serviceDTO = new ServiceDTO("ser", EndpointType.HTTP,"Creator");
         String s = mapper.writeValueAsString(serviceDTO);
-        ServiceDTO
-                serviceDTO1 =
-                mapper.readValue(s, ServiceDTO.class);
+        ServiceDTO serviceDTO1 = mapper.readValue(s, ServiceDTO.class);
         Assert.assertEquals(serviceDTO, serviceDTO1);
     }
 

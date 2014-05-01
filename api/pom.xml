@@ -9,7 +9,6 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>api</artifactId>
     <name>api</name>
-    <version>1.5</version>
     <packaging>jar</packaging>
 
     <properties>

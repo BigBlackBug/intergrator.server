@@ -1,7 +1,9 @@
 package com.icl.integrator.services;
 
 import com.icl.integrator.dto.DeliveryPacketType;
+import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionMethod;
+import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,35 +21,16 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Service
+@Transactional
 public class PersistenceService {
 
     @PersistenceContext
     private EntityManager em;
 
-    @Transactional
-    public HttpServiceEndpoint getHttpService(String serviceName) throws
-            NoResultException {
-        String query = "select ep from HttpServiceEndpoint ep where " +
-                "ep.serviceName=:serviceName";
-        return em.createQuery(query, HttpServiceEndpoint.class).
-                setParameter("serviceName", serviceName).getSingleResult();
-    }
-
-    @Transactional
-    public JMSServiceEndpoint getJmsService(String serviceName) throws
-            NoResultException {
-        String query = "select ep from JMSServiceEndpoint ep where " +
-                "ep.serviceName=:serviceName";
-        return em.createQuery(query, JMSServiceEndpoint.class).
-                setParameter("serviceName", serviceName).getSingleResult();
-    }
-
-    @Transactional
     public <T extends AbstractEntity> T merge(T entity) {
         return em.merge(entity);
     }
 
-	@Transactional
 	public <T extends AbstractEntity> T saveOrUpdate(T entity) {
 		if(entity.getId() == null){
 			em.persist(entity);
@@ -57,30 +40,50 @@ public class PersistenceService {
 		}
 	}
 
-	@Transactional
 	public <T extends AbstractEntity> T refresh(T entity) {
 		em.refresh(entity);
 		return entity;
 	}
 
-    @Transactional
     public <T extends AbstractEntity> T persist(T entity) {
         em.persist(entity);
 	    return entity;
     }
 
-	@Transactional
-	public <T extends AbstractEntity> T find(Class<T> entityClass,UUID id) {
-		return em.find(entityClass,id);
+	public <T extends AbstractEntity> T find(Class<T> entityClass, UUID id) {
+		return em.find(entityClass, id);
 	}
 
-    @Transactional
-    public List<HttpServiceEndpoint> getHttpServices() {
-        return em.createQuery("select ep from HttpServiceEndpoint ep",
-                              HttpServiceEndpoint.class).getResultList();
-    }
+	public AbstractEndpointEntity getEndpointEntity(String name){
+		return em.createQuery(
+				"select entity from AbstractEndpointEntity  entity where entity.serviceName=:name",
+				AbstractEndpointEntity.class).setParameter("name", name).getSingleResult();
+	}
+	public IntegratorUser findUserByUsername(String username) throws NoResultException{
+		return em.createQuery("select user from IntegratorUser user where user.username=:username",
+		                      IntegratorUser.class).setParameter("username", username)
+				.getSingleResult();
+	}
 
-    @Transactional
+//    public List<HttpServiceEndpoint> getHttpServices() {
+//        return em.createQuery("select ep from HttpServiceEndpoint ep",
+//                              HttpServiceEndpoint.class).getResultList();
+//    }
+
+	public List<ServiceDTO> getAllServices(){
+		List resultList = em.createQuery(
+				"select ep.serviceName,ep.type,ep.creator.username from AbstractEndpointEntity ep")
+				.getResultList();
+		List<ServiceDTO> result = new ArrayList<>();
+		for (Object service : resultList) {
+			Object[] serviceData = (Object[]) service;
+			result.add(new ServiceDTO(serviceData[0].toString(),
+			                          EndpointType.valueOf(serviceData[1].toString()),
+			                          serviceData[2].toString()));
+		}
+		return result;
+	}
+
     public HttpAction getHttpAction(String actionName, UUID endpointID) {
         return em.createQuery(
                 "select action from HttpAction action where " +
@@ -91,7 +94,6 @@ public class PersistenceService {
                 .getSingleResult();
     }
 
-    @Transactional
     public JMSAction getJmsAction(String actionName, UUID endpointID) {
         return em.createQuery(
                 "select action from JMSAction action where " +
@@ -101,40 +103,11 @@ public class PersistenceService {
                 .setParameter("endpointID", endpointID).getSingleResult();
     }
 
-    @Transactional
-    public List<JMSServiceEndpoint> getJmsServices() {
-        return em.createQuery("select ep from JMSServiceEndpoint ep",
-                              JMSServiceEndpoint.class).getResultList();
-    }
-
-//    @Transactional
-//    public List<String> getHttpActions(String serviceName) {
-//        String query =
-//                "select action.actionName from HttpServiceEndpoint ep join " +
-//                        "ep.httpActions action where ep.serviceName=:serviceName";
-//        return em.createQuery(query, String.class).
-//                setParameter("serviceName", serviceName).getResultList();
-//    }
-//
-//    @Transactional
-//    public List<String> getJmsActions(String serviceName) {
-//        String query =
-//                "select action.actionName from JMSServiceEndpoint ep join " +
-//                        "ep.jmsActions action where ep.serviceName=:serviceName";
-//        return em.createQuery(query, String.class).
-//                setParameter("serviceName", serviceName).getResultList();
+//    public List<JMSServiceEndpoint> getJmsServices() {
+//        return em.createQuery("select ep from JMSServiceEndpoint ep",
+//                              JMSServiceEndpoint.class).getResultList();
 //    }
 
-    @Transactional
-    public List<String> getActionNames(String serviceName) {
-        String query =
-                "select action.actionName from AbstractEndpointEntity ep join " +
-                        "ep.actions action where ep.serviceName=:serviceName";
-        return em.createQuery(query, String.class).
-                setParameter("serviceName", serviceName).getResultList();
-    }
-
-    @Transactional
     public HttpServiceEndpoint findHttpService(String host, int port) {
         String query = "select ep from HttpServiceEndpoint ep where " +
                 "ep.serviceURL=:serviceURL and ep.servicePort=:servicePort";
@@ -147,7 +120,7 @@ public class PersistenceService {
             return null;
         }
     }
-	@Transactional
+
     public HttpAction findHttpAction(UUID id, String path) {
         try {
             String query =
@@ -161,7 +134,7 @@ public class PersistenceService {
             return null;
         }
     }
-	@Transactional
+
     public JMSServiceEndpoint findJmsService(String connectionFactory,
                                              String jndiProperties) {
         try {
@@ -175,7 +148,7 @@ public class PersistenceService {
             return null;
         }
     }
-	@Transactional
+
     public JMSAction findJmsAction(UUID id, String queueName, String username,
                                    String password) {
         try {
@@ -196,7 +169,6 @@ public class PersistenceService {
         }
     }
 
-	@Transactional
 	public List<AutoDetectionPacket> findAutoDetectionPackets(
 			DeliveryPacketType deliveryPacketType) {
 		return em.createQuery(
@@ -204,7 +176,6 @@ public class PersistenceService {
 				.setParameter("deliveryPacketType", deliveryPacketType).getResultList();
 	}
 
-	@Transactional
 	public List<Delivery> findAllUnfinishedDeliveries() {
 		return em.createQuery(
 				"select delivery from Delivery delivery where " +
@@ -217,14 +188,12 @@ public class PersistenceService {
 
 	}
 
-    @Transactional
     public List<AbstractActionEntity> getActions(String serviceName) {
         return em.createQuery("select ep.actions from AbstractEndpointEntity ep where ep" +
                                       ".serviceName=:serviceName").setParameter(
                 "serviceName", serviceName).getResultList();
     }
 
-    @Transactional
     public Map<String, List<AbstractEndpointEntity>> getAllActionMap() {
         Map<String, List<AbstractEndpointEntity>> result = new HashMap<>();
         List<String> actions =
@@ -247,7 +216,6 @@ public class PersistenceService {
         return result;
     }
 
-    @Transactional
     public Map<AbstractEndpointEntity, List<AbstractActionEntity>>
     getServicesSupportingActionType(ActionMethod actionMethod) {
         List<AbstractActionEntity> actions =

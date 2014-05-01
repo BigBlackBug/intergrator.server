@@ -20,7 +20,7 @@ import javax.persistence.*;
 @Inheritance
 @DiscriminatorColumn(name = "ACTION_TYPE",
                      discriminatorType = DiscriminatorType.STRING)
-public abstract class AbstractActionEntity extends AbstractEntity {
+public abstract class AbstractActionEntity extends AbstractEntity implements HasCreator {
 
 	@Column(nullable = false, length = 255, name = "ACTION_NAME")
 	private String actionName;
@@ -39,8 +39,9 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 	@Column(name = "ACTION_METHOD", nullable = false, updatable = false)
 	private ActionMethod actionMethod;
 
-	@Column(nullable = false, name = "GENERATED")
-	private boolean generated;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "CREATOR_ID")
+	private IntegratorUser creator;
 
 	protected AbstractActionEntity() {
 
@@ -78,11 +79,16 @@ public abstract class AbstractActionEntity extends AbstractEntity {
 		this.actionName = actionName;
 	}
 
-	public boolean isGenerated() {
-		return generated;
+	@Override
+	public IntegratorUser getCreator() {
+		return creator;
 	}
 
-	public void setGenerated(boolean generated) {
-		this.generated = generated;
+	public void setCreator(IntegratorUser creator) {
+		this.creator = creator;
+	}
+
+	public boolean isGenerated() {
+		return creator == null;
 	}
 }

@@ -1,4 +1,4 @@
-package com.icl.integrator;
+package com.icl.integrator.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -91,10 +91,10 @@ public class IntegratorJmsController implements MessageListener {
 						break;
 					}
 					case GET_SERVICE_INFO: {
-						IntegratorPacket<ServiceDTO, DestinationDescriptor> packet =
+						IntegratorPacket<String, DestinationDescriptor> packet =
 								mapper.convertValue(
 										integratorPacket,
-										new TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>() {
+										new TypeReference<IntegratorPacket<String, DestinationDescriptor>>() {
 										});
 						integratorService.getServiceInfo(packet);
 						break;
@@ -109,10 +109,10 @@ public class IntegratorJmsController implements MessageListener {
 						break;
 					}
 					case GET_SUPPORTED_ACTIONS: {
-						IntegratorPacket<ServiceDTO, DestinationDescriptor> packet =
+						IntegratorPacket<String, DestinationDescriptor> packet =
 								mapper.convertValue(
 										integratorPacket,
-										new TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>() {
+										new TypeReference<IntegratorPacket<String, DestinationDescriptor>>() {
 										});
 						integratorService.getSupportedActions(packet);
 						break;

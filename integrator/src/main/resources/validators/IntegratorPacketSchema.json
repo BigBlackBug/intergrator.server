@@ -15,13 +15,16 @@
             ]
 
         },
-        "packet": {
-            "oneOf": [
+        "data": {
+            "anyOf": [
                 {
                     "type": "null"
                 },
                 {
                     "$ref": "#/definitions/actionMethod"
+                },
+                {
+                    "type": "string"
                 },
                 {
                     "type": "object",
@@ -34,9 +37,6 @@
                         },
                         {
                             "$ref": "#/definitions/serviceDD"
-                        },
-                        {
-                            "$ref": "#/definitions/serviceDTO"
                         },
                         {
                             "$ref": "#/definitions/addActionDTO"
@@ -86,13 +86,11 @@
                             "type": "array",
                             "items": [
                                 {
-                                    "$ref": "#/definitions/serviceDTO"
+                                    "type": "string"
                                 }
                             ]
                         }
                     ]
-
-
                 },
                 "action": {
                     "oneOf": [
@@ -191,27 +189,13 @@
                 }
             }
         },
-        "serviceDTO": {
-            "type": "object",
-            "required": [ "serviceName", "endpointType" ],
-            "additionalProperties": false,
-            "properties": {
-                "serviceName": {
-                    "type": "string"
-                },
-                "endpointType": {
-                    "type": "string",
-                    "enum": [ "HTTP", "JMS" ]
-                }
-            }
-        },
         "addActionDTO": {
             "type": "object",
             "required": [ "service", "actionRegistration" ],
             "additionalProperties": false,
             "properties": {
-                "service": {
-                    "$ref": "#/definitions/serviceDTO"
+                "serviceName": {
+                    "type": "string"
                 },
                 "actionRegistration": {
                     "$ref": "#/definitions/actionRegDTO"
@@ -317,7 +301,9 @@
                 "HANDLE_ADD_ACTION",
                 "HANDLE_GET_SERVICE_INFO",
                 "HANDLE_PING",
-                "HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE"
+                "HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE",
+                "HANDLE_GET_ACTIONS_FOR_DELIVERY",
+                "HANDLE_GET_SERVICES_SUPPORTING_ACTION_TYPE"
             ]
         } ,
         "actionDesc": {

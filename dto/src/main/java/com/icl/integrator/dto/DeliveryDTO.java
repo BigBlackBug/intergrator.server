@@ -17,7 +17,7 @@ public class DeliveryDTO implements Serializable{
 
 	private DestinationDescriptor responseHandlerDescriptor;
 
-	private List<ServiceDTO> destinations;
+	private List<String> destinations;
 
 	private String action;
 
@@ -36,7 +36,7 @@ public class DeliveryDTO implements Serializable{
     public DeliveryDTO(RequestDataDTO requestData,
                        DestinationDescriptor responseHandlerDescriptor,
                        String action,
-                       List<ServiceDTO> destinations) {
+                       List<String> destinations) {
         this.destinations = destinations;
 		this.requestData = requestData;
 		this.action = action;
@@ -46,26 +46,25 @@ public class DeliveryDTO implements Serializable{
     public DeliveryDTO(RequestDataDTO requestData,
                        DestinationDescriptor responseHandlerDescriptor,
                        String action,
-                       ServiceDTO destination) {
-        this(requestData,responseHandlerDescriptor,action,Arrays.asList(destination));
+                       String destination) {
+	    this(requestData, responseHandlerDescriptor, action, Arrays.asList(destination));
     }
 
-    public DeliveryDTO(RequestDataDTO requestData,
+	public DeliveryDTO(RequestDataDTO requestData,
                        DestinationDescriptor responseHandlerDescriptor,
                        String action,
-                       ServiceDTO... destinations) {
+                       String... destinations) {
         this(requestData,responseHandlerDescriptor,action,Arrays.asList(destinations));
     }
 
-    public DeliveryDTO(RequestDataDTO requestData, String action, List<ServiceDTO> destinations) {
+    public DeliveryDTO(RequestDataDTO requestData, String action, List<String> destinations) {
         this.destinations = destinations;
         this.requestData = requestData;
         this.action = action;
     }
 
-    public DeliveryDTO(RequestDataDTO requestData, String action, ServiceDTO destination, ServiceDTO... destinations) {
-        this(requestData,action, Arrays.asList(destinations));
-        this.destinations.add(destination);
+    public DeliveryDTO(RequestDataDTO requestData, String action, String... destinations) {
+        this(requestData, action, Arrays.asList(destinations));
     }
 
     DeliveryDTO(){
@@ -119,16 +118,16 @@ public class DeliveryDTO implements Serializable{
 		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
 
-	public List<ServiceDTO> getDestinations() {
+	public List<String> getDestinations() {
 		return destinations;
 	}
 
-	public void setDestinations(List<ServiceDTO> destinations) {
+	public void setDestinations(List<String> destinations) {
 		this.destinations = destinations;
 	}
 
-	public void addDestination(ServiceDTO serviceDTO) {
-		this.destinations.add(serviceDTO);
+	public void addDestination(String serviceName) {
+		this.destinations.add(serviceName);
 	}
 
 	public String getAction() {

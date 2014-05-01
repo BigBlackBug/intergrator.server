@@ -41,7 +41,7 @@ public class PacketProcessor {
 				        new DefaultDeliverySuccessConverter(delivery);
 		        deliveryService.deliver(delivery,ResponseDTO.class,
 		                                new ResponseDeliveryDescriptor<>(errorConverter,successConverter));
-	            response = new ResponseDTO<>(delivery.getId().toString(), String.class.toString());
+	            response = new ResponseDTO<>(delivery.getId().toString());
             } catch (Exception ex) {
 	            ErrorDTO error = new ErrorDTO(ex);
 	            response = new ResponseDTO<>(error);

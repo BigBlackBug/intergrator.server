@@ -47,7 +47,6 @@ public class DeliveryCreator {
 	                                    HttpActionDTO httpActionDTO) {
 		HttpAction httpAction = new HttpAction();
 		httpAction.setActionURL(httpActionDTO.getPath());
-		httpAction.setGenerated(true);
 		httpAction.setActionName(generateActionName(service.getServiceName()));
 		httpAction.setEndpoint(service);
 		httpAction.setActionMethod(httpActionDTO.getActionMethod());
@@ -59,7 +58,6 @@ public class DeliveryCreator {
 	                                  QueueDTO queueDTO) {
 		JMSAction jmsAction = new JMSAction();
 		jmsAction.setPassword(queueDTO.getPassword());
-		jmsAction.setGenerated(true);
 		jmsAction.setQueueName(queueDTO.getQueueName());
 		jmsAction.setUsername(queueDTO.getUsername());
 		jmsAction.setActionName(generateActionName(service.getServiceName()));
@@ -111,7 +109,6 @@ public class DeliveryCreator {
 							DeliverySettings.createDefaultSettings();
 					service.setDeliverySettings(defaultSettings);
 					defaultSettings.setEndpoint(service);
-					service.setGenerated(true);
 					service.setServiceName(generateServiceName());
 					service.setServiceURL(realDescriptor.getHost());
 					service.setServicePort(realDescriptor.getPort());
@@ -154,7 +151,6 @@ public class DeliveryCreator {
 					service.setDeliverySettings(defaultSettings);
 					defaultSettings.setEndpoint(service);
 					service.setServiceName(generateServiceName());
-					service.setGenerated(true);
 					service.setConnectionFactory(
 							realDescriptor.getConnectionFactory());
 					service.setJndiProperties(jndiPropertiesString);
@@ -175,22 +171,16 @@ public class DeliveryCreator {
 					}
 				}
 			}
-		} else if (descriptorType ==
-				DestinationDescriptor.DescriptorType.SERVICE) {
+		} else if (descriptorType ==DestinationDescriptor.DescriptorType.SERVICE) {
 			ServiceDestinationDescriptor realSourceService =
 					(ServiceDestinationDescriptor) destination;
 			EndpointType endpointType = realSourceService.getEndpointType();
+			endpointEntity = persistenceService.getEndpointEntity(realSourceService.getService());
 			if (endpointType == EndpointType.HTTP) {
-				endpointEntity =
-						persistenceService.getHttpService(
-								realSourceService.getService());
 				actionEntity = persistenceService
 						.getHttpAction(realSourceService.getAction(),
 						               endpointEntity.getId());
 			} else if (endpointType == EndpointType.JMS) {
-				endpointEntity =
-						persistenceService.getJmsService(
-								realSourceService.getService());
 				actionEntity = persistenceService.getJmsAction(
 						realSourceService.getAction(),
 						endpointEntity.getId());
@@ -224,22 +214,16 @@ public class DeliveryCreator {
 	private <T> Deliveries createDeliveries(DeliveryDTO deliveryDTO, T data,
 	                                        DestinationDescriptor responseHandlerDescriptor) {
 		Deliveries deliveries = new Deliveries();
-		for (ServiceDTO destination : deliveryDTO.getDestinations()) {
+		for (String destination : deliveryDTO.getDestinations()) {
 			try {
 				AbstractActionEntity actionEntity = null;
-				AbstractEndpointEntity endpointEntity = null;
-				EndpointType endpointType = destination.getEndpointType();
+				AbstractEndpointEntity endpointEntity =
+						persistenceService.getEndpointEntity(destination);
+				EndpointType endpointType = endpointEntity.getType();
 				if (endpointType == EndpointType.HTTP) {
-					endpointEntity =
-							persistenceService.getHttpService(
-									destination.getServiceName());
 					actionEntity = persistenceService
-							.getHttpAction(deliveryDTO.getAction(),
-							               endpointEntity.getId());
+							.getHttpAction(deliveryDTO.getAction(), endpointEntity.getId());
 				} else if (endpointType == EndpointType.JMS) {
-					endpointEntity =
-							persistenceService.getJmsService(
-									destination.getServiceName());
 					actionEntity = persistenceService.getJmsAction(
 							deliveryDTO.getAction(), endpointEntity.getId());
 				}
@@ -249,9 +233,8 @@ public class DeliveryCreator {
 				persistenceService.persist(delivery);
 				deliveries.addDelivery(delivery);
 			} catch (Exception ex) {
-				logger.error("Error creating delivery packet for destination",
-				             ex);
-				deliveries.addError(destination.getServiceName(), ex);
+				logger.error("Error creating delivery packet for destination", ex);
+				deliveries.addError(destination, ex);
 			}
 		}
 		return deliveries;

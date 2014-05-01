@@ -3,7 +3,7 @@ package com.icl.integrator.springapi.interceptors;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.ActionMethod;
-import com.icl.integrator.dto.registration.RegistrationResultDTO;
+import com.icl.integrator.dto.registration.ActionRegistrationResultDTO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -38,7 +38,7 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 		          new ParameterizedTypeReference<Map<String, ResponseDTO<UUID>>>() {
 		          }.getType());
 		types.put(ActionMethod.HANDLE_SERVER_REGISTRATION_RESPONSE,
-		          new ParameterizedTypeReference<ResponseDTO<RegistrationResultDTO>>() {
+		          new ParameterizedTypeReference<ResponseDTO<List<ActionRegistrationResultDTO>>>() {
 		          }.getType());
 		types.put(ActionMethod.HANDLE_SERVICE_IS_AVAILABLE,
 		          new ParameterizedTypeReference<ResponseDTO<Boolean>>() {
@@ -60,6 +60,12 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 		          }.getType());
 		types.put(ActionMethod.HANDLE_PING, new ParameterizedTypeReference<ResponseDTO<Boolean>>() {
 		}.getType());
+		types.put(ActionMethod.HANDLE_GET_ACTIONS_FOR_DELIVERY,
+		          new ParameterizedTypeReference<ResponseDTO<List<DeliveryActionsDTO>>>() {
+		          }.getType());
+		types.put(ActionMethod.HANDLE_GET_SERVICES_SUPPORTING_ACTION_TYPE,
+		          new ParameterizedTypeReference<ResponseDTO<List<ServiceAndActions<ActionDescriptor>>>>() {
+		          }.getType());
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package com.icl.integrator.util.connectors;
 
-import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
@@ -10,9 +9,9 @@ import com.icl.integrator.dto.registration.QueueDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
+import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.model.*;
 import com.icl.integrator.services.EndpointResolverService;
-import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.util.IntegratorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,22 +34,16 @@ public class EndpointConnectorFactory {
 
 	public EndpointConnector createEndpointConnector(String serviceName,
 	                                                 EndpointType endpointType,
-	                                                 String action) {
-		return createEndpointConnector(new ServiceDTO(serviceName, endpointType), action);
-	}
-
-	public EndpointConnector createEndpointConnector(
-			ServiceDTO destination, String action)
-			throws IntegratorException {
-		switch (destination.getEndpointType()) {
+	                                                 String action) throws IntegratorException {
+		switch (endpointType) {
 			case HTTP: {
 				EndpointResolverService.Result result = endpointResolverService
-						.getServiceURL(destination.getServiceName(), action);
+						.getServiceURL(serviceName, action);
 				return new HTTPEndpointConnector(result.getUrl(), result.getActionMethod());
 			}
 			case JMS: {
 				JMSServiceEndpoint jmsEndpoint = endpointResolverService
-						.getJmsEndpoint(destination.getServiceName());
+						.getJmsEndpoint(serviceName);
 				return new JMSEndpointConnector(
 						jmsEndpoint,
 						jmsEndpoint.getActionByName(action));

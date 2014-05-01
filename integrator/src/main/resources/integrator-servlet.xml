@@ -5,6 +5,7 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
         http://activemq.apache.org/schema/core
@@ -14,7 +15,8 @@
         http://www.springframework.org/schema/jms
         http://www.springframework.org/schema/jms/spring-jms-2.5.xsd
         http://www.springframework.org/schema/tx
-        http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+        http://www.springframework.org/schema/tx/spring-tx-3.1.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
     <!--
        Turn on AspectJ @Configurable support. As a result, any time you
        instantiate an object, Spring will attempt to perform dependency
@@ -28,18 +30,8 @@
        method). Roo applications use this useful feature in a number of
        areas, such as @PersistenceContext injection into entities.
    -->
-    <context:spring-configured/>
-    <context:component-scan base-package="com.icl.integrator"/>
-    <tx:annotation-driven transaction-manager="transactionManager"/>
-    <!--<bean id="packetProcessorFactory"-->
-          <!--class="com.icl.integrator.services.PacketProcessorFactory">-->
-        <!--<lookup-method name="createProcessor" bean="asyncProcessor"/>-->
-    <!--</bean>-->
-
-    <!--<bean id="asyncProcessor"-->
-          <!--class="com.icl.integrator.services.PacketProcessor"-->
-          <!--scope="prototype">-->
-    <!--</bean>-->
+    <!--<context:spring-configured/>-->
+    <context:component-scan base-package="com.icl.integrator.controllers"/>
 
     <!--Jackson configuration-->
     <bean id="jacksonMessageConverter"
@@ -52,26 +44,6 @@
                 <ref bean="jacksonMessageConverter"/>
             </list>
         </property>
-    </bean>
-    <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
-          id="entityManagerFactory">
-        <property name="persistenceUnitName" value="develop"/>
-
-        <!-- Необходимо для использования Pageable в параметрах методов JpaRepository'ев -->
-        <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
-        </property>
-
-        <property name="persistenceProvider" ref="hibernatePersistenceProvider"/>
-    </bean>
-
-    <bean id="hibernatePersistenceProvider"
-          class="org.hibernate.ejb.HibernatePersistence">
-    </bean>
-
-    <bean id="transactionManager"
-          class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
 
     <bean id="cnManager"
@@ -112,9 +84,11 @@
         <!--<constructor-arg ref="connectionFactory"/>-->
     </bean>
     <!-- listener container definition using the jms namespace, concurrency is the max number of concurrent listeners that can be started -->
-    <jms:listener-container concurrency="10">
-        <jms:listener id="IntegratorQueueListener"
-                      destination="IntegratorQueue"
-                      ref="integratorJmsController"/>
-    </jms:listener-container>
+
+    <!--TODO включить-->
+    <!--<jms:listener-container concurrency="10">-->
+        <!--<jms:listener id="IntegratorQueueListener"-->
+                      <!--destination="IntegratorQueue"-->
+                      <!--ref="integratorJmsController"/>-->
+    <!--</jms:listener-container>-->
 </beans>

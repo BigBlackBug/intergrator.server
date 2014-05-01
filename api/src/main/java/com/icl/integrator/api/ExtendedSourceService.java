@@ -1,10 +1,8 @@
 package com.icl.integrator.api;
 
-import com.icl.integrator.dto.FullServiceDTO;
-import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.registration.ActionDescriptor;
-import com.icl.integrator.dto.registration.RegistrationResultDTO;
+import com.icl.integrator.dto.registration.ActionRegistrationResultDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +20,7 @@ public interface ExtendedSourceService extends SourceService {
 	public void handleDeliveryResponse(Map<String, ResponseDTO<UUID>> response);
 
 	public void handleServiceRegistrationResponse(
-			ResponseDTO<RegistrationResultDTO> response);
+			ResponseDTO<List<ActionRegistrationResultDTO>> response);
 
 	public void handleServiceIsAvailableResponse(ResponseDTO<Boolean> response);
 
@@ -35,5 +33,9 @@ public interface ExtendedSourceService extends SourceService {
 	public void handleGetServiceInfo(ResponseDTO<FullServiceDTO<ActionDescriptor>> response);
 
 	public void handleAutoDetectionRegistration(ResponseDTO<List<ResponseDTO<Void>>> response);
+
+	public void handleGetActionsForDelivery(ResponseDTO<List<DeliveryActionsDTO>> response);
+
+	public void handleGetServicesSupportingActionType(ResponseDTO<List<ServiceAndActions<ActionDescriptor>>> response);
 
 }

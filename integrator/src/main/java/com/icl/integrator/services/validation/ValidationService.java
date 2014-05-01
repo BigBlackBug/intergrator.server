@@ -12,6 +12,7 @@ import com.icl.integrator.dto.DeliveryPacketType;
 import com.icl.integrator.dto.RequestDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -22,6 +23,7 @@ import java.util.Map;
 /**
  * Created by BigBlackBug on 2/12/14.
  */
+@Service
 public class ValidationService {
 
 	private final JsonSchemaFactory jsonSchemaFactory;

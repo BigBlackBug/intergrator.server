@@ -34,7 +34,7 @@ public interface IntegratorAPI {
     ping(IntegratorPacket<Void, T> packet);
 
     public <T extends ActionDescriptor, Y extends DestinationDescriptor>
-    ResponseDTO<RegistrationResultDTO>
+    ResponseDTO<List<ActionRegistrationResultDTO>>
     registerService(IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
 
     /**
@@ -50,18 +50,20 @@ public interface IntegratorAPI {
 
     /**
      * Возвращает список действий, зарегистрированных на сервисе
+     * @param serviceName
      */
     public <T extends DestinationDescriptor,Y extends ActionDescriptor>
     ResponseDTO<List<ActionEndpointDTO<Y>>>
-    getSupportedActions(IntegratorPacket<ServiceDTO, T> serviceDTO);
+    getSupportedActions(IntegratorPacket<String, T> serviceName);
 
     /**
      * Возвращает полную информацию о сервисе, включая информацию о действиях
+     * @param serviceName
      */
     public <ADType extends ActionDescriptor,
             DDType extends DestinationDescriptor>
     ResponseDTO<FullServiceDTO<ADType>>
-    getServiceInfo(IntegratorPacket<ServiceDTO, DDType> serviceDTO);
+    getServiceInfo(IntegratorPacket<String, DDType> serviceName);
 
     public <T extends DestinationDescriptor,Y extends ActionDescriptor>
     ResponseDTO<Void>
@@ -86,9 +88,9 @@ public interface IntegratorAPI {
     /**
      * Получает инфу о сервисах и действиях определённого типа
      * @param packet тип действия
-     * @return карту название_сервиса - {сервис и инфа о действиях}
+     * @return список вида [{сервис и инфа о действиях}]
      */
     public <T extends DestinationDescriptor, Y extends ActionDescriptor>
-    ResponseDTO<Map<String, ServiceAndActions<Y>>>
+    ResponseDTO<List<ServiceAndActions<Y>>>
     getServicesSupportingActionType(IntegratorPacket<ActionMethod, T> packet);
 }

@@ -28,17 +28,14 @@ public final class AddActionDTODeserializer
             throws IOException {
         ObjectNode treeNode = jp.readValueAsTree();
         IntegratorObjectMapper mapper = new IntegratorObjectMapper();
-        ServiceDTO endpoint = mapper.readValue(
-                treeNode.get("service").toString(), ServiceDTO.class);
+	    String serviceName = treeNode.get("serviceName").asText();
         JsonNode actionRegistrationNode = treeNode.get("actionRegistration");
         boolean forceRegister =
                 actionRegistrationNode.get("forceRegister").asBoolean();
 	    ActionEndpointDTO action = mapper.readValue(actionRegistrationNode.get("action").toString(),
 	                                                   new TypeReference<ActionEndpointDTO>() {
 	                                                   });
-//	    ActionMethod deliveryType =
-//			    mapper.readValue(actionRegistrationNode.get("deliveryType").toString(), ActionMethod.class);
         ActionRegistrationDTO actionRegistrationDTO = new ActionRegistrationDTO(action, forceRegister);
-        return new AddActionDTO<>(endpoint, actionRegistrationDTO);
+        return new AddActionDTO<>(serviceName, actionRegistrationDTO);
     }
 }

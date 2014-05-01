@@ -1,7 +1,5 @@
 package com.icl.integrator.dto.registration;
 
-import com.icl.integrator.dto.ServiceDTO;
-
 import java.io.Serializable;
 
 /**
@@ -15,14 +13,14 @@ public class AddActionDTO<T extends ActionDescriptor> implements Serializable {
 
     private ActionRegistrationDTO<T> actionRegistration;
 
-    private ServiceDTO service;
+    private String serviceName;
 
     AddActionDTO() {
     }
 
-    public AddActionDTO(ServiceDTO service,
+    public AddActionDTO(String serviceName,
                         ActionRegistrationDTO<T> action) {
-        this.service = service;
+        this.serviceName = serviceName;
         this.actionRegistration = action;
     }
 
@@ -35,12 +33,12 @@ public class AddActionDTO<T extends ActionDescriptor> implements Serializable {
         this.actionRegistration = actionRegistration;
     }
 
-    public ServiceDTO getService() {
-        return service;
+    public String getServiceName() {
+        return serviceName;
     }
 
-    public void setService(ServiceDTO service) {
-        this.service = service;
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
 	@Override
@@ -57,7 +55,7 @@ public class AddActionDTO<T extends ActionDescriptor> implements Serializable {
 		if (!actionRegistration.equals(that.actionRegistration)) {
 			return false;
 		}
-		if (!service.equals(that.service)) {
+		if (!serviceName.equals(that.serviceName)) {
 			return false;
 		}
 
@@ -67,7 +65,7 @@ public class AddActionDTO<T extends ActionDescriptor> implements Serializable {
 	@Override
 	public int hashCode() {
 		int result = actionRegistration.hashCode();
-		result = 31 * result + service.hashCode();
+		result = 31 * result + serviceName.hashCode();
 		return result;
 	}
 }

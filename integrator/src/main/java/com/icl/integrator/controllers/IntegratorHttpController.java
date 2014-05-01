@@ -1,4 +1,4 @@
-package com.icl.integrator;
+package com.icl.integrator.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,6 +6,7 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.services.AuthorizationService;
 import com.icl.integrator.services.IntegratorService;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.apache.commons.logging.Log;
@@ -13,6 +14,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,6 +38,9 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
     @Autowired
 	private IntegratorService integratorService;
+
+	@Autowired
+	private AuthorizationService authService;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -66,7 +72,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
 	@Override
     public <T extends ActionDescriptor, Y extends DestinationDescriptor>
-    ResponseDTO<RegistrationResultDTO>
+	ResponseDTO<List<ActionRegistrationResultDTO>>
     registerService(@RequestBody IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
         TypeReference<IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>, DestinationDescriptor>>
                 type =
@@ -100,37 +106,42 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	@Override
 	public <T extends DestinationDescriptor,Y extends ActionDescriptor>
     ResponseDTO<List<ActionEndpointDTO<Y>>>
-    getSupportedActions(@RequestBody IntegratorPacket<ServiceDTO, T> serviceDTO) {
-        TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>
+    getSupportedActions(@RequestBody IntegratorPacket<String, T> serviceName) {
+        TypeReference<IntegratorPacket<String, DestinationDescriptor>>
                 type =
-				new TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>() {
+				new TypeReference<IntegratorPacket<String, DestinationDescriptor>>() {
 				};
 
 		return integratorService.getSupportedActions(fixConversion(
-				serviceDTO, type));
+				serviceName, type));
 	}
 
     @Override
     public <T extends DestinationDescriptor, Y extends ActionDescriptor>
-    ResponseDTO<Void> addAction(@RequestBody IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {
+    ResponseDTO<Void> addAction(@RequestBody IntegratorPacket<AddActionDTO<Y>, T> packet) {
         TypeReference<IntegratorPacket<AddActionDTO<Y>, DestinationDescriptor>>
-                type =
-				new TypeReference<IntegratorPacket<AddActionDTO<Y>, DestinationDescriptor>>() {
-				};
-		return integratorService.addAction(fixConversion(actionDTO, type));
-	}
+		        type =
+		        new TypeReference<IntegratorPacket<AddActionDTO<Y>, DestinationDescriptor>>() {
+		        };
+	    AddActionDTO<Y> data = packet.getData();
+	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    if (!authService.hasAccessToService(data.getServiceName(), auth)) {
+		    return new ResponseDTO<>(new ErrorDTO(
+				    "Вы не можете добавлять действия к сервису, созданному не Вами"));
+	    }
+	    return integratorService.addAction(fixConversion(packet, type));
+    }
 
 	@Override
 	public <ADType extends ActionDescriptor,
 			DDType extends DestinationDescriptor>
 	ResponseDTO<FullServiceDTO<ADType>>
-    getServiceInfo(@RequestBody IntegratorPacket<ServiceDTO, DDType> serviceDTO) {
-        TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>
+    getServiceInfo(@RequestBody IntegratorPacket<String, DDType> serviceName) {
+        TypeReference<IntegratorPacket<String, DestinationDescriptor>>
                 type =
-				new TypeReference<IntegratorPacket<ServiceDTO, DestinationDescriptor>>() {
+				new TypeReference<IntegratorPacket<String, DestinationDescriptor>>() {
 				};
-		return integratorService
-				.getServiceInfo(fixConversion(serviceDTO, type));
+		return integratorService.getServiceInfo(fixConversion(serviceName, type));
 	}
 
 	@Override
@@ -158,7 +169,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
     @Override
     public <T extends DestinationDescriptor, Y extends ActionDescriptor>
-    ResponseDTO<Map<String, ServiceAndActions<Y>>>
+    ResponseDTO<List<ServiceAndActions<Y>>>
     getServicesSupportingActionType(@RequestBody IntegratorPacket<ActionMethod, T> packet) {
         TypeReference<IntegratorPacket<ActionMethod, DestinationDescriptor>>
                 type =

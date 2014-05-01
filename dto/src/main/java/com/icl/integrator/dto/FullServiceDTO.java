@@ -24,41 +24,45 @@ public class FullServiceDTO<Y extends ActionDescriptor> implements Serializable 
 
 	private List<ActionEndpointDTO<Y>> actions;
 
-    private DeliverySettingsDTO deliverySettings;
+	private DeliverySettingsDTO deliverySettings;
 
-    public FullServiceDTO() {
+	private String creatorName;
+
+	FullServiceDTO(){
+
 	}
 
-    public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
-                          DeliverySettingsDTO deliverySettings,
-                          List<ActionEndpointDTO<Y>> actions) {
-        this.serviceName = serviceName;
-        this.endpoint = endpoint;
-        this.actions = actions;
-        this.deliverySettings = deliverySettings;
-    }
+	public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
+	                      DeliverySettingsDTO deliverySettings, String creatorName,
+	                      List<ActionEndpointDTO<Y>> actions) {
+		this.serviceName = serviceName;
+		this.endpoint = endpoint;
+		this.actions = actions;
+		this.creatorName = creatorName;
+		this.deliverySettings = deliverySettings;
+	}
 
-    public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
-                          DeliverySettingsDTO deliverySettings,
-                          ActionEndpointDTO<Y>... actions) {
-        this(serviceName, endpoint, deliverySettings, Arrays.asList(actions));
-    }
+	public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
+	                      DeliverySettingsDTO deliverySettings, String creatorName,
+	                      ActionEndpointDTO<Y>... actions) {
+		this(serviceName, endpoint, deliverySettings, creatorName, Arrays.asList(actions));
+	}
 
-    public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
-                          DeliverySettingsDTO deliverySettings,
-                          ActionEndpointDTO<Y> action) {
-        this(serviceName, endpoint, deliverySettings, Arrays.asList(action));
-    }
+	public FullServiceDTO(String serviceName, EndpointDescriptor endpoint,
+	                      DeliverySettingsDTO deliverySettings, String creatorName,
+	                      ActionEndpointDTO<Y> action) {
+		this(serviceName, endpoint, deliverySettings, creatorName, Arrays.asList(action));
+	}
 
-    public DeliverySettingsDTO getDeliverySettings() {
-        return deliverySettings;
-    }
+	public DeliverySettingsDTO getDeliverySettings() {
+		return deliverySettings;
+	}
 
-    public void setDeliverySettings(DeliverySettingsDTO deliverySettings) {
-        this.deliverySettings = deliverySettings;
-    }
+	public void setDeliverySettings(DeliverySettingsDTO deliverySettings) {
+		this.deliverySettings = deliverySettings;
+	}
 
-    public String getServiceName() {
+	public String getServiceName() {
 		return serviceName;
 	}
 
@@ -100,6 +104,12 @@ public class FullServiceDTO<Y extends ActionDescriptor> implements Serializable 
 		if (!actions.equals(that.actions)) {
 			return false;
 		}
+		if (!creatorName.equals(that.creatorName)) {
+			return false;
+		}
+		if (!deliverySettings.equals(that.deliverySettings)) {
+			return false;
+		}
 		if (!endpoint.equals(that.endpoint)) {
 			return false;
 		}
@@ -115,6 +125,17 @@ public class FullServiceDTO<Y extends ActionDescriptor> implements Serializable 
 		int result = serviceName.hashCode();
 		result = 31 * result + endpoint.hashCode();
 		result = 31 * result + actions.hashCode();
+		result = 31 * result + deliverySettings.hashCode();
+		result = 31 * result + creatorName.hashCode();
 		return result;
+	}
+
+	public String getCreatorName() {
+		return creatorName;
+	}
+
+	public void setCreatorName(String creatorName) {
+
+		this.creatorName = creatorName;
 	}
 }
