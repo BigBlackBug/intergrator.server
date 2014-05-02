@@ -2,16 +2,15 @@ package com.icl.integrator.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.DeliveryDTO;
 import com.icl.integrator.dto.IntegratorMethod;
 import com.icl.integrator.dto.IntegratorPacket;
-import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.AddActionDTO;
 import com.icl.integrator.dto.registration.TargetRegistrationDTO;
-import com.icl.integrator.services.IntegratorService;
 import com.icl.integrator.services.validation.PacketValidationException;
 import com.icl.integrator.services.validation.ValidationService;
 import com.icl.integrator.services.validation.ValidatorException;
@@ -19,6 +18,7 @@ import com.icl.integrator.util.IntegratorException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
@@ -37,8 +37,9 @@ public class IntegratorJmsController implements MessageListener {
 	@Autowired
 	private ObjectMapper mapper;
 
+	@Qualifier("integratorService")
 	@Autowired
-	private IntegratorService integratorService;
+	private IntegratorAPI integratorService;
 
 	@Autowired
 	private ValidationService validationService;

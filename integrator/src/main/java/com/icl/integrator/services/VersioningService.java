@@ -11,6 +11,7 @@ import java.util.Map;
 @Service
 public class VersioningService {
 
+	//TODO synch
 	private final Map<String, Long> loggedInUsers = new HashMap<>();
 
 	private long serverState = 1L;
@@ -27,7 +28,7 @@ public class VersioningService {
 		loggedInUsers.remove(username);
 	}
 
-	public void changeServerState() {
+	public void increaseServerVersion() {
 		serverState++;
 	}
 

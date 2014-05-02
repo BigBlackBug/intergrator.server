@@ -1,5 +1,7 @@
 package com.icl.integrator.security;
 
+import com.icl.integrator.services.VersioningService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -13,6 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+	@Autowired
+	private VersioningService versioningService;
 
     private RequestCache requestCache = new HttpSessionRequestCache();
 
@@ -34,6 +39,7 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
         }
 
         clearAuthenticationAttributes(request);
+	    versioningService.login(authentication.getName());
     }
 
     public void setRequestCache(final RequestCache requestCache) {

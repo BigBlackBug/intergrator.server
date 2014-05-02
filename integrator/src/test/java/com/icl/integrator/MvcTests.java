@@ -2,6 +2,7 @@ package com.icl.integrator;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.IntegratorPacket;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
@@ -15,6 +16,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -47,6 +49,10 @@ public class MvcTests {
 	@Autowired
 	private ObjectMapper mapper;
 
+	@Qualifier("integratorService")
+	@Autowired
+	private IntegratorAPI service;
+
 	@Before
 	@Transactional
 	public void setup() throws Exception {
@@ -69,6 +75,11 @@ public class MvcTests {
 		mockMvc.perform(post("/integrator/getServiceList").contentType(
 				MediaType.APPLICATION_JSON).content(mapper.writeValueAsString
 				(packet))).andExpect(status().is(200));
+	}
+
+	@Test
+	public void testService() {
+		service.ping(new IntegratorPacket<Void, DestinationDescriptor>());
 	}
 
 }

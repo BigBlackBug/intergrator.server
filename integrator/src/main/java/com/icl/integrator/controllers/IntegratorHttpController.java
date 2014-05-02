@@ -2,16 +2,17 @@ package com.icl.integrator.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.services.AuthorizationService;
-import com.icl.integrator.services.IntegratorService;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -36,8 +37,9 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
     private static Log logger = LogFactory.getLog(IntegratorHttpController.class);
 
+	@Qualifier("integratorService")
     @Autowired
-	private IntegratorService integratorService;
+	private IntegratorAPI integratorService;
 
 	@Autowired
 	private AuthorizationService authService;
