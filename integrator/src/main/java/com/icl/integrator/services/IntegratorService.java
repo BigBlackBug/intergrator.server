@@ -45,6 +45,9 @@ public class IntegratorService implements IntegratorAPI {
 	@Autowired
 	private ValidationService validationService;
 
+	@Autowired
+	private VersioningService versioningService;
+
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<String>>>
 	deliver(IntegratorPacket<DeliveryDTO, T> delivery) {
@@ -73,6 +76,7 @@ public class IntegratorService implements IntegratorAPI {
 		logger.info("Received a service registration request");
 		List<ActionRegistrationResultDTO> result =
 				registrationService.register(registrationDTO.getData());
+		versioningService.increaseServerVersion();
 		return new ResponseDTO<>(result);
 	}
 
@@ -90,8 +94,8 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>> getServiceList(
-			IntegratorPacket<Void, T> packet) {
+	public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>>
+	getServiceList(IntegratorPacket<Void, T> packet) {
 		List<ServiceDTO> serviceList = workerService.getServiceList();
 		return new ResponseDTO<>(serviceList);
 	}
@@ -111,9 +115,10 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
-	public <T extends DestinationDescriptor, Y extends ActionDescriptor> ResponseDTO<Void> addAction(
-			IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {
+	public <T extends DestinationDescriptor, Y extends ActionDescriptor> ResponseDTO<Void>
+	addAction(IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {
 		workerService.addAction(actionDTO.getData());
+		versioningService.increaseServerVersion();
 		return new ResponseDTO<>(true);
 	}
 
@@ -134,6 +139,7 @@ public class IntegratorService implements IntegratorAPI {
 		try {
 			List<ResponseDTO<Void>> result =
 					registrationService.register(autoDetectionDTO.getData());
+			versioningService.increaseServerVersion();
 			return new ResponseDTO<>(result);
 		} catch (JsonProcessingException e) {
 			throw new IntegratorException(e);
@@ -155,7 +161,7 @@ public class IntegratorService implements IntegratorAPI {
 	getServicesSupportingActionType(IntegratorPacket<ActionMethod, T> packet) {
 		logger.info("Received a getServicesSupportingActionType request");
 		List<ServiceAndActions<Y>> serviceDTOListMap = workerService.get(packet.getData());
-		return  new ResponseDTO<>(serviceDTOListMap);
+		return new ResponseDTO<>(serviceDTOListMap);
 	}
 
 }
