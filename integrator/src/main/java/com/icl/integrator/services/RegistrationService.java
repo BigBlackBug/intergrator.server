@@ -304,7 +304,7 @@ public class RegistrationService {
     }
 
     public <Y> List<ResponseDTO<Void>> register(AutoDetectionRegistrationDTO<Y> packet)
-            throws Exception {
+		    throws JsonProcessingException {
         AutoDetectionPacket autoDetectionPacket = new AutoDetectionPacket();
         autoDetectionPacket.setDeliveryPacketType(packet.getDeliveryPacketType());
         List<ResponseDTO<Void>> result = new ArrayList<>();

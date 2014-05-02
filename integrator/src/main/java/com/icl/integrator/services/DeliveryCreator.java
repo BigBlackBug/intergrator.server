@@ -243,7 +243,7 @@ public class DeliveryCreator {
 	@Transactional
 	public Deliveries createDeliveries(DeliveryDTO deliveryDTO,
 	                                   DestinationDescriptor responseHandlerDescriptor)
-			throws JsonProcessingException, IntegratorException {
+			throws IntegratorException {
 		logger.info("Creating a delivery packet");
 
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
