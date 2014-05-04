@@ -12,7 +12,6 @@ import com.icl.integrator.springapi.IntegratorHttpAPI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -37,7 +36,6 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 
     private static Log logger = LogFactory.getLog(IntegratorHttpController.class);
 
-	@Qualifier("integratorService")
     @Autowired
 	private IntegratorAPI integratorService;
 
@@ -180,7 +178,17 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         return integratorService.getServicesSupportingActionType(fixConversion(packet, type));
     }
 
-    @ExceptionHandler(Exception.class)
+	@Override
+	public <T extends DestinationDescriptor> ResponseDTO<List<Modification>> fetchUpdates(
+			@RequestBody IntegratorPacket<Void, T> responseHandler) {
+		TypeReference<IntegratorPacket<Void, DestinationDescriptor>>
+				type =
+				new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
+				};
+		return integratorService.fetchUpdates(fixConversion(responseHandler, type));
+	}
+
+	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> handleNotAuthenticatedException(
 			Exception ex,
 			HttpServletRequest request) {

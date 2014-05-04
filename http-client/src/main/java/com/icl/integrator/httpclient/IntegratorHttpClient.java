@@ -298,8 +298,8 @@ public class IntegratorHttpClient implements IntegratorClient {
 	ResponseDTO<FullServiceDTO<ADType>> getServiceInfo(
 			IntegratorPacket<String, DDType> serviceName) throws IntegratorClientException {
 		try {
-			HttpMethodDescriptor methodPair = getMethodPath
-					("getServiceInfo", IntegratorPacket.class);
+			HttpMethodDescriptor methodPair = getMethodPath(
+					"getServiceInfo", IntegratorPacket.class);
 			ParameterizedTypeReference<ResponseDTO<FullServiceDTO<ADType>>>
 					type =
 					new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<ADType>>>() {
@@ -371,6 +371,26 @@ public class IntegratorHttpClient implements IntegratorClient {
 		} catch (Exception e) {
 			throw new IntegratorClientException(e);
 		}
+	}
+
+	@Override
+	public <T extends DestinationDescriptor>
+	ResponseDTO<List<Modification>>
+	fetchUpdates(IntegratorPacket<Void, T> packet) {
+		try {
+			HttpMethodDescriptor methodPair = getMethodPath("fetchUpdates", IntegratorPacket.class);
+			ParameterizedTypeReference<ResponseDTO<List<Modification>>>
+					type =
+					new ParameterizedTypeReference<ResponseDTO<List<Modification>>>() {
+					};
+			return sendRequest(packet, type, methodPair);
+		} catch (Exception e) {
+			throw new IntegratorClientException(e);
+		}
+	}
+
+	public ResponseDTO<List<Modification>> fetchUpdates() {
+		return fetchUpdates(new IntegratorPacket<Void, DestinationDescriptor>());
 	}
 
 	/**

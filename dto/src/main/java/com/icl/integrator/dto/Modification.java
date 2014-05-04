@@ -1,17 +1,23 @@
-package com.icl.integrator.services.utils;
+package com.icl.integrator.dto;
 
-public class Modification {
+import java.io.Serializable;
 
-	private final SubjectType subjectType;
+public class Modification implements Serializable {
 
-	private final ActionType action;
+	private SubjectType subjectType;
 
-	private final String entityName;
+	private ActionType action;
+
+	private String entityName;
 
 	public Modification(SubjectType subjectType, ActionType action, String entityName) {
 		this.subjectType = subjectType;
 		this.action = action;
 		this.entityName = entityName;
+	}
+
+	Modification(){
+
 	}
 
 	@Override
@@ -47,7 +53,6 @@ public class Modification {
 	}
 
 	public SubjectType getSubjectType() {
-
 		return subjectType;
 	}
 

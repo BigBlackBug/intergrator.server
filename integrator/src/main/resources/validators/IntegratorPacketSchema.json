@@ -303,7 +303,8 @@
                 "HANDLE_PING",
                 "HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE",
                 "HANDLE_GET_ACTIONS_FOR_DELIVERY",
-                "HANDLE_GET_SERVICES_SUPPORTING_ACTION_TYPE"
+                "HANDLE_GET_SERVICES_SUPPORTING_ACTION_TYPE",
+                "HANDLE_FETCH_UPDATES"
             ]
         } ,
         "actionDesc": {

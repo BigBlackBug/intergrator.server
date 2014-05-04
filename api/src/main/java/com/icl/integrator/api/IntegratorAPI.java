@@ -93,4 +93,9 @@ public interface IntegratorAPI {
     public <T extends DestinationDescriptor, Y extends ActionDescriptor>
     ResponseDTO<List<ServiceAndActions<Y>>>
     getServicesSupportingActionType(IntegratorPacket<ActionMethod, T> packet);
+
+	public <T extends DestinationDescriptor>
+	ResponseDTO<List<Modification>>
+	fetchUpdates(IntegratorPacket<Void, T> responseHandler);
+
 }

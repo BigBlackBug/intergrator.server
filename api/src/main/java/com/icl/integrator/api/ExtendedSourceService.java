@@ -38,4 +38,6 @@ public interface ExtendedSourceService extends SourceService {
 
 	public void handleGetServicesSupportingActionType(ResponseDTO<List<ServiceAndActions<ActionDescriptor>>> response);
 
+	public void handleFetchUpdates(ResponseDTO<List<Modification>> response);
+
 }

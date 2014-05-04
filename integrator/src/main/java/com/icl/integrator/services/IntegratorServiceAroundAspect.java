@@ -21,7 +21,7 @@ public class IntegratorServiceAroundAspect {
 	//TODO move to props
 	private static final String errorMessage =
 			"Состояние Вашего клиента не совпадает с состоянием сервера." +
-					"Пожалуйста вызовите метод update, чтобы получить изменения," +
+					"Пожалуйста вызовите метод fetchUpdates, чтобы получить изменения," +
 					" совершённые с момента последнего обновления";
 
 	private static Log logger = LogFactory.getLog(IntegratorServiceAroundAspect.class);

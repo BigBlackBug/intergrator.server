@@ -1,6 +1,6 @@
 package com.icl.integrator.services;
 
-import com.icl.integrator.services.utils.Modification;
+import com.icl.integrator.dto.Modification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 

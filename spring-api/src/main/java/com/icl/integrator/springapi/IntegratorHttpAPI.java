@@ -114,7 +114,16 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
     @Override
     @RequestMapping(value = "getServicesSupportingActionType", method = RequestMethod.POST)
     public
-    @ResponseBody <T extends DestinationDescriptor,Y extends ActionDescriptor>
+    @ResponseBody
+    <T extends DestinationDescriptor, Y extends ActionDescriptor>
     ResponseDTO<List<ServiceAndActions<Y>>>
     getServicesSupportingActionType(@RequestBody IntegratorPacket<ActionMethod, T> packet);
+
+	@Override
+	@RequestMapping(value = "fetchUpdates", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor>
+	ResponseDTO<List<Modification>>
+	fetchUpdates(@RequestBody IntegratorPacket<Void, T> responseHandler);
 }

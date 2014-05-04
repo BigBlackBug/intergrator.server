@@ -11,6 +11,10 @@ public class ActionRegistrationResultDTO {
 
 	private ResponseDTO<Void> registrationResult;
 
+	ActionRegistrationResultDTO(){
+
+	}
+
 	public ActionRegistrationResultDTO(String actionName,
 	                                   ResponseDTO<Void> registrationResult) {
 		this.actionName = actionName;

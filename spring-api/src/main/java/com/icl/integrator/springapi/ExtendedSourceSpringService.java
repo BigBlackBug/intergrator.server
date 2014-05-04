@@ -111,4 +111,12 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	@ResponseBody
 	void handleGetServicesSupportingActionType(
 			@RequestBody ResponseDTO<List<ServiceAndActions<ActionDescriptor>>> response);
+
+	@Override
+	@RequestMapping(value = "/handleFetchUpdates",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleFetchUpdates(@RequestBody ResponseDTO<List<Modification>> response);
 }

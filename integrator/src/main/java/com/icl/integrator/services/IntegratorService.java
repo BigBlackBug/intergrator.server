@@ -6,13 +6,15 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
-import com.icl.integrator.services.utils.Modification;
+import com.icl.integrator.model.IntegratorUser;
 import com.icl.integrator.services.validation.ValidationService;
 import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.ConnectionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -65,8 +67,9 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
-	public <T extends DestinationDescriptor> ResponseDTO<Boolean> ping(
-			IntegratorPacket<Void, T> responseHandler) {
+	public <T extends DestinationDescriptor>
+	ResponseDTO<Boolean>
+	ping(IntegratorPacket<Void, T> responseHandler) {
 		return new ResponseDTO<>(Boolean.TRUE);
 	}
 
@@ -170,6 +173,16 @@ public class IntegratorService implements IntegratorAPI {
 		logger.info("Received a getServicesSupportingActionType request");
 		List<ServiceAndActions<Y>> serviceDTOListMap = workerService.get(packet.getData());
 		return new ResponseDTO<>(serviceDTOListMap);
+	}
+
+	@Override
+	public <T extends DestinationDescriptor>
+	ResponseDTO<List<Modification>>
+	fetchUpdates(IntegratorPacket<Void, T> responseHandler) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		IntegratorUser user = (IntegratorUser) authentication.getPrincipal();
+		List<Modification> modifications = versioningService.fetchModifications(user.getUsername());
+		return new ResponseDTO<>(modifications);
 	}
 
 }
