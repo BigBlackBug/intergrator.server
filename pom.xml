@@ -100,7 +100,7 @@
             <dependency>
                 <groupId>com.icl.integrator</groupId>
                 <artifactId>dto</artifactId>
-                <version>1.6</version>
+                <version>${stable.integrator.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>

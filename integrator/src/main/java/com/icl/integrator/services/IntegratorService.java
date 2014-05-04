@@ -6,6 +6,7 @@ import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.services.utils.Modification;
 import com.icl.integrator.services.validation.ValidationService;
 import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.ConnectionException;
@@ -76,7 +77,10 @@ public class IntegratorService implements IntegratorAPI {
 		logger.info("Received a service registration request");
 		List<ActionRegistrationResultDTO> result =
 				registrationService.register(registrationDTO.getData());
-		versioningService.increaseServerVersion();
+		String serviceName = registrationDTO.getData().getServiceName();
+		versioningService.logModification(new Modification(Modification.SubjectType.SERVICE,
+		                                                   Modification.ActionType.ADDED,
+		                                                   serviceName));
 		return new ResponseDTO<>(result);
 	}
 
@@ -118,7 +122,12 @@ public class IntegratorService implements IntegratorAPI {
 	public <T extends DestinationDescriptor, Y extends ActionDescriptor> ResponseDTO<Void>
 	addAction(IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {
 		workerService.addAction(actionDTO.getData());
-		versioningService.increaseServerVersion();
+		String actionName = actionDTO.getData().getActionRegistration().getAction().getActionName();
+		versioningService.logModification(
+				new Modification(Modification.SubjectType.ACTION,
+				                 Modification.ActionType.ADDED,
+				                 actionName)
+		);
 		return new ResponseDTO<>(true);
 	}
 
@@ -139,7 +148,6 @@ public class IntegratorService implements IntegratorAPI {
 		try {
 			List<ResponseDTO<Void>> result =
 					registrationService.register(autoDetectionDTO.getData());
-			versioningService.increaseServerVersion();
 			return new ResponseDTO<>(result);
 		} catch (JsonProcessingException e) {
 			throw new IntegratorException(e);

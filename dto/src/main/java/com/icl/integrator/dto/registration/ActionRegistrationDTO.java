@@ -53,7 +53,6 @@ public class ActionRegistrationDTO<T extends ActionDescriptor> implements Serial
 	}
 
 	public ActionEndpointDTO<T> getAction() {
-
 		return action;
 	}
 

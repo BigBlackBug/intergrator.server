@@ -23,7 +23,7 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-expression:3.2.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:3.2.6.RELEASE" level="project" />
     <orderEntry type="module" module-name="api" />
-    <orderEntry type="library" name="Maven: com.icl.integrator:dto:1.6" level="project" />
+    <orderEntry type="module" module-name="dto" />
     <orderEntry type="library" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
     <orderEntry type="module" module-name="deserializer" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.2" level="project" />
