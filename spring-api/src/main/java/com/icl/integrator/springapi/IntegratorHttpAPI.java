@@ -126,4 +126,11 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
 	<T extends DestinationDescriptor>
 	ResponseDTO<List<Modification>>
 	fetchUpdates(@RequestBody IntegratorPacket<Void, T> responseHandler);
+
+	@Override
+	@RequestMapping(value = "removeService", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor>
+	ResponseDTO<Void> removeService(@RequestBody IntegratorPacket<String,T> serviceName);
 }

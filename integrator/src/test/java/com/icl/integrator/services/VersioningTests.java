@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by BigBlackBug on 02.05.2014.
@@ -52,7 +53,7 @@ public class VersioningTests {
 		                                                   "servname"));
 		List<Modification> vasya = versioningService.fetchModifications("vasya");
 		versioningService.scheduleUserRemoval();
-		List<Modification> modifications = versioningService.getModifications();
+		Set<Modification> modifications = versioningService.getModifications();
 		Assert.assertEquals(0, modifications.size());
 		versioningService.logout("vasya");
 	}
@@ -80,10 +81,8 @@ public class VersioningTests {
 		Assert.assertEquals(mod3, vasya.get(2));
 		Assert.assertEquals(mod4, vasya.get(3));
 		versioningService.scheduleUserRemoval();
-		List<Modification> modifications = versioningService.getModifications();
+		Set<Modification> modifications = versioningService.getModifications();
 		Assert.assertEquals(2, modifications.size());
-		Assert.assertEquals(mod3, modifications.get(0));
-		Assert.assertEquals(mod4, modifications.get(1));
 		versioningService.logout("vasya");
 		versioningService.logout("petya");
 	}

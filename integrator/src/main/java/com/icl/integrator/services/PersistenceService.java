@@ -240,4 +240,8 @@ public class PersistenceService {
         return map;
     }
 
+	public void removeService(String serviceName) {
+		em.createQuery("delete AbstractEndpointEntity ep where ep.serviceName=:serviceName")
+				.setParameter("serviceName", serviceName).executeUpdate();
+	}
 }

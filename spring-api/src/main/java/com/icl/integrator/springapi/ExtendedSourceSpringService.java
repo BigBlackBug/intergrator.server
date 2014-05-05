@@ -75,8 +75,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleAddAction(@RequestBody ResponseDTO
-			                     response);
+	void handleAddAction(@RequestBody ResponseDTO<Void> response);
 
 	@Override
 	@RequestMapping(value = "/handleGetServiceInfo",
@@ -119,4 +118,12 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleFetchUpdates(@RequestBody ResponseDTO<List<Modification>> response);
+
+	@Override
+	@RequestMapping(value = "/handleRemoveService",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleRemoveService(@RequestBody ResponseDTO<Void> response);
 }

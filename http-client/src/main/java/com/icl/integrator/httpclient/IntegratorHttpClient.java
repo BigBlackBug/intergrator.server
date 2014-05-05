@@ -394,6 +394,25 @@ public class IntegratorHttpClient implements IntegratorClient {
 		return fetchUpdates(new IntegratorPacket<Void, DestinationDescriptor>());
 	}
 
+	@Override
+	public <T extends DestinationDescriptor> ResponseDTO<Void> removeService(
+			IntegratorPacket<String, T> serviceName) {
+		try {
+			HttpMethodDescriptor methodPair = getMethodPath("removeService", IntegratorPacket.class);
+			ParameterizedTypeReference<ResponseDTO<Void>>
+					type =
+					new ParameterizedTypeReference<ResponseDTO<Void>>() {
+					};
+			return sendRequest(serviceName, type, methodPair);
+		} catch (Exception e) {
+			throw new IntegratorClientException(e);
+		}
+	}
+
+	public ResponseDTO<Void> removeService(String serviceName) {
+		return removeService(new IntegratorPacket<String, DestinationDescriptor>(serviceName));
+	}
+
 	/**
 	 * @see IntegratorHttpClient#registerAutoDetection(IntegratorPacket)
 	 * @throws IntegratorClientException

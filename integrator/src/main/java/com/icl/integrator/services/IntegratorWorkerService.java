@@ -227,7 +227,7 @@ public class IntegratorWorkerService {
     }
 
     public <T extends ActionDescriptor>
-    List<ServiceAndActions<T>> get(ActionMethod actionMethod) {
+    List<ServiceAndActions<T>> getServicesSupportingActionType(ActionMethod actionMethod) {
         Map<AbstractEndpointEntity, List<AbstractActionEntity>> servicesSupportingActionType =
                 persistenceService.getServicesSupportingActionType(actionMethod);
 	    List<ServiceAndActions<T>> result = new ArrayList<>();
@@ -269,4 +269,8 @@ public class IntegratorWorkerService {
         }
         return null;
     }
+
+	public void removeService(String serviceName) {
+		persistenceService.removeService(serviceName);
+	}
 }

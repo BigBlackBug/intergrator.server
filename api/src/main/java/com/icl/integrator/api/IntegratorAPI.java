@@ -99,4 +99,7 @@ public interface IntegratorAPI {
 	ResponseDTO<List<Modification>>
 	fetchUpdates(IntegratorPacket<Void, T> responseHandler);
 
+	public <T extends DestinationDescriptor>
+	ResponseDTO<Void> removeService(IntegratorPacket<String,T> serviceName);
+
 }

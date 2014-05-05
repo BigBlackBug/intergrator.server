@@ -190,6 +190,22 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 		return integratorService.fetchUpdates(fixConversion(responseHandler, type));
 	}
 
+	@Override
+	public <T extends DestinationDescriptor> ResponseDTO<Void> removeService(
+			@RequestBody IntegratorPacket<String, T> serviceNamePacket) {
+		TypeReference<IntegratorPacket<String, DestinationDescriptor>>
+				type =
+				new TypeReference<IntegratorPacket<String, DestinationDescriptor>>() {
+				};
+		String serviceName = serviceNamePacket.getData();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!authService.hasAccessToService(serviceName, auth)) {
+			return new ResponseDTO<>(new ErrorDTO(
+					"Вы не можете удалять сервис, созданный не Вами"));
+		}
+		return integratorService.removeService(fixConversion(serviceNamePacket, type));
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> handleNotAuthenticatedException(
 			Exception ex,

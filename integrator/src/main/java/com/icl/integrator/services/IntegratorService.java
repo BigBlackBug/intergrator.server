@@ -187,7 +187,8 @@ public class IntegratorService implements IntegratorAPI {
 	ResponseDTO<List<ServiceAndActions<Y>>>
 	getServicesSupportingActionType(IntegratorPacket<ActionMethod, T> packet) {
 		logger.info("Received a getServicesSupportingActionType request");
-		List<ServiceAndActions<Y>> serviceDTOListMap = workerService.get(packet.getData());
+		List<ServiceAndActions<Y>> serviceDTOListMap =
+				workerService.getServicesSupportingActionType(packet.getData());
 		return new ResponseDTO<>(serviceDTOListMap);
 	}
 
@@ -200,6 +201,14 @@ public class IntegratorService implements IntegratorAPI {
 		IntegratorUser user = (IntegratorUser) authentication.getPrincipal();
 		List<Modification> modifications = versioningService.fetchModifications(user.getUsername());
 		return new ResponseDTO<>(modifications);
+	}
+
+	@Override
+	@RestrictedAccess
+	public <T extends DestinationDescriptor> ResponseDTO<Void> removeService(
+			IntegratorPacket<String, T> serviceName) {
+		workerService.removeService(serviceName.getData());
+		return new ResponseDTO<>(true);
 	}
 
 }

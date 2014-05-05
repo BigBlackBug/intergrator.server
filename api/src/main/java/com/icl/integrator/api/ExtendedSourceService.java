@@ -40,4 +40,6 @@ public interface ExtendedSourceService extends SourceService {
 
 	public void handleFetchUpdates(ResponseDTO<List<Modification>> response);
 
+	public void handleRemoveService(ResponseDTO<Void> response);
+
 }

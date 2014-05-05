@@ -70,6 +70,10 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 		types.put(ActionMethod.HANDLE_FETCH_UPDATES,
 		          new ParameterizedTypeReference<ResponseDTO<List<Modification>>>() {
 		          }.getType());
+
+		types.put(ActionMethod.HANDLE_REMOVE_SERVICE,
+		          new ParameterizedTypeReference<ResponseDTO<Void>>() {
+		          }.getType());
 	}
 
 	@Override
@@ -83,12 +87,11 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 
 			Type requiredType = types.get(ActionMethod.valueOf(actionMethod));
 			if (!requiredType.equals(realType)) {
-				response.sendError(422, "Выбранный метод не подходит для этого действия. Правильная сигнатура "+
-						requiredType.toString());
+				response.sendError(422, "Выбранный метод не подходит для этого действия." +
+						" Правильная сигнатура " + requiredType.toString());
 			}
 			return false;
-		} else {
-			return true;
 		}
+		return true;
 	}
 }
