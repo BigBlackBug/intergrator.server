@@ -7,6 +7,8 @@ import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.model.IntegratorUser;
+import com.icl.integrator.services.utils.RestrictedAccess;
+import com.icl.integrator.services.utils.Synchronized;
 import com.icl.integrator.services.validation.ValidationService;
 import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.ConnectionException;
@@ -52,6 +54,7 @@ public class IntegratorService implements IntegratorAPI {
 	private VersioningService versioningService;
 
 	@Override
+	@RestrictedAccess
 	public <T extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<String>>>
 	deliver(IntegratorPacket<DeliveryDTO, T> delivery) {
 		logger.info("Received a delivery request");
@@ -67,6 +70,7 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@Synchronized
 	public <T extends DestinationDescriptor>
 	ResponseDTO<Boolean>
 	ping(IntegratorPacket<Void, T> responseHandler) {
@@ -74,9 +78,11 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@Synchronized
 	public <T extends ActionDescriptor, Y extends DestinationDescriptor>
 	ResponseDTO<List<ActionRegistrationResultDTO>> registerService(
 			IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
+		//TODO проверка если не добавлен
 		logger.info("Received a service registration request");
 		List<ActionRegistrationResultDTO> result =
 				registrationService.register(registrationDTO.getData());
@@ -88,6 +94,7 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@Synchronized
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
 			IntegratorPacket<ServiceDestinationDescriptor, T> serviceDescriptor) {
 		logger.info("Received a ping request for " + serviceDescriptor);
@@ -101,6 +108,7 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@Synchronized
 	public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>>
 	getServiceList(IntegratorPacket<Void, T> packet) {
 		List<ServiceDTO> serviceList = workerService.getServiceList();
@@ -108,6 +116,7 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@RestrictedAccess
 	public <T extends DestinationDescriptor, Y extends ActionDescriptor>
 	ResponseDTO<List<ActionEndpointDTO<Y>>> getSupportedActions(
 			IntegratorPacket<String, T> serviceName) {
@@ -122,8 +131,11 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@RestrictedAccess
 	public <T extends DestinationDescriptor, Y extends ActionDescriptor> ResponseDTO<Void>
 	addAction(IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {
+		//TODO разрулить это дело. если типа изменений по сервису нет,то пусть коммитит.
+		//TODO везде натыкать таких проверок
 		workerService.addAction(actionDTO.getData());
 		String actionName = actionDTO.getData().getActionRegistration().getAction().getActionName();
 		versioningService.logModification(
@@ -135,6 +147,7 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@RestrictedAccess
 	public <ADType extends ActionDescriptor,
 			DDType extends DestinationDescriptor> ResponseDTO<FullServiceDTO<ADType>>
 	getServiceInfo(IntegratorPacket<String, DDType> serviceName) {
@@ -144,6 +157,7 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@RestrictedAccess
 	public <T extends DestinationDescriptor, Y> ResponseDTO<List<ResponseDTO<Void>>>
 	registerAutoDetection(
 			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO) {
@@ -158,6 +172,7 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@Synchronized
 	public <T extends DestinationDescriptor>
 	ResponseDTO<List<DeliveryActionsDTO>> getActionsForDelivery(
 			IntegratorPacket<Void, T> packet) {
@@ -167,6 +182,7 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@Synchronized
 	public <T extends DestinationDescriptor, Y extends ActionDescriptor>
 	ResponseDTO<List<ServiceAndActions<Y>>>
 	getServicesSupportingActionType(IntegratorPacket<ActionMethod, T> packet) {
@@ -176,6 +192,7 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
+	@Synchronized
 	public <T extends DestinationDescriptor>
 	ResponseDTO<List<Modification>>
 	fetchUpdates(IntegratorPacket<Void, T> responseHandler) {

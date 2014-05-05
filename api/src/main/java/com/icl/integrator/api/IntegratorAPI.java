@@ -31,22 +31,23 @@ public interface IntegratorAPI {
      */
     public <T extends DestinationDescriptor>
     ResponseDTO<Boolean>
-    ping(IntegratorPacket<Void, T> packet);
+    ping(IntegratorPacket<Void, T> packet);      
 
     public <T extends ActionDescriptor, Y extends DestinationDescriptor>
     ResponseDTO<List<ActionRegistrationResultDTO>>
-    registerService(IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
+    registerService(IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);         
 
     /**
      * Проверяет доступность указанного сервиса
+     * @param packet
      */
     public <T extends DestinationDescriptor>
     ResponseDTO<Boolean>
-    isAvailable(IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO);
+    isAvailable(IntegratorPacket<ServiceDestinationDescriptor, T> packet); 
 
     public <T extends DestinationDescriptor>
     ResponseDTO<List<ServiceDTO>>
-    getServiceList(IntegratorPacket<Void, T> packet);
+    getServiceList(IntegratorPacket<Void, T> packet); 
 
     /**
      * Возвращает список действий, зарегистрированных на сервисе
@@ -83,7 +84,7 @@ public interface IntegratorAPI {
      */
     public <T extends DestinationDescriptor>
     ResponseDTO<List<DeliveryActionsDTO>>
-    getActionsForDelivery(IntegratorPacket<Void, T> packet);
+    getActionsForDelivery(IntegratorPacket<Void, T> packet);      
 
     /**
      * Получает инфу о сервисах и действиях определённого типа
@@ -92,7 +93,7 @@ public interface IntegratorAPI {
      */
     public <T extends DestinationDescriptor, Y extends ActionDescriptor>
     ResponseDTO<List<ServiceAndActions<Y>>>
-    getServicesSupportingActionType(IntegratorPacket<ActionMethod, T> packet);
+    getServicesSupportingActionType(IntegratorPacket<ActionMethod, T> packet);        
 
 	public <T extends DestinationDescriptor>
 	ResponseDTO<List<Modification>>

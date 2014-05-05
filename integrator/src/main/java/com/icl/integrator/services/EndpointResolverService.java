@@ -56,8 +56,7 @@ public class EndpointResolverService {
 			throw new IntegratorException("При регистрации сервиса был указан" +
 					                              " невалидный адрес, " +
 					                              "поэтому послать запрос " +
-					                              "на него невозможно",
-			                              ex);
+					                              "на него невозможно", ex);
 		}
 	}
 

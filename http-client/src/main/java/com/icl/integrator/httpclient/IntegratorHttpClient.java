@@ -200,17 +200,18 @@ public class IntegratorHttpClient implements IntegratorClient {
 	/**
 	 * {@inheritDoc}
 	 * @throws IntegratorClientException
+	 * @param packet
 	 */
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
-			IntegratorPacket<ServiceDestinationDescriptor, T> pingDTO)
+			IntegratorPacket<ServiceDestinationDescriptor, T> packet)
 			throws IntegratorClientException {
 		try {
 			HttpMethodDescriptor methodPair = getMethodPath("isAvailable", IntegratorPacket.class);
 			ParameterizedTypeReference<ResponseDTO<Boolean>>
 					type = new ParameterizedTypeReference<ResponseDTO<Boolean>>() {
 			};
-			return sendRequest(pingDTO, type, methodPair);
+			return sendRequest(packet, type, methodPair);
 		} catch (Exception e) {
 			throw new IntegratorClientException(e);
 		}

@@ -19,8 +19,8 @@ public class VersioningService {
 
 	private Queue<UserVersionEntity> versionEntities = new PriorityQueue<>();
 
-	List<Modification> getModifications() {
-		return modifications;
+	Set<Modification> getModifications() {
+		return Collections.unmodifiableSet(new HashSet<>(modifications));
 	}
 
 	public void login(String username) {

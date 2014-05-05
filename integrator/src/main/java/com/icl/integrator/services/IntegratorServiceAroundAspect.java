@@ -1,5 +1,6 @@
 package com.icl.integrator.services;
 
+import com.icl.integrator.dto.ErrorCode;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.IntegratorPacket;
 import com.icl.integrator.dto.ResponseDTO;
@@ -32,8 +33,7 @@ public class IntegratorServiceAroundAspect {
 	@Autowired
 	private VersioningService versioningService;
 
-	@Around("execution(* com.icl.integrator.services.IntegratorService.*(..)) && " +
-			        "!execution(* com.icl.integrator.services.IntegratorService.fetchUpdates(..))")
+	@Around("@annotation(com.icl.integrator.services.utils.RestrictedAccess)")
 	public Object syncAndSecurityAroundAdvice(ProceedingJoinPoint pjp) {
 		IntegratorPacket packet = (IntegratorPacket) pjp.getArgs()[0];
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -43,7 +43,8 @@ public class IntegratorServiceAroundAspect {
 			if (versioningService.isAllowedToContinue(user.getUsername())) {
 				value = executeMethod(pjp);
 			} else {
-				value = new ResponseDTO<>(new ErrorDTO(errorMessage));
+				value = new ResponseDTO<>(
+						new ErrorDTO(errorMessage, ErrorCode.OUTDATED_CLIENT_STATE));
 			}
 			deliveryService.deliver(packet.getResponseHandlerDescriptor(), value);
 		}
@@ -51,7 +52,7 @@ public class IntegratorServiceAroundAspect {
 		return value;
 	}
 
-	@Around("execution(* com.icl.integrator.services.IntegratorService.fetchUpdates(..))")
+	@Around("@annotation(com.icl.integrator.services.utils.Synchronized)")
 	public Object synchronizationAroundAdvice(ProceedingJoinPoint pjp) {
 		IntegratorPacket packet = (IntegratorPacket) pjp.getArgs()[0];
 		Object value;

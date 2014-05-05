@@ -116,8 +116,8 @@ public class EndpointConnectorFactory {
 		}
 	}
 
-	public EndpointConnector createEndpointConnector(
-			DestinationDescriptor destinationDescriptor) {
+	public EndpointConnector createEndpointConnector(DestinationDescriptor destinationDescriptor)
+			throws IntegratorException{
 		if (destinationDescriptor.getDescriptorType() ==
 				DestinationDescriptor.DescriptorType.RAW) {
 			RawDestinationDescriptor dd =
