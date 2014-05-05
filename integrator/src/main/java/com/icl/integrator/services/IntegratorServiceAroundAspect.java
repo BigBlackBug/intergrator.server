@@ -32,31 +32,44 @@ public class IntegratorServiceAroundAspect {
 	@Autowired
 	private VersioningService versioningService;
 
-	@Around("execution(* com.icl.integrator.services.IntegratorService.*(..))")
-	public Object employeeAroundAdvice(ProceedingJoinPoint pjp) {
+	@Around("execution(* com.icl.integrator.services.IntegratorService.*(..)) && " +
+			        "!execution(* com.icl.integrator.services.IntegratorService.fetchUpdates(..))")
+	public Object syncAndSecurityAroundAdvice(ProceedingJoinPoint pjp) {
 		IntegratorPacket packet = (IntegratorPacket) pjp.getArgs()[0];
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		IntegratorUser user = (IntegratorUser) authentication.getPrincipal();
 		Object value;
-		if (versioningService.isAllowedToContinue(user.getUsername())) {
-			synchronized (IntegratorServiceAroundAspect.class) {
-				if (versioningService.isAllowedToContinue(user.getUsername())) {
-					try {
-						value = pjp.proceed();
-					} catch (Throwable ex) {
-						logger.error("Ошибочка вышла при выполнении метода " +
-								             pjp.getSignature().getName(), ex);
-						value = new ResponseDTO<>(new ErrorDTO(ex));
-					}
-				} else {
-					value = new ResponseDTO<>(new ErrorDTO(errorMessage));
-				}
+		synchronized (IntegratorServiceAroundAspect.class) {
+			if (versioningService.isAllowedToContinue(user.getUsername())) {
+				value = executeMethod(pjp);
+			} else {
+				value = new ResponseDTO<>(new ErrorDTO(errorMessage));
 			}
-		} else {
-			value = new ResponseDTO<>(new ErrorDTO(errorMessage));
+			deliveryService.deliver(packet.getResponseHandlerDescriptor(), value);
 		}
-		deliveryService.deliver(packet.getResponseHandlerDescriptor(), value);
+
 		return value;
+	}
+
+	@Around("execution(* com.icl.integrator.services.IntegratorService.fetchUpdates(..))")
+	public Object synchronizationAroundAdvice(ProceedingJoinPoint pjp) {
+		IntegratorPacket packet = (IntegratorPacket) pjp.getArgs()[0];
+		Object value;
+		synchronized (IntegratorServiceAroundAspect.class) {
+			value = executeMethod(pjp);
+			deliveryService.deliver(packet.getResponseHandlerDescriptor(), value);
+		}
+		return value;
+	}
+
+	private Object executeMethod(ProceedingJoinPoint pjp) {
+		try {
+			return pjp.proceed();
+		} catch (Throwable ex) {
+			logger.error("Ошибочка вышла при выполнении метода " +
+					             pjp.getSignature().getName(), ex);
+			return new ResponseDTO<>(new ErrorDTO(ex));
+		}
 	}
 
 }

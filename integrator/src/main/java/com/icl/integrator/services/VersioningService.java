@@ -63,6 +63,9 @@ public class VersioningService {
 	@Scheduled(fixedRate = 60000)
 	public void scheduleUserRemoval() {
 		UserVersionEntity peek = versionEntities.peek();
+		if (peek == null) {
+			return;
+		}
 		Integer startIndex = peek.startIndex;
 		if (startIndex != 0) {
 			ListIterator<Modification> it = modifications.listIterator();
