@@ -6,6 +6,7 @@ import com.icl.integrator.dto.registration.ActionMethod;
 import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.model.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -27,10 +28,12 @@ public class PersistenceService {
     @PersistenceContext
     private EntityManager em;
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
     public <T extends AbstractEntity> T merge(T entity) {
         return em.merge(entity);
     }
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public <T extends AbstractEntity> T saveOrUpdate(T entity) {
 		if(entity.getId() == null){
 			em.persist(entity);
@@ -45,6 +48,7 @@ public class PersistenceService {
 		return entity;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
     public <T extends AbstractEntity> T persist(T entity) {
         em.persist(entity);
 	    return entity;
@@ -241,7 +245,14 @@ public class PersistenceService {
     }
 
 	public void removeService(String serviceName) {
-		em.createQuery("delete AbstractEndpointEntity ep where ep.serviceName=:serviceName")
-				.setParameter("serviceName", serviceName).executeUpdate();
+		AbstractEndpointEntity service = findService(serviceName);
+		em.remove(service);
+	}
+
+	public AbstractEndpointEntity findService(String serviceName) {
+		return em.createQuery(
+				"select ep from AbstractEndpointEntity ep where ep.serviceName=:serviceName",
+				AbstractEndpointEntity.class).setParameter("serviceName", serviceName)
+				.getSingleResult();
 	}
 }

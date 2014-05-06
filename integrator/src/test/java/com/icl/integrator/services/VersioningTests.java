@@ -30,25 +30,25 @@ public class VersioningTests {
 	@Test
 	public void test2() {
 		versioningService.login("vasya");
-		versioningService.logModification(new Modification(Modification.SubjectType.ACTION,
+		versioningService.logModification("vasya",new Modification(Modification.SubjectType.ACTION,
 		                                                   Modification.ActionType.ADDED,
 		                                                   "actionname"));
-		versioningService.logModification(new Modification(Modification.SubjectType.SERVICE,
+		versioningService.logModification("vasya",new Modification(Modification.SubjectType.SERVICE,
 		                                                   Modification.ActionType.CHANGED,
 		                                                   "servname"));
-		Assert.assertEquals(false, versioningService.isAllowedToContinue("vasya"));
+		Assert.assertEquals(true, versioningService.isAllowedToContinue("vasya"));
 		List<Modification> vasya = versioningService.fetchModifications("vasya");
-		Assert.assertEquals(2, vasya.size());
+		Assert.assertEquals(0, vasya.size());
 		versioningService.logout("vasya");
 	}
 
 	@Test
 	public void test3() {
 		versioningService.login("vasya");
-		versioningService.logModification(new Modification(Modification.SubjectType.ACTION,
+		versioningService.logModification("vasya",new Modification(Modification.SubjectType.ACTION,
 		                                                   Modification.ActionType.ADDED,
 		                                                   "actionname"));
-		versioningService.logModification(new Modification(Modification.SubjectType.SERVICE,
+		versioningService.logModification("vasya",new Modification(Modification.SubjectType.SERVICE,
 		                                                   Modification.ActionType.CHANGED,
 		                                                   "servname"));
 		List<Modification> vasya = versioningService.fetchModifications("vasya");
@@ -63,26 +63,26 @@ public class VersioningTests {
 		versioningService.login("vasya");
 		Modification mod1 = new Modification(Modification.SubjectType.ACTION,
 		                                     Modification.ActionType.ADDED, "actionname");
-		versioningService.logModification(mod1);
+		versioningService.logModification("vasya",mod1);
 		Modification mod2 = new Modification(Modification.SubjectType.SERVICE,
 		                                     Modification.ActionType.CHANGED, "servname");
-		versioningService.logModification(mod2);
+		versioningService.logModification("vasya",mod2);
 		versioningService.login("petya");
 		Modification mod3 = new Modification(Modification.SubjectType.ACTION,
 		                                     Modification.ActionType.ADDED, "actionname3");
-		versioningService.logModification(mod3);
+		versioningService.logModification("petya",mod3);
 		Modification mod4 = new Modification(Modification.SubjectType.SERVICE,
 		                                     Modification.ActionType.CHANGED, "servname4");
-		versioningService.logModification(mod4);
+		versioningService.logModification("petya",mod4);
 		List<Modification> vasya = versioningService.fetchModifications("vasya");
-		Assert.assertEquals(4, vasya.size());
-		Assert.assertEquals(mod1, vasya.get(0));
-		Assert.assertEquals(mod2, vasya.get(1));
-		Assert.assertEquals(mod3, vasya.get(2));
-		Assert.assertEquals(mod4, vasya.get(3));
+		Assert.assertEquals(2, vasya.size());
+		Assert.assertEquals(mod3, vasya.get(0));
+		Assert.assertEquals(mod4, vasya.get(1));
+//		Assert.assertEquals(mod3, vasya.get(2));
+//		Assert.assertEquals(mod4, vasya.get(3));
 		versioningService.scheduleUserRemoval();
 		Set<Modification> modifications = versioningService.getModifications();
-		Assert.assertEquals(2, modifications.size());
+		Assert.assertEquals(0, modifications.size());
 		versioningService.logout("vasya");
 		versioningService.logout("petya");
 	}
@@ -90,13 +90,13 @@ public class VersioningTests {
 	@Test(expected = IllegalArgumentException.class)
 	public void test5() {
 		versioningService.login("vasya");
-		versioningService.logModification(new Modification(Modification.SubjectType.ACTION,
+		versioningService.logModification("vasya",new Modification(Modification.SubjectType.ACTION,
 		                                                   Modification.ActionType.ADDED,
 		                                                   "actionname"));
-		versioningService.logModification(new Modification(Modification.SubjectType.SERVICE,
+		versioningService.logModification("vasya",new Modification(Modification.SubjectType.SERVICE,
 		                                                   Modification.ActionType.CHANGED,
 		                                                   "servname"));
-		Assert.assertEquals(false, versioningService.isAllowedToContinue("vasya"));
+		Assert.assertEquals(true, versioningService.isAllowedToContinue("vasya"));
 		versioningService.logout("vasya");
 		versioningService.fetchModifications("vasya");
 	}

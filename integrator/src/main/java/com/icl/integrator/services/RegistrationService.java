@@ -10,6 +10,8 @@ import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
+import com.icl.integrator.util.DatabaseExceptionUtils;
+import com.icl.integrator.util.GeneralUtils;
 import com.icl.integrator.util.connectors.ConnectionException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
@@ -20,6 +22,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -50,40 +53,10 @@ public class RegistrationService {
     @Autowired
     private DeliveryCreator deliveryCreator;
 
-    @Transactional(noRollbackFor = ConnectionException.class)
-    public <T extends ActionDescriptor>
-    List<ActionRegistrationResultDTO> register(
-            TargetRegistrationDTO<T> registrationDTO)
-            throws TargetRegistrationException {
-	    List<ActionRegistrationResultDTO> result = new ArrayList<>();
-
-        EndpointDescriptor endpoint = registrationDTO.getEndpoint();
-        List<ActionEndpointDTO<T>> actions = new ArrayList<>();
-        List<ActionRegistrationDTO<T>> actionRegistrations =
-                registrationDTO.getActionRegistrations();
-        if (actionRegistrations != null) {
-            for (ActionRegistrationDTO<T> actionRegistration : actionRegistrations) {
-                ActionEndpointDTO<T> action = actionRegistration.getAction();
-                try {
-                    if (!actionRegistration.isForceRegister()) {
-                        testConnection(endpoint, action);
-                    }
-                    actions.add(action);
-                } catch (ConnectionException ex) {
-                    ResponseDTO<Void> dto = new ResponseDTO<>(new ErrorDTO(ex));
-                    result.add(new ActionRegistrationResultDTO(action.getActionName(), dto));
-                }
-            }
-        }
-	    List<ActionRegistrationResultDTO> regResult =
-			    registerService(endpoint, registrationDTO, actions);
-	    regResult.addAll(result);
-	    return regResult;
-    }
-
-    @Transactional(noRollbackFor = Exception.class)
-    private <T extends ActionDescriptor>
-    List<ActionRegistrationResultDTO> registerService(EndpointDescriptor endpoint,
+	//TODO схерали он обновляет старые севрисы
+	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = Exception.class)
+	public <T extends ActionDescriptor>
+	List<ActionRegistrationResultDTO> registerService(EndpointDescriptor endpoint,
                                                    TargetRegistrationDTO registrationDTO,
                                                    List<ActionEndpointDTO<T>> actions)
     throws TargetRegistrationException {
@@ -97,8 +70,9 @@ public class RegistrationService {
         try {
             serviceEntity = persistenceService.saveOrUpdate(serviceEntity);
         } catch (DataAccessException ex) {
-            logger.error("GG", ex);
-            throw new TargetRegistrationException("Ошибка регистрации", ex);
+	        String realErrorCause = DatabaseExceptionUtils.getRealErrorCause(ex);
+	        logger.error(realErrorCause);
+	        throw new TargetRegistrationException("Ошибка регистрации. \n" + realErrorCause);
         }
 	    List<ActionRegistrationResultDTO> result = new ArrayList<>();
         for (ActionEndpointDTO<T> actionDTO : actions) {
@@ -110,6 +84,12 @@ public class RegistrationService {
                 serviceEntity.addAction(action);
                 persistenceService.saveOrUpdate(action);
                 responseDTO = new ResponseDTO<>(true);
+            } catch (DataAccessException ex) {
+	            String realErrorCause = DatabaseExceptionUtils.getRealErrorCause(ex);
+	            ErrorDTO errorDTO = new ErrorDTO();
+	            errorDTO.setErrorMessage("Ошибка регистрации");
+	            errorDTO.setDeveloperMessage(realErrorCause);
+	            responseDTO = new ResponseDTO<>(errorDTO);
             } catch (Exception ex) {
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setErrorMessage("Ошибка регистрации");
@@ -121,7 +101,6 @@ public class RegistrationService {
 	    return result;
     }
 
-    @Transactional
     private <T extends ActionDescriptor> AbstractActionEntity getAction(
             ActionEndpointDTO<T> actionEndpoint, UUID serviceID, IntegratorUser creator)
             throws TargetRegistrationException {
@@ -182,7 +161,6 @@ public class RegistrationService {
         }
     }
 
-    @Transactional
     private AbstractEndpointEntity createEntity(
             EndpointDescriptor descriptor,
             String serviceName, DeliverySettingsDTO deliverySettings, IntegratorUser creator)
@@ -195,31 +173,37 @@ public class RegistrationService {
                 throw new TargetRegistrationException(
                         "Пожалуйста, используйте реальный адрес машины, а не localhost");
             }
-            endpoint = persistenceService
-                    .findHttpService(host, realDescriptor.getPort());
-            if (endpoint != null) {
-                updateEndpoint(endpoint, serviceName, deliverySettings,creator);
-            } else {
-                endpoint = createHttp(serviceName, realDescriptor, deliverySettings,creator);
-            }
+
+	        if (!GeneralUtils.isValidIP(host)) {
+		        throw new TargetRegistrationException("IP адрес сервиса не валиден");
+	        }
+	        int port = realDescriptor.getPort();
+	        if (port < 1 && port > 65535) {
+		        throw new TargetRegistrationException("Порт должен быть значением в интервале [1;65535]");
+	        }
+	        endpoint = persistenceService.findHttpService(host, port);
+	        //сервис может быть сгенерированным с говноименем, поэтому не кидаем ошибку, а заменяем имя
+	        if (endpoint != null) {
+		        updateEndpoint(endpoint, serviceName, deliverySettings, creator);
+	        } else {
+		        endpoint = createHttp(serviceName, realDescriptor, deliverySettings, creator);
+	        }
         } else {
-            JMSEndpointDescriptorDTO realDescriptor = (JMSEndpointDescriptorDTO) descriptor;
-            String jndiProperties;
-            try {
-                jndiProperties = mapper.
-                        writeValueAsString(realDescriptor.getJndiProperties());
-            } catch (JsonProcessingException e) {
-                throw new TargetRegistrationException(e);
-            }
+	        JMSEndpointDescriptorDTO realDescriptor = (JMSEndpointDescriptorDTO) descriptor;
+	        String jndiProperties;
+	        try {
+		        jndiProperties = mapper.writeValueAsString(realDescriptor.getJndiProperties());
+	        } catch (JsonProcessingException e) {
+		        throw new TargetRegistrationException(e);
+	        }
             endpoint = persistenceService
-                    .findJmsService(realDescriptor.getConnectionFactory(), jndiProperties);
-            if (endpoint != null) {
-                updateEndpoint(endpoint, serviceName, deliverySettings,creator);
-            } else {
-                endpoint = createJms(serviceName, realDescriptor.getConnectionFactory(),
-                                     jndiProperties,
-                                     deliverySettings,creator);
-            }
+		            .findJmsService(realDescriptor.getConnectionFactory(), jndiProperties);
+	        if (endpoint != null) {
+		        updateEndpoint(endpoint, serviceName, deliverySettings, creator);
+	        } else {
+		        endpoint = createJms(serviceName, realDescriptor.getConnectionFactory(),
+		                             jndiProperties, deliverySettings, creator);
+	        }
         }
         return endpoint;
     }
@@ -285,15 +269,6 @@ public class RegistrationService {
                             endpoint.getServiceName() + "'"
             );
         }
-    }
-
-    private <T extends ActionDescriptor>
-    void testConnection(EndpointDescriptor endpoint, ActionEndpointDTO<T> action)
-            throws ConnectionException {
-        EndpointConnector connector =
-                connectorFactory.createEndpointConnector(
-                        endpoint, action.getActionDescriptor());
-        connector.testConnection();
     }
 
     private void testConnection(DestinationDescriptor destinationDescriptor)

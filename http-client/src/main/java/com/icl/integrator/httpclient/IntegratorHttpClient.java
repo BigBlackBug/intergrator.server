@@ -374,6 +374,13 @@ public class IntegratorHttpClient implements IntegratorClient {
 		}
 	}
 
+	public <Y extends ActionDescriptor>
+	ResponseDTO<List<ServiceAndActions<Y>>> getServicesSupportingActionType(
+			ActionMethod actionMethod) {
+		return getServicesSupportingActionType(
+				new IntegratorPacket<ActionMethod, DestinationDescriptor>(actionMethod));
+	}
+
 	@Override
 	public <T extends DestinationDescriptor>
 	ResponseDTO<List<Modification>>

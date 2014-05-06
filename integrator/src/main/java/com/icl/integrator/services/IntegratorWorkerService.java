@@ -2,12 +2,10 @@ package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.DeliveryActionsDTO;
-import com.icl.integrator.dto.FullServiceDTO;
-import com.icl.integrator.dto.ServiceAndActions;
-import com.icl.integrator.dto.ServiceDTO;
+import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.dto.util.EndpointType;
@@ -44,7 +42,49 @@ public class IntegratorWorkerService {
 	private PersistenceService persistenceService;
 
 	@Autowired
+	private RegistrationService registrationService;
+
+	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Transactional(noRollbackFor = ConnectionException.class)
+	public <T extends ActionDescriptor>
+	List<ActionRegistrationResultDTO> registerService(
+			TargetRegistrationDTO<T> registrationDTO)
+			throws TargetRegistrationException {
+		List<ActionRegistrationResultDTO> result = new ArrayList<>();
+
+		EndpointDescriptor endpoint = registrationDTO.getEndpoint();
+		List<ActionEndpointDTO<T>> actions = new ArrayList<>();
+		List<ActionRegistrationDTO<T>> actionRegistrations =
+				registrationDTO.getActionRegistrations();
+		if (actionRegistrations != null) {
+			for (ActionRegistrationDTO<T> actionRegistration : actionRegistrations) {
+				ActionEndpointDTO<T> action = actionRegistration.getAction();
+				try {
+					if (!actionRegistration.isForceRegister()) {
+						testConnection(endpoint, action);
+					}
+					actions.add(action);
+				} catch (ConnectionException ex) {
+					ResponseDTO<Void> dto = new ResponseDTO<>(new ErrorDTO(ex));
+					result.add(new ActionRegistrationResultDTO(action.getActionName(), dto));
+				}
+			}
+		}
+		List<ActionRegistrationResultDTO> regResult =
+				registrationService.registerService(endpoint, registrationDTO, actions);
+		regResult.addAll(result);
+		return regResult;
+	}
+
+	private <T extends ActionDescriptor>
+	void testConnection(EndpointDescriptor endpoint, ActionEndpointDTO<T> action)
+			throws ConnectionException {
+		EndpointConnector connector =
+				connectorFactory.createEndpointConnector(endpoint, action.getActionDescriptor());
+		connector.testConnection();
+	}
 
 	@Transactional
 	public <T extends ActionDescriptor> void addAction(

@@ -1,7 +1,6 @@
 package com.icl.integrator.services;
 
 import com.icl.integrator.dto.Modification;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -41,8 +40,14 @@ public class VersioningService {
 		versionEntities.remove(new UserVersionEntity(-1, username));
 	}
 
-	public void logModification(Modification modification) {
+	public void logModification(String username, Modification modification) {
 		modifications.add(modification);
+		Integer integer = loggedInUsers.get(username);
+		int newValue = integer + 1;
+		loggedInUsers.put(username, newValue);
+		UserVersionEntity entity = new UserVersionEntity(newValue, username);
+		versionEntities.remove(entity);
+		versionEntities.add(entity);
 	}
 
 	private void refreshUserState(String username) {
@@ -60,7 +65,8 @@ public class VersioningService {
 				.unmodifiableList(modifications.subList(startIndex, modifications.size()));
 	}
 
-	@Scheduled(fixedRate = 60000)
+	//	@Scheduled(fixedRate = 60000)
+	//TODO fix
 	public void scheduleUserRemoval() {
 		UserVersionEntity peek = versionEntities.peek();
 		if (peek == null) {

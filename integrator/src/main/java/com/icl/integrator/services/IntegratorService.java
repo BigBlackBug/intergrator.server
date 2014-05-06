@@ -85,11 +85,15 @@ public class IntegratorService implements IntegratorAPI {
 		//TODO проверка если не добавлен
 		logger.info("Received a service registration request");
 		List<ActionRegistrationResultDTO> result =
-				registrationService.register(registrationDTO.getData());
+				workerService.registerService(registrationDTO.getData());
 		String serviceName = registrationDTO.getData().getServiceName();
-		versioningService.logModification(new Modification(Modification.SubjectType.SERVICE,
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = ((IntegratorUser) authentication.getPrincipal()).getUsername();
+		versioningService.logModification(username,
+		                                  new Modification(Modification.SubjectType.SERVICE,
 		                                                   Modification.ActionType.ADDED,
-		                                                   serviceName));
+		                                                   serviceName)
+		);
 		return new ResponseDTO<>(result);
 	}
 
@@ -138,10 +142,12 @@ public class IntegratorService implements IntegratorAPI {
 		//TODO везде натыкать таких проверок
 		workerService.addAction(actionDTO.getData());
 		String actionName = actionDTO.getData().getActionRegistration().getAction().getActionName();
-		versioningService.logModification(
-				new Modification(Modification.SubjectType.ACTION,
-				                 Modification.ActionType.ADDED,
-				                 actionName)
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = ((IntegratorUser) authentication.getPrincipal()).getUsername();
+		versioningService.logModification(username,
+		                                  new Modification(Modification.SubjectType.ACTION,
+		                                                   Modification.ActionType.ADDED,
+		                                                   actionName)
 		);
 		return new ResponseDTO<>(true);
 	}
@@ -206,8 +212,15 @@ public class IntegratorService implements IntegratorAPI {
 	@Override
 	@RestrictedAccess
 	public <T extends DestinationDescriptor> ResponseDTO<Void> removeService(
-			IntegratorPacket<String, T> serviceName) {
-		workerService.removeService(serviceName.getData());
+			IntegratorPacket<String, T> serviceNamePacket) {
+		String serviceName = serviceNamePacket.getData();
+		workerService.removeService(serviceName);
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = ((IntegratorUser) authentication.getPrincipal()).getUsername();
+		versioningService
+				.logModification(username, new Modification(Modification.SubjectType.SERVICE,
+				                                            Modification.ActionType.REMOVED,
+				                                            serviceName));
 		return new ResponseDTO<>(true);
 	}
 
