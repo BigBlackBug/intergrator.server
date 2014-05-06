@@ -46,14 +46,8 @@ public class DeliveryBootstrap implements ApplicationListener<ContextRefreshedEv
 		if (isInitialized) {
 			return;
 		}
-//		Role role = new Role();
-//		role.setRole(RoleEnum.ROLE_USER);
-//		final IntegratorUser user = new IntegratorUser();
-//		user.setUsername("user");
-//		user.setPassword("1a1dc91c907325c69271ddf0c944bc72");
-//		user.setRole(role);
-//		role.setUserRoles(new HashSet<IntegratorUser>(){{add(user);}});
-//		persistenceService.persist(user);
+		//TODO remove
+		persistenceService.createDefaultUser();
 		List<Delivery> deliveries = persistenceService.findAllUnfinishedDeliveries();
 		for (Delivery delivery : deliveries) {
 			delivery.setRequestDate(new Date());

@@ -54,6 +54,26 @@ public class PersistenceService {
 	    return entity;
     }
 
+	//TODO stub
+	public void createDefaultUser(){
+		try {
+			em.createQuery("select e from IntegratorUser e where e.username=:username")
+					.setParameter("username", "user").getSingleResult();
+		}catch(NoResultException ex){
+			Role role = new Role();
+			role.setRole(RoleEnum.ROLE_USER);
+			final IntegratorUser user = new IntegratorUser();
+			user.setUsername("user");
+			//pass
+			user.setPassword("1a1dc91c907325c69271ddf0c944bc72");
+			user.setRole(role);
+			role.setUserRoles(new HashSet<IntegratorUser>() {{
+				add(user);
+			}});
+			em.persist(user);
+		}
+
+	}
 	public <T extends AbstractEntity> T find(Class<T> entityClass, UUID id) {
 		return em.find(entityClass, id);
 	}
