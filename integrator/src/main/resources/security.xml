@@ -7,7 +7,7 @@
       http://www.springframework.org/schema/security
       http://www.springframework.org/schema/security/spring-security-3.2.xsd
       http://www.springframework.org/schema/beans
-      http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+      classpath:spring-beans-4.0.xsd">
 
     <beans:bean id="restAuthenticationEntryPoint" class="com.icl.integrator.security.RestAuthenticationEntryPoint"/>
     <beans:bean id="authSuccessHandler" class="com.icl.integrator.security.IntegratorAuthenticationSuccessHandler" />
@@ -17,9 +17,8 @@
     <beans:bean id="userService" class="com.icl.integrator.security.UserService" />
 
     <http pattern="/integrator/ping" security="none"/>
-    <http use-expressions="true" entry-point-ref="restAuthenticationEntryPoint">
+    <http use-expressions="true" entry-point-ref="restAuthenticationEntryPoint" >
         <intercept-url pattern="/integrator/**" access="isAuthenticated()" />
-
         <sec:form-login authentication-success-handler-ref="authSuccessHandler"
                         authentication-failure-handler-ref="authFailureHandler" />
 

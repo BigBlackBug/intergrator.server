@@ -17,19 +17,6 @@
         http://www.springframework.org/schema/tx
         http://www.springframework.org/schema/tx/spring-tx-3.1.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <!--
-       Turn on AspectJ @Configurable support. As a result, any time you
-       instantiate an object, Spring will attempt to perform dependency
-       injection on that object. This occurs for instantiation via the "new"
-       keyword, as well as via reflection. This is possible because AspectJ
-       is used to "weave" Roo-based applications at compile time. In effect
-       this feature allows dependency injection of any object at all in your
-       system, which is a very useful feature (without @Configurable you'd
-       only be able to dependency inject objects acquired from Spring or
-       subsequently presented to a specific Spring dependency injection
-       method). Roo applications use this useful feature in a number of
-       areas, such as @PersistenceContext injection into entities.
-   -->
     <!--<context:spring-configured/>-->
     <context:component-scan base-package="com.icl.integrator.controllers"/>
 
@@ -69,8 +56,7 @@
         </amq:transportConnectors>
     </amq:broker>
 
-    <amq:connectionFactory id="amqConnectionFactory"
-                           brokerURL="tcp://localhost:61616"/>
+    <amq:connectionFactory id="amqConnectionFactory" brokerURL="tcp://localhost:61616"/>
     <!-- CachingConnectionFactory Definition, sessionCacheSize property is the number of sessions to cache -->
     <bean id="connectionFactory"
           class="org.springframework.jms.connection.CachingConnectionFactory">
@@ -83,7 +69,8 @@
         <property name="connectionFactory" ref="connectionFactory"/>
         <!--<constructor-arg ref="connectionFactory"/>-->
     </bean>
-    <!-- listener container definition using the jms namespace, concurrency is the max number of concurrent listeners that can be started -->
+    <!-- listener container definition using the jms namespace,
+     concurrency is the max number of concurrent listeners that can be started -->
 
     <!--TODO включить-->
     <!--<jms:listener-container concurrency="10">-->

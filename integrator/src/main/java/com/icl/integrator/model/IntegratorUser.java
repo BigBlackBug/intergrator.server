@@ -13,22 +13,22 @@ import java.util.Collection;
 @Table(name = "INTEGRATOR_USER")
 public class IntegratorUser extends AbstractEntity implements UserDetails {
 
-	@Column(name = "USERNAME", nullable = false, updatable = false)
+	@Column(name = "USERNAME", nullable = false, updatable = false, unique = true)
 	private String username;
 
 	@Column(name = "PASSWORD_HASH", nullable = false, updatable = false)
 	private String password;
 
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "ROLE_ID", nullable = false)
-	private Role role;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "ROLE", nullable = false, updatable = false)
+	private RoleEnum role;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return Arrays.asList(new SimpleGrantedAuthority(role.getRole().toString()));
+		return Arrays.asList(new SimpleGrantedAuthority(role.toString()));
 	}
 
-	public Role getRole() {
+	public RoleEnum getRole() {
 		return role;
 	}
 
@@ -40,7 +40,7 @@ public class IntegratorUser extends AbstractEntity implements UserDetails {
 		this.password = password;
 	}
 
-	public void setRole(Role role) {
+	public void setRole(RoleEnum role) {
 		this.role = role;
 	}
 

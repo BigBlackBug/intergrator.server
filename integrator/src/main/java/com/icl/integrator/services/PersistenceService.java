@@ -60,16 +60,11 @@ public class PersistenceService {
 			em.createQuery("select e from IntegratorUser e where e.username=:username")
 					.setParameter("username", "user").getSingleResult();
 		}catch(NoResultException ex){
-			Role role = new Role();
-			role.setRole(RoleEnum.ROLE_USER);
 			final IntegratorUser user = new IntegratorUser();
 			user.setUsername("user");
 			//pass
 			user.setPassword("1a1dc91c907325c69271ddf0c944bc72");
-			user.setRole(role);
-			role.setUserRoles(new HashSet<IntegratorUser>() {{
-				add(user);
-			}});
+			user.setRole(RoleEnum.ROLE_USER);
 			em.persist(user);
 		}
 
@@ -83,16 +78,12 @@ public class PersistenceService {
 				"select entity from AbstractEndpointEntity  entity where entity.serviceName=:name",
 				AbstractEndpointEntity.class).setParameter("name", name).getSingleResult();
 	}
+
 	public IntegratorUser findUserByUsername(String username) throws NoResultException{
 		return em.createQuery("select user from IntegratorUser user where user.username=:username",
 		                      IntegratorUser.class).setParameter("username", username)
 				.getSingleResult();
 	}
-
-//    public List<HttpServiceEndpoint> getHttpServices() {
-//        return em.createQuery("select ep from HttpServiceEndpoint ep",
-//                              HttpServiceEndpoint.class).getResultList();
-//    }
 
 	public List<ServiceDTO> getAllServices(){
 		List resultList = em.createQuery(
@@ -126,11 +117,6 @@ public class PersistenceService {
                 .setParameter("actionName", actionName)
                 .setParameter("endpointID", endpointID).getSingleResult();
     }
-
-//    public List<JMSServiceEndpoint> getJmsServices() {
-//        return em.createQuery("select ep from JMSServiceEndpoint ep",
-//                              JMSServiceEndpoint.class).getResultList();
-//    }
 
     public HttpServiceEndpoint findHttpService(String host, int port) {
         String query = "select ep from HttpServiceEndpoint ep where " +

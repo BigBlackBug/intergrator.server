@@ -25,18 +25,11 @@ public class IntegratorPacket<T, Y extends DestinationDescriptor> implements Ser
         this.responseHandlerDescriptor = responseHandlerDescriptor;
     }
 
-    public IntegratorPacket(T data,
-                            Y responseHandlerDescriptor) {
-        this.data = data;
-        this.responseHandlerDescriptor = responseHandlerDescriptor;
-    }
-
     public IntegratorPacket(T data) {
         this.data = data;
     }
 
-	public IntegratorPacket(IntegratorMethod method, T data, Y responseHandlerDescriptor) {
-		this.method = method;
+	public IntegratorPacket(T data, Y responseHandlerDescriptor) {
 		this.data = data;
 		this.responseHandlerDescriptor = responseHandlerDescriptor;
 	}
