@@ -8,6 +8,7 @@ package com.icl.integrator.dto;
  * To change this template use File | Settings | File Templates.
  */
 public enum IntegratorMethod {
+	//TODO пополнить. также поправить схему
 	PING,
 	DELIVER,
 	REGISTER_SERVICE,

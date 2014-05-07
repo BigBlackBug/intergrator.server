@@ -19,7 +19,7 @@ public class AuthorizationService {
 
 	public boolean hasAccessToService(String serviceName, Authentication authentication) {
 		IntegratorUser user = (IntegratorUser) authentication.getPrincipal();
-		RoleEnum role = user.getRole().getRole();
+		RoleEnum role = user.getRole();
 		return role == RoleEnum.ROLE_ADMIN || role == RoleEnum.ROLE_USER
 				&& checkUsername(serviceName, user.getUsername());
 	}

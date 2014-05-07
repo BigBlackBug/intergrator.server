@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -288,14 +289,14 @@ public class IntegratorWorkerService {
 	                          endpoint.getCreator().getUsername());
     }
 
-    private ActionEndpointDTO<ActionDescriptor> convertActionToDTO(
-		    AbstractActionEntity actionEntity) {
-        EndpointType type = actionEntity.getType();
-        switch (type) {
-            case HTTP: {
-                HttpAction httpAction = (HttpAction) actionEntity;
-                ActionDescriptor httpActionDTO = new HttpActionDTO(httpAction.getActionURL(),
-                                                                   actionEntity.getActionMethod());
+	private ActionEndpointDTO<ActionDescriptor>
+	convertActionToDTO(AbstractActionEntity actionEntity) {
+		EndpointType type = actionEntity.getType();
+		switch (type) {
+			case HTTP: {
+				HttpAction httpAction = (HttpAction) actionEntity;
+				ActionDescriptor httpActionDTO = new HttpActionDTO(httpAction.getActionURL(),
+				                                                   actionEntity.getActionMethod());
                 return new ActionEndpointDTO<>(actionEntity.getActionName(), httpActionDTO);
             }
             case JMS: {
@@ -313,4 +314,13 @@ public class IntegratorWorkerService {
 	public void removeService(String serviceName) {
 		persistenceService.removeService(serviceName);
 	}
+
+	public void registerUser(UserRegistrationDTO packet) {
+		final IntegratorUser user = new IntegratorUser();
+		user.setUsername(packet.getUsername());
+		user.setPassword(DigestUtils.md5DigestAsHex(packet.getPassword().getBytes()));
+		user.setRole(RoleEnum.ROLE_USER);
+		persistenceService.persist(user);
+	}
+
 }

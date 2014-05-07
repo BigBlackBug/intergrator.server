@@ -33,15 +33,21 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	private final String host;
 
-	private final String path;
+	private final String mainControllerPath;
 
 	private final int port;
 
 	private final RestTemplate restTemplate;
 
+	private final Class<?> clientInterface;
+
+	private final String managementControllerPath;
+
 	public IntegratorHttpClient(String host, String deployPath, int port,
 	                            IntegratorClientSettings clientSettings) {
-		this.path = createControllerPath(deployPath);
+		this.clientInterface = getClass().getInterfaces()[0];
+		this.mainControllerPath = createControllerPath(deployPath);
+		this.managementControllerPath = createManagementControllerPath(deployPath);
 		this.host = host;
 		this.port = port;
 		this.restTemplate = new IntegratorRestTemplate(clientSettings);
@@ -60,8 +66,17 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	private String createControllerPath(String deployPath) {
-		String controllerPath = getClass().getInterfaces()[0].getInterfaces()[0]
-				.getAnnotation(RequestMapping.class).value()[0];
+		return createControllerPath(clientInterface.getInterfaces()[0]
+				                            .getAnnotation(RequestMapping.class), deployPath);
+	}
+
+	private String createManagementControllerPath(String deployPath) {
+		return createControllerPath(clientInterface.getInterfaces()[1]
+				                            .getAnnotation(RequestMapping.class), deployPath);
+	}
+
+	private String createControllerPath(RequestMapping requestMapping, String deployPath) {
+		String controllerPath = requestMapping.value()[0];
 		StringBuilder sb = new StringBuilder();
 
 		if (!deployPath.isEmpty() && !deployPath.startsWith("/")) {
@@ -71,8 +86,11 @@ public class IntegratorHttpClient implements IntegratorClient {
 		return sb.toString();
 	}
 
+
+
 	/**
 	 * {@inheritDoc}
+	 *
 	 * @throws IntegratorClientException
 	 */
 	@Override
@@ -90,24 +108,24 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	/**
-	 * @see IntegratorHttpClient#ping(IntegratorPacket)
 	 * @throws IntegratorClientException
+	 * @see IntegratorHttpClient#ping(IntegratorPacket)
 	 */
 	public ResponseDTO<Boolean> ping() throws IntegratorClientException {
 		return ping(new IntegratorPacket<Void, DestinationDescriptor>());
 	}
 
 	/**
-	 * @see IntegratorHttpClient#getServiceList(IntegratorPacket)
 	 * @throws IntegratorClientException
+	 * @see IntegratorHttpClient#getServiceList(IntegratorPacket)
 	 */
 	public ResponseDTO<List<ServiceDTO>> getServiceList() throws IntegratorClientException {
 		return getServiceList(new IntegratorPacket<Void, DestinationDescriptor>());
 	}
 
 	/**
-	 * @see com.icl.integrator.api.IntegratorAPI#getSupportedActions(com.icl.integrator.dto.IntegratorPacket)
 	 * @throws IntegratorClientException
+	 * @see com.icl.integrator.api.IntegratorAPI#getSupportedActions(com.icl.integrator.dto.IntegratorPacket)
 	 */
 	public <T extends ActionDescriptor>
 	ResponseDTO<List<ActionEndpointDTO<T>>>
@@ -116,8 +134,8 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	/**
-	 * @see com.icl.integrator.api.IntegratorAPI#getServiceInfo(com.icl.integrator.dto.IntegratorPacket)
 	 * @throws IntegratorClientException
+	 * @see com.icl.integrator.api.IntegratorAPI#getServiceInfo(com.icl.integrator.dto.IntegratorPacket)
 	 */
 	public <Y extends ActionDescriptor>
 	ResponseDTO<FullServiceDTO<Y>>
@@ -126,8 +144,8 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	/**
-	 * @see IntegratorHttpClient#deliver(IntegratorPacket)
 	 * @throws IntegratorClientException
+	 * @see IntegratorHttpClient#deliver(IntegratorPacket)
 	 */
 	public ResponseDTO<Map<String, ResponseDTO<String>>> deliver(
 			DeliveryDTO delivery) throws IntegratorClientException {
@@ -153,8 +171,8 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	/**
-	 * @see IntegratorHttpClient#registerService(IntegratorPacket)
 	 * @throws IntegratorClientException
+	 * @see IntegratorHttpClient#registerService(IntegratorPacket)
 	 */
 	public <T extends ActionDescriptor>
 	ResponseDTO<List<ActionRegistrationResultDTO>> registerService(
@@ -164,6 +182,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	/**
 	 * {@inheritDoc}
+	 *
 	 * @throws IntegratorClientException
 	 */
 	@Override
@@ -185,8 +204,8 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	/**
-	 * @see IntegratorHttpClient#isAvailable(IntegratorPacket)
 	 * @throws IntegratorClientException
+	 * @see IntegratorHttpClient#isAvailable(IntegratorPacket)
 	 */
 	public ResponseDTO<Boolean> isAvailable(ServiceDestinationDescriptor serviceDescriptor)
 			throws IntegratorClientException {
@@ -199,8 +218,9 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	/**
 	 * {@inheritDoc}
-	 * @throws IntegratorClientException
+	 *
 	 * @param packet
+	 * @throws IntegratorClientException
 	 */
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
@@ -219,6 +239,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	/**
 	 * {@inheritDoc}
+	 *
 	 * @throws IntegratorClientException
 	 */
 	@Override
@@ -240,8 +261,9 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	/**
 	 * {@inheritDoc}
-	 * @throws IntegratorClientException
+	 *
 	 * @param serviceName
+	 * @throws IntegratorClientException
 	 */
 	@Override
 	public <T extends DestinationDescriptor, Y extends ActionDescriptor>
@@ -262,8 +284,8 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	/**
-	 * @see IntegratorHttpClient#addAction(IntegratorPacket)
 	 * @throws IntegratorClientException
+	 * @see IntegratorHttpClient#addAction(IntegratorPacket)
 	 */
 	public <T extends ActionDescriptor> ResponseDTO<Void> addAction(AddActionDTO<T> actionDTO)
 			throws IntegratorClientException {
@@ -272,6 +294,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	/**
 	 * {@inheritDoc}
+	 *
 	 * @throws IntegratorClientException
 	 */
 	@Override
@@ -291,8 +314,9 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	/**
 	 * {@inheritDoc}
-	 * @throws IntegratorClientException
+	 *
 	 * @param serviceName
+	 * @throws IntegratorClientException
 	 */
 	@Override
 	public <ADType extends ActionDescriptor, DDType extends DestinationDescriptor>
@@ -313,6 +337,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	/**
 	 * {@inheritDoc}
+	 *
 	 * @throws IntegratorClientException
 	 */
 	@Override
@@ -335,6 +360,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	/**
 	 * {@inheritDoc}
+	 *
 	 * @throws IntegratorClientException
 	 */
 	@Override
@@ -355,6 +381,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	/**
 	 * {@inheritDoc}
+	 *
 	 * @throws IntegratorClientException
 	 */
 	@Override
@@ -405,7 +432,8 @@ public class IntegratorHttpClient implements IntegratorClient {
 	public <T extends DestinationDescriptor> ResponseDTO<Void> removeService(
 			IntegratorPacket<String, T> serviceName) {
 		try {
-			HttpMethodDescriptor methodPair = getMethodPath("removeService", IntegratorPacket.class);
+			HttpMethodDescriptor methodPair =
+					getMethodPath("removeService", IntegratorPacket.class);
 			ParameterizedTypeReference<ResponseDTO<Void>>
 					type =
 					new ParameterizedTypeReference<ResponseDTO<Void>>() {
@@ -421,8 +449,8 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	/**
-	 * @see IntegratorHttpClient#registerAutoDetection(IntegratorPacket)
 	 * @throws IntegratorClientException
+	 * @see IntegratorHttpClient#registerAutoDetection(IntegratorPacket)
 	 */
 	public <Y> ResponseDTO<List<ResponseDTO<Void>>>
 	registerAutoDetection(AutoDetectionRegistrationDTO<Y> autoDetectionDTO)
@@ -436,7 +464,8 @@ public class IntegratorHttpClient implements IntegratorClient {
 		body.add(IntegratorClientConstants.USERNAME_PARAM, username);
 		body.add(IntegratorClientConstants.PASSWORD_PARAM, password);
 		try {
-			URL url = new URL("HTTP", host, port, path + IntegratorClientConstants.LOGIN_URL);
+			URL url = new URL("HTTP", host, port,
+			                  mainControllerPath + IntegratorClientConstants.LOGIN_URL);
 			restTemplate.postForObject(url.toURI(), body, Void.class);
 		} catch (Exception ex) {
 			throw new IntegratorClientException(ex);
@@ -447,14 +476,15 @@ public class IntegratorHttpClient implements IntegratorClient {
 	public void logout() throws IntegratorClientException {
 		HttpStatus statusCode;
 		try {
-			URL url = new URL("HTTP", host, port, path + IntegratorClientConstants.LOGOUT_URL);
+			URL url = new URL("HTTP", host, port,
+			                  mainControllerPath + IntegratorClientConstants.LOGOUT_URL);
 			ResponseEntity<Void> response = restTemplate.getForEntity(url.toURI(), Void.class);
 			statusCode = response.getStatusCode();
 		} catch (Exception ex) {
 			throw new IntegratorClientException(ex);
 		}
 		if (statusCode.series().value() != 2) {
-			throw new IntegratorClientException("Не фортануло "+statusCode.getReasonPhrase());
+			throw new IntegratorClientException("Не фортануло " + statusCode.getReasonPhrase());
 		}
 	}
 
@@ -462,12 +492,19 @@ public class IntegratorHttpClient implements IntegratorClient {
 	                                           Class<?>... parameterTypes) {
 		Method m = null;
 		try {
-			m = getClass().getInterfaces()[0].getMethod(methodName, parameterTypes);
+			m = clientInterface.getMethod(methodName, parameterTypes);
 		} catch (NoSuchMethodException e) {
 		}
 		RequestMapping annotation = m.getAnnotation(RequestMapping.class);
-		return new HttpMethodDescriptor(annotation.value()[0],
-		                                annotation.method()[0]);
+		return new HttpMethodDescriptor(annotation.value()[0], annotation.method()[0]);
+	}
+
+	private <Response, Request> Response sendRequest(
+			String controllerPath,
+			Request data, ParameterizedTypeReference<Response> responseType,
+			HttpMethodDescriptor methodDescriptor)
+			throws RestClientException, MalformedURLException {
+		return sendRequest(controllerPath, new HttpEntity<>(data), responseType, methodDescriptor);
 	}
 
 	private <Response, Request> Response sendRequest(
@@ -478,24 +515,47 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	private <Response, Request> Response sendRequest(
+			String controllerPath,
 			HttpEntity<Request> requestEntity, ParameterizedTypeReference<Response> responseType,
 			HttpMethodDescriptor methodDescriptor)
 			throws RestClientException, MalformedURLException {
 
 		RequestMethod methodType = methodDescriptor.getMethodType();
-		URL url = new URL("HTTP", host, port, path + methodDescriptor.getMethodPath());
+		URL url = new URL("HTTP", host, port, controllerPath + methodDescriptor.getMethodPath());
 
 		String urlString = url.toString();
 		if (methodType.equals(RequestMethod.GET)) {
-			return restTemplate.
-					exchange(urlString, HttpMethod.GET,
-					         requestEntity, responseType).getBody();
+			return restTemplate
+					.exchange(urlString, HttpMethod.GET, requestEntity, responseType)
+					.getBody();
 		} else if (methodType.equals(RequestMethod.POST)) {
-			return restTemplate.
-					exchange(urlString, HttpMethod.POST,
-					         requestEntity, responseType).getBody();
+			return restTemplate
+					.exchange(urlString, HttpMethod.POST, requestEntity, responseType)
+					.getBody();
 		} else {
 			throw new MethodNotSupportedException();
+		}
+	}
+
+	private <Response, Request> Response sendRequest(
+			HttpEntity<Request> requestEntity, ParameterizedTypeReference<Response> responseType,
+			HttpMethodDescriptor methodDescriptor)
+			throws RestClientException, MalformedURLException {
+		return sendRequest(mainControllerPath, requestEntity, responseType, methodDescriptor);
+	}
+
+	@Override
+	public ResponseDTO<Void> registerUser(UserRegistrationDTO packet) {
+		try {
+			HttpMethodDescriptor methodPair =
+					getMethodPath("registerUser", UserRegistrationDTO.class);
+			ParameterizedTypeReference<ResponseDTO<Void>>
+					type =
+					new ParameterizedTypeReference<ResponseDTO<Void>>() {
+					};
+			return sendRequest(managementControllerPath, packet, type, methodPair);
+		} catch (Exception ex) {
+			throw new IntegratorClientException(ex);
 		}
 	}
 
