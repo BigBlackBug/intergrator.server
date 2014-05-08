@@ -8,14 +8,14 @@
         <properties>
             <property name="hibernate.dialect"
                       value="org.hibernate.dialect.PostgreSQLDialect"/>
-            <property name="hibernate.connection.url"
-                      value="jdbc:postgresql://192.168.84.174/integrator"/>
-            <property name="hibernate.connection.username" value="postgres"/>
-            <property name="hibernate.connection.password" value="1"/>
             <!--<property name="hibernate.connection.url"-->
-                      <!--value="jdbc:postgresql://localhost/integrator"/>-->
+                      <!--value="jdbc:postgresql://192.168.84.174/integrator"/>-->
             <!--<property name="hibernate.connection.username" value="postgres"/>-->
-            <!--<property name="hibernate.connection.password" value="postgres"/>-->
+            <!--<property name="hibernate.connection.password" value="1"/>-->
+            <property name="hibernate.connection.url"
+                      value="jdbc:postgresql://localhost/integrator"/>
+            <property name="hibernate.connection.username" value="postgres"/>
+            <property name="hibernate.connection.password" value="postgres"/>
             <property name="hibernate.connection.driver_class"
                       value="org.postgresql.Driver"/>
 
