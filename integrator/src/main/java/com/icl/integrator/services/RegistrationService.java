@@ -2,6 +2,7 @@ package com.icl.integrator.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.dto.DeliveryPacketType;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
@@ -12,6 +13,7 @@ import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
 import com.icl.integrator.util.DatabaseExceptionUtils;
 import com.icl.integrator.util.GeneralUtils;
+import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.ConnectionException;
 import com.icl.integrator.util.connectors.EndpointConnector;
 import com.icl.integrator.util.connectors.EndpointConnectorFactory;
@@ -279,10 +281,15 @@ public class RegistrationService {
     }
 
     public <Y> List<ResponseDTO<Void>> register(AutoDetectionRegistrationDTO<Y> packet)
-		    throws JsonProcessingException {
+		    throws JsonProcessingException, IntegratorException {
         AutoDetectionPacket autoDetectionPacket = new AutoDetectionPacket();
-        autoDetectionPacket.setDeliveryPacketType(packet.getDeliveryPacketType());
-        List<ResponseDTO<Void>> result = new ArrayList<>();
+	    if(packet.getDeliveryPacketType() == DeliveryPacketType.UNDEFINED){
+		    throw new IntegratorException(
+				    "Ты не можешь зарегать авторазруливание для пакетов типа UNDEFINED. " +
+						    "На то он и UNDEFINED");
+	    }
+	    autoDetectionPacket.setDeliveryPacketType(packet.getDeliveryPacketType());
+	    List<ResponseDTO<Void>> result = new ArrayList<>();
         String referenceObject = mapper.writeValueAsString(packet.getReferenceObject());
 
         autoDetectionPacket.setReferenceObject(referenceObject);
