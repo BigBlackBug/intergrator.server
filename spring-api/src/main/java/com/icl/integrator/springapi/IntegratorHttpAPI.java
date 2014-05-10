@@ -4,6 +4,7 @@ import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -133,4 +134,11 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
 	@ResponseBody
 	<T extends DestinationDescriptor>
 	ResponseDTO<Void> removeService(@RequestBody IntegratorPacket<String,T> serviceName);
+
+	@Override
+	@RequestMapping(value = "editService", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor>
+	ResponseDTO<Void> editService(@RequestBody IntegratorPacket<EditServiceDTO,T> editServiceDTO);
 }

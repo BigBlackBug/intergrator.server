@@ -6,6 +6,7 @@ import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.services.AuthorizationService;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
@@ -204,6 +205,22 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 					"Вы не можете удалять сервис, созданный не Вами"));
 		}
 		return integratorService.removeService(fixConversion(serviceNamePacket, type));
+	}
+
+	@Override
+	public <T extends DestinationDescriptor> ResponseDTO<Void> editService(
+			@RequestBody IntegratorPacket<EditServiceDTO, T> editServiceDTO) {
+		TypeReference<IntegratorPacket<EditServiceDTO, DestinationDescriptor>>
+				type =
+				new TypeReference<IntegratorPacket<EditServiceDTO, DestinationDescriptor>>() {
+				};
+		String serviceName = editServiceDTO.getData().getServiceName();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!authService.hasAccessToService(serviceName, auth)) {
+			return new ResponseDTO<>(new ErrorDTO(
+					"Вы не можете изменять сервис, созданный не Вами"));
+		}
+		return integratorService.editService(fixConversion(editServiceDTO, type));
 	}
 
 	@ExceptionHandler(Exception.class)

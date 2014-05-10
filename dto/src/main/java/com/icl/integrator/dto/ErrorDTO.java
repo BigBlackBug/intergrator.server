@@ -17,7 +17,7 @@ public class ErrorDTO implements Serializable {
 
 	private String developerMessage;
 
-    private ErrorCode errorCode;
+	private ErrorCode errorCode = ErrorCode.DEFAULT;
 
     public ErrorDTO(String errorMessage, String developerMessage,
                     ErrorCode errorCode) {
@@ -42,7 +42,7 @@ public class ErrorDTO implements Serializable {
         this(errorMessage, ErrorCode.DEFAULT);
     }
 
-    public ErrorDTO() {
+    ErrorDTO() {
 	}
 
     public ErrorDTO(Throwable ex, ErrorCode errorCode) {

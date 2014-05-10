@@ -55,7 +55,6 @@ public class RegistrationService {
     @Autowired
     private DeliveryCreator deliveryCreator;
 
-	//TODO схерали он обновляет старые севрисы
 	@Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = Exception.class)
 	public <T extends ActionDescriptor>
 	List<ActionRegistrationResultDTO> registerService(EndpointDescriptor endpoint,
@@ -65,8 +64,7 @@ public class RegistrationService {
         String serviceName = registrationDTO.getServiceName();
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    IntegratorUser creator = (IntegratorUser) authentication.getPrincipal();
-	    DeliverySettingsDTO deliverySettings =
-                registrationDTO.getDeliverySettings();
+	    DeliverySettingsDTO deliverySettings = registrationDTO.getDeliverySettings();
         AbstractEndpointEntity serviceEntity =
                 createEntity(endpoint, serviceName, deliverySettings, creator);
         try {
@@ -87,15 +85,11 @@ public class RegistrationService {
                 persistenceService.saveOrUpdate(action);
                 responseDTO = new ResponseDTO<>(true);
             } catch (DataAccessException ex) {
-	            String realErrorCause = ExceptionUtils.getRealSQLError(ex);
-	            ErrorDTO errorDTO = new ErrorDTO();
-	            errorDTO.setErrorMessage("Ошибка регистрации");
-	            errorDTO.setDeveloperMessage(realErrorCause);
+	            ErrorDTO errorDTO = new ErrorDTO("Ошибка регистрации",
+	                                             ExceptionUtils.getRealSQLError(ex));
 	            responseDTO = new ResponseDTO<>(errorDTO);
             } catch (Exception ex) {
-                ErrorDTO errorDTO = new ErrorDTO();
-                errorDTO.setErrorMessage("Ошибка регистрации");
-                errorDTO.setDeveloperMessage(ex.getMessage());
+	            ErrorDTO errorDTO = new ErrorDTO("Ошибка регистрации", ex.getMessage());
                 responseDTO = new ResponseDTO<>(errorDTO);
             }
             result.add(new ActionRegistrationResultDTO(actionDTO.getActionName(), responseDTO));

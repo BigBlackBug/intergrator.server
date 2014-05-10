@@ -58,7 +58,7 @@ public class ValidatorTests {
 		RawDestinationDescriptor dd =
 				new RawDestinationDescriptor(
 						desr, new HttpActionDTO("/ext_source/handleGetServiceList",
-                                             ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE)
+                                             ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION)
 				);
 		ServiceDestinationDescriptor sdd = new ServiceDestinationDescriptor("a",null,EndpointType.HTTP);
 		IntegratorPacket p = new IntegratorPacket();

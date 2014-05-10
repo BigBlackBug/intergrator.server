@@ -34,10 +34,10 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 		types.put(ActionMethod.HANDLE_RESPONSE_FROM_TARGET,
 		          new ParameterizedTypeReference<ResponseDTO<ResponseFromTargetDTO>>() {
 		          }.getType());
-		types.put(ActionMethod.HANDLE_DELIVERY_RESPONSE,
+		types.put(ActionMethod.HANDLE_DELIVERY_METHOD_RESPONSE,
 		          new ParameterizedTypeReference<Map<String, ResponseDTO<UUID>>>() {
 		          }.getType());
-		types.put(ActionMethod.HANDLE_SERVER_REGISTRATION_RESPONSE,
+		types.put(ActionMethod.HANDLE_SERVER_REGISTRATION,
 		          new ParameterizedTypeReference<ResponseDTO<List<ActionRegistrationResultDTO>>>() {
 		          }.getType());
 		types.put(ActionMethod.HANDLE_SERVICE_IS_AVAILABLE,
@@ -55,22 +55,21 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 		types.put(ActionMethod.HANDLE_GET_SERVICE_INFO,
 		          new ParameterizedTypeReference<ResponseDTO<FullServiceDTO<ActionDescriptor>>>() {
 		          }.getType());
-		types.put(ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE,
+		types.put(ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION,
 		          new ParameterizedTypeReference<ResponseDTO<List<ResponseDTO<Void>>>>() {
 		          }.getType());
-		types.put(ActionMethod.HANDLE_PING, new ParameterizedTypeReference<ResponseDTO<Boolean>>() {
-		}.getType());
+		types.put(ActionMethod.HANDLE_PING,
+		          new ParameterizedTypeReference<ResponseDTO<Boolean>>() {
+		          }.getType());
 		types.put(ActionMethod.HANDLE_GET_ACTIONS_FOR_DELIVERY,
 		          new ParameterizedTypeReference<ResponseDTO<List<DeliveryActionsDTO>>>() {
 		          }.getType());
 		types.put(ActionMethod.HANDLE_GET_SERVICES_SUPPORTING_ACTION_TYPE,
 		          new ParameterizedTypeReference<ResponseDTO<List<ServiceAndActions<ActionDescriptor>>>>() {
 		          }.getType());
-
 		types.put(ActionMethod.HANDLE_FETCH_UPDATES,
 		          new ParameterizedTypeReference<ResponseDTO<List<Modification>>>() {
 		          }.getType());
-
 		types.put(ActionMethod.HANDLE_REMOVE_SERVICE,
 		          new ParameterizedTypeReference<ResponseDTO<Void>>() {
 		          }.getType());

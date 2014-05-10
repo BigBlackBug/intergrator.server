@@ -3,6 +3,7 @@ package com.icl.integrator.httpclient;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -446,6 +447,25 @@ public class IntegratorHttpClient implements IntegratorClient {
 
 	public ResponseDTO<Void> removeService(String serviceName) {
 		return removeService(new IntegratorPacket<String, DestinationDescriptor>(serviceName));
+	}
+
+	@Override
+	public <T extends DestinationDescriptor> ResponseDTO<Void> editService(
+			 IntegratorPacket<EditServiceDTO, T> editServiceDTO) {
+		try {
+			HttpMethodDescriptor methodPair = getMethodPath("editService", IntegratorPacket.class);
+			ParameterizedTypeReference<ResponseDTO<Void>>
+					type =
+					new ParameterizedTypeReference<ResponseDTO<Void>>() {
+					};
+			return sendRequest(editServiceDTO, type, methodPair);
+		} catch (Exception e) {
+			throw new IntegratorClientException(e);
+		}
+	}
+
+	public ResponseDTO<Void> editService(EditServiceDTO editServiceDTO) {
+		return editService(new IntegratorPacket<EditServiceDTO, DestinationDescriptor>(editServiceDTO));
 	}
 
 	/**

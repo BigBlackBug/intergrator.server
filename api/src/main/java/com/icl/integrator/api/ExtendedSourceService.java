@@ -19,10 +19,10 @@ public interface ExtendedSourceService extends SourceService {
 
 	public void handleDeliveryResponse(Map<String, ResponseDTO<UUID>> response);
 
-	public void handleServiceRegistrationResponse(
+	public void handleServiceRegistration(
 			ResponseDTO<List<ActionRegistrationResultDTO>> response);
 
-	public void handleServiceIsAvailableResponse(ResponseDTO<Boolean> response);
+	public void handleServiceIsAvailable(ResponseDTO<Boolean> response);
 
 	public void handleGetServiceList(ResponseDTO<List<ServiceDTO>> response);
 

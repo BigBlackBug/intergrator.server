@@ -152,10 +152,10 @@ public class Scheduler {
 
 	        @Override
             public void execute(E exception) {
-                ErrorDTO errorDTO = new ErrorDTO();
-                errorDTO.setErrorMessage("Не могу доставить запрос на таргет");
-                errorDTO.setDeveloperMessage("Последнее исключение - \n" +
-		                                              getStackTraceAsString(exception));
+		        String developerMessage = "Последнее исключение - \n" +
+				        getStackTraceAsString(exception);
+		        String errorMessage = "Не могу доставить запрос на таргет";
+		        ErrorDTO errorDTO = new ErrorDTO(errorMessage, developerMessage);
 		        callback.execute(errorDTO);
             }
         }

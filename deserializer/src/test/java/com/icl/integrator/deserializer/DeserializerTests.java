@@ -41,7 +41,7 @@ public class DeserializerTests {
         RawDestinationDescriptor targetResponseHandler =
                 new RawDestinationDescriptor(jmsEndpointDescriptorDTO
                         , new QueueDTO("SourceQueue",
-                                       ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION_RESPONSE));
+                                       ActionMethod.HANDLE_AUTO_DETECTION_REGISTRATION));
         IntegratorPacket<Void, DestinationDescriptor>
                 packet =
                 new IntegratorPacket<Void, DestinationDescriptor>(

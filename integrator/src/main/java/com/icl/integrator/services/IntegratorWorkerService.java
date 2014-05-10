@@ -1,9 +1,11 @@
 package com.icl.integrator.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
@@ -21,7 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
+import javax.persistence.NoResultException;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -95,18 +99,19 @@ public class IntegratorWorkerService {
 		AbstractEndpointEntity entity = persistenceService.getEndpointEntity(serviceName);
 		EndpointType endpointType = entity.getType();
 		ActionEndpointDTO<T> action = actionReg.getAction();
-        EndpointType actionEndpointType = action.getActionDescriptor().getEndpointType();
-        if (endpointType != actionEndpointType) {
-            throw new IntegratorException(
-                    String.format("Тип добавляемого действия '%s' не совпадает с" +
-                                          " типом сервиса '%s'", actionEndpointType, endpointType));
-        }
-        String actionName = action.getActionName();
+		EndpointType actionEndpointType = action.getActionDescriptor().getEndpointType();
+		if (endpointType != actionEndpointType) {
+			throw new IntegratorException(
+					String.format("Тип добавляемого действия '%s' не совпадает с" +
+							              " типом сервиса '%s'", actionEndpointType, endpointType)
+			);
+		}
+		String actionName = action.getActionName();
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		IntegratorUser creator = (IntegratorUser) authentication.getPrincipal();
 
 		if (endpointType == EndpointType.HTTP) {
-            HttpServiceEndpoint serviceEndpoint = (HttpServiceEndpoint) entity;
+			HttpServiceEndpoint serviceEndpoint = (HttpServiceEndpoint) entity;
 			HttpActionDTO httpActionDTO = (HttpActionDTO) action.getActionDescriptor();
 
 			HttpAction httpAction = persistenceService.findHttpAction(
@@ -133,9 +138,9 @@ public class IntegratorWorkerService {
 			QueueDTO queueDTO = (QueueDTO) action.getActionDescriptor();
 			JMSAction jmsAction = persistenceService
 					.findJmsAction(serviceEndpoint.getId(),
-                                   queueDTO.getQueueName(),
-                                   queueDTO.getUsername(),
-                                   queueDTO.getPassword());
+					               queueDTO.getQueueName(),
+					               queueDTO.getUsername(),
+					               queueDTO.getPassword());
 
 			if (jmsAction != null) {
 				if (jmsAction.isGenerated()) {
@@ -160,16 +165,16 @@ public class IntegratorWorkerService {
 	}
 
 	public List<ActionEndpointDTO> getSupportedActions(String serviceName) {
-        List<AbstractActionEntity> actions = persistenceService.getActions(serviceName);
-        List<ActionEndpointDTO> result = new ArrayList<>();
-        for (AbstractActionEntity actionEntity : actions) {
-            result.add(convertActionToDTO(actionEntity));
-        }
-        return result;
-    }
+		List<AbstractActionEntity> actions = persistenceService.getActions(serviceName);
+		List<ActionEndpointDTO> result = new ArrayList<>();
+		for (AbstractActionEntity actionEntity : actions) {
+			result.add(convertActionToDTO(actionEntity));
+		}
+		return result;
+	}
 
 	public Boolean pingService(ServiceDestinationDescriptor serviceDescriptor)
-            throws ConnectionException{
+			throws ConnectionException {
 		EndpointConnector connector = connectorFactory.createEndpointConnector(serviceDescriptor);
 		connector.testConnection();
 		return true;
@@ -195,12 +200,13 @@ public class IntegratorWorkerService {
 					                              httpService.getServicePort());
 			List<ActionEndpointDTO<HttpActionDTO>> actions = getHttpActionDTOs(httpService);
 			return (FullServiceDTO<Y>) new FullServiceDTO<>(serviceName, httpEndpointDescriptorDTO,
-					                     deliverySettingsDTO, creatorName,actions);
+			                                                deliverySettingsDTO, creatorName,
+			                                                actions);
 		} else if (endpointType == EndpointType.JMS) {
 			JMSServiceEndpoint jmsService = (JMSServiceEndpoint) entity;
 			DeliverySettings deliverySettings = jmsService.getDeliverySettings();
-            DeliverySettingsDTO deliverySettingsDTO = new DeliverySettingsDTO(
-                    deliverySettings.getRetryNumber(), deliverySettings.getRetryDelay());
+			DeliverySettingsDTO deliverySettingsDTO = new DeliverySettingsDTO(
+					deliverySettings.getRetryNumber(), deliverySettings.getRetryDelay());
 			Map<String, String> props;
 			try {
 				TypeReference<Map<String, String>> typeReference =
@@ -227,7 +233,7 @@ public class IntegratorWorkerService {
 		for (AbstractActionEntity action : service.getActions()) {
 			HttpAction realAction = (HttpAction) action;
 			HttpActionDTO httpActionDTO = new HttpActionDTO(
-					realAction.getActionURL(),realAction.getActionMethod());
+					realAction.getActionURL(), realAction.getActionMethod());
 			result.add(new ActionEndpointDTO<>(
 					action.getActionName(), httpActionDTO));
 		}
@@ -250,44 +256,44 @@ public class IntegratorWorkerService {
 	}
 
 
-    public List<DeliveryActionsDTO> getAllActionMap() {
-        Map<String, List<AbstractEndpointEntity>> allActionMap =
-                persistenceService.getAllActionMap();
-        List<DeliveryActionsDTO> list = new ArrayList<>();
-        for (Map.Entry<String, List<AbstractEndpointEntity>> entry : allActionMap.entrySet()) {
-            List<AbstractEndpointEntity> endpoints = entry.getValue();
-            List<ServiceDTO> serviceList = new ArrayList<>();
-            for (AbstractEndpointEntity endpoint : endpoints) {
-	            serviceList.add(new ServiceDTO(endpoint.getServiceName(),
-	                                           endpoint.getType(),
-	                                           endpoint.getCreator().getUsername()));
-            }
-            list.add(new DeliveryActionsDTO(entry.getKey(), serviceList));
-        }
-        return list;
-    }
+	public List<DeliveryActionsDTO> getAllActionMap() {
+		Map<String, List<AbstractEndpointEntity>> allActionMap =
+				persistenceService.getAllActionMap();
+		List<DeliveryActionsDTO> list = new ArrayList<>();
+		for (Map.Entry<String, List<AbstractEndpointEntity>> entry : allActionMap.entrySet()) {
+			List<AbstractEndpointEntity> endpoints = entry.getValue();
+			List<ServiceDTO> serviceList = new ArrayList<>();
+			for (AbstractEndpointEntity endpoint : endpoints) {
+				serviceList.add(new ServiceDTO(endpoint.getServiceName(),
+				                               endpoint.getType(),
+				                               endpoint.getCreator().getUsername()));
+			}
+			list.add(new DeliveryActionsDTO(entry.getKey(), serviceList));
+		}
+		return list;
+	}
 
-    public <T extends ActionDescriptor>
-    List<ServiceAndActions<T>> getServicesSupportingActionType(ActionMethod actionMethod) {
-        Map<AbstractEndpointEntity, List<AbstractActionEntity>> servicesSupportingActionType =
-                persistenceService.getServicesSupportingActionType(actionMethod);
-	    List<ServiceAndActions<T>> result = new ArrayList<>();
-        for (Map.Entry<AbstractEndpointEntity, List<AbstractActionEntity>>
-                entry : servicesSupportingActionType.entrySet()) {
-            List<AbstractActionEntity> actions = entry.getValue();
-            List<ActionEndpointDTO<T>> actionDTOs = new ArrayList<>();
-            for (AbstractActionEntity e : actions) {
-                actionDTOs.add((ActionEndpointDTO<T>) convertActionToDTO(e));
-            }
-            result.add(new ServiceAndActions<>(entityToDTO(entry.getKey()), actionDTOs));
-        }
-        return result;
-    }
+	public <T extends ActionDescriptor>
+	List<ServiceAndActions<T>> getServicesSupportingActionType(ActionMethod actionMethod) {
+		Map<AbstractEndpointEntity, List<AbstractActionEntity>> servicesSupportingActionType =
+				persistenceService.getServicesSupportingActionType(actionMethod);
+		List<ServiceAndActions<T>> result = new ArrayList<>();
+		for (Map.Entry<AbstractEndpointEntity, List<AbstractActionEntity>>
+				entry : servicesSupportingActionType.entrySet()) {
+			List<AbstractActionEntity> actions = entry.getValue();
+			List<ActionEndpointDTO<T>> actionDTOs = new ArrayList<>();
+			for (AbstractActionEntity e : actions) {
+				actionDTOs.add((ActionEndpointDTO<T>) convertActionToDTO(e));
+			}
+			result.add(new ServiceAndActions<>(entityToDTO(entry.getKey()), actionDTOs));
+		}
+		return result;
+	}
 
-    private ServiceDTO entityToDTO(AbstractEndpointEntity endpoint) {
-	    return new ServiceDTO(endpoint.getServiceName(), endpoint.getType(),
-	                          endpoint.getCreator().getUsername());
-    }
+	private ServiceDTO entityToDTO(AbstractEndpointEntity endpoint) {
+		return new ServiceDTO(endpoint.getServiceName(), endpoint.getType(),
+		                      endpoint.getCreator().getUsername());
+	}
 
 	private ActionEndpointDTO<ActionDescriptor>
 	convertActionToDTO(AbstractActionEntity actionEntity) {
@@ -297,19 +303,19 @@ public class IntegratorWorkerService {
 				HttpAction httpAction = (HttpAction) actionEntity;
 				ActionDescriptor httpActionDTO = new HttpActionDTO(httpAction.getActionURL(),
 				                                                   actionEntity.getActionMethod());
-                return new ActionEndpointDTO<>(actionEntity.getActionName(), httpActionDTO);
-            }
-            case JMS: {
-                JMSAction httpAction = (JMSAction) actionEntity;
-                ActionDescriptor httpActionDTO = new QueueDTO(httpAction.getQueueName(),
-                                                              httpAction.getUsername(),
-                                                              httpAction.getPassword(),
-                                                              actionEntity.getActionMethod());
-                return new ActionEndpointDTO<>(actionEntity.getActionName(), httpActionDTO);
-            }
-        }
-        return null;
-    }
+				return new ActionEndpointDTO<>(actionEntity.getActionName(), httpActionDTO);
+			}
+			case JMS: {
+				JMSAction httpAction = (JMSAction) actionEntity;
+				ActionDescriptor httpActionDTO = new QueueDTO(httpAction.getQueueName(),
+				                                              httpAction.getUsername(),
+				                                              httpAction.getPassword(),
+				                                              actionEntity.getActionMethod());
+				return new ActionEndpointDTO<>(actionEntity.getActionName(), httpActionDTO);
+			}
+		}
+		return null;
+	}
 
 	public void removeService(String serviceName) {
 		persistenceService.removeService(serviceName);
@@ -323,4 +329,58 @@ public class IntegratorWorkerService {
 		persistenceService.persist(user);
 	}
 
+	//TODO как-нибудь отрефакторить всё это говно с ифами и прочим.
+	@Transactional
+	public void editService(EditServiceDTO editServiceDTO) throws IntegratorException {
+		String serviceName = editServiceDTO.getServiceName();
+		DeliverySettingsDTO newDeliverySettings = editServiceDTO.getDeliverySettings();
+		EndpointDescriptor endpointDescriptor = editServiceDTO.getEndpointDescriptor();
+		String newServiceName = editServiceDTO.getNewServiceName();
+		AbstractEndpointEntity endpointEntity;
+		try {
+			endpointEntity = persistenceService.getEndpointEntity(serviceName);
+		}catch(NoResultException nex){
+			throw new IntegratorException(String.format("Сервиса с именем %s не существует",serviceName));
+		}
+		if (newServiceName != null) {
+			endpointEntity.setServiceName(newServiceName);
+		}
+		if (newDeliverySettings != null) {
+			DeliverySettings deliverySettings = endpointEntity.getDeliverySettings();
+			deliverySettings.setRetryDelay(newDeliverySettings.getRetryDelay());
+			deliverySettings.setRetryNumber(newDeliverySettings.getRetryNumber());
+		}
+		if (endpointDescriptor != null) {
+			EndpointType newEndpointType = endpointDescriptor.getEndpointType();
+			EndpointType oldEndpointType = endpointEntity.getType();
+			if (newEndpointType != oldEndpointType) {
+				throw new IntegratorException(
+						MessageFormat.format(
+								"Тип нового дескриптора ({0}) не совпадает с типом сервиса ({1})",
+								newEndpointType,
+								oldEndpointType)
+				);
+			} else {
+				if (newEndpointType == EndpointType.HTTP) {
+					HttpEndpointDescriptorDTO httpDesc =
+							(HttpEndpointDescriptorDTO) endpointDescriptor;
+					HttpServiceEndpoint ep = (HttpServiceEndpoint) endpointEntity;
+					ep.setServicePort(httpDesc.getPort());
+					ep.setServiceURL(httpDesc.getHost());
+				} else if (newEndpointType == EndpointType.JMS) {
+					JMSEndpointDescriptorDTO jmsDesc =
+							(JMSEndpointDescriptorDTO) endpointDescriptor;
+					JMSServiceEndpoint ep = (JMSServiceEndpoint) endpointEntity;
+					ep.setConnectionFactory(jmsDesc.getConnectionFactory());
+					String jndiProperties;
+					try {
+						jndiProperties = objectMapper.writeValueAsString(jmsDesc.getJndiProperties());
+					} catch (JsonProcessingException e) {
+						throw new TargetRegistrationException(e);
+					}
+					ep.setJndiProperties(jndiProperties);
+				}
+			}
+		}
+	}
 }

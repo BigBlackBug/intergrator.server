@@ -3,6 +3,7 @@ package com.icl.integrator.api;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 
 import java.util.List;
@@ -101,5 +102,8 @@ public interface IntegratorAPI {
 
 	public <T extends DestinationDescriptor>
 	ResponseDTO<Void> removeService(IntegratorPacket<String,T> serviceName);
+
+	public <T extends DestinationDescriptor>
+	ResponseDTO<Void> editService(IntegratorPacket<EditServiceDTO,T> editServiceDTO);
 
 }

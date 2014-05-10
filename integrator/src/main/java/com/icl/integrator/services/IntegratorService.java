@@ -5,16 +5,19 @@ import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.model.IntegratorUser;
 import com.icl.integrator.services.utils.RestrictedAccess;
 import com.icl.integrator.services.utils.Synchronized;
 import com.icl.integrator.services.validation.ValidationService;
+import com.icl.integrator.util.ExceptionUtils;
 import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.ConnectionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -82,14 +85,11 @@ public class IntegratorService implements IntegratorAPI {
 	public <T extends ActionDescriptor, Y extends DestinationDescriptor>
 	ResponseDTO<List<ActionRegistrationResultDTO>> registerService(
 			IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
-		//TODO проверка если не добавлен
 		logger.info("Received a service registration request");
 		List<ActionRegistrationResultDTO> result =
 				workerService.registerService(registrationDTO.getData());
 		String serviceName = registrationDTO.getData().getServiceName();
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = ((IntegratorUser) authentication.getPrincipal()).getUsername();
-		versioningService.logModification(username,
+		versioningService.logModification(getCurrentUsername(),
 		                                  new Modification(Modification.SubjectType.SERVICE,
 		                                                   Modification.ActionType.ADDED,
 		                                                   serviceName)
@@ -142,8 +142,7 @@ public class IntegratorService implements IntegratorAPI {
 		//TODO везде натыкать таких проверок
 		workerService.addAction(actionDTO.getData());
 		String actionName = actionDTO.getData().getActionRegistration().getAction().getActionName();
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = ((IntegratorUser) authentication.getPrincipal()).getUsername();
+		String username = getCurrentUsername();
 		versioningService.logModification(username,
 		                                  new Modification(Modification.SubjectType.ACTION,
 		                                                   Modification.ActionType.ADDED,
@@ -203,9 +202,7 @@ public class IntegratorService implements IntegratorAPI {
 	public <T extends DestinationDescriptor>
 	ResponseDTO<List<Modification>>
 	fetchUpdates(IntegratorPacket<Void, T> responseHandler) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		IntegratorUser user = (IntegratorUser) authentication.getPrincipal();
-		List<Modification> modifications = versioningService.fetchModifications(user.getUsername());
+		List<Modification> modifications = versioningService.fetchModifications(getCurrentUsername());
 		return new ResponseDTO<>(modifications);
 	}
 
@@ -215,13 +212,38 @@ public class IntegratorService implements IntegratorAPI {
 			IntegratorPacket<String, T> serviceNamePacket) {
 		String serviceName = serviceNamePacket.getData();
 		workerService.removeService(serviceName);
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = ((IntegratorUser) authentication.getPrincipal()).getUsername();
+		String username = getCurrentUsername();
 		versioningService
 				.logModification(username, new Modification(Modification.SubjectType.SERVICE,
 				                                            Modification.ActionType.REMOVED,
 				                                            serviceName));
 		return new ResponseDTO<>(true);
+	}
+
+	@Override
+	@RestrictedAccess
+	public <T extends DestinationDescriptor> ResponseDTO<Void> editService(
+			IntegratorPacket<EditServiceDTO, T> editServiceDTO) {
+		EditServiceDTO data = editServiceDTO.getData();
+		String serviceName = data.getServiceName();
+		try {
+			workerService.editService(data);
+		}catch(DataAccessException ex){
+			String realSQLError = ExceptionUtils.getRealSQLError(ex);
+			logger.error(realSQLError);
+			return new ResponseDTO<>(new ErrorDTO(realSQLError));
+		}
+		versioningService
+				.logModification(getCurrentUsername(),
+				                 new Modification(Modification.SubjectType.SERVICE,
+				                                  Modification.ActionType.CHANGED,
+				                                  serviceName));
+		return new ResponseDTO<>(true);
+	}
+
+	private String getCurrentUsername() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return ((IntegratorUser) authentication.getPrincipal()).getUsername();
 	}
 
 }

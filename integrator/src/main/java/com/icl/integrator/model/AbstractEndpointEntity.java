@@ -26,8 +26,7 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
 	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
 	protected Set<AbstractActionEntity> actions = new HashSet<>();
 
-	@Column(unique = true, nullable = false, length = 255,
-	        name = "SERVICE_NAME")
+	@Column(unique = true, nullable = false, length = 255, name = "SERVICE_NAME")
 	private String serviceName;
 
 	@Enumerated(EnumType.STRING)
