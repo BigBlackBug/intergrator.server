@@ -14,6 +14,7 @@
         <module>api</module>
         <module>spring-api</module>
         <module>deserializer</module>
+        <module>util</module>
     </modules>
 
     <properties>
@@ -100,6 +101,11 @@
             <dependency>
                 <groupId>com.icl.integrator</groupId>
                 <artifactId>dto</artifactId>
+                <version>${stable.integrator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.icl.integrator</groupId>
+                <artifactId>util</artifactId>
                 <version>${stable.integrator.version}</version>
             </dependency>
             <dependency>

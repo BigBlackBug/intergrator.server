@@ -20,6 +20,7 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:3.2.6.RELEASE" level="project" />
     <orderEntry type="module" module-name="api" />
     <orderEntry type="module" module-name="dto" />
+    <orderEntry type="module" module-name="util" />
     <orderEntry type="library" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.2" level="project" />
   </component>

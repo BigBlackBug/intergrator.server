@@ -11,7 +11,7 @@ import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
 import com.icl.integrator.model.*;
-import com.icl.integrator.util.DatabaseExceptionUtils;
+import com.icl.integrator.util.ExceptionUtils;
 import com.icl.integrator.util.GeneralUtils;
 import com.icl.integrator.util.IntegratorException;
 import com.icl.integrator.util.connectors.ConnectionException;
@@ -72,7 +72,7 @@ public class RegistrationService {
         try {
             serviceEntity = persistenceService.saveOrUpdate(serviceEntity);
         } catch (DataAccessException ex) {
-	        String realErrorCause = DatabaseExceptionUtils.getRealErrorCause(ex);
+	        String realErrorCause = ExceptionUtils.getRealSQLError(ex);
 	        logger.error(realErrorCause);
 	        throw new TargetRegistrationException("Ошибка регистрации. \n" + realErrorCause);
         }
@@ -87,7 +87,7 @@ public class RegistrationService {
                 persistenceService.saveOrUpdate(action);
                 responseDTO = new ResponseDTO<>(true);
             } catch (DataAccessException ex) {
-	            String realErrorCause = DatabaseExceptionUtils.getRealErrorCause(ex);
+	            String realErrorCause = ExceptionUtils.getRealSQLError(ex);
 	            ErrorDTO errorDTO = new ErrorDTO();
 	            errorDTO.setErrorMessage("Ошибка регистрации");
 	            errorDTO.setDeveloperMessage(realErrorCause);

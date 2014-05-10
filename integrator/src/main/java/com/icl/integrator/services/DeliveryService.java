@@ -105,9 +105,9 @@ public class DeliveryService {
 	}
 
 
-	public <ResponseClass,ТипКПС> void deliver(Delivery delivery,
+	public <ResponseClass, AcceptedBySource> void deliver(Delivery delivery,
 	                    Class<ResponseClass> responseClass,
-	                    ResponseDeliveryDescriptor<ResponseClass,ТипКПС>
+	                    ResponseDeliveryDescriptor<ResponseClass, AcceptedBySource>
 			responseDeliveryDescriptor) {
 		AbstractEndpointEntity endpoint = delivery.getEndpoint();
 		AbstractActionEntity action = delivery.getAction();

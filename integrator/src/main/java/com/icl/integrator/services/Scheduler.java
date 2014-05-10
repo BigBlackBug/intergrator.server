@@ -6,7 +6,6 @@ import com.icl.integrator.model.DeliverySettings;
 import com.icl.integrator.model.DeliveryStatus;
 import com.icl.integrator.task.Callback;
 import com.icl.integrator.task.TaskCreator;
-import com.icl.integrator.dto.util.Utils;
 import com.icl.integrator.util.connectors.ConnectionException;
 import com.icl.integrator.util.connectors.EndpointConnectorExceptions;
 import org.apache.commons.logging.Log;
@@ -22,6 +21,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.icl.integrator.util.ExceptionUtils.getStackTraceAsString;
+
 /**
  * Created by bigblackbug on 2/5/14.
  */
@@ -33,11 +34,10 @@ public class Scheduler {
     private static final ScheduledExecutorService EXECUTOR = Executors
             .newScheduledThreadPool(THREAD_CORE_POOL_SIZE);
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat
-            ("dd.MM.yyyy HH:mm:ss::SSS");
+	private static final SimpleDateFormat DATE_FORMAT =
+			new SimpleDateFormat("dd.MM.yyyy HH:mm:ss::SSS");
 
-    private final static Log logger = LogFactory.getLog(
-            Scheduler.class);
+    private final static Log logger = LogFactory.getLog(Scheduler.class);
 
     private Map<Long, Integer> scheduleMap = new HashMap<>();
 
@@ -155,8 +155,7 @@ public class Scheduler {
                 ErrorDTO errorDTO = new ErrorDTO();
                 errorDTO.setErrorMessage("Не могу доставить запрос на таргет");
                 errorDTO.setDeveloperMessage("Последнее исключение - \n" +
-                                                     Utils.getStackTraceAsString(
-                                                             exception));
+		                                              getStackTraceAsString(exception));
 		        callback.execute(errorDTO);
             }
         }
@@ -171,14 +170,10 @@ public class Scheduler {
 
         protected final DeliverySettings deliverySettings;
 
-//        protected final Callback<Y> retryLimitHandler;
-
         private Callback<E> callback;
 
-        protected ExceptionHandler(Schedulable<T> deliverySchedulable/*,
-                                   Callback<Y> retryLimitHandler*/) {
+        protected ExceptionHandler(Schedulable<T> deliverySchedulable) {
             taskCreator = deliverySchedulable.getTaskCreator();
-//            this.retryLimitHandler = retryLimitHandler;
             delivery = deliverySchedulable.getDelivery();
             deliverySettings = deliverySchedulable.getDeliverySettings();
         }
@@ -196,9 +191,8 @@ public class Scheduler {
                             exception);
                 scheduleMap.remove(taskCreator.getTaskID());
                 delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_FAILED);
-	            delivery.setLastFailureReason(Utils.getStackTraceAsString(exception));
+	            delivery.setLastFailureReason(getStackTraceAsString(exception));
                 persistenceService.merge(delivery);
-	            //тут чё одинаковые деливери? и вкололбеке?
                 //обычно посылатель домой
                 //но также мб просто сменщик статуса
                 //например когда мы шедулим реквест на исходник
@@ -214,8 +208,6 @@ public class Scheduler {
                                                             .getRetryDelay());
             logger.info("Rescheduling next request to " +
                                 DATE_FORMAT.format(nextRequestDate));
-//            delivery.setDeliveryStatus(DeliveryStatus.WAITING_FOR_DELIVERY);
-//            persistenceService.merge(delivery);
             EXECUTOR.schedule(taskCreator.create(),
                               deliverySettings.getRetryDelay(),
                               TimeUnit.MILLISECONDS);

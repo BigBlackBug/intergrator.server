@@ -38,7 +38,7 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleServiceRegistrationResponse(
+	void handleServiceRegistration(
 			@RequestBody
 			ResponseDTO<List<ActionRegistrationResultDTO>> response);
 
@@ -48,8 +48,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleServiceIsAvailableResponse(@RequestBody
-	                                      ResponseDTO<Boolean> response);
+	void handleServiceIsAvailable(@RequestBody
+	                              ResponseDTO<Boolean> response);
 
 	@Override
 	@RequestMapping(value = "/handleGetServiceList",
@@ -85,6 +85,15 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	@ResponseBody
 	void handleGetServiceInfo(@RequestBody
 	                          ResponseDTO<FullServiceDTO<ActionDescriptor>> response);
+
+	@Override
+	@RequestMapping(value = "/handleGetServiceInfo",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleAutoDetectionRegistration(@RequestBody
+	                                     ResponseDTO<List<ResponseDTO<Void>>> response);
 
 	@Override
 	@RequestMapping(value = "/handleResponseFromTarget",
