@@ -6,6 +6,7 @@ import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.editor.EditActionDTO;
 import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.services.AuthorizationService;
@@ -126,13 +127,15 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 		        type =
 		        new TypeReference<IntegratorPacket<AddActionDTO<Y>, DestinationDescriptor>>() {
 		        };
-	    AddActionDTO<Y> data = packet.getData();
+	    IntegratorPacket<AddActionDTO<Y>, DestinationDescriptor> fixedPacket =
+			    fixConversion(packet, type);
+	    AddActionDTO<Y> data = fixedPacket.getData();
 	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    if (!authService.hasAccessToService(data.getServiceName(), auth)) {
 		    return new ResponseDTO<>(new ErrorDTO(
 				    "Вы не можете добавлять действия к сервису, созданному не Вами"));
 	    }
-	    return integratorService.addAction(fixConversion(packet, type));
+	    return integratorService.addAction(fixedPacket);
     }
 
 	@Override
@@ -214,13 +217,34 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 				type =
 				new TypeReference<IntegratorPacket<EditServiceDTO, DestinationDescriptor>>() {
 				};
-		String serviceName = editServiceDTO.getData().getServiceName();
+		IntegratorPacket<EditServiceDTO, DestinationDescriptor> fixedDTO =
+				fixConversion(editServiceDTO, type);
+		String serviceName = fixedDTO.getData().getServiceName();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (!authService.hasAccessToService(serviceName, auth)) {
 			return new ResponseDTO<>(new ErrorDTO(
 					"Вы не можете изменять сервис, созданный не Вами"));
 		}
-		return integratorService.editService(fixConversion(editServiceDTO, type));
+		return integratorService.editService(fixedDTO);
+	}
+
+	@Override
+	public <T extends DestinationDescriptor> ResponseDTO<Void> editAction(
+			@RequestBody IntegratorPacket<EditActionDTO, T> editActionDTO) {
+		TypeReference<IntegratorPacket<EditActionDTO, DestinationDescriptor>>
+				type =
+				new TypeReference<IntegratorPacket<EditActionDTO, DestinationDescriptor>>() {
+				};
+		IntegratorPacket<EditActionDTO, DestinationDescriptor> fixedDTO =
+				fixConversion(editActionDTO, type);
+		String serviceName = fixedDTO.getData().getServiceName();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		//TODO maybe rethink
+		if (!authService.hasAccessToService(serviceName, auth)) {
+			return new ResponseDTO<>(new ErrorDTO(
+					"Вы не можете изменять действие, созданное не Вами"));
+		}
+		return integratorService.editAction(fixedDTO);
 	}
 
 	@ExceptionHandler(Exception.class)

@@ -2,18 +2,18 @@ package com.icl.integrator.dto;
 
 import java.io.Serializable;
 
-public class Modification implements Serializable {
+public class Modification<T> implements Serializable {
 
 	private SubjectType subjectType;
 
 	private ActionType action;
 
-	private String entityName;
+	private T entityName;
 
-	public Modification(SubjectType subjectType, ActionType action, String entityName) {
+	public Modification(SubjectType subjectType, ActionType action, T subject) {
 		this.subjectType = subjectType;
 		this.action = action;
-		this.entityName = entityName;
+		this.entityName = subject;
 	}
 
 	Modification(){
@@ -60,7 +60,7 @@ public class Modification implements Serializable {
 		return action;
 	}
 
-	public String getEntityName() {
+	public T getEntityName() {
 		return entityName;
 	}
 
@@ -73,4 +73,53 @@ public class Modification implements Serializable {
 	}
 
 
+	public static class ServiceActionPair {
+
+		private String serviceName;
+
+		private String actionName;
+
+		public ServiceActionPair(String serviceName, String actionName) {
+
+			this.serviceName = serviceName;
+			this.actionName = actionName;
+		}
+
+		public String getServiceName() {
+			return serviceName;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			ServiceActionPair that = (ServiceActionPair) o;
+
+			if (!actionName.equals(that.actionName)) {
+				return false;
+			}
+			if (!serviceName.equals(that.serviceName)) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = serviceName.hashCode();
+			result = 31 * result + actionName.hashCode();
+			return result;
+		}
+
+		public String getActionName() {
+
+			return actionName;
+		}
+	}
 }

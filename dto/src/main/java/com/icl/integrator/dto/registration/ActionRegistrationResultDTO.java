@@ -57,4 +57,8 @@ public class ActionRegistrationResultDTO {
 		return result;
 	}
 
+	@Override
+	public String toString() {
+		return "actionName: " + actionName + " response: " + registrationResult;
+	}
 }

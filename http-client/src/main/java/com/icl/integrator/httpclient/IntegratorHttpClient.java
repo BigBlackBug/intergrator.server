@@ -3,6 +3,7 @@ package com.icl.integrator.httpclient;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.editor.EditActionDTO;
 import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 import org.springframework.core.ParameterizedTypeReference;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestClientException;
@@ -465,7 +467,26 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	public ResponseDTO<Void> editService(EditServiceDTO editServiceDTO) {
-		return editService(new IntegratorPacket<EditServiceDTO, DestinationDescriptor>(editServiceDTO));
+		return editService(new IntegratorPacket<>(editServiceDTO));
+	}
+
+	@Override
+	public <T extends DestinationDescriptor> ResponseDTO<Void> editAction(
+			IntegratorPacket<EditActionDTO, T> editActionDTO) {
+		try {
+			HttpMethodDescriptor methodPair = getMethodPath("editAction", IntegratorPacket.class);
+			ParameterizedTypeReference<ResponseDTO<Void>>
+					type =
+					new ParameterizedTypeReference<ResponseDTO<Void>>() {
+					};
+			return sendRequest(editActionDTO, type, methodPair);
+		} catch (Exception e) {
+			throw new IntegratorClientException(e);
+		}
+	}
+
+	public ResponseDTO<Void> editAction(EditActionDTO editActionDTO) {
+		return editAction(new IntegratorPacket<>(editActionDTO));
 	}
 
 	/**

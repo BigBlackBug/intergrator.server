@@ -5,8 +5,8 @@ import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionMethod;
 import com.icl.integrator.dto.util.EndpointType;
 import com.icl.integrator.model.*;
+import com.icl.integrator.util.IntegratorException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -28,12 +28,12 @@ public class PersistenceService {
     @PersistenceContext
     private EntityManager em;
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
     public <T extends AbstractEntity> T merge(T entity) {
         return em.merge(entity);
     }
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
 	public <T extends AbstractEntity> T saveOrUpdate(T entity) {
 		if(entity.getId() == null){
 			em.persist(entity);
@@ -48,7 +48,7 @@ public class PersistenceService {
 		return entity;
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional
     public <T extends AbstractEntity> T persist(T entity) {
         em.persist(entity);
 	    return entity;
@@ -73,12 +73,6 @@ public class PersistenceService {
 		return em.find(entityClass, id);
 	}
 
-	public AbstractEndpointEntity getEndpointEntity(String name){
-		return em.createQuery(
-				"select entity from AbstractEndpointEntity  entity where entity.serviceName=:name",
-				AbstractEndpointEntity.class).setParameter("name", name).getSingleResult();
-	}
-
 	public IntegratorUser findUserByUsername(String username) throws NoResultException{
 		return em.createQuery("select user from IntegratorUser user where user.username=:username",
 		                      IntegratorUser.class).setParameter("username", username)
@@ -99,8 +93,9 @@ public class PersistenceService {
 		return result;
 	}
 
-    public HttpAction getHttpAction(String actionName, UUID endpointID) {
-        return em.createQuery(
+	//TODO get rid
+	public HttpAction getHttpAction(String actionName, UUID endpointID) {
+		return em.createQuery(
                 "select action from HttpAction action where " +
                         "endpoint.id=:endpointID and action.actionName=:actionName",
                 HttpAction.class)
@@ -255,10 +250,15 @@ public class PersistenceService {
 		em.remove(service);
 	}
 
-	public AbstractEndpointEntity findService(String serviceName) {
-		return em.createQuery(
-				"select ep from AbstractEndpointEntity ep where ep.serviceName=:serviceName",
+	public AbstractEndpointEntity findService(String serviceName) throws IntegratorException {
+		try {
+			return em.createQuery(
+					"select ep from AbstractEndpointEntity ep where ep.serviceName=:serviceName",
 				AbstractEndpointEntity.class).setParameter("serviceName", serviceName)
 				.getSingleResult();
+		} catch (NoResultException nex) {
+			throw new IntegratorException(
+					String.format("Сервиса с именем %s не существует", serviceName));
+		}
 	}
 }

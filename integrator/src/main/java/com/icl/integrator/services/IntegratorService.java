@@ -5,6 +5,7 @@ import com.icl.integrator.api.IntegratorAPI;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.editor.EditActionDTO;
 import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.model.IntegratorUser;
@@ -90,7 +91,7 @@ public class IntegratorService implements IntegratorAPI {
 				workerService.registerService(registrationDTO.getData());
 		String serviceName = registrationDTO.getData().getServiceName();
 		versioningService.logModification(getCurrentUsername(),
-		                                  new Modification(Modification.SubjectType.SERVICE,
+		                                  new Modification<>(Modification.SubjectType.SERVICE,
 		                                                   Modification.ActionType.ADDED,
 		                                                   serviceName)
 		);
@@ -144,7 +145,7 @@ public class IntegratorService implements IntegratorAPI {
 		String actionName = actionDTO.getData().getActionRegistration().getAction().getActionName();
 		String username = getCurrentUsername();
 		versioningService.logModification(username,
-		                                  new Modification(Modification.SubjectType.ACTION,
+		                                  new Modification<>(Modification.SubjectType.ACTION,
 		                                                   Modification.ActionType.ADDED,
 		                                                   actionName)
 		);
@@ -214,7 +215,7 @@ public class IntegratorService implements IntegratorAPI {
 		workerService.removeService(serviceName);
 		String username = getCurrentUsername();
 		versioningService
-				.logModification(username, new Modification(Modification.SubjectType.SERVICE,
+				.logModification(username, new Modification<>(Modification.SubjectType.SERVICE,
 				                                            Modification.ActionType.REMOVED,
 				                                            serviceName));
 		return new ResponseDTO<>(true);
@@ -235,9 +236,32 @@ public class IntegratorService implements IntegratorAPI {
 		}
 		versioningService
 				.logModification(getCurrentUsername(),
-				                 new Modification(Modification.SubjectType.SERVICE,
+				                 new Modification<>(Modification.SubjectType.SERVICE,
 				                                  Modification.ActionType.CHANGED,
 				                                  serviceName));
+		return new ResponseDTO<>(true);
+	}
+
+	@Override
+	@RestrictedAccess
+	public <T extends DestinationDescriptor> ResponseDTO<Void> editAction(
+			IntegratorPacket<EditActionDTO, T> editActionDTO) {
+		EditActionDTO data = editActionDTO.getData();
+		String serviceName = data.getServiceName();
+		String actionName = data.getActionName();
+		try {
+			workerService.editAction(data);
+		}catch(DataAccessException ex){
+			String realSQLError = ExceptionUtils.getRealSQLError(ex);
+			logger.error(realSQLError);
+			return new ResponseDTO<>(new ErrorDTO(realSQLError));
+		}
+		Modification.ServiceActionPair pair = new Modification.ServiceActionPair(
+				serviceName, actionName);
+		versioningService.logModification(getCurrentUsername(),
+				                 new Modification<>(Modification.SubjectType.ACTION,
+				                                    Modification.ActionType.CHANGED,
+				                                    pair));
 		return new ResponseDTO<>(true);
 	}
 

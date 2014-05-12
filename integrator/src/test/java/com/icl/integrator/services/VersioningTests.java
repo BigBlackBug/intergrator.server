@@ -30,10 +30,10 @@ public class VersioningTests {
 	@Test
 	public void test2() {
 		versioningService.login("vasya");
-		versioningService.logModification("vasya",new Modification(Modification.SubjectType.ACTION,
+		versioningService.logModification("vasya",new Modification<>(Modification.SubjectType.ACTION,
 		                                                   Modification.ActionType.ADDED,
 		                                                   "actionname"));
-		versioningService.logModification("vasya",new Modification(Modification.SubjectType.SERVICE,
+		versioningService.logModification("vasya",new Modification<>(Modification.SubjectType.SERVICE,
 		                                                   Modification.ActionType.CHANGED,
 		                                                   "servname"));
 		Assert.assertEquals(true, versioningService.isAllowedToContinue("vasya"));
@@ -45,10 +45,10 @@ public class VersioningTests {
 	@Test
 	public void test3() {
 		versioningService.login("vasya");
-		versioningService.logModification("vasya",new Modification(Modification.SubjectType.ACTION,
+		versioningService.logModification("vasya",new Modification<>(Modification.SubjectType.ACTION,
 		                                                   Modification.ActionType.ADDED,
 		                                                   "actionname"));
-		versioningService.logModification("vasya",new Modification(Modification.SubjectType.SERVICE,
+		versioningService.logModification("vasya",new Modification<>(Modification.SubjectType.SERVICE,
 		                                                   Modification.ActionType.CHANGED,
 		                                                   "servname"));
 		List<Modification> vasya = versioningService.fetchModifications("vasya");
@@ -61,17 +61,17 @@ public class VersioningTests {
 	@Test
 	public void test4() {
 		versioningService.login("vasya");
-		Modification mod1 = new Modification(Modification.SubjectType.ACTION,
+		Modification mod1 = new Modification<>(Modification.SubjectType.ACTION,
 		                                     Modification.ActionType.ADDED, "actionname");
 		versioningService.logModification("vasya",mod1);
-		Modification mod2 = new Modification(Modification.SubjectType.SERVICE,
+		Modification mod2 = new Modification<>(Modification.SubjectType.SERVICE,
 		                                     Modification.ActionType.CHANGED, "servname");
 		versioningService.logModification("vasya",mod2);
 		versioningService.login("petya");
-		Modification mod3 = new Modification(Modification.SubjectType.ACTION,
+		Modification mod3 = new Modification<>(Modification.SubjectType.ACTION,
 		                                     Modification.ActionType.ADDED, "actionname3");
 		versioningService.logModification("petya",mod3);
-		Modification mod4 = new Modification(Modification.SubjectType.SERVICE,
+		Modification mod4 = new Modification<>(Modification.SubjectType.SERVICE,
 		                                     Modification.ActionType.CHANGED, "servname4");
 		versioningService.logModification("petya",mod4);
 		List<Modification> vasya = versioningService.fetchModifications("vasya");
@@ -90,10 +90,10 @@ public class VersioningTests {
 	@Test(expected = IllegalArgumentException.class)
 	public void test5() {
 		versioningService.login("vasya");
-		versioningService.logModification("vasya",new Modification(Modification.SubjectType.ACTION,
+		versioningService.logModification("vasya",new Modification<>(Modification.SubjectType.ACTION,
 		                                                   Modification.ActionType.ADDED,
 		                                                   "actionname"));
-		versioningService.logModification("vasya",new Modification(Modification.SubjectType.SERVICE,
+		versioningService.logModification("vasya",new Modification<>(Modification.SubjectType.SERVICE,
 		                                                   Modification.ActionType.CHANGED,
 		                                                   "servname"));
 		Assert.assertEquals(true, versioningService.isAllowedToContinue("vasya"));

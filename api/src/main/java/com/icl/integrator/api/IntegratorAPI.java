@@ -3,6 +3,7 @@ package com.icl.integrator.api;
 import com.icl.integrator.dto.*;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
+import com.icl.integrator.dto.editor.EditActionDTO;
 import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 
@@ -105,5 +106,8 @@ public interface IntegratorAPI {
 
 	public <T extends DestinationDescriptor>
 	ResponseDTO<Void> editService(IntegratorPacket<EditServiceDTO,T> editServiceDTO);
+
+	public <T extends DestinationDescriptor>
+	ResponseDTO<Void> editAction(IntegratorPacket<EditActionDTO,T> editActionDTO);
 
 }
