@@ -71,8 +71,8 @@ public class ActionEndpointDTO<T extends ActionDescriptor> implements Serializab
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("actionName: ").append(actionName)
-                .append(" ActionDescriptor: '").append(actionDescriptor);
-        return sb.toString();
+		        .append(" ActionDescriptor: '").append(actionDescriptor).append("'");
+	    return sb.toString();
     }
 }
 

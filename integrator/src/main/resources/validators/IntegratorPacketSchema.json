@@ -46,6 +46,9 @@
                         },
                         {
                             "$ref": "#/definitions/editServiceDTO"
+                        } ,
+                        {
+                            "$ref": "#/definitions/editActionDTO"
                         }
                     ]
                 }
@@ -246,6 +249,28 @@
                 },
                 "deliverySettings": {
                     "$ref": "#/definitions/deliverySettings"
+                }
+            }
+        },
+        "editActionDTO": {
+            "type": "object",
+            "required": [ "actionName", "serviceName","forceChanges" ],
+            "additionalProperties": false,
+            "properties": {
+                "serviceName": {
+                    "type": "string"
+                },
+                "newActionName": {
+                    "type": "string"
+                },
+                "forceChanges": {
+                    "type": "boolean"
+                },
+                "actionName": {
+                    "type": "string"
+                },
+                "actionDescriptor": {
+                    "$ref": "#/definitions/actionDesc"
                 }
             }
         },

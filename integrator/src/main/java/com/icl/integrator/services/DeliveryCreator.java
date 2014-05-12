@@ -175,7 +175,7 @@ public class DeliveryCreator {
 			ServiceDestinationDescriptor realSourceService =
 					(ServiceDestinationDescriptor) destination;
 			EndpointType endpointType = realSourceService.getEndpointType();
-			endpointEntity = persistenceService.getEndpointEntity(realSourceService.getService());
+			endpointEntity = persistenceService.findService(realSourceService.getService());
 			if (endpointType == EndpointType.HTTP) {
 				actionEntity = persistenceService
 						.getHttpAction(realSourceService.getAction(),
@@ -217,8 +217,7 @@ public class DeliveryCreator {
 		for (String destination : deliveryDTO.getDestinations()) {
 			try {
 				AbstractActionEntity actionEntity = null;
-				AbstractEndpointEntity endpointEntity =
-						persistenceService.getEndpointEntity(destination);
+				AbstractEndpointEntity endpointEntity = persistenceService.findService(destination);
 				EndpointType endpointType = endpointEntity.getType();
 				if (endpointType == EndpointType.HTTP) {
 					actionEntity = persistenceService

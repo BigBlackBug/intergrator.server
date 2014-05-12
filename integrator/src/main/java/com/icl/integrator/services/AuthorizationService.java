@@ -32,5 +32,4 @@ public class AuthorizationService {
 			throw new IntegratorException("Сервиса с id='" + serviceName + "' не существует");
 		}
 	}
-
 }

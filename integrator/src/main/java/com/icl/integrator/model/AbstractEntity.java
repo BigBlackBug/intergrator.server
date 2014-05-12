@@ -29,6 +29,7 @@ public abstract class AbstractEntity {
     public UUID getId() {
         return id;
     }
+
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof AbstractEntity)) {

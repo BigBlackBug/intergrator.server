@@ -18,17 +18,17 @@ public class EditServiceDTODeserializer extends JsonDeserializer<EditServiceDTO>
 
 	@Override
 	public EditServiceDTO deserialize(JsonParser jp, DeserializationContext ctxt)
-			throws IOException{
+			throws IOException {
 		ObjectNode treeNode = jp.readValueAsTree();
 		IntegratorObjectMapper mapper = new IntegratorObjectMapper();
 		JsonNode serviceEndpoint = treeNode.get("endpointDescriptor");
 		EndpointDescriptor endpoint = mapper.readValue(serviceEndpoint.toString(),
-		                                                  EndpointDescriptor.class);
+		                                               EndpointDescriptor.class);
 		String serviceName = treeNode.get("serviceName").asText();
 		String newServiceName = treeNode.get("newServiceName").asText();
 		JsonNode deliverySettings = treeNode.get("deliverySettings");
 		DeliverySettingsDTO deliverySettingsDTO = mapper.readValue(deliverySettings.toString(),
 		                                                           DeliverySettingsDTO.class);
-		return new EditServiceDTO(serviceName,newServiceName,endpoint,deliverySettingsDTO);
+		return new EditServiceDTO(serviceName, newServiceName, endpoint, deliverySettingsDTO);
 	}
 }

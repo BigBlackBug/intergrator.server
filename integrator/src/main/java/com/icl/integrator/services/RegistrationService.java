@@ -97,6 +97,7 @@ public class RegistrationService {
 	    return result;
     }
 
+	//TODO проверить все ли действия того же типа, что и сервис
     private <T extends ActionDescriptor> AbstractActionEntity getAction(
             ActionEndpointDTO<T> actionEndpoint, UUID serviceID, IntegratorUser creator)
             throws TargetRegistrationException {
