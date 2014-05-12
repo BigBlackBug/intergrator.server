@@ -26,11 +26,7 @@ import java.util.List;
 @Component
 public class DeliveryBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
-	public static final String BASE_PACKAGE =
-			"com.icl.ios.registration.card.model.dataBase";
-
-	private static Log logger =
-			LogFactory.getLog(DeliveryBootstrap.class);
+	private static Log logger = LogFactory.getLog(DeliveryBootstrap.class);
 
 	private boolean isInitialized = false;
 
