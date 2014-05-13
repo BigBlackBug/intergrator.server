@@ -1,5 +1,6 @@
 package com.icl.integrator.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.services.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,9 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 	@Autowired
 	private VersioningService versioningService;
 
+	@Autowired
+	private ObjectMapper mapper;
+
 	private RequestCache requestCache = new HttpSessionRequestCache();
 
 	@Override
@@ -30,7 +34,7 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 
 		final SavedRequest savedRequest = requestCache.getRequest(request, response);
 		if (savedRequest == null) {
-			clearAuthenticationAttributes(request);
+			finish(request, response);
 			return;
 		}
 
@@ -38,11 +42,20 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 		if (isAlwaysUseDefaultTargetUrl() || (targetUrlParameter != null
 				&& StringUtils.hasText(request.getParameter(targetUrlParameter)))) {
 			requestCache.removeRequest(request, response);
-			clearAuthenticationAttributes(request);
+			finish(request, response);
 			return;
 		}
 
+		finish(request, response);
+	}
+
+	private void finish(final HttpServletRequest request, final HttpServletResponse response)
+			throws IOException {
 		clearAuthenticationAttributes(request);
+//		String responseValue = mapper.writeValueAsString(new ResponseDTO(true));
+//		response.setHeader("Content-Type","application/json");
+//		response.setHeader("Content-Length", String.valueOf(responseValue.getBytes().length));
+//		response.getWriter().append(responseValue);
 	}
 
 	public void setRequestCache(final RequestCache requestCache) {

@@ -6,6 +6,8 @@ import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.editor.EditActionDTO;
 import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.httpclient.exceptions.AuthException;
+import com.icl.integrator.httpclient.exceptions.IntegratorClientException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -13,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestClientException;
@@ -94,7 +95,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @throws IntegratorClientException
+	 * @throws com.icl.integrator.httpclient.exceptions.IntegratorClientException
 	 */
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> ping(
@@ -504,12 +505,17 @@ public class IntegratorHttpClient implements IntegratorClient {
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add(IntegratorClientConstants.USERNAME_PARAM, username);
 		body.add(IntegratorClientConstants.PASSWORD_PARAM, password);
+		ResponseDTO responseDTO;
 		try {
 			URL url = new URL("HTTP", host, port,
 			                  mainControllerPath + IntegratorClientConstants.LOGIN_URL);
-			restTemplate.postForObject(url.toURI(), body, Void.class);
+			responseDTO = restTemplate.postForObject(url.toURI(), body, ResponseDTO.class);
 		} catch (Exception ex) {
 			throw new IntegratorClientException(ex);
+		}
+		//TODO если аутентификация успешна, то прилетает нулл. спасибо секьюрити за это
+		if (responseDTO != null) {
+			throw new AuthException(responseDTO.getError().getErrorMessage());
 		}
 	}
 
