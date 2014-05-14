@@ -90,8 +90,6 @@ public class IntegratorHttpClient implements IntegratorClient {
 		return sb.toString();
 	}
 
-
-
 	/**
 	 * {@inheritDoc}
 	 *
@@ -408,8 +406,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 	public <Y extends ActionDescriptor>
 	ResponseDTO<List<ServiceAndActions<Y>>> getServicesSupportingActionType(
 			ActionMethod actionMethod) {
-		return getServicesSupportingActionType(
-				new IntegratorPacket<ActionMethod, DestinationDescriptor>(actionMethod));
+		return getServicesSupportingActionType(new IntegratorPacket<>(actionMethod));
 	}
 
 	@Override
@@ -449,7 +446,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	public ResponseDTO<Void> removeService(String serviceName) {
-		return removeService(new IntegratorPacket<String, DestinationDescriptor>(serviceName));
+		return removeService(new IntegratorPacket<>(serviceName));
 	}
 
 	@Override
