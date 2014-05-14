@@ -72,24 +72,24 @@ public class RegistrationService {
         } catch (DataAccessException ex) {
 	        String realErrorCause = ExceptionUtils.getRealSQLError(ex);
 	        logger.error(realErrorCause);
-	        throw new TargetRegistrationException("Ошибка регистрации. \n" + realErrorCause);
+	        throw new TargetRegistrationException("Ошибка записи сервиса в БД. \n" + realErrorCause);
         }
 	    List<ActionRegistrationResultDTO> result = new ArrayList<>();
         for (ActionEndpointDTO<T> actionDTO : actions) {
             ResponseDTO<Void> responseDTO;
             AbstractActionEntity action;
             try {
-                action = getAction(actionDTO, serviceEntity.getId(), creator);
+                action = createAction(actionDTO, serviceEntity, creator);
                 action.setEndpoint(serviceEntity);
                 serviceEntity.addAction(action);
                 persistenceService.saveOrUpdate(action);
                 responseDTO = new ResponseDTO<>(true);
             } catch (DataAccessException ex) {
-	            ErrorDTO errorDTO = new ErrorDTO("Ошибка регистрации",
+	            ErrorDTO errorDTO = new ErrorDTO("Ошибка записи действия в БД",
 	                                             ExceptionUtils.getRealSQLError(ex));
 	            responseDTO = new ResponseDTO<>(errorDTO);
             } catch (Exception ex) {
-	            ErrorDTO errorDTO = new ErrorDTO("Ошибка регистрации", ex.getMessage());
+	            ErrorDTO errorDTO = new ErrorDTO("Ошибка регистрации действия", ex.getMessage());
                 responseDTO = new ResponseDTO<>(errorDTO);
             }
             result.add(new ActionRegistrationResultDTO(actionDTO.getActionName(), responseDTO));
@@ -98,15 +98,20 @@ public class RegistrationService {
     }
 
 	//TODO проверить все ли действия того же типа, что и сервис
-    private <T extends ActionDescriptor> AbstractActionEntity getAction(
-            ActionEndpointDTO<T> actionEndpoint, UUID serviceID, IntegratorUser creator)
+    private <T extends ActionDescriptor> AbstractActionEntity createAction(
+		    ActionEndpointDTO<T> actionEndpoint, AbstractEndpointEntity service, IntegratorUser creator)
             throws TargetRegistrationException {
         AbstractActionEntity actionEntity;
-        T actionDescriptor = actionEndpoint.getActionDescriptor();
+	    UUID serviceID = service.getId();
+	    T actionDescriptor = actionEndpoint.getActionDescriptor();
+	    if (actionDescriptor.getEndpointType() != service.getType()) {
+		    throw new TargetRegistrationException("Тип действия не совпадает с типом сервиса");
+	    }
         String actionName = actionEndpoint.getActionName();
         if (actionDescriptor instanceof HttpActionDTO) {
             HttpActionDTO httpActionDTO = (HttpActionDTO) actionDescriptor;
             actionEntity = persistenceService.findHttpAction(serviceID, httpActionDTO.getPath());
+	        //действие может быть сгенерированным с говноименем, поэтому не кидаем ошибку, а заменяем имя
             if (actionEntity != null) {
                 updateAction(actionEntity, actionName, creator);
             } else {
