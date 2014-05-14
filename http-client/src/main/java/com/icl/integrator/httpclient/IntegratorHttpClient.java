@@ -8,6 +8,7 @@ import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.httpclient.exceptions.AuthException;
 import com.icl.integrator.httpclient.exceptions.IntegratorClientException;
+import com.icl.integrator.httpclient.exceptions.MethodNotSupportedException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;

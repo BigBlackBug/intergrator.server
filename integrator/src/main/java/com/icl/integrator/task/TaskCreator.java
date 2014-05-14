@@ -22,15 +22,15 @@ public class TaskCreator<T> {
 
     private static long counter = 0;
 
-    private final Log logger = LogFactory.getLog(TaskCreator.class);
-
     private final long taskID = counter++;
 
-    private TaskRunnable<T> taskRunnable;
+	private final Log logger = LogFactory.getLog(TaskCreator.class);
 
-    private Descriptor<TaskCreator<T>> descriptor;
+	private TaskRunnable<T> taskRunnable;
 
-    public TaskCreator(Callable<T> action) {
+	private Descriptor<TaskCreator<T>> descriptor;
+
+	public TaskCreator(Callable<T> action) {
         taskRunnable = new TaskRunnable<>(action);
     }
 
@@ -38,13 +38,13 @@ public class TaskCreator<T> {
         return taskRunnable.action;
     }
 
-    public TaskCreator setCallback(Callback<T> callback) {
-        taskRunnable.setCallback(callback);
-        return this;
-    }
+	public Callback<T> getCallback() {
+		return taskRunnable.getCallback();
+	}
 
-    public Callback<T> getCallback() {
-        return taskRunnable.getCallback();
+	public TaskCreator setCallback(Callback<T> callback) {
+		taskRunnable.setCallback(callback);
+		return this;
     }
 
     public TaskCreator setDescriptor(Descriptor<TaskCreator<T>> descriptor) {
@@ -68,16 +68,14 @@ public class TaskCreator<T> {
         return taskID;
     }
 
-    public <Y extends Exception> TaskCreator addExceptionHandler
-            (Callback<Y> exceptionCallback,
-             Class<Y> exceptionClass) {
-        taskRunnable.addExceptionCallback(exceptionCallback, exceptionClass);
+	public <Y extends Exception> TaskCreator addExceptionHandler(
+			Callback<Y> exceptionCallback, Class<Y> exceptionClass) {
+		taskRunnable.addExceptionCallback(exceptionCallback, exceptionClass);
         return this;
     }
 
-    public TaskCreator setDefaultExceptionHandler(
-            Callback<Exception> exceptionCallback) {
-        taskRunnable.setDefaultExceptionHandler(exceptionCallback);
+	public TaskCreator setDefaultExceptionHandler(Callback<Exception> exceptionCallback) {
+		taskRunnable.setDefaultExceptionHandler(exceptionCallback);
         return this;
     }
 
@@ -89,10 +87,10 @@ public class TaskCreator<T> {
 
         private Callback<Exception> defaultExceptionHandler =
                 new Callback<Exception>() {
-                    @Override
-                    public void execute(Exception exception) {
-                        logger.error("An exception has occurred", exception);
-                    }
+	                @Override
+	                public void execute(Exception exception) {
+		                logger.error("An exception has occurred", exception);
+	                }
                 };
 
         private Callback<T> callback;
@@ -107,14 +105,12 @@ public class TaskCreator<T> {
         }
 
         public <Y extends Exception>
-        void addExceptionCallback(Callback<Y> exceptionCallback,
-                                  Class<Y> exceptionClass) {
-            exceptionHandlerMap.put(exceptionClass, exceptionCallback);
+        void addExceptionCallback(Callback<Y> exceptionCallback, Class<Y> exceptionClass) {
+	        exceptionHandlerMap.put(exceptionClass, exceptionCallback);
         }
 
-        public void setDefaultExceptionHandler(
-                Callback<Exception> defaultExceptionHandler) {
-            this.defaultExceptionHandler = defaultExceptionHandler;
+	    public void setDefaultExceptionHandler(Callback<Exception> defaultExceptionHandler) {
+		    this.defaultExceptionHandler = defaultExceptionHandler;
         }
 
         @Override
@@ -126,10 +122,9 @@ public class TaskCreator<T> {
                 Class<?> excClass = e.getClass();
                 boolean handled = false;
                 do {
-                    Callback exceptionCallback =
-                            exceptionHandlerMap.get(excClass);
-                    if (exceptionCallback != null) {
-                        exceptionCallback.execute(e);
+	                Callback exceptionCallback = exceptionHandlerMap.get(excClass);
+	                if (exceptionCallback != null) {
+		                exceptionCallback.execute(e);
                         handled = true;
                     }
                     excClass = excClass.getSuperclass();
@@ -144,13 +139,13 @@ public class TaskCreator<T> {
             }
         }
 
-        public void setCallback(Callback<T> callback) {
-            this.callback = callback;
-        }
-
         public Callback<T> getCallback() {
             return callback;
         }
+
+	    public void setCallback(Callback<T> callback) {
+		    this.callback = callback;
+	    }
     }
 
 }

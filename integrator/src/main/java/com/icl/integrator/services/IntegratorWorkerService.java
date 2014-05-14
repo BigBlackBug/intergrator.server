@@ -187,32 +187,33 @@ public class IntegratorWorkerService {
 	@SuppressWarnings("unchecked")
 	public <Y extends ActionDescriptor> FullServiceDTO<Y>
 	getServiceInfo(String serviceName) {
-		AbstractEndpointEntity<AbstractActionEntity> entity = persistenceService.findService(serviceName);
+		AbstractEndpointEntity<AbstractActionEntity> entity =
+				persistenceService.findService(serviceName);
 		String creatorName = entity.getCreator().getUsername();
 		DeliverySettings deliverySettings = entity.getDeliverySettings();
 		DeliverySettingsDTO deliverySettingsDTO = new DeliverySettingsDTO(
 				deliverySettings.getRetryNumber(), deliverySettings.getRetryDelay());
 		EndpointDescriptor endpointDescriptor = createEndpointDescriptor(entity);
 		List<ActionEndpointDTO<ActionDescriptor>> result = new ArrayList<>();
-		for(AbstractActionEntity action:entity.getActions()){
+		for (AbstractActionEntity action : entity.getActions()) {
 			result.add(new ActionEndpointDTO<>(action.getActionName(), createActionDTO(action)));
 		}
 		return (FullServiceDTO<Y>) new FullServiceDTO<>(serviceName, endpointDescriptor,
-			                                                deliverySettingsDTO, creatorName,
-			                                                result);
+		                                                deliverySettingsDTO, creatorName,
+		                                                result);
 	}
 
 	private ActionDescriptor createActionDTO(AbstractActionEntity action) {
-		if(action.getType() == EndpointType.HTTP){
+		if (action.getType() == EndpointType.HTTP) {
 			HttpAction realAction = (HttpAction) action;
 			return new HttpActionDTO(
 					realAction.getActionURL(), realAction.getActionMethod());
-		}          else{
+		} else {
 			JMSAction realAction = (JMSAction) action;
 			return new QueueDTO(realAction.getQueueName(),
-			                                  realAction.getUsername(),
-			                                  realAction.getPassword(),
-			                                  realAction.getActionMethod());
+			                    realAction.getUsername(),
+			                    realAction.getPassword(),
+			                    realAction.getActionMethod());
 		}
 	}
 
@@ -329,7 +330,8 @@ public class IntegratorWorkerService {
 					ep.setConnectionFactory(jmsDesc.getConnectionFactory());
 					String jndiProperties;
 					try {
-						jndiProperties = objectMapper.writeValueAsString(jmsDesc.getJndiProperties());
+						jndiProperties =
+								objectMapper.writeValueAsString(jmsDesc.getJndiProperties());
 					} catch (JsonProcessingException e) {
 						throw new TargetRegistrationException(e);
 					}

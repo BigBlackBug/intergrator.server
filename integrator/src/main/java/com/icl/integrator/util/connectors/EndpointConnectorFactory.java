@@ -66,7 +66,7 @@ public class EndpointConnectorFactory {
 					URL url = new URL("HTTP", endpointDescriptor.getHost(),
 					                  endpointDescriptor.getPort(),
 					                  actionDescriptor.getPath());
-					return new HTTPEndpointConnector(url,descriptor.getActionMethod());
+					return new HTTPEndpointConnector(url, descriptor.getActionMethod());
 				} catch (MalformedURLException e) {
 					throw new IntegratorException(e);
 				}
@@ -98,7 +98,7 @@ public class EndpointConnectorFactory {
 							new URL("HTTP", endpointDescriptor.getServiceURL(),
 							        endpointDescriptor.getServicePort(),
 							        actionDescriptor.getActionURL());
-					return new HTTPEndpointConnector(url,actionDescriptor.getActionMethod());
+					return new HTTPEndpointConnector(url, actionDescriptor.getActionMethod());
 				} catch (MalformedURLException e) {
 					throw new IntegratorException(e);
 				}
@@ -117,7 +117,7 @@ public class EndpointConnectorFactory {
 	}
 
 	public EndpointConnector createEndpointConnector(DestinationDescriptor destinationDescriptor)
-			throws IntegratorException{
+			throws IntegratorException {
 		if (destinationDescriptor.getDescriptorType() ==
 				DestinationDescriptor.DescriptorType.RAW) {
 			RawDestinationDescriptor dd =

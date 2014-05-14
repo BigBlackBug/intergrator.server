@@ -15,15 +15,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -247,14 +243,4 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 		return integratorService.editAction(fixedDTO);
 	}
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ResponseDTO> handleNotAuthenticatedException(
-			Exception ex,
-			HttpServletRequest request) {
-		logger.info("handling exception");
-		return new ResponseEntity<ResponseDTO>(
-				new ResponseDTO<>(new ErrorDTO(ex)),
-				HttpStatus.BAD_REQUEST
-		);
-	}
 }

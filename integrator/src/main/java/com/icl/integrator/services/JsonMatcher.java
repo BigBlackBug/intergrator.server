@@ -16,7 +16,7 @@ import java.util.Map;
 public class JsonMatcher {
 
 	public boolean matches(JsonNode data, JsonNode reference) {
-		if(reference instanceof NullNode){
+		if (reference instanceof NullNode) {
 			return true;
 		}
 		if (reference.isObject()) {
@@ -52,7 +52,7 @@ public class JsonMatcher {
 	}
 
 	private <T> List<T> copyIterator(Iterator<T> iter) {
-		List<T> copy = new ArrayList<T>();
+		List<T> copy = new ArrayList<>();
 		while (iter.hasNext()) {
 			copy.add(iter.next());
 		}

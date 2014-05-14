@@ -28,73 +28,75 @@ import java.util.Map;
                 produces = MediaType.APPLICATION_JSON_VALUE)
 public interface IntegratorHttpAPI extends IntegratorAPI {
 
-    @Override
-    @RequestMapping(value = "deliver", method = RequestMethod.POST)
-    public
-    @ResponseBody  <T extends DestinationDescriptor>
-    ResponseDTO<Map<String, ResponseDTO<String>>> deliver(
-		    @RequestBody
-		    IntegratorPacket<DeliveryDTO, T> delivery);
+	@Override
+	@RequestMapping(value = "deliver", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor>
+	ResponseDTO<Map<String, ResponseDTO<String>>> deliver(
+			@RequestBody
+			IntegratorPacket<DeliveryDTO, T> delivery);
 
-    @Override
-    @RequestMapping(value = "ping", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    <T extends DestinationDescriptor>
-    ResponseDTO<Boolean> ping(@RequestBody
-                 IntegratorPacket<Void, T> responseHandlerDescriptor);
+	@Override
+	@RequestMapping(value = "ping", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor>
+	ResponseDTO<Boolean> ping(@RequestBody
+	                          IntegratorPacket<Void, T> responseHandlerDescriptor);
 
-    @Override
-    @RequestMapping(value = "registerService", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    <T extends ActionDescriptor, Y extends DestinationDescriptor>
-    ResponseDTO<List<ActionRegistrationResultDTO>> registerService(
-		    @RequestBody
-		    IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
+	@Override
+	@RequestMapping(value = "registerService", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends ActionDescriptor, Y extends DestinationDescriptor>
+	ResponseDTO<List<ActionRegistrationResultDTO>> registerService(
+			@RequestBody
+			IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO);
 
-    @Override
-    @RequestMapping(value = "isAvailable", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    <T extends DestinationDescriptor>
-    ResponseDTO<Boolean> isAvailable(@RequestBody
-                                     IntegratorPacket<ServiceDestinationDescriptor, T> packet);
+	@Override
+	@RequestMapping(value = "isAvailable", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor>
+	ResponseDTO<Boolean> isAvailable(@RequestBody
+	                                 IntegratorPacket<ServiceDestinationDescriptor, T> packet);
 
-    @Override
-    @RequestMapping(value = "getServiceList", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    <T extends DestinationDescriptor>
-    ResponseDTO<List<ServiceDTO>> getServiceList(
-            @RequestBody
-            IntegratorPacket<Void, T> responseHandlerDescriptor);
+	@Override
+	@RequestMapping(value = "getServiceList", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor>
+	ResponseDTO<List<ServiceDTO>> getServiceList(
+			@RequestBody
+			IntegratorPacket<Void, T> responseHandlerDescriptor);
 
-    @Override
-    @RequestMapping(value = "getSupportedActions", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    <T extends DestinationDescriptor,Y extends ActionDescriptor>
-    ResponseDTO<List<ActionEndpointDTO<Y>>> getSupportedActions(
-            @RequestBody
-            IntegratorPacket<String, T> serviceName);
+	@Override
+	@RequestMapping(value = "getSupportedActions", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor, Y extends ActionDescriptor>
+	ResponseDTO<List<ActionEndpointDTO<Y>>> getSupportedActions(
+			@RequestBody
+			IntegratorPacket<String, T> serviceName);
 
-    @Override
-    @RequestMapping(value = "addAction", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    <T extends DestinationDescriptor,Y extends ActionDescriptor>
-    ResponseDTO<Void> addAction(@RequestBody
-                                IntegratorPacket<AddActionDTO<Y>, T> actionDTO);
+	@Override
+	@RequestMapping(value = "addAction", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor, Y extends ActionDescriptor>
+	ResponseDTO<Void> addAction(@RequestBody
+	                            IntegratorPacket<AddActionDTO<Y>, T> actionDTO);
 
-    @Override
-    @RequestMapping(value = "getServiceInfo", method = RequestMethod.POST)
-    public @ResponseBody
-    <ADType extends ActionDescriptor,
-            DDType extends DestinationDescriptor>
-    ResponseDTO<FullServiceDTO<ADType>> getServiceInfo(
-            @RequestBody
-            IntegratorPacket<String, DDType> serviceName);
+	@Override
+	@RequestMapping(value = "getServiceInfo", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<ADType extends ActionDescriptor,
+			DDType extends DestinationDescriptor>
+	ResponseDTO<FullServiceDTO<ADType>> getServiceInfo(
+			@RequestBody
+			IntegratorPacket<String, DDType> serviceName);
 
 	@Override
 	@RequestMapping(value = "registerAutoDetection", method = RequestMethod.POST)
@@ -105,21 +107,21 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
 			@RequestBody
 			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO);
 
-    @Override
-    @RequestMapping(value = "getActionsForDelivery", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    <T extends DestinationDescriptor>
-    ResponseDTO<List<DeliveryActionsDTO>>
-    getActionsForDelivery(@RequestBody IntegratorPacket<Void, T> packet);
+	@Override
+	@RequestMapping(value = "getActionsForDelivery", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor>
+	ResponseDTO<List<DeliveryActionsDTO>>
+	getActionsForDelivery(@RequestBody IntegratorPacket<Void, T> packet);
 
-    @Override
-    @RequestMapping(value = "getServicesSupportingActionType", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    <T extends DestinationDescriptor, Y extends ActionDescriptor>
-    ResponseDTO<List<ServiceAndActions<Y>>>
-    getServicesSupportingActionType(@RequestBody IntegratorPacket<ActionMethod, T> packet);
+	@Override
+	@RequestMapping(value = "getServicesSupportingActionType", method = RequestMethod.POST)
+	public
+	@ResponseBody
+	<T extends DestinationDescriptor, Y extends ActionDescriptor>
+	ResponseDTO<List<ServiceAndActions<Y>>>
+	getServicesSupportingActionType(@RequestBody IntegratorPacket<ActionMethod, T> packet);
 
 	@Override
 	@RequestMapping(value = "fetchUpdates", method = RequestMethod.POST)
@@ -134,19 +136,19 @@ public interface IntegratorHttpAPI extends IntegratorAPI {
 	public
 	@ResponseBody
 	<T extends DestinationDescriptor>
-	ResponseDTO<Void> removeService(@RequestBody IntegratorPacket<String,T> serviceName);
+	ResponseDTO<Void> removeService(@RequestBody IntegratorPacket<String, T> serviceName);
 
 	@Override
 	@RequestMapping(value = "editService", method = RequestMethod.POST)
 	public
 	@ResponseBody
 	<T extends DestinationDescriptor>
-	ResponseDTO<Void> editService(@RequestBody IntegratorPacket<EditServiceDTO,T> editServiceDTO);
+	ResponseDTO<Void> editService(@RequestBody IntegratorPacket<EditServiceDTO, T> editServiceDTO);
 
 	@Override
 	@RequestMapping(value = "editAction", method = RequestMethod.POST)
 	public
 	@ResponseBody
 	<T extends DestinationDescriptor>
-	ResponseDTO<Void> editAction(@RequestBody IntegratorPacket<EditActionDTO,T> editActionDTO);
+	ResponseDTO<Void> editAction(@RequestBody IntegratorPacket<EditActionDTO, T> editActionDTO);
 }

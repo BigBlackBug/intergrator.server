@@ -9,6 +9,6 @@ package com.icl.integrator.task;
  */
 public interface Descriptor<T> {
 
-    public String describe(T object);
+	public String describe(T object);
 
 }

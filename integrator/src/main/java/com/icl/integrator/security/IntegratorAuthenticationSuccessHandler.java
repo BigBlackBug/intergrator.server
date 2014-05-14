@@ -1,6 +1,5 @@
 package com.icl.integrator.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.services.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -19,9 +18,6 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 
 	@Autowired
 	private VersioningService versioningService;
-
-	@Autowired
-	private ObjectMapper mapper;
 
 	private RequestCache requestCache = new HttpSessionRequestCache();
 

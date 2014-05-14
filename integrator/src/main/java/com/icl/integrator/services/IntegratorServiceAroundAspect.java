@@ -1,9 +1,9 @@
 package com.icl.integrator.services;
 
-import com.icl.integrator.dto.ErrorCode;
 import com.icl.integrator.dto.ErrorDTO;
 import com.icl.integrator.dto.IntegratorPacket;
 import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.dto.util.ErrorCode;
 import com.icl.integrator.model.IntegratorUser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

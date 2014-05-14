@@ -25,29 +25,30 @@ import java.util.Map;
 @Service
 public class PacketProcessor {
 
-    private static Log logger = LogFactory.getLog(PacketProcessor.class);
+	private static Log logger = LogFactory.getLog(PacketProcessor.class);
 
-    @Autowired
-    private DeliveryService deliveryService;
+	@Autowired
+	private DeliveryService deliveryService;
 
-    public Map<String, ResponseDTO<String>> process(List<Delivery> deliveries) {
-        Map<String, ResponseDTO<String>> serviceToRequestID = new HashMap<>();
-        for (Delivery delivery : deliveries) {
-            ResponseDTO<String> response;
-	        String serviceName = delivery.getEndpoint().getServiceName();
-	        try {
-		        DefaultErrorConverter errorConverter = new DefaultErrorConverter();
-		        DefaultDeliverySuccessConverter successConverter =
-				        new DefaultDeliverySuccessConverter(delivery);
-		        deliveryService.deliver(delivery,ResponseDTO.class,
-		                                new ResponseDeliveryDescriptor<>(errorConverter,successConverter));
-	            response = new ResponseDTO<>(delivery.getId().toString());
-            } catch (Exception ex) {
-	            ErrorDTO error = new ErrorDTO(ex);
-	            response = new ResponseDTO<>(error);
-            }
-            serviceToRequestID.put(serviceName, response);
-        }
-        return serviceToRequestID;
-    }
+	public Map<String, ResponseDTO<String>> process(List<Delivery> deliveries) {
+		Map<String, ResponseDTO<String>> serviceToRequestID = new HashMap<>();
+		for (Delivery delivery : deliveries) {
+			ResponseDTO<String> response;
+			String serviceName = delivery.getEndpoint().getServiceName();
+			try {
+				DefaultErrorConverter errorConverter = new DefaultErrorConverter();
+				DefaultDeliverySuccessConverter successConverter =
+						new DefaultDeliverySuccessConverter(delivery);
+				deliveryService.deliver(delivery, ResponseDTO.class,
+				                        new ResponseDeliveryDescriptor<>(errorConverter,
+				                                                         successConverter));
+				response = new ResponseDTO<>(delivery.getId().toString());
+			} catch (Exception ex) {
+				ErrorDTO error = new ErrorDTO(ex);
+				response = new ResponseDTO<>(error);
+			}
+			serviceToRequestID.put(serviceName, response);
+		}
+		return serviceToRequestID;
+	}
 }
