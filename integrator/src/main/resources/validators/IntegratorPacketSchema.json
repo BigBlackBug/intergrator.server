@@ -362,7 +362,9 @@
                 "HANDLE_GET_ACTIONS_FOR_DELIVERY",
                 "HANDLE_GET_SERVICES_SUPPORTING_ACTION_TYPE",
                 "HANDLE_FETCH_UPDATES",
-                "HANDLE_REMOVE_SERVICE"
+                "HANDLE_REMOVE_SERVICE",
+                "HANDLE_EDIT_SERVICE",
+                "HANDLE_EDIT_ACTION"
             ]
         } ,
         "actionDesc": {
@@ -370,7 +372,7 @@
             "oneOf": [
                 {
                     "type": "object",
-                    "required": ["path", "actionMethod","endpointType"],
+                    "required": ["path", "actionMethod", "endpointType"],
                     "additionalProperties": false,
                     "properties": {
                         "path": {
@@ -387,7 +389,7 @@
                 },
                 {
                     "type": "object",
-                    "required": ["username", "password", "queueName", "actionMethod","endpointType"],
+                    "required": ["queueName", "actionMethod", "endpointType"],
                     "additionalProperties": false,
                     "properties": {
                         "endpointType": {

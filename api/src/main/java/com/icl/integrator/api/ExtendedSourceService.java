@@ -15,31 +15,50 @@ import java.util.UUID;
  * Time: 14:42
  * To change this template use File | Settings | File Templates.
  */
-public interface ExtendedSourceService extends SourceService {
+public abstract class ExtendedSourceService implements SourceService {
 
-	public void handleDeliveryResponse(Map<String, ResponseDTO<UUID>> response);
+	public void handleDeliveryResponse(Map<String, ResponseDTO<UUID>> response) {
+	}
 
 	public void handleServiceRegistration(
-			ResponseDTO<List<ActionRegistrationResultDTO>> response);
+			ResponseDTO<List<ActionRegistrationResultDTO>> response) {
+	}
 
-	public void handleServiceIsAvailable(ResponseDTO<Boolean> response);
+	public void handleServiceIsAvailable(ResponseDTO<Boolean> response) {
+	}
 
-	public void handleGetServiceList(ResponseDTO<List<ServiceDTO>> response);
+	public void handleGetServiceList(ResponseDTO<List<ServiceDTO>> response) {
+	}
 
-	public void handleGetSupportedActions(ResponseDTO<List<String>> response);
+	public void handleGetSupportedActions(ResponseDTO<List<String>> response) {
+	}
 
-	public void handleAddAction(ResponseDTO<Void> response);
+	public void handleAddAction(ResponseDTO<Void> response) {
+	}
 
-	public void handleGetServiceInfo(ResponseDTO<FullServiceDTO<ActionDescriptor>> response);
+	public void handleGetServiceInfo(ResponseDTO<FullServiceDTO<ActionDescriptor>> response) {
+	}
 
-	public void handleAutoDetectionRegistration(ResponseDTO<List<ResponseDTO<Void>>> response);
+	public void handleAutoDetectionRegistration(ResponseDTO<List<ResponseDTO<Void>>> response) {
+	}
 
-	public void handleGetActionsForDelivery(ResponseDTO<List<DeliveryActionsDTO>> response);
+	public void handleGetActionsForDelivery(ResponseDTO<List<DeliveryActionsDTO>> response) {
+	}
 
-	public void handleGetServicesSupportingActionType(ResponseDTO<List<ServiceAndActions<ActionDescriptor>>> response);
+	public void handleGetServicesSupportingActionType(
+			ResponseDTO<List<ServiceAndActions<ActionDescriptor>>> response) {
+	}
 
-	public void handleFetchUpdates(ResponseDTO<List<Modification>> response);
+	public void handleFetchUpdates(ResponseDTO<List<Modification>> response) {
+	}
 
-	public void handleRemoveService(ResponseDTO<Void> response);
+	public void handleRemoveService(ResponseDTO<Void> response) {
+	}
+
+	public void handleEditService(ResponseDTO<Void> response) {
+	}
+
+	public void handleEditAction(ResponseDTO<Void> response) {
+	}
 
 }
