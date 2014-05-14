@@ -1,4 +1,4 @@
-package com.icl.integrator.dto;
+package com.icl.integrator.dto.util;
 
 import java.io.Serializable;
 
@@ -8,5 +8,6 @@ import java.io.Serializable;
 public enum ErrorCode implements Serializable {
 	DEFAULT,
 	OUTDATED_CLIENT_STATE,
-	SERVICE_NOT_AVAILABLE
+	SERVICE_NOT_AVAILABLE,
+	UNAUTHORIZED
 }
