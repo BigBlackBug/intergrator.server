@@ -10,14 +10,13 @@ import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 
 import java.io.IOException;
 
-public final class DestinationDescriptorDeserializer extends
-        JsonDeserializer<DestinationDescriptor> {
+public class DestinationDescriptorDeserializer extends JsonDeserializer<DestinationDescriptor> {
 
-    public DestinationDescriptorDeserializer() {
-    }
+	public DestinationDescriptorDeserializer() {
+	}
 
-    @Override
-    public DestinationDescriptor deserialize(JsonParser jp,
+	@Override
+	public DestinationDescriptor deserialize(JsonParser jp,
                                              DeserializationContext ctx)
             throws IOException {
         ObjectNode treeNode = jp.readValueAsTree();
@@ -25,20 +24,17 @@ public final class DestinationDescriptorDeserializer extends
 
         DestinationDescriptor.DescriptorType descriptorType =
                 mapper.readValue(treeNode.get("descriptorType").toString(),
-                                 DestinationDescriptor.DescriptorType
-                                         .class);
-        DestinationDescriptor destinationDescriptor = null;
-        if (descriptorType == DestinationDescriptor.DescriptorType.RAW) {
+                                 DestinationDescriptor.DescriptorType.class);
+		DestinationDescriptor destinationDescriptor = null;
+		if (descriptorType == DestinationDescriptor.DescriptorType.RAW) {
+			destinationDescriptor =
+					mapper.readValue(treeNode.toString(), RawDestinationDescriptor.class);
+		} else if (descriptorType == DestinationDescriptor.DescriptorType.SERVICE) {
             destinationDescriptor =
-                    mapper.readValue(treeNode.toString(),
-                                     RawDestinationDescriptor.class);
-        } else if (descriptorType == DestinationDescriptor.DescriptorType.SERVICE) {
-            destinationDescriptor =
-                    mapper.readValue(treeNode.toString(),
-                                     ServiceDestinationDescriptor.class);
-        }
+		            mapper.readValue(treeNode.toString(), ServiceDestinationDescriptor.class);
+		}
 
-        return destinationDescriptor;
+		return destinationDescriptor;
     }
 
 }

@@ -27,9 +27,9 @@ public class RawDestinationDescriptorDeserializer
 		JsonNode treeNode = jp.readValueAsTree();
 		IntegratorObjectMapper mapper = new IntegratorObjectMapper();
 		EndpointDescriptor endpointDTO = mapper.readValue(treeNode.get("endpoint").toString(),
-		                                           EndpointDescriptor.class);
+		                                                  EndpointDescriptor.class);
 		ActionDescriptor sourceResponse = mapper.readValue(
-				treeNode.get("actionDescriptor").toString(),ActionDescriptor.class);
-		return new RawDestinationDescriptor(endpointDTO,sourceResponse);
+				treeNode.get("actionDescriptor").toString(), ActionDescriptor.class);
+		return new RawDestinationDescriptor(endpointDTO, sourceResponse);
 	}
 }

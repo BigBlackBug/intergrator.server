@@ -25,35 +25,35 @@ import com.icl.integrator.dto.source.EndpointDescriptor;
  */
 public class IntegratorObjectMapper extends ObjectMapper {
 
-    public static final String MODULE_NAME = "IntegratorObjectMapper";
+	public static final String MODULE_NAME = "IntegratorObjectMapper";
 
-    public IntegratorObjectMapper() {
-        super();
-        SimpleModule testModule = new SimpleModule(MODULE_NAME);
-        testModule.addDeserializer(DestinationDescriptor.class,
-                                   new DestinationDescriptorDeserializer());
-        testModule.addDeserializer(TargetRegistrationDTO.class,
-                                   new TargetRegistrationDTODeserializer());
-        testModule.addDeserializer(EndpointDescriptor.class,
-                                   new EndpointDescriptorDeserializer());
-	    testModule.addDeserializer(ActionDescriptor.class,
-	                               new ActionDescriptorDeserializer());
-        testModule.addDeserializer(AddActionDTO.class,
-                                   new AddActionDTODeserializer());
-        testModule.addDeserializer(RawDestinationDescriptor.class,
-                                   new RawDestinationDescriptorDeserializer());
-        testModule.addDeserializer(FullServiceDTO.class,
-                                   new FullServiceDTODeserializer());
-        testModule.addDeserializer(ActionEndpointDTO.class,
-                                   new ActionEndpointDTODeserializer());
-	    testModule.addDeserializer(EditServiceDTO.class,
-	                               new EditServiceDTODeserializer());
-	    testModule.addDeserializer(EditActionDTO.class,
-	                               new EditActionDTODeserializer());
-	    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	    configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
-        setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        registerModule(testModule);
-    }
+	public IntegratorObjectMapper() {
+		super();
+		SimpleModule testModule = new SimpleModule(MODULE_NAME);
+		testModule.addDeserializer(DestinationDescriptor.class,
+		                           new DestinationDescriptorDeserializer());
+		testModule.addDeserializer(TargetRegistrationDTO.class,
+		                           new TargetRegistrationDTODeserializer());
+		testModule.addDeserializer(EndpointDescriptor.class,
+		                           new EndpointDescriptorDeserializer());
+		testModule.addDeserializer(ActionDescriptor.class,
+		                           new ActionDescriptorDeserializer());
+		testModule.addDeserializer(AddActionDTO.class,
+		                           new AddActionDTODeserializer());
+		testModule.addDeserializer(RawDestinationDescriptor.class,
+		                           new RawDestinationDescriptorDeserializer());
+		testModule.addDeserializer(FullServiceDTO.class,
+		                           new FullServiceDTODeserializer());
+		testModule.addDeserializer(ActionEndpointDTO.class,
+		                           new ActionEndpointDTODeserializer());
+		testModule.addDeserializer(EditServiceDTO.class,
+		                           new EditServiceDTODeserializer());
+		testModule.addDeserializer(EditActionDTO.class,
+		                           new EditActionDTODeserializer());
+		configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+		setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		registerModule(testModule);
+	}
 
 }
