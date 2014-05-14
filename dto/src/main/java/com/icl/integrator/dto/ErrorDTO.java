@@ -48,7 +48,7 @@ public class ErrorDTO implements Serializable {
     public ErrorDTO(Throwable ex, ErrorCode errorCode) {
         String message = ex.getMessage();
         if (message == null) {
-            message = ex.getClass().getSimpleName();
+            message = ex.getClass().getName();
         }
         this.errorMessage = message;
         this.developerMessage = ExceptionUtils.getStackTraceAsString(ex);

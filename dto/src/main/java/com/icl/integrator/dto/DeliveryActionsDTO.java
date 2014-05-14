@@ -26,7 +26,7 @@ public class DeliveryActionsDTO implements Serializable{
     public DeliveryActionsDTO(String actionName,
                               ServiceDTO service) {
         this.actionName = actionName;
-        this.services = new ArrayList<>();
+        this.services = new ArrayList<ServiceDTO>();
         services.add(service);
     }
 
