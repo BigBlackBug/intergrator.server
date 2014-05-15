@@ -498,6 +498,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 		return registerAutoDetection(new IntegratorPacket<>(autoDetectionDTO));
 	}
 
+	//TODO добавить шифрование
 	@Override
 	public void login(String username, String password) throws IntegratorClientException {
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
@@ -511,7 +512,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 		} catch (Exception ex) {
 			throw new IntegratorClientException(ex);
 		}
-		//TODO если аутентификация успешна, то прилетает нулл. спасибо секьюрити за это
+		//TODO если аутентификация успешна, то прилетает нулл. спасибо спрингсекьюрити за это
 		if (responseDTO != null) {
 			throw new AuthException(responseDTO.getError().getErrorMessage());
 		}

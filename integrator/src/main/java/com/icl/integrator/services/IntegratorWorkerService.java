@@ -164,11 +164,13 @@ public class IntegratorWorkerService {
 		}
 	}
 
-	public List<ActionEndpointDTO> getSupportedActions(String serviceName) {
+	public <T extends ActionDescriptor>
+	List<ActionEndpointDTO<T>> getSupportedActions(String serviceName) {
 		List<AbstractActionEntity> actions = persistenceService.getActions(serviceName);
-		List<ActionEndpointDTO> result = new ArrayList<>();
+		List<ActionEndpointDTO<T>> result = new ArrayList<>();
 		for (AbstractActionEntity actionEntity : actions) {
-			result.add(convertActionToDTO(actionEntity));
+			ActionEndpointDTO<T> dto = convertActionToDTO(actionEntity);
+			result.add(dto);
 		}
 		return result;
 	}
@@ -243,8 +245,9 @@ public class IntegratorWorkerService {
 				entry : servicesSupportingActionType.entrySet()) {
 			List<AbstractActionEntity> actions = entry.getValue();
 			List<ActionEndpointDTO<T>> actionDTOs = new ArrayList<>();
-			for (AbstractActionEntity e : actions) {
-				actionDTOs.add((ActionEndpointDTO<T>) convertActionToDTO(e));
+			for (AbstractActionEntity action : actions) {
+				ActionEndpointDTO<T> dto = convertActionToDTO(action);
+				actionDTOs.add(dto);
 			}
 			result.add(new ServiceAndActions<>(entityToDTO(entry.getKey()), actionDTOs));
 		}
@@ -256,23 +259,23 @@ public class IntegratorWorkerService {
 		                      endpoint.getCreator().getUsername());
 	}
 
-	private ActionEndpointDTO<ActionDescriptor>
+	private <T extends ActionDescriptor> ActionEndpointDTO<T>
 	convertActionToDTO(AbstractActionEntity actionEntity) {
 		EndpointType type = actionEntity.getType();
 		switch (type) {
 			case HTTP: {
 				HttpAction httpAction = (HttpAction) actionEntity;
-				ActionDescriptor httpActionDTO = new HttpActionDTO(httpAction.getActionURL(),
+				HttpActionDTO httpActionDTO = new HttpActionDTO(httpAction.getActionURL(),
 				                                                   actionEntity.getActionMethod());
-				return new ActionEndpointDTO<>(actionEntity.getActionName(), httpActionDTO);
+				return new ActionEndpointDTO(actionEntity.getActionName(), httpActionDTO);
 			}
 			case JMS: {
 				JMSAction httpAction = (JMSAction) actionEntity;
-				ActionDescriptor httpActionDTO = new QueueDTO(httpAction.getQueueName(),
+				QueueDTO httpActionDTO = new QueueDTO(httpAction.getQueueName(),
 				                                              httpAction.getUsername(),
 				                                              httpAction.getPassword(),
 				                                              actionEntity.getActionMethod());
-				return new ActionEndpointDTO<>(actionEntity.getActionName(), httpActionDTO);
+				return new ActionEndpointDTO(actionEntity.getActionName(), httpActionDTO);
 			}
 		}
 		return null;

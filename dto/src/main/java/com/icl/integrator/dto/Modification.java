@@ -2,21 +2,18 @@ package com.icl.integrator.dto;
 
 import java.io.Serializable;
 
-public class Modification<T> implements Serializable {
-
-	private SubjectType subjectType;
+public class Modification implements Serializable {
 
 	private ActionType action;
 
-	private T entityName;
+	private Subject subject;
 
-	public Modification(SubjectType subjectType, ActionType action, T subject) {
-		this.subjectType = subjectType;
+	public Modification(ActionType action, Subject subject) {
 		this.action = action;
-		this.entityName = subject;
+		this.subject = subject;
 	}
 
-	Modification(){
+	Modification() {
 
 	}
 
@@ -34,10 +31,7 @@ public class Modification<T> implements Serializable {
 		if (action != modification.action) {
 			return false;
 		}
-		if (!entityName.equals(modification.entityName)) {
-			return false;
-		}
-		if (subjectType != modification.subjectType) {
+		if (!subject.equals(modification.subject)) {
 			return false;
 		}
 
@@ -46,22 +40,17 @@ public class Modification<T> implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int result = subjectType.hashCode();
-		result = 31 * result + action.hashCode();
-		result = 31 * result + entityName.hashCode();
+		int result = action.hashCode();
+		result = 31 * result + subject.hashCode();
 		return result;
-	}
-
-	public SubjectType getSubjectType() {
-		return subjectType;
 	}
 
 	public ActionType getAction() {
 		return action;
 	}
 
-	public T getEntityName() {
-		return entityName;
+	public Subject getSubject() {
+		return subject;
 	}
 
 	public static enum SubjectType {
@@ -72,21 +61,16 @@ public class Modification<T> implements Serializable {
 		ADDED, REMOVED, CHANGED
 	}
 
+	public static abstract class Subject {
 
-	public static class ServiceActionPair {
+		private final SubjectType subjectType;
 
-		private String serviceName;
-
-		private String actionName;
-
-		public ServiceActionPair(String serviceName, String actionName) {
-
-			this.serviceName = serviceName;
-			this.actionName = actionName;
+		protected Subject(SubjectType subjectType) {
+			this.subjectType = subjectType;
 		}
 
-		public String getServiceName() {
-			return serviceName;
+		public SubjectType getSubjectType() {
+			return subjectType;
 		}
 
 		@Override
@@ -98,7 +82,89 @@ public class Modification<T> implements Serializable {
 				return false;
 			}
 
-			ServiceActionPair that = (ServiceActionPair) o;
+			Subject subject = (Subject) o;
+
+			if (subjectType != subject.subjectType) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			return subjectType.hashCode();
+		}
+	}
+
+	public static class ServiceSubject extends Subject {
+
+		private String serviceName;
+
+		public ServiceSubject(String serviceName) {
+			super(SubjectType.SERVICE);
+			this.serviceName = serviceName;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+			if (!super.equals(o)) {
+				return false;
+			}
+
+			ServiceSubject that = (ServiceSubject) o;
+
+			if (!serviceName.equals(that.serviceName)) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = super.hashCode();
+			result = 31 * result + serviceName.hashCode();
+			return result;
+		}
+
+		public String getServiceName() {
+			return serviceName;
+		}
+
+	}
+
+	public static class ActionSubject extends Subject {
+
+		private String serviceName;
+
+		private String actionName;
+
+		public ActionSubject(String serviceName, String actionName) {
+			super(SubjectType.ACTION);
+			this.serviceName = serviceName;
+			this.actionName = actionName;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+			if (!super.equals(o)) {
+				return false;
+			}
+
+			ActionSubject that = (ActionSubject) o;
 
 			if (!actionName.equals(that.actionName)) {
 				return false;
@@ -112,13 +178,17 @@ public class Modification<T> implements Serializable {
 
 		@Override
 		public int hashCode() {
-			int result = serviceName.hashCode();
+			int result = super.hashCode();
+			result = 31 * result + serviceName.hashCode();
 			result = 31 * result + actionName.hashCode();
 			return result;
 		}
 
-		public String getActionName() {
+		public String getServiceName() {
+			return serviceName;
+		}
 
+		public String getActionName() {
 			return actionName;
 		}
 	}
