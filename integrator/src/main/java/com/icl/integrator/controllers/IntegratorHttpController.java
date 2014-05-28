@@ -45,8 +45,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	private <Result, Arg> Result fixConversion(
-			Arg argument, TypeReference<Result> type) {
+	private <Result, Arg> Result fixConversion(Arg argument, TypeReference<Result> type) {
 		return objectMapper.convertValue(argument, type);
 	}
 
@@ -79,8 +78,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
                 new TypeReference<IntegratorPacket<TargetRegistrationDTO<ActionDescriptor>,
                         DestinationDescriptor>>() {
                 };
-        return integratorService.registerService(fixConversion(
-                registrationDTO, type));
+		return integratorService.registerService(fixConversion(registrationDTO, type));
 	}
 
 	@Override
@@ -99,9 +97,8 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
         TypeReference<IntegratorPacket<Void, DestinationDescriptor>> type =
                 new TypeReference<IntegratorPacket<Void, DestinationDescriptor>>() {
                 };
-		return integratorService.getServiceList(fixConversion(
-				responseHandlerDescriptor, type));
-	}
+	    return integratorService.getServiceList(fixConversion(responseHandlerDescriptor, type));
+    }
 
 	@Override
 	public <T extends DestinationDescriptor,Y extends ActionDescriptor>
@@ -112,8 +109,7 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 				new TypeReference<IntegratorPacket<String, DestinationDescriptor>>() {
 				};
 
-		return integratorService.getSupportedActions(fixConversion(
-				serviceName, type));
+		return integratorService.getSupportedActions(fixConversion(serviceName, type));
 	}
 
     @Override

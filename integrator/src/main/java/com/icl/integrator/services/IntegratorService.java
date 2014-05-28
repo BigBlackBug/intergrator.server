@@ -162,6 +162,7 @@ public class IntegratorService implements IntegratorAPI {
 	@Synchronized
 	public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>>
 	getServiceList(IntegratorPacket<Void, T> packet) {
+		//TODO сброс версий для сервисов???
 		List<ServiceDTO> serviceList = workerService.getServiceList();
 		return new ResponseDTO<>(serviceList);
 	}

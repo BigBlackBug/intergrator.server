@@ -48,10 +48,6 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 	private void finish(final HttpServletRequest request, final HttpServletResponse response)
 			throws IOException {
 		clearAuthenticationAttributes(request);
-//		String responseValue = mapper.writeValueAsString(new ResponseDTO(true));
-//		response.setHeader("Content-Type","application/json");
-//		response.setHeader("Content-Length", String.valueOf(responseValue.getBytes().length));
-//		response.getWriter().append(responseValue);
 	}
 
 	public void setRequestCache(final RequestCache requestCache) {

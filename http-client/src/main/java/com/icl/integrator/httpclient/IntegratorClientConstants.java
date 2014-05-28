@@ -5,11 +5,11 @@ package com.icl.integrator.httpclient;
  */
 public interface IntegratorClientConstants {
 
-	public static final String LOGOUT_URL = "j_spring_security_logout";
+	public static final String LOGOUT_URL = "logout";
 
-	public static final String LOGIN_URL = "j_spring_security_check";
+	public static final String LOGIN_URL = "login";
 
-	public static final String USERNAME_PARAM = "j_username";
+	public static final String USERNAME_PARAM = "username";
 
-	public static final String PASSWORD_PARAM = "j_password";
+	public static final String PASSWORD_PARAM = "password";
 }

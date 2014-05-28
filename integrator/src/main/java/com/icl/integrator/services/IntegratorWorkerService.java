@@ -285,7 +285,7 @@ public class IntegratorWorkerService {
 		persistenceService.removeService(serviceName);
 	}
 
-	public void registerUser(UserRegistrationDTO packet) {
+	public void registerUser(UserCredentialsDTO packet) {
 		final IntegratorUser user = new IntegratorUser();
 		user.setUsername(packet.getUsername());
 		user.setPassword(DigestUtils.md5DigestAsHex(packet.getPassword().getBytes()));

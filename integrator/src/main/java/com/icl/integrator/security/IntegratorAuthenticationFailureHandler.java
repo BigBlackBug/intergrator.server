@@ -26,6 +26,7 @@ public class IntegratorAuthenticationFailureHandler implements AuthenticationFai
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 	                                    AuthenticationException exception)
 			throws IOException, ServletException {
+		//TODO считать из пакета и отослать результат
 		if (exception instanceof BadCredentialsException) {
 			finish(response, "Неверный пароль");
 		} else if (exception instanceof UsernameNotFoundException) {
