@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 public interface SourceSpringService extends SourceService {
 
-    @Override
-    @RequestMapping(value = "/handleResponseFromTarget",
-                    consumes = MediaType.APPLICATION_JSON_VALUE,
-                    method = {RequestMethod.POST, RequestMethod.HEAD})
-    public @ResponseBody void handleResponseFromTarget(@RequestBody
-                                             ResponseDTO<ResponseFromTargetDTO> responseDTO);
+	@Override
+	@RequestMapping(value = "/handleResponseFromTarget",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleResponseFromTarget(@RequestBody
+	                              ResponseDTO<ResponseFromTargetDTO> responseDTO);
 }

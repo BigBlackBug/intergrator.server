@@ -10,7 +10,23 @@
                 },
                 {
                     "type": "string",
-                    "enum": [ "PING", "DELIVER", "REGISTER_SERVICE", "IS_AVAILABLE", "GET_SERVICE_LIST", "GET_SUPPORTED_ACTIONS", "ADD_ACTION", "GET_SERVICE_INFO" ]
+                    "enum": [
+                        "PING",
+                        "DELIVER",
+                        "REGISTER_SERVICE",
+                        "IS_AVAILABLE",
+                        "GET_SERVICE_LIST",
+                        "GET_SUPPORTED_ACTIONS",
+                        "ADD_ACTION",
+                        "GET_SERVICE_INFO",
+                        "REGISTER_AUTO_DETECTION",
+                        "GET_ACTIONS_FOR_DELIVERY",
+                        "GET_SERVICES_SUPPORTING_ACTION_TYPE",
+                        "FETCH_UPDATES",
+                        "REMOVE_SERVICE",
+                        "EDIT_SERVICE",
+                        "EDIT_ACTION"
+                    ]
                 }
             ]
 
@@ -362,7 +378,9 @@
                 "HANDLE_GET_ACTIONS_FOR_DELIVERY",
                 "HANDLE_GET_SERVICES_SUPPORTING_ACTION_TYPE",
                 "HANDLE_FETCH_UPDATES",
-                "HANDLE_REMOVE_SERVICE"
+                "HANDLE_REMOVE_SERVICE",
+                "HANDLE_EDIT_SERVICE",
+                "HANDLE_EDIT_ACTION"
             ]
         } ,
         "actionDesc": {
@@ -370,7 +388,7 @@
             "oneOf": [
                 {
                     "type": "object",
-                    "required": ["path", "actionMethod","endpointType"],
+                    "required": ["path", "actionMethod", "endpointType"],
                     "additionalProperties": false,
                     "properties": {
                         "path": {
@@ -387,7 +405,7 @@
                 },
                 {
                     "type": "object",
-                    "required": ["username", "password", "queueName", "actionMethod","endpointType"],
+                    "required": ["queueName", "actionMethod", "endpointType"],
                     "additionalProperties": false,
                     "properties": {
                         "endpointType": {

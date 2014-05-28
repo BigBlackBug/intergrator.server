@@ -23,21 +23,21 @@ public class HTTPEndpointConnector implements EndpointConnector {
 
 	public static final String CONTENT_TYPE = "Content-Type";
 
-    public static final int DEFAULT_TIMEOUT = 5000;
+	public static final int DEFAULT_TIMEOUT = 5000;
 
-    private final URL url;
+	private final URL url;
 
 	private final ActionMethod actionMethod;
 
-    private final RestTemplate restTemplate;
+	private final RestTemplate restTemplate;
 
-	HTTPEndpointConnector(URL url,ActionMethod actionMethod) {
+	HTTPEndpointConnector(URL url, ActionMethod actionMethod) {
 		this.url = url;
 		this.actionMethod = actionMethod;
-        HttpComponentsClientHttpRequestFactory rf = new HttpComponentsClientHttpRequestFactory();
-        rf.setReadTimeout(DEFAULT_TIMEOUT);
-        rf.setConnectTimeout(DEFAULT_TIMEOUT);
-        this.restTemplate = new RestTemplate(rf);
+		HttpComponentsClientHttpRequestFactory rf = new HttpComponentsClientHttpRequestFactory();
+		rf.setReadTimeout(DEFAULT_TIMEOUT);
+		rf.setConnectTimeout(DEFAULT_TIMEOUT);
+		this.restTemplate = new RestTemplate(rf);
 	}
 
 	@Override
@@ -47,7 +47,8 @@ public class HTTPEndpointConnector implements EndpointConnector {
 			headers.add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 			HttpEntity<String> entity = new HttpEntity<>(headers);
 
-			restTemplate.exchange(url.toURI().toString()+"?action_method={action_method}", HttpMethod.HEAD,
+			restTemplate.exchange(url.toURI().toString() + "?action_method={action_method}",
+			                      HttpMethod.HEAD,
 			                      entity, Void.class, actionMethod);
 		} catch (URISyntaxException e) {
 			throw new ConnectionException("URL не валиден", e);

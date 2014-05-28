@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.icl.integrator.dto.ServiceDTO;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
 import com.icl.integrator.dto.registration.ActionRegistrationDTO;
 import com.icl.integrator.dto.registration.AddActionDTO;
@@ -20,8 +19,7 @@ import java.io.IOException;
  * Time: 16:35
  * To change this template use File | Settings | File Templates.
  */
-public final class AddActionDTODeserializer
-        extends JsonDeserializer<AddActionDTO> {
+public class AddActionDTODeserializer extends JsonDeserializer<AddActionDTO> {
 
     @Override
     public AddActionDTO deserialize(JsonParser jp, DeserializationContext ctxt)

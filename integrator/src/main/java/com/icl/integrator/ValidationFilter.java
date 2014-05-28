@@ -18,8 +18,7 @@ import java.io.IOException;
 @Component
 public class ValidationFilter implements Filter {
 
-	private static Log logger =
-			LogFactory.getLog(ValidationFilter.class);
+	private static Log logger = LogFactory.getLog(ValidationFilter.class);
 
 	@Autowired
 	private ObjectMapper objectMapper;

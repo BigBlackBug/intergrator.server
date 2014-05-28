@@ -9,9 +9,9 @@ package com.icl.integrator.util.connectors;
  */
 public interface EndpointConnector {
 
-    public void testConnection() throws ConnectionException;
+	public void testConnection() throws ConnectionException;
 
-    public <Request, Response> Response sendRequest(
-            Request data, Class<Response> responseClass) throws Exception;
+	public <Request, Response> Response sendRequest(
+			Request data, Class<Response> responseClass) throws Exception;
 
 }

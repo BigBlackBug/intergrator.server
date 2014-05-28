@@ -1,8 +1,10 @@
 package com.icl.integrator.springapi;
 
 import com.icl.integrator.api.IntegratorManagementAPI;
+import com.icl.integrator.dto.IntegratorPacket;
 import com.icl.integrator.dto.ResponseDTO;
-import com.icl.integrator.dto.registration.UserRegistrationDTO;
+import com.icl.integrator.dto.destination.DestinationDescriptor;
+import com.icl.integrator.dto.registration.UserCredentialsDTO;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,5 +23,6 @@ public interface IntegratorManagementHttpAPI extends IntegratorManagementAPI {
 	@RequestMapping(value = "registerUser", method = RequestMethod.POST)
 	public
 	@ResponseBody
-	ResponseDTO<Void> registerUser(@RequestBody UserRegistrationDTO packet);
+	ResponseDTO<Void> registerUser(@RequestBody
+	                               IntegratorPacket<UserCredentialsDTO,DestinationDescriptor> packet);
 }

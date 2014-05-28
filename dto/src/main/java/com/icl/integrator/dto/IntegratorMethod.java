@@ -8,7 +8,7 @@ package com.icl.integrator.dto;
  * To change this template use File | Settings | File Templates.
  */
 public enum IntegratorMethod {
-	//TODO пополнить. также поправить схему
+	//TODO поправить обработку в JMS контроллере
 	PING,
 	DELIVER,
 	REGISTER_SERVICE,
@@ -17,5 +17,11 @@ public enum IntegratorMethod {
 	GET_SUPPORTED_ACTIONS,
 	ADD_ACTION,
 	GET_SERVICE_INFO,
-	REGISTER_AUTO_DETECTION
+	REGISTER_AUTO_DETECTION,
+	GET_ACTIONS_FOR_DELIVERY,
+	GET_SERVICES_SUPPORTING_ACTION_TYPE,
+	FETCH_UPDATES,
+	REMOVE_SERVICE,
+	EDIT_SERVICE,
+	EDIT_ACTION
 }

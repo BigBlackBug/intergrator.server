@@ -3,17 +3,16 @@ package com.icl.integrator.dto.registration;
 /**
  * Created by BigBlackBug on 07.05.2014.
  */
-public class UserRegistrationDTO {
+public class UserCredentialsDTO {
 
 	private String username;
 
 	private String password;
 
-	UserRegistrationDTO() {
+	UserCredentialsDTO() {
 	}
 
-	public UserRegistrationDTO(String username, String password) {
-
+	public UserCredentialsDTO(String username, String password) {
 		this.username = username;
 		this.password = password;
 	}
@@ -27,7 +26,7 @@ public class UserRegistrationDTO {
 			return false;
 		}
 
-		UserRegistrationDTO that = (UserRegistrationDTO) o;
+		UserCredentialsDTO that = (UserCredentialsDTO) o;
 
 		if (!password.equals(that.password)) {
 			return false;

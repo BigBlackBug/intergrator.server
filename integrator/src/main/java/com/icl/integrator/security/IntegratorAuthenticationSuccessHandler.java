@@ -30,7 +30,7 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 
 		final SavedRequest savedRequest = requestCache.getRequest(request, response);
 		if (savedRequest == null) {
-			clearAuthenticationAttributes(request);
+			finish(request, response);
 			return;
 		}
 
@@ -38,10 +38,15 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 		if (isAlwaysUseDefaultTargetUrl() || (targetUrlParameter != null
 				&& StringUtils.hasText(request.getParameter(targetUrlParameter)))) {
 			requestCache.removeRequest(request, response);
-			clearAuthenticationAttributes(request);
+			finish(request, response);
 			return;
 		}
 
+		finish(request, response);
+	}
+
+	private void finish(final HttpServletRequest request, final HttpServletResponse response)
+			throws IOException {
 		clearAuthenticationAttributes(request);
 	}
 

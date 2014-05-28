@@ -6,13 +6,14 @@ import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.editor.EditActionDTO;
 import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.httpclient.exceptions.AuthException;
+import com.icl.integrator.httpclient.exceptions.IntegratorClientException;
+import com.icl.integrator.httpclient.exceptions.MethodNotSupportedException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -89,12 +90,10 @@ public class IntegratorHttpClient implements IntegratorClient {
 		return sb.toString();
 	}
 
-
-
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @throws IntegratorClientException
+	 * @throws com.icl.integrator.httpclient.exceptions.IntegratorClientException
 	 */
 	@Override
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> ping(
@@ -407,8 +406,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 	public <Y extends ActionDescriptor>
 	ResponseDTO<List<ServiceAndActions<Y>>> getServicesSupportingActionType(
 			ActionMethod actionMethod) {
-		return getServicesSupportingActionType(
-				new IntegratorPacket<ActionMethod, DestinationDescriptor>(actionMethod));
+		return getServicesSupportingActionType(new IntegratorPacket<>(actionMethod));
 	}
 
 	@Override
@@ -448,7 +446,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 	}
 
 	public ResponseDTO<Void> removeService(String serviceName) {
-		return removeService(new IntegratorPacket<String, DestinationDescriptor>(serviceName));
+		return removeService(new IntegratorPacket<>(serviceName));
 	}
 
 	@Override
@@ -499,20 +497,43 @@ public class IntegratorHttpClient implements IntegratorClient {
 		return registerAutoDetection(new IntegratorPacket<>(autoDetectionDTO));
 	}
 
+	//TODO добавить шифрование
 	@Override
 	public void login(String username, String password) throws IntegratorClientException {
-		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-		body.add(IntegratorClientConstants.USERNAME_PARAM, username);
-		body.add(IntegratorClientConstants.PASSWORD_PARAM, password);
+//		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+//		body.add(IntegratorClientConstants.USERNAME_PARAM, username);
+//		body.add(IntegratorClientConstants.PASSWORD_PARAM, password);
+//		ResponseDTO responseDTO;
+//		try {
+//			URL url = new URL("HTTP", host, port,
+//			                  mainControllerPath + IntegratorClientConstants.LOGIN_URL);
+//			responseDTO = restTemplate.postForObject(url.toURI(), body, ResponseDTO.class);
+//		} catch (Exception ex) {
+//			throw new IntegratorClientException(ex);
+//		}
+//		//TODO если аутентификация успешна, то прилетает нулл. спасибо спрингсекьюрити за это
+//		if (responseDTO != null) {
+//			throw new AuthException(responseDTO.getError().getErrorMessage());
+//		}
+		ResponseDTO responseDTO;
 		try {
-			URL url = new URL("HTTP", host, port,
-			                  mainControllerPath + IntegratorClientConstants.LOGIN_URL);
-			restTemplate.postForObject(url.toURI(), body, Void.class);
-		} catch (Exception ex) {
-			throw new IntegratorClientException(ex);
+			IntegratorPacket<UserCredentialsDTO, DestinationDescriptor> packet =
+					new IntegratorPacket<>(new UserCredentialsDTO(username, password));
+			ParameterizedTypeReference<ResponseDTO> type =
+					new ParameterizedTypeReference<ResponseDTO>() {
+					};
+			HttpMethodDescriptor methodDescriptor =
+					new HttpMethodDescriptor("/login", RequestMethod.POST);
+			responseDTO = sendRequest(mainControllerPath, packet, type, methodDescriptor);
+		} catch (Exception e) {
+			throw new IntegratorClientException(e);
+		}
+		if (responseDTO != null) {
+			throw new AuthException(responseDTO.getError().getErrorMessage());
 		}
 	}
 
+	//TODO 2 логаута подряд крешатся
 	@Override
 	public void logout() throws IntegratorClientException {
 		HttpStatus statusCode;
@@ -526,6 +547,22 @@ public class IntegratorHttpClient implements IntegratorClient {
 		}
 		if (statusCode.series().value() != 2) {
 			throw new IntegratorClientException("Не фортануло " + statusCode.getReasonPhrase());
+		}
+	}
+
+	@Override
+	public ResponseDTO<Void> registerUser(
+			@RequestBody IntegratorPacket<UserCredentialsDTO, DestinationDescriptor> packet) {
+		try {
+			HttpMethodDescriptor methodPair =
+					getMethodPath("registerUser", IntegratorPacket.class);
+			ParameterizedTypeReference<ResponseDTO<Void>>
+					type =
+					new ParameterizedTypeReference<ResponseDTO<Void>>() {
+					};
+			return sendRequest(managementControllerPath, packet, type, methodPair);
+		} catch (Exception ex) {
+			throw new IntegratorClientException(ex);
 		}
 	}
 
@@ -583,21 +620,6 @@ public class IntegratorHttpClient implements IntegratorClient {
 			HttpMethodDescriptor methodDescriptor)
 			throws RestClientException, MalformedURLException {
 		return sendRequest(mainControllerPath, requestEntity, responseType, methodDescriptor);
-	}
-
-	@Override
-	public ResponseDTO<Void> registerUser(UserRegistrationDTO packet) {
-		try {
-			HttpMethodDescriptor methodPair =
-					getMethodPath("registerUser", UserRegistrationDTO.class);
-			ParameterizedTypeReference<ResponseDTO<Void>>
-					type =
-					new ParameterizedTypeReference<ResponseDTO<Void>>() {
-					};
-			return sendRequest(managementControllerPath, packet, type, methodPair);
-		} catch (Exception ex) {
-			throw new IntegratorClientException(ex);
-		}
 	}
 
 	private static class HttpMethodDescriptor {

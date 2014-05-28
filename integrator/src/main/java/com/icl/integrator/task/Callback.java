@@ -9,6 +9,6 @@ package com.icl.integrator.task;
  */
 public interface Callback<T> {
 
-    public void execute(T arg);
+	public void execute(T arg);
 
 }

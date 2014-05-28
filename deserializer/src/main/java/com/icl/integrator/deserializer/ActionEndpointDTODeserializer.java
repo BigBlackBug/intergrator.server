@@ -1,7 +1,6 @@
 package com.icl.integrator.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -17,16 +16,17 @@ import java.io.IOException;
  */
 public class ActionEndpointDTODeserializer extends JsonDeserializer<ActionEndpointDTO> {
 
-    @Override
-    public ActionEndpointDTO deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
-        ObjectNode treeNode = jp.readValueAsTree();
-        IntegratorObjectMapper o = new IntegratorObjectMapper();
-        String actionName = treeNode.get("actionName").asText();
-        TreeNode actionDescriptor = treeNode.get("actionDescriptor");
-        ActionDescriptor action = o.readValue(actionDescriptor.toString(),
-                                              new TypeReference<ActionDescriptor>() {
-                                              });
-        return new ActionEndpointDTO(actionName,action);
-    }
+	@Override
+	public ActionEndpointDTO deserialize(JsonParser jp, DeserializationContext ctxt)
+			throws IOException {
+		ObjectNode treeNode = jp.readValueAsTree();
+		IntegratorObjectMapper o = new IntegratorObjectMapper();
+		String actionName = treeNode.get("actionName").asText();
+		TreeNode actionDescriptor = treeNode.get("actionDescriptor");
+		ActionDescriptor action = o.readValue(actionDescriptor.toString(),
+		                                      new TypeReference<ActionDescriptor>() {
+		                                      }
+		);
+		return new ActionEndpointDTO(actionName, action);
+	}
 }

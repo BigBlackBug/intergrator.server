@@ -1,5 +1,6 @@
 package com.icl.integrator.dto;
 
+import com.icl.integrator.dto.util.ErrorCode;
 import com.icl.integrator.util.ExceptionUtils;
 
 import java.io.Serializable;
@@ -48,7 +49,7 @@ public class ErrorDTO implements Serializable {
     public ErrorDTO(Throwable ex, ErrorCode errorCode) {
         String message = ex.getMessage();
         if (message == null) {
-            message = ex.getClass().getSimpleName();
+            message = ex.getClass().getName();
         }
         this.errorMessage = message;
         this.developerMessage = ExceptionUtils.getStackTraceAsString(ex);
@@ -113,7 +114,7 @@ public class ErrorDTO implements Serializable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Message: '").append(errorMessage).append("' DevMessage: '")
-				.append(developerMessage).append("' Code: '").append(errorCode).append("'");
+				.append(developerMessage).append("' ErrorCode: '").append(errorCode).append("'");
 		return sb.toString();
 	}
 }

@@ -1,4 +1,4 @@
-package com.icl.integrator.httpclient;
+package com.icl.integrator.httpclient.exceptions;
 
 /**
  * Created with IntelliJ IDEA.

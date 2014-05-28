@@ -29,36 +29,36 @@ import static com.icl.integrator.util.ExceptionUtils.getStackTraceAsString;
 @Service
 public class Scheduler {
 
-    private static final int THREAD_CORE_POOL_SIZE = 15;
+	private static final int THREAD_CORE_POOL_SIZE = 15;
 
-    private static final ScheduledExecutorService EXECUTOR = Executors
-            .newScheduledThreadPool(THREAD_CORE_POOL_SIZE);
+	private static final ScheduledExecutorService EXECUTOR = Executors
+			.newScheduledThreadPool(THREAD_CORE_POOL_SIZE);
 
 	private static final SimpleDateFormat DATE_FORMAT =
 			new SimpleDateFormat("dd.MM.yyyy HH:mm:ss::SSS");
 
-    private final static Log logger = LogFactory.getLog(Scheduler.class);
+	private final static Log logger = LogFactory.getLog(Scheduler.class);
 
-    private Map<Long, Integer> scheduleMap = new HashMap<>();
+	private Map<Long, Integer> scheduleMap = new HashMap<>();
 
-    @Autowired
-    private PersistenceService persistenceService;
+	@Autowired
+	private PersistenceService persistenceService;
 
-    private <T> void schedule(final TaskCreator<T> taskCreator, Delivery delivery) {
-        scheduleMap.put(taskCreator.getTaskID(), 0);
-	    final Callback<T> odlCallback = taskCreator.getCallback();
-	    Callback<T> newCallback = new Callback<T>() {
-		    @Override
-		    public void execute(T arg) {
-			    scheduleMap.remove(taskCreator.getTaskID());
-			    odlCallback.execute(arg);
-		    }
-	    };
-	    taskCreator.setCallback(newCallback);
-        delivery.setDeliveryStatus(DeliveryStatus.IN_PROGRESS);
-        persistenceService.merge(delivery);
-        EXECUTOR.submit(taskCreator.create());
-    }
+	private <T> void schedule(final TaskCreator<T> taskCreator, Delivery delivery) {
+		scheduleMap.put(taskCreator.getTaskID(), 0);
+		final Callback<T> odlCallback = taskCreator.getCallback();
+		Callback<T> newCallback = new Callback<T>() {
+			@Override
+			public void execute(T arg) {
+				scheduleMap.remove(taskCreator.getTaskID());
+				odlCallback.execute(arg);
+			}
+		};
+		taskCreator.setCallback(newCallback);
+		delivery.setDeliveryStatus(DeliveryStatus.IN_PROGRESS);
+		persistenceService.merge(delivery);
+		EXECUTOR.submit(taskCreator.create());
+	}
 
     public <T> void scheduleGeneral(final Schedulable<T> deliverySchedulable,
                                     final Callback<Void> retryLimitHandler) {
@@ -88,47 +88,45 @@ public class Scheduler {
         final Delivery delivery = deliverySchedulable.getDelivery();
         //не прошёл пинг
         taskCreator.addExceptionHandler(new ExceptionHandlerError<T,
-		        ConnectionException>(deliverySchedulable,
-                                     retryLimitHandler),
+		        ConnectionException>(deliverySchedulable,retryLimitHandler),
                                         ConnectionException.class);
 
 	    taskCreator.addExceptionHandler(new ExceptionHandlerError<T,
-			    EndpointConnectorExceptions.JMSConnectorException>
-			                                    (deliverySchedulable,
-			                                     retryLimitHandler),
+			    EndpointConnectorExceptions.JMSConnectorException>(
+			                                    deliverySchedulable,retryLimitHandler),
 	                                    EndpointConnectorExceptions.JMSConnectorException.class);
 
 	    taskCreator.addExceptionHandler(new ExceptionHandlerError<T,
-			    EndpointConnectorExceptions.HttpConnectorException>
-			                                    (deliverySchedulable,
-			                                     retryLimitHandler),
+			    EndpointConnectorExceptions.HttpConnectorException>(
+			                                    deliverySchedulable,retryLimitHandler),
 	                                    EndpointConnectorExceptions.HttpConnectorException.class);
         schedule(taskCreator, delivery);
     }
 
     private class ExceptionHandlerGeneral<T, E extends Exception> extends
-            ExceptionHandler<T, Void, E> {
+		    ExceptionHandler<T, Void, E> {
 
-        public ExceptionHandlerGeneral(Schedulable<T> deliverySchedulable,
-                Callback<Void> retryLimitHandler) {
-            super(deliverySchedulable);
-	        if(retryLimitHandler!=null){
-                setCallback(new CallbackGeneral(retryLimitHandler));
-	        }
-        }
+	    public ExceptionHandlerGeneral(Schedulable<T> deliverySchedulable,
+	                                   Callback<Void> retryLimitHandler) {
+		    super(deliverySchedulable);
+		    if (retryLimitHandler != null) {
+			    setCallback(new CallbackGeneral(retryLimitHandler));
+		    }
+	    }
 
-        protected class CallbackGeneral implements Callback<E> {
+	    protected class CallbackGeneral implements Callback<E> {
 
-	        private Callback <Void> callback;
+		    private Callback<Void> callback;
 
-	        public CallbackGeneral(Callback<Void> callback) {
-		        this.callback = callback;
-	        }
-            @Override
-            public void execute(E arg) {
-	            callback.execute(null);
-            }
-        }
+		    public CallbackGeneral(Callback<Void> callback) {
+			    this.callback = callback;
+		    }
+
+		    @Override
+		    public void execute(E arg) {
+			    callback.execute(null);
+		    }
+	    }
     }
 
 	private class ExceptionHandlerError<T, E extends Exception> extends
@@ -144,78 +142,73 @@ public class Scheduler {
 
 		protected class CallbackError implements Callback<E> {
 
-	        private Callback <ErrorDTO> callback;
+			private Callback<ErrorDTO> callback;
 
-	        public CallbackError(Callback<ErrorDTO> callback) {
-		        this.callback = callback;
-	        }
+			public CallbackError(Callback<ErrorDTO> callback) {
+				this.callback = callback;
+			}
 
-	        @Override
-            public void execute(E exception) {
-		        String developerMessage = "Последнее исключение - \n" +
-				        getStackTraceAsString(exception);
-		        String errorMessage = "Не могу доставить запрос на таргет";
-		        ErrorDTO errorDTO = new ErrorDTO(errorMessage, developerMessage);
-		        callback.execute(errorDTO);
-            }
-        }
-    }
+			@Override
+			public void execute(E exception) {
+				String developerMessage = "Последнее исключение - \n" +
+						getStackTraceAsString(exception);
+				String errorMessage = "Не могу доставить запрос на таргет";
+				ErrorDTO errorDTO = new ErrorDTO(errorMessage, developerMessage);
+				callback.execute(errorDTO);
+			}
+		}
+	}
 
-    private abstract class ExceptionHandler<T, Y, E extends Exception>
-            implements Callback<E> {
+	private abstract class ExceptionHandler<T, Y, E extends Exception>
+			implements Callback<E> {
 
-        protected final TaskCreator<T> taskCreator;
+		protected final TaskCreator<T> taskCreator;
 
-        protected final Delivery delivery;
+		protected final Delivery delivery;
 
-        protected final DeliverySettings deliverySettings;
+		protected final DeliverySettings deliverySettings;
 
-        private Callback<E> callback;
+		private Callback<E> callback;
 
-        protected ExceptionHandler(Schedulable<T> deliverySchedulable) {
-            taskCreator = deliverySchedulable.getTaskCreator();
-            delivery = deliverySchedulable.getDelivery();
-            deliverySettings = deliverySchedulable.getDeliverySettings();
-        }
+		protected ExceptionHandler(Schedulable<T> deliverySchedulable) {
+			taskCreator = deliverySchedulable.getTaskCreator();
+			delivery = deliverySchedulable.getDelivery();
+			deliverySettings = deliverySchedulable.getDeliverySettings();
+		}
 
-        protected void setCallback(Callback<E> callback) {
-            this.callback = callback;
-        }
+		protected void setCallback(Callback<E> callback) {
+			this.callback = callback;
+		}
 
-        @Override
-        public void execute(E exception) {
-            logger.info("Exception when sending request", exception);
-            int retryIndex = scheduleMap.get(taskCreator.getTaskID());
-            if (retryIndex == deliverySettings.getRetryNumber()) {
-                logger.info("Too many retries to handle exception",
-                            exception);
-                scheduleMap.remove(taskCreator.getTaskID());
-                delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_FAILED);
-	            delivery.setLastFailureReason(getStackTraceAsString(exception));
-                persistenceService.merge(delivery);
-                //обычно посылатель домой
-                //но также мб просто сменщик статуса
-                //например когда мы шедулим реквест на исходник
-                //обрабочик облома
-                if (callback != null) {
-                    callback.execute(exception);
-                }
-	            return;
-            }
+		@Override
+		public void execute(E exception) {
+			logger.info("Exception when sending request", exception);
+			int retryIndex = scheduleMap.get(taskCreator.getTaskID());
+			if (retryIndex == deliverySettings.getRetryNumber()) {
+				logger.info("Too many retries to handle exception",
+				            exception);
+				scheduleMap.remove(taskCreator.getTaskID());
+				delivery.setDeliveryStatus(DeliveryStatus.DELIVERY_FAILED);
+				delivery.setLastFailureReason(getStackTraceAsString(exception));
+				persistenceService.merge(delivery);
+				//обычно посылатель домой
+				//но также мб просто сменщик статуса
+				//например когда мы шедулим реквест на исходник
+				//обрабочик облома
+				if (callback != null) {
+					callback.execute(exception);
+				}
+				return;
+			}
 
-            Date nextRequestDate = new Date(System.currentTimeMillis() +
-                                                    deliverySettings
-                                                            .getRetryDelay());
-            logger.info("Rescheduling next request to " +
-                                DATE_FORMAT.format(nextRequestDate));
-            EXECUTOR.schedule(taskCreator.create(),
-                              deliverySettings.getRetryDelay(),
-                              TimeUnit.MILLISECONDS);
-            scheduleMap.put(taskCreator.getTaskID(),
-                            retryIndex + 1);
-        }
-
-    }
-
+			Date nextRequestDate = new Date(System.currentTimeMillis() +
+					                                deliverySettings.getRetryDelay());
+			logger.info("Rescheduling next request to " + DATE_FORMAT.format(nextRequestDate));
+			EXECUTOR.schedule(taskCreator.create(),
+			                  deliverySettings.getRetryDelay(),
+			                  TimeUnit.MILLISECONDS);
+			scheduleMap.put(taskCreator.getTaskID(), retryIndex + 1);
+		}
+	}
 }
 

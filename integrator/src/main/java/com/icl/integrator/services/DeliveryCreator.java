@@ -3,7 +3,9 @@ package com.icl.integrator.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icl.integrator.dto.*;
+import com.icl.integrator.dto.DeliveryDTO;
+import com.icl.integrator.dto.DeliveryPacketType;
+import com.icl.integrator.dto.RequestDataDTO;
 import com.icl.integrator.dto.destination.DestinationDescriptor;
 import com.icl.integrator.dto.destination.RawDestinationDescriptor;
 import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
@@ -12,8 +14,8 @@ import com.icl.integrator.dto.registration.QueueDTO;
 import com.icl.integrator.dto.source.EndpointDescriptor;
 import com.icl.integrator.dto.source.HttpEndpointDescriptorDTO;
 import com.icl.integrator.dto.source.JMSEndpointDescriptorDTO;
-import com.icl.integrator.model.*;
 import com.icl.integrator.dto.util.EndpointType;
+import com.icl.integrator.model.*;
 import com.icl.integrator.util.IntegratorException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -171,7 +173,7 @@ public class DeliveryCreator {
 					}
 				}
 			}
-		} else if (descriptorType ==DestinationDescriptor.DescriptorType.SERVICE) {
+		} else if (descriptorType == DestinationDescriptor.DescriptorType.SERVICE) {
 			ServiceDestinationDescriptor realSourceService =
 					(ServiceDestinationDescriptor) destination;
 			EndpointType endpointType = realSourceService.getEndpointType();
@@ -194,7 +196,8 @@ public class DeliveryCreator {
 	public <T> Delivery createDelivery(AbstractEndpointEntity service,
 	                                   AbstractActionEntity action,
 	                                   T data,
-	                                   DestinationEntity destinationEntity) throws JsonProcessingException {
+	                                   DestinationEntity destinationEntity)
+			throws JsonProcessingException {
 		service = persistenceService
 				.find(AbstractEndpointEntity.class, service.getId());
 		action = persistenceService
@@ -248,18 +251,18 @@ public class DeliveryCreator {
 		RequestDataDTO requestData = deliveryDTO.getRequestData();
 		Deliveries deliveries;
 		if (requestData.getDeliveryPacketType() == DeliveryPacketType.UNDEFINED) {
-            if(deliveryDTO.getDestinations().isEmpty()){
-                throw new IntegratorException("Вы не указали ни один таргет");
-            }
+			if (deliveryDTO.getDestinations().isEmpty()) {
+				throw new IntegratorException("Вы не указали ни один таргет");
+			}
 			deliveries = createDeliveries(deliveryDTO, requestData, responseHandlerDescriptor);
 		} else {
 			if (deliveryDTO.getDestinations() != null) {
 				deliveries = createDeliveries(deliveryDTO, requestData, responseHandlerDescriptor);
 			} else {
 				deliveries = createAutoDetectedDeliveries(deliveryDTO, responseHandlerDescriptor);
-                if(deliveries.isEmpty()){
-                    throw new IntegratorException("Не получилось найти ни один подходящий сервис");
-                }
+				if (deliveries.isEmpty()) {
+					throw new IntegratorException("Не получилось найти ни один подходящий сервис");
+				}
 			}
 		}
 		return deliveries;

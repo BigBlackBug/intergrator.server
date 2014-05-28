@@ -10,7 +10,7 @@ public class PersistentDestination {
 	private final AbstractEndpointEntity service;
 
 	public PersistentDestination(AbstractEndpointEntity service,
-	                      AbstractActionEntity action) {
+	                             AbstractActionEntity action) {
 		this.action = action;
 		this.service = service;
 	}

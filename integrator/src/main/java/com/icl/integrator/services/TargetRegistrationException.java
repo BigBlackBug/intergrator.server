@@ -9,18 +9,18 @@ package com.icl.integrator.services;
  */
 public class TargetRegistrationException extends RuntimeException {
 
-    public TargetRegistrationException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public TargetRegistrationException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    public TargetRegistrationException() {
-    }
+	public TargetRegistrationException() {
+	}
 
 	public TargetRegistrationException(Throwable cause) {
 		super(cause);
 	}
 
 	public TargetRegistrationException(String message) {
-        super(message);
-    }
+		super(message);
+	}
 }

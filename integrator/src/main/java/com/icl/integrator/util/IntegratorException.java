@@ -9,15 +9,15 @@ package com.icl.integrator.util;
  */
 public class IntegratorException extends RuntimeException {
 
-    public IntegratorException(Throwable cause) {
-        super(cause);
-    }
+	public IntegratorException(Throwable cause) {
+		super(cause);
+	}
 
-    public IntegratorException(String message) {
-        super(message);
-    }
+	public IntegratorException(String message) {
+		super(message);
+	}
 
-    public IntegratorException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public IntegratorException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

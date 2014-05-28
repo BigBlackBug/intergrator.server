@@ -38,7 +38,8 @@ public class ValidationService {
 	public ValidationService() {
 		jsonSchemaFactory = JsonSchemaFactory.newBuilder().setValidationConfiguration(
 				ValidationConfiguration.newBuilder().setDefaultVersion(
-						SchemaVersion.DRAFTV4).freeze()).freeze();
+						SchemaVersion.DRAFTV4).freeze()
+		).freeze();
 	}
 
 	@PostConstruct

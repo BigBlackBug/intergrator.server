@@ -2,7 +2,6 @@
 <beans:beans xmlns="http://www.springframework.org/schema/security"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:beans="http://www.springframework.org/schema/beans"
-             xmlns:sec="http://www.springframework.org/schema/security"
              xsi:schemaLocation="
       http://www.springframework.org/schema/security
       http://www.springframework.org/schema/security/spring-security-3.2.xsd
@@ -11,30 +10,33 @@
 
     <beans:bean id="restAuthenticationEntryPoint" class="com.icl.integrator.security.RestAuthenticationEntryPoint"/>
     <beans:bean id="authSuccessHandler" class="com.icl.integrator.security.IntegratorAuthenticationSuccessHandler" />
-    <beans:bean id="authFailureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler" />
+    <beans:bean id="authFailureHandler" class="com.icl.integrator.security.IntegratorAuthenticationFailureHandler"/>
     <beans:bean id="logoutSuccessHandler" class="com.icl.integrator.security.NoRedirectLogoutSuccessHandler"/>
-    <!--TODO probably send a valid packet instead of form when 401-->
     <beans:bean id="userService" class="com.icl.integrator.security.UserService" />
 
     <http pattern="/integrator/ping" security="none"/>
-    <http use-expressions="true" entry-point-ref="restAuthenticationEntryPoint" >
+    <http use-expressions="true" entry-point-ref="restAuthenticationEntryPoint">
         <intercept-url pattern="/integrator/**" access="isAuthenticated()" />
-        <sec:form-login authentication-success-handler-ref="authSuccessHandler"
-                        authentication-failure-handler-ref="authFailureHandler" />
-
-        <logout success-handler-ref="logoutSuccessHandler"/>
+        <custom-filter position="FORM_LOGIN_FILTER" ref="authFilter"/>
+        <logout success-handler-ref="logoutSuccessHandler" logout-url="/logout"/>
     </http>
 
+    <beans:bean id="authFilter" class="com.icl.integrator.security.AuthenticationFilter">
+        <beans:property name="authenticationSuccessHandler" ref="authSuccessHandler"/>
+        <beans:property name="authenticationFailureHandler" ref="authFailureHandler"/>
+        <beans:property name="authenticationManager" ref="authenticationManager"/>
+    </beans:bean>
+
+    <beans:bean id="md5encoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
+    <beans:bean id="authenticationProvider"
+                class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+        <beans:property name="hideUserNotFoundExceptions" value="false"/>
+        <beans:property name="userDetailsService" ref="userService"/>
+        <beans:property name="passwordEncoder" ref="md5encoder"/>
+    </beans:bean>
+
     <authentication-manager alias="authenticationManager">
-        <authentication-provider user-service-ref="userService" >
-            <password-encoder hash="md5"/>
-        </authentication-provider>
-        <!--<authentication-provider>-->
-            <!--<user-service>-->
-                <!--<user name="temporary" password="temporary" authorities="ROLE_ADMIN" />-->
-                <!--<user name="user" password="userPass" authorities="ROLE_USER" />-->
-            <!--</user-service>-->
-        <!--</authentication-provider>-->
+        <authentication-provider ref="authenticationProvider"/>
     </authentication-manager>
 
 </beans:beans>

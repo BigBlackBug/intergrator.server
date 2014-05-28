@@ -8,8 +8,8 @@ import com.icl.integrator.dto.destination.ServiceDestinationDescriptor;
 import com.icl.integrator.dto.editor.EditActionDTO;
 import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
+import com.icl.integrator.dto.util.ErrorCode;
 import com.icl.integrator.model.IntegratorUser;
-import com.icl.integrator.services.utils.RestrictedAccess;
 import com.icl.integrator.services.utils.Synchronized;
 import com.icl.integrator.services.validation.ValidationService;
 import com.icl.integrator.util.ExceptionUtils;
@@ -23,7 +23,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +35,13 @@ import java.util.Map;
  */
 @Service
 public class IntegratorService implements IntegratorAPI {
+
+	//TODO move to props
+	private static final String errorMessage =
+			"Состояние Вашего клиента не совпадает с состоянием сервера." +
+					"Пожалуйста вызовите метод fetchUpdates, чтобы получить изменения, " +
+					"совершённые с момента последнего обновления. " +
+					"Для получения ожидаемого результата желательно обработать полученные данные";
 
 	private static Log logger = LogFactory.getLog(IntegratorService.class);
 
@@ -58,12 +64,34 @@ public class IntegratorService implements IntegratorAPI {
 	private VersioningService versioningService;
 
 	@Override
-	@RestrictedAccess
+	@Synchronized
 	public <T extends DestinationDescriptor> ResponseDTO<Map<String, ResponseDTO<String>>>
 	deliver(IntegratorPacket<DeliveryDTO, T> delivery) {
 		logger.info("Received a delivery request");
 		DeliveryDTO packet = delivery.getData();
 		validationService.validate(packet.getRequestData());
+
+		List<String> destinations = packet.getDestinations();
+		String action = packet.getAction();
+		boolean canContinue = true;
+		for (String service : destinations) {
+			//service not deleted/changed
+			canContinue &=
+					versioningService.hasAccess(getCurrentUsername(),
+					                            new Modification.ServiceSubject(service),
+					                            Modification.ActionType.REMOVED,
+					                            Modification.ActionType.CHANGED);
+			//action not deleted changed
+			canContinue &= versioningService.hasAccess(getCurrentUsername(),
+			                                           new Modification.ActionSubject(service,
+			                                                                          action),
+			                                           Modification.ActionType.CHANGED,
+			                                           Modification.ActionType.REMOVED
+			);
+		}
+		if (!canContinue) {
+			return new ResponseDTO<>(new ErrorDTO(errorMessage, ErrorCode.OUTDATED_CLIENT_STATE));
+		}
 
 		Deliveries deliveries =
 				deliveryCreator.createDeliveries(packet, packet.getResponseHandlerDescriptor());
@@ -87,14 +115,19 @@ public class IntegratorService implements IntegratorAPI {
 	ResponseDTO<List<ActionRegistrationResultDTO>> registerService(
 			IntegratorPacket<TargetRegistrationDTO<T>, Y> registrationDTO) {
 		logger.info("Received a service registration request");
+		String serviceName = registrationDTO.getData().getServiceName();
+		String username = getCurrentUsername();
+		Modification.ServiceSubject subject = new Modification.ServiceSubject(serviceName);
+		Modification modification = new Modification(Modification.ActionType.ADDED, subject);
+
+		if (!versioningService.hasAccess(username, modification)) {
+			return new ResponseDTO<>(new ErrorDTO(errorMessage, ErrorCode.OUTDATED_CLIENT_STATE));
+		}
+
 		List<ActionRegistrationResultDTO> result =
 				workerService.registerService(registrationDTO.getData());
-		String serviceName = registrationDTO.getData().getServiceName();
-		versioningService.logModification(getCurrentUsername(),
-		                                  new Modification<>(Modification.SubjectType.SERVICE,
-		                                                   Modification.ActionType.ADDED,
-		                                                   serviceName)
-		);
+
+		versioningService.logModification(username, modification);
 		return new ResponseDTO<>(result);
 	}
 
@@ -103,8 +136,21 @@ public class IntegratorService implements IntegratorAPI {
 	public <T extends DestinationDescriptor> ResponseDTO<Boolean> isAvailable(
 			IntegratorPacket<ServiceDestinationDescriptor, T> serviceDescriptor) {
 		logger.info("Received a ping request for " + serviceDescriptor);
+		String username = getCurrentUsername();
+		ServiceDestinationDescriptor destinationDescriptor = serviceDescriptor.getData();
+		String service = destinationDescriptor.getService();
+		String action = destinationDescriptor.getAction();
+		if (!versioningService.hasAccess(username, new Modification.ServiceSubject(service),
+		                                 Modification.ActionType.CHANGED,
+		                                 Modification.ActionType.REMOVED) ||
+				!versioningService
+						.hasAccess(username, new Modification.ActionSubject(service, action),
+						           Modification.ActionType.CHANGED,
+						           Modification.ActionType.REMOVED)) {
+			return new ResponseDTO<>(new ErrorDTO(errorMessage, ErrorCode.OUTDATED_CLIENT_STATE));
+		}
 		try {
-			workerService.pingService(serviceDescriptor.getData());
+			workerService.pingService(destinationDescriptor);
 			return new ResponseDTO<>(Boolean.TRUE);
 		} catch (ConnectionException ex) {
 			logger.error(ex, ex);
@@ -116,57 +162,76 @@ public class IntegratorService implements IntegratorAPI {
 	@Synchronized
 	public <T extends DestinationDescriptor> ResponseDTO<List<ServiceDTO>>
 	getServiceList(IntegratorPacket<Void, T> packet) {
+		//TODO сброс версий для сервисов???
 		List<ServiceDTO> serviceList = workerService.getServiceList();
 		return new ResponseDTO<>(serviceList);
 	}
 
 	@Override
-	@RestrictedAccess
+	@Synchronized
 	public <T extends DestinationDescriptor, Y extends ActionDescriptor>
 	ResponseDTO<List<ActionEndpointDTO<Y>>> getSupportedActions(
-			IntegratorPacket<String, T> serviceName) {
-		List<ActionEndpointDTO> supportedActions = workerService
-				.getSupportedActions(serviceName.getData());
-		List<ActionEndpointDTO<Y>> result = new ArrayList<>();
-		for (ActionEndpointDTO actionEndpoint : supportedActions) {
-			result.add(actionEndpoint);
+			IntegratorPacket<String, T> serviceNamePacket) {
+		String serviceName = serviceNamePacket.getData();
+		if (!versioningService.hasAccess(
+				getCurrentUsername(), new Modification.ServiceSubject(serviceName),
+				Modification.ActionType.CHANGED, Modification.ActionType.REMOVED)) {
+			return new ResponseDTO<>(new ErrorDTO(errorMessage, ErrorCode.OUTDATED_CLIENT_STATE));
 		}
-		//TODO really?
-		return new ResponseDTO<>(result);
+		List<ActionEndpointDTO<Y>> supportedActions = workerService
+				.getSupportedActions(serviceName);
+		return new ResponseDTO<>(supportedActions);
 	}
 
 	@Override
-	@RestrictedAccess
+	@Synchronized
 	public <T extends DestinationDescriptor, Y extends ActionDescriptor> ResponseDTO<Void>
 	addAction(IntegratorPacket<AddActionDTO<Y>, T> actionDTO) {
-		//TODO разрулить это дело. если типа изменений по сервису нет,то пусть коммитит.
-		//TODO везде натыкать таких проверок
-		workerService.addAction(actionDTO.getData());
-		String actionName = actionDTO.getData().getActionRegistration().getAction().getActionName();
+		AddActionDTO<Y> data = actionDTO.getData();
+		String serviceName = data.getServiceName();
+		String actionName = data.getActionRegistration().getAction().getActionName();
 		String username = getCurrentUsername();
-		versioningService.logModification(username,
-		                                  new Modification<>(Modification.SubjectType.ACTION,
-		                                                   Modification.ActionType.ADDED,
-		                                                   actionName)
-		);
+
+		Modification.ActionSubject subject =
+				new Modification.ActionSubject(serviceName, actionName);
+		Modification modification = new Modification(Modification.ActionType.ADDED, subject);
+		//или сервис уже удалили
+		//или уже кто-то добавил действие с таким именем
+		if (!versioningService.hasAccess(username,
+		                                 new Modification.ServiceSubject(serviceName),
+		                                 Modification.ActionType.REMOVED,
+		                                 Modification.ActionType.CHANGED)
+				|| !versioningService.hasAccess(username, modification)) {
+			return new ResponseDTO<>(new ErrorDTO(errorMessage, ErrorCode.OUTDATED_CLIENT_STATE));
+		}
+		workerService.addAction(data);
+
+		versioningService.logModification(username, modification);
 		return new ResponseDTO<>(true);
 	}
 
 	@Override
-	@RestrictedAccess
+	@Synchronized
 	public <ADType extends ActionDescriptor,
 			DDType extends DestinationDescriptor> ResponseDTO<FullServiceDTO<ADType>>
-	getServiceInfo(IntegratorPacket<String, DDType> serviceName) {
+	getServiceInfo(IntegratorPacket<String, DDType> serviceNamePacket) {
+		String serviceName = serviceNamePacket.getData();
+		if (!versioningService
+				.hasAccess(getCurrentUsername(), new Modification.ServiceSubject(serviceName),
+				           Modification.ActionType.REMOVED)) {
+			return new ResponseDTO<>(new ErrorDTO(errorMessage, ErrorCode.OUTDATED_CLIENT_STATE));
+		}
 		FullServiceDTO<ADType> serviceInfo =
-				workerService.getServiceInfo(serviceName.getData());
+				workerService.getServiceInfo(serviceNamePacket.getData());
 		return new ResponseDTO<>(serviceInfo);
 	}
 
 	@Override
-	@RestrictedAccess
+	@Synchronized
 	public <T extends DestinationDescriptor, Y> ResponseDTO<List<ResponseDTO<Void>>>
 	registerAutoDetection(
 			IntegratorPacket<AutoDetectionRegistrationDTO<Y>, T> autoDetectionDTO) {
+		//TODO версионность
 		logger.info("Received an autodetection registration request");
 		try {
 			List<ResponseDTO<Void>> result =
@@ -208,25 +273,35 @@ public class IntegratorService implements IntegratorAPI {
 	}
 
 	@Override
-	@RestrictedAccess
+	@Synchronized
 	public <T extends DestinationDescriptor> ResponseDTO<Void> removeService(
 			IntegratorPacket<String, T> serviceNamePacket) {
 		String serviceName = serviceNamePacket.getData();
-		workerService.removeService(serviceName);
+		Modification modification = new Modification(
+				Modification.ActionType.REMOVED, new Modification.ServiceSubject(serviceName));
+
 		String username = getCurrentUsername();
-		versioningService
-				.logModification(username, new Modification<>(Modification.SubjectType.SERVICE,
-				                                            Modification.ActionType.REMOVED,
-				                                            serviceName));
+		if (!versioningService.hasAccess(username, modification)) {
+			return new ResponseDTO<>(new ErrorDTO(errorMessage, ErrorCode.OUTDATED_CLIENT_STATE));
+		}
+
+		workerService.removeService(serviceName);
+		versioningService.logModification(username, modification);
 		return new ResponseDTO<>(true);
 	}
 
 	@Override
-	@RestrictedAccess
+	@Synchronized
 	public <T extends DestinationDescriptor> ResponseDTO<Void> editService(
 			IntegratorPacket<EditServiceDTO, T> editServiceDTO) {
 		EditServiceDTO data = editServiceDTO.getData();
 		String serviceName = data.getServiceName();
+		Modification.ServiceSubject subject = new Modification.ServiceSubject(serviceName);
+		if (!versioningService.hasAccess(getCurrentUsername(), subject,
+		                                 Modification.ActionType.CHANGED,
+		                                 Modification.ActionType.REMOVED)) {
+			return new ResponseDTO<>(new ErrorDTO(errorMessage, ErrorCode.OUTDATED_CLIENT_STATE));
+		}
 		try {
 			workerService.editService(data);
 		}catch(DataAccessException ex){
@@ -234,21 +309,27 @@ public class IntegratorService implements IntegratorAPI {
 			logger.error(realSQLError);
 			return new ResponseDTO<>(new ErrorDTO(realSQLError));
 		}
-		versioningService
-				.logModification(getCurrentUsername(),
-				                 new Modification<>(Modification.SubjectType.SERVICE,
-				                                  Modification.ActionType.CHANGED,
-				                                  serviceName));
+		versioningService.logModification(getCurrentUsername(),
+		                                  new Modification(Modification.ActionType.CHANGED,
+		                                                   subject)
+		);
 		return new ResponseDTO<>(true);
 	}
 
 	@Override
-	@RestrictedAccess
+	@Synchronized
 	public <T extends DestinationDescriptor> ResponseDTO<Void> editAction(
 			IntegratorPacket<EditActionDTO, T> editActionDTO) {
 		EditActionDTO data = editActionDTO.getData();
 		String serviceName = data.getServiceName();
 		String actionName = data.getActionName();
+		Modification.ActionSubject subject =
+				new Modification.ActionSubject(serviceName, actionName);
+		if (!versioningService.hasAccess(getCurrentUsername(), subject,
+		                                 Modification.ActionType.CHANGED,
+		                                 Modification.ActionType.REMOVED)) {
+			return new ResponseDTO<>(new ErrorDTO(errorMessage, ErrorCode.OUTDATED_CLIENT_STATE));
+		}
 		try {
 			workerService.editAction(data);
 		}catch(DataAccessException ex){
@@ -256,12 +337,10 @@ public class IntegratorService implements IntegratorAPI {
 			logger.error(realSQLError);
 			return new ResponseDTO<>(new ErrorDTO(realSQLError));
 		}
-		Modification.ServiceActionPair pair = new Modification.ServiceActionPair(
-				serviceName, actionName);
 		versioningService.logModification(getCurrentUsername(),
-				                 new Modification<>(Modification.SubjectType.ACTION,
-				                                    Modification.ActionType.CHANGED,
-				                                    pair));
+		                                  new Modification(Modification.ActionType.CHANGED,
+		                                                   subject)
+		);
 		return new ResponseDTO<>(true);
 	}
 

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+
 /**
  * Created with IntelliJ IDEA.
  * User: e.shahmaev
@@ -21,7 +22,7 @@ import java.util.UUID;
  * Time: 14:52
  * To change this template use File | Settings | File Templates.
  */
-public interface ExtendedSourceSpringService extends ExtendedSourceService {
+public abstract class ExtendedSourceSpringService extends ExtendedSourceService {
 
 	@Override
 	@RequestMapping(value = "/handleDeliveryResponse",
@@ -30,7 +31,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleDeliveryResponse(@RequestBody
-	                            Map<String, ResponseDTO<UUID>> response);
+	                            Map<String, ResponseDTO<UUID>> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleServiceRegistrationResponse",
@@ -40,7 +42,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	@ResponseBody
 	void handleServiceRegistration(
 			@RequestBody
-			ResponseDTO<List<ActionRegistrationResultDTO>> response);
+			ResponseDTO<List<ActionRegistrationResultDTO>> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleServiceIsAvailableResponse",
@@ -49,7 +52,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleServiceIsAvailable(@RequestBody
-	                              ResponseDTO<Boolean> response);
+	                              ResponseDTO<Boolean> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleGetServiceList",
@@ -58,7 +62,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleGetServiceList(@RequestBody
-	                          ResponseDTO<List<ServiceDTO>> response);
+	                          ResponseDTO<List<ServiceDTO>> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleGetSupportedActions",
@@ -67,7 +72,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleGetSupportedActions(@RequestBody
-	                               ResponseDTO<List<String>> response);
+	                               ResponseDTO<List<String>> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleAddAction",
@@ -75,7 +81,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleAddAction(@RequestBody ResponseDTO<Void> response);
+	void handleAddAction(@RequestBody ResponseDTO<Void> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleGetServiceInfo",
@@ -84,7 +91,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleGetServiceInfo(@RequestBody
-	                          ResponseDTO<FullServiceDTO<ActionDescriptor>> response);
+	                          ResponseDTO<FullServiceDTO<ActionDescriptor>> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleGetServiceInfo",
@@ -93,7 +101,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleAutoDetectionRegistration(@RequestBody
-	                                     ResponseDTO<List<ResponseDTO<Void>>> response);
+	                                     ResponseDTO<List<ResponseDTO<Void>>> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleResponseFromTarget",
@@ -102,14 +111,17 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleResponseFromTarget(@RequestBody
-	                              ResponseDTO<ResponseFromTargetDTO> responseDTO);
+	                              ResponseDTO<ResponseFromTargetDTO> responseDTO) {
+	}
+
 	@Override
 	@RequestMapping(value = "/handleGetActionsForDelivery",
 	                consumes = MediaType.APPLICATION_JSON_VALUE,
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleGetActionsForDelivery(@RequestBody ResponseDTO<List<DeliveryActionsDTO>> response);
+	void handleGetActionsForDelivery(@RequestBody ResponseDTO<List<DeliveryActionsDTO>> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleGetServicesSupportingActionType",
@@ -118,7 +130,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	public
 	@ResponseBody
 	void handleGetServicesSupportingActionType(
-			@RequestBody ResponseDTO<List<ServiceAndActions<ActionDescriptor>>> response);
+			@RequestBody ResponseDTO<List<ServiceAndActions<ActionDescriptor>>> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleFetchUpdates",
@@ -126,7 +139,8 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleFetchUpdates(@RequestBody ResponseDTO<List<Modification>> response);
+	void handleFetchUpdates(@RequestBody ResponseDTO<List<Modification>> response) {
+	}
 
 	@Override
 	@RequestMapping(value = "/handleRemoveService",
@@ -134,5 +148,24 @@ public interface ExtendedSourceSpringService extends ExtendedSourceService {
 	                method = {RequestMethod.POST, RequestMethod.HEAD})
 	public
 	@ResponseBody
-	void handleRemoveService(@RequestBody ResponseDTO<Void> response);
+	void handleRemoveService(@RequestBody ResponseDTO<Void> response) {
+	}
+
+	@Override
+	@RequestMapping(value = "/handleEditService",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleEditService(@RequestBody ResponseDTO<Void> response) {
+	}
+
+	@Override
+	@RequestMapping(value = "/handleEditAction",
+	                consumes = MediaType.APPLICATION_JSON_VALUE,
+	                method = {RequestMethod.POST, RequestMethod.HEAD})
+	public
+	@ResponseBody
+	void handleEditAction(@RequestBody ResponseDTO<Void> response) {
+	}
 }

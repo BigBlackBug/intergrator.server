@@ -73,6 +73,12 @@ public class HeadInterceptor extends HandlerInterceptorAdapter {
 		types.put(ActionMethod.HANDLE_REMOVE_SERVICE,
 		          new ParameterizedTypeReference<ResponseDTO<Void>>() {
 		          }.getType());
+		types.put(ActionMethod.HANDLE_EDIT_SERVICE,
+		          new ParameterizedTypeReference<ResponseDTO<Void>>() {
+		          }.getType());
+		types.put(ActionMethod.HANDLE_EDIT_ACTION,
+		          new ParameterizedTypeReference<ResponseDTO<Void>>() {
+		          }.getType());
 	}
 
 	@Override

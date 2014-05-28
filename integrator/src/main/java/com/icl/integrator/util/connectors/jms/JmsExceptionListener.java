@@ -8,7 +8,7 @@ import javax.jms.JMSException;
 @Component
 public class JmsExceptionListener implements ExceptionListener {
 
-    public void onException(final JMSException e) {
-        e.printStackTrace();
-    }
+	public void onException(final JMSException e) {
+		e.printStackTrace();
+	}
 }
