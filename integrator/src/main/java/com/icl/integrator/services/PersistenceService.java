@@ -55,16 +55,15 @@ public class PersistenceService {
 	public void createDefaultUser() {
 		try {
 			em.createQuery("select e from IntegratorUser e where e.username=:username")
-					.setParameter("username", "user").getSingleResult();
+					.setParameter("username", "sodch").getSingleResult();
 		} catch (NoResultException ex) {
 			final IntegratorUser user = new IntegratorUser();
-			user.setUsername("user");
-			//pass
-			user.setPassword("1a1dc91c907325c69271ddf0c944bc72");
+			user.setUsername("sodch");
+			//sodch
+			user.setPassword("872bd866e6a71edd85c1a245ce17495b");
 			user.setRole(RoleEnum.ROLE_USER);
 			em.persist(user);
 		}
-
 	}
 
 	public <T extends AbstractEntity> T find(Class<T> entityClass, UUID id) {
