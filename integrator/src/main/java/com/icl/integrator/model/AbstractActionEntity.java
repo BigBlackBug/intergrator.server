@@ -43,12 +43,23 @@ public abstract class AbstractActionEntity extends AbstractEntity implements Has
 	@JoinColumn(name = "CREATOR_ID")
 	private IntegratorUser creator;
 
+	@Embedded
+	private DeliverySettings deliverySettings = DeliverySettings.createDefaultSettings();
+
 	protected AbstractActionEntity() {
 
 	}
 
 	protected AbstractActionEntity(EndpointType endpointType) {
 		this.type = endpointType;
+	}
+
+	public DeliverySettings getDeliverySettings() {
+		return deliverySettings;
+	}
+
+	public void setDeliverySettings(DeliverySettings deliverySettings) {
+		this.deliverySettings = deliverySettings;
 	}
 
 	public ActionMethod getActionMethod() {

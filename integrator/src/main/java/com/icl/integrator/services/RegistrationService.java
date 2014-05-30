@@ -110,7 +110,8 @@ public class RegistrationService {
 		    throw new TargetRegistrationException("Тип действия не совпадает с типом сервиса");
 	    }
         String actionName = actionEndpoint.getActionName();
-        if (actionDescriptor instanceof HttpActionDTO) {
+
+	    if (actionDescriptor instanceof HttpActionDTO) {
             HttpActionDTO httpActionDTO = (HttpActionDTO) actionDescriptor;
             actionEntity = persistenceService.findHttpAction(serviceID, httpActionDTO.getPath());
 	        //действие может быть сгенерированным с говноименем, поэтому не кидаем ошибку, а заменяем имя
@@ -131,6 +132,16 @@ public class RegistrationService {
                 actionEntity = createJmsAction(actionName, queueDTO, creator);
             }
         }
+	    DeliverySettingsDTO deliverySettings = actionEndpoint.getDeliverySettings();
+	    DeliverySettings settings;
+	    if (deliverySettings == null) {
+		    settings = service.getDeliverySettings();
+	    } else {
+		    settings = new DeliverySettings();
+		    settings.setRetryDelay(deliverySettings.getRetryDelay());
+		    settings.setRetryNumber(deliverySettings.getRetryNumber());
+	    }
+	    actionEntity.setDeliverySettings(settings);
         return actionEntity;
     }
 
@@ -228,7 +239,6 @@ public class RegistrationService {
             settings.setRetryDelay(deliverySettings.getRetryDelay());
             settings.setRetryNumber(deliverySettings.getRetryNumber());
         }
-        settings.setEndpoint(endpoint);
         endpoint.setDeliverySettings(settings);
         return endpoint;
     }
@@ -248,7 +258,6 @@ public class RegistrationService {
             settings.setRetryDelay(deliverySettings.getRetryDelay());
             settings.setRetryNumber(deliverySettings.getRetryNumber());
         }
-        settings.setEndpoint(endpoint);
         endpoint.setDeliverySettings(settings);
         return endpoint;
     }
@@ -264,7 +273,6 @@ public class RegistrationService {
                 settings = new DeliverySettings();
                 settings.setRetryDelay(deliverySettings.getRetryDelay());
                 settings.setRetryNumber(deliverySettings.getRetryNumber());
-                settings.setEndpoint(endpoint);
                 endpoint.setDeliverySettings(settings);
             }
         } else {

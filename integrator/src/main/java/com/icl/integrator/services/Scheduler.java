@@ -104,7 +104,7 @@ public class Scheduler {
     }
 
     private class ExceptionHandlerGeneral<T, E extends Exception> extends
-		    ExceptionHandler<T, Void, E> {
+		    ExceptionHandler<T, E> {
 
 	    public ExceptionHandlerGeneral(Schedulable<T> deliverySchedulable,
 	                                   Callback<Void> retryLimitHandler) {
@@ -130,7 +130,7 @@ public class Scheduler {
     }
 
 	private class ExceptionHandlerError<T, E extends Exception> extends
-			ExceptionHandler<T, ErrorDTO, E> {
+			ExceptionHandler<T, E> {
 
 		public ExceptionHandlerError(Schedulable<T> deliverySchedulable,
 		                             Callback<ErrorDTO> retryLimitHandler) {
@@ -159,7 +159,7 @@ public class Scheduler {
 		}
 	}
 
-	private abstract class ExceptionHandler<T, Y, E extends Exception>
+	private abstract class ExceptionHandler<T, E extends Exception>
 			implements Callback<E> {
 
 		protected final TaskCreator<T> taskCreator;
@@ -201,12 +201,10 @@ public class Scheduler {
 				return;
 			}
 
-			Date nextRequestDate = new Date(System.currentTimeMillis() +
-					                                deliverySettings.getRetryDelay());
+			long retryDelay = deliverySettings.getRetryDelay();
+			Date nextRequestDate = new Date(System.currentTimeMillis() + retryDelay);
 			logger.info("Rescheduling next request to " + DATE_FORMAT.format(nextRequestDate));
-			EXECUTOR.schedule(taskCreator.create(),
-			                  deliverySettings.getRetryDelay(),
-			                  TimeUnit.MILLISECONDS);
+			EXECUTOR.schedule(taskCreator.create(), retryDelay, TimeUnit.MILLISECONDS);
 			scheduleMap.put(taskCreator.getTaskID(), retryIndex + 1);
 		}
 	}

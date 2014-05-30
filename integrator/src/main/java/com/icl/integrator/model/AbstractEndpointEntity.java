@@ -34,9 +34,7 @@ public abstract class AbstractEndpointEntity<T extends AbstractActionEntity>
 	        insertable = false)
 	private EndpointType type;
 
-	//TODO make embeddable
-	@OneToOne
-	@Cascade(value = {org.hibernate.annotations.CascadeType.ALL})
+	@Embedded
 	private DeliverySettings deliverySettings = DeliverySettings.createDefaultSettings();
 
 	@ManyToOne(optional = false)
