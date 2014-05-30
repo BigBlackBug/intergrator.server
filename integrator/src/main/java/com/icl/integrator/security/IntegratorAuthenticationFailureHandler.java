@@ -2,7 +2,9 @@ package com.icl.integrator.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icl.integrator.dto.ErrorDTO;
+import com.icl.integrator.dto.IntegratorPacket;
 import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.services.DeliveryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -22,23 +24,31 @@ public class IntegratorAuthenticationFailureHandler implements AuthenticationFai
 	@Autowired
 	private ObjectMapper mapper;
 
+	@Autowired
+	private DeliveryService deliveryService;
+
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 	                                    AuthenticationException exception)
 			throws IOException, ServletException {
-		//TODO считать из пакета и отослать результат
 		if (exception instanceof BadCredentialsException) {
-			finish(response, "Неверный пароль");
+			finish(request, response, "Неверный пароль");
 		} else if (exception instanceof UsernameNotFoundException) {
-			finish(response, "Пользователя с таким именем не существует");
+			finish(request, response, "Пользователя с таким именем не существует");
 		} else {
-			finish(response, exception.getMessage());
+			finish(request, response, exception.getMessage());
 		}
 	}
 
-	private void finish(final HttpServletResponse response, String message)
-			throws IOException {
-		String responseValue = mapper.writeValueAsString(new ResponseDTO(new ErrorDTO(message)));
+	private void finish(HttpServletRequest request, final HttpServletResponse response,
+	                    String message) throws IOException {
+		IntegratorPacket packet =
+				(IntegratorPacket) request.getAttribute(AuthenticationFilter.PACKET_ATTRIBUTE);
+
+		ResponseDTO error = new ResponseDTO(new ErrorDTO(message));
+		deliveryService.deliver(packet.getResponseHandlerDescriptor(), error);
+
+		String responseValue = mapper.writeValueAsString(error);
 		response.setHeader("Content-Type","application/json; charset=UTF-8");
 		response.getWriter().append(responseValue);
 	}

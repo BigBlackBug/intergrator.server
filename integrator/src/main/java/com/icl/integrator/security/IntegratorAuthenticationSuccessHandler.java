@@ -1,5 +1,9 @@
 package com.icl.integrator.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.dto.IntegratorPacket;
+import com.icl.integrator.dto.ResponseDTO;
+import com.icl.integrator.services.DeliveryService;
 import com.icl.integrator.services.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -17,7 +21,13 @@ import java.io.IOException;
 public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
 	@Autowired
+	private ObjectMapper mapper;
+
+	@Autowired
 	private VersioningService versioningService;
+
+	@Autowired
+	private DeliveryService deliveryService;
 
 	private RequestCache requestCache = new HttpSessionRequestCache();
 
@@ -48,6 +58,15 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 	private void finish(final HttpServletRequest request, final HttpServletResponse response)
 			throws IOException {
 		clearAuthenticationAttributes(request);
+		IntegratorPacket packet =
+				(IntegratorPacket) request.getAttribute(AuthenticationFilter.PACKET_ATTRIBUTE);
+
+		ResponseDTO responseDTO = new ResponseDTO(true);
+		deliveryService.deliver(packet.getResponseHandlerDescriptor(), responseDTO);
+		response.setHeader("Content-Type", "application/json; charset=UTF-8");
+
+		String responseValue = mapper.writeValueAsString(responseDTO);
+		response.getWriter().append(responseValue);
 	}
 
 	public void setRequestCache(final RequestCache requestCache) {
