@@ -550,6 +550,10 @@ public class IntegratorHttpClient implements IntegratorClient {
 		}
 	}
 
+	public ResponseDTO<Void> registerUser(UserCredentialsDTO credentialsDTO) {
+		return registerUser(new IntegratorPacket<>(credentialsDTO));
+	}
+
 	private HttpMethodDescriptor getMethodPath(String methodName,
 	                                           Class<?>... parameterTypes) {
 		Method m = null;
