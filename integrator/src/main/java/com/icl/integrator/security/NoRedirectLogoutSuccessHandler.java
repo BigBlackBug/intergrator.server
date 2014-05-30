@@ -23,7 +23,10 @@ public class NoRedirectLogoutSuccessHandler implements LogoutSuccessHandler {
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
 	                            Authentication authentication)
 			throws IOException, ServletException {
-		IntegratorUser integratorUser = (IntegratorUser) (authentication.getPrincipal());
-		versioningService.logout(integratorUser.getUsername());
+		if (authentication != null) {
+			//ещё не вышли
+			IntegratorUser integratorUser = (IntegratorUser) (authentication.getPrincipal());
+			versioningService.logout(integratorUser.getUsername());
+		}
 	}
 }
