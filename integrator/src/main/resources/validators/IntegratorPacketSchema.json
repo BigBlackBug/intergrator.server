@@ -293,7 +293,7 @@
                 },
                 "deliverySettings": {
                     "$ref": "#/definitions/deliverySettings"
-                },
+                }
             }
         },
         "deliverySettings": {
