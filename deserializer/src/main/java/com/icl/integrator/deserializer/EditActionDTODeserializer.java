@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.editor.EditActionDTO;
 import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.registration.DeliverySettingsDTO;
 
 import java.io.IOException;
 
@@ -24,10 +25,13 @@ public class EditActionDTODeserializer extends JsonDeserializer<EditActionDTO> {
 		boolean forceChanges = treeNode.get("forceChanges").asBoolean();
 		ActionDescriptor actionDescriptor = mapper.readValue(serviceEndpoint.toString(),
 		                                                     ActionDescriptor.class);
+		DeliverySettingsDTO deliverySettings =
+				mapper.readValue(treeNode.get("deliverySettings").toString(),
+				                 DeliverySettingsDTO.class);
 		String serviceName = treeNode.get("serviceName").asText();
 		String newActionName = treeNode.get("newActionName").asText();
 		String actionName = treeNode.get("actionName").asText();
 		return new EditActionDTO(serviceName, actionName, newActionName, actionDescriptor,
-		                         forceChanges);
+		                         deliverySettings, forceChanges);
 	}
 }

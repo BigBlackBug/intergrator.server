@@ -87,30 +87,24 @@ public class DeliveryCreator {
 		AbstractActionEntity actionEntity = null;
 		AbstractEndpointEntity endpointEntity = null;
 
-		DestinationDescriptor.DescriptorType descriptorType =
-				destination.getDescriptorType();
+		DestinationDescriptor.DescriptorType descriptorType = destination.getDescriptorType();
 		if (descriptorType == DestinationDescriptor.DescriptorType.RAW) {
-			RawDestinationDescriptor realSourceService =
-					(RawDestinationDescriptor) destination;
+			RawDestinationDescriptor realSourceService = (RawDestinationDescriptor) destination;
 			EndpointDescriptor descriptor = realSourceService.getEndpoint();
 			EndpointType endpointType = descriptor.getEndpointType();
 
 			if (endpointType == EndpointType.HTTP) {
-				HttpEndpointDescriptorDTO realDescriptor =
-						(HttpEndpointDescriptorDTO) descriptor;
+				HttpEndpointDescriptorDTO realDescriptor = (HttpEndpointDescriptorDTO) descriptor;
 				HttpActionDTO httpActionDTO =
-						(HttpActionDTO) realSourceService
-								.getActionDescriptor();
+						(HttpActionDTO) realSourceService.getActionDescriptor();
 				HttpServiceEndpoint service =
 						persistenceService.findHttpService(
 								realDescriptor.getHost(),
 								realDescriptor.getPort());
 				if (service == null) {
 					service = new HttpServiceEndpoint();
-					DeliverySettings defaultSettings =
-							DeliverySettings.createDefaultSettings();
+					DeliverySettings defaultSettings = DeliverySettings.createDefaultSettings();
 					service.setDeliverySettings(defaultSettings);
-					defaultSettings.setEndpoint(service);
 					service.setServiceName(generateServiceName());
 					service.setServiceURL(realDescriptor.getHost());
 					service.setServicePort(realDescriptor.getPort());
@@ -131,15 +125,11 @@ public class DeliveryCreator {
 			} else if (endpointType == EndpointType.JMS) {
 				JMSEndpointDescriptorDTO realDescriptor =
 						(JMSEndpointDescriptorDTO) descriptor;
-				QueueDTO queueDTO =
-						(QueueDTO) realSourceService
-								.getActionDescriptor();
-				Map<String, String> jndiProperties =
-						realDescriptor.getJndiProperties();
+				QueueDTO queueDTO = (QueueDTO) realSourceService.getActionDescriptor();
+				Map<String, String> jndiProperties = realDescriptor.getJndiProperties();
 				String jndiPropertiesString = null;
 				try {
-					jndiPropertiesString =
-							objectMapper.writeValueAsString(jndiProperties);
+					jndiPropertiesString = objectMapper.writeValueAsString(jndiProperties);
 				} catch (JsonProcessingException e) {
 				}
 				JMSServiceEndpoint service =
@@ -148,16 +138,12 @@ public class DeliveryCreator {
 								jndiPropertiesString);
 				if (service == null) {
 					service = new JMSServiceEndpoint();
-					DeliverySettings defaultSettings =
-							DeliverySettings.createDefaultSettings();
+					DeliverySettings defaultSettings = DeliverySettings.createDefaultSettings();
 					service.setDeliverySettings(defaultSettings);
-					defaultSettings.setEndpoint(service);
 					service.setServiceName(generateServiceName());
-					service.setConnectionFactory(
-							realDescriptor.getConnectionFactory());
+					service.setConnectionFactory(realDescriptor.getConnectionFactory());
 					service.setJndiProperties(jndiPropertiesString);
-					JMSAction action =
-							createJmsAction(service, queueDTO);
+					JMSAction action = createJmsAction(service, queueDTO);
 					endpointEntity = persistenceService.persist(service);
 					actionEntity = action;
 				} else {
@@ -198,10 +184,8 @@ public class DeliveryCreator {
 	                                   T data,
 	                                   DestinationEntity destinationEntity)
 			throws JsonProcessingException {
-		service = persistenceService
-				.find(AbstractEndpointEntity.class, service.getId());
-		action = persistenceService
-				.find(AbstractActionEntity.class, action.getId());
+		service = persistenceService.find(AbstractEndpointEntity.class, service.getId());
+		action = persistenceService.find(AbstractActionEntity.class, action.getId());
 		Delivery delivery = new Delivery();
 		delivery.setAction(action);
 		delivery.setDeliveryData(objectMapper.writeValueAsString(data));

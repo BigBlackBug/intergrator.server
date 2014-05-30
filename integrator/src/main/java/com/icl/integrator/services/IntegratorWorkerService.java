@@ -351,6 +351,7 @@ public class IntegratorWorkerService {
 		String serviceName = editActionDTO.getServiceName();
 		String newActionName = editActionDTO.getNewActionName();
 		ActionDescriptor actionDescriptor = editActionDTO.getActionDescriptor();
+		DeliverySettingsDTO deliverySettings = editActionDTO.getDeliverySettings();
 		AbstractEndpointEntity service = persistenceService.findService(serviceName);
 		AbstractActionEntity actionEntity = service.getActionByName(actionName);
 		if (actionEntity == null) {
@@ -361,6 +362,14 @@ public class IntegratorWorkerService {
 		}
 		if (newActionName != null) {
 			actionEntity.setActionName(newActionName);
+		}
+		if (deliverySettings != null) {
+			if (deliverySettings.equals(DeliverySettingsDTO.RESET_DELIVERY_SETTINGS)) {
+				actionEntity.setDeliverySettings(null);
+			} else {
+				actionEntity.setDeliverySettings(new DeliverySettings(
+						deliverySettings.getRetryDelay(), deliverySettings.getRetryNumber()));
+			}
 		}
 		if (actionDescriptor != null) {
 			EndpointType newEndpointType = actionDescriptor.getEndpointType();

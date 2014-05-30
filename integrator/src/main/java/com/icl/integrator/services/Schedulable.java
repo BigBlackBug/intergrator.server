@@ -24,8 +24,13 @@ public final class Schedulable<T> {
 	                   Delivery delivery) {
 		this.taskCreator = taskCreator;
 		this.delivery = delivery;
-		this.deliverySettings = delivery.getEndpoint()
-				.getDeliverySettings();
+		DeliverySettings endpointDS = delivery.getEndpoint().getDeliverySettings();
+		DeliverySettings actionDS = delivery.getAction().getDeliverySettings();
+		if (actionDS != null) {
+			this.deliverySettings = actionDS;
+		} else {
+			this.deliverySettings = endpointDS;
+		}
 	}
 
 	public DeliverySettings getDeliverySettings() {

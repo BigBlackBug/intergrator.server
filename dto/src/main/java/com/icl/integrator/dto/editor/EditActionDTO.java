@@ -1,6 +1,7 @@
 package com.icl.integrator.dto.editor;
 
 import com.icl.integrator.dto.registration.ActionDescriptor;
+import com.icl.integrator.dto.registration.DeliverySettingsDTO;
 
 /**
  * Created by BigBlackBug on 12.05.2014.
@@ -17,13 +18,25 @@ public class EditActionDTO {
 
 	private ActionDescriptor actionDescriptor;
 
+	private DeliverySettingsDTO deliverySettings;
+
+	public EditActionDTO(String serviceName, String actionName, String newActionName,
+	                     ActionDescriptor actionDescriptor, DeliverySettingsDTO deliverySettings,
+	                     boolean forceChanges) {
+		this.serviceName = serviceName;
+		this.actionName = actionName;
+		this.newActionName = newActionName;
+		this.forceChanges = forceChanges;
+		this.deliverySettings = deliverySettings;
+		this.actionDescriptor = actionDescriptor;
+	}
+
 	public EditActionDTO(String serviceName, String actionName, String newActionName,
 	                     ActionDescriptor actionDescriptor, boolean forceChanges) {
 		this.serviceName = serviceName;
 		this.actionName = actionName;
 		this.newActionName = newActionName;
 		this.forceChanges = forceChanges;
-
 		this.actionDescriptor = actionDescriptor;
 	}
 
@@ -44,6 +57,10 @@ public class EditActionDTO {
 	}
 
 	EditActionDTO() {
+	}
+
+	public DeliverySettingsDTO getDeliverySettings() {
+		return deliverySettings;
 	}
 
 	public boolean isForceChanges() {
@@ -79,6 +96,10 @@ public class EditActionDTO {
 				that.newActionName != null) {
 			return false;
 		}
+		if (deliverySettings != null ? !deliverySettings.equals(that.deliverySettings) :
+				that.deliverySettings != null) {
+			return false;
+		}
 		if (!serviceName.equals(that.serviceName)) {
 			return false;
 		}
@@ -91,6 +112,7 @@ public class EditActionDTO {
 		int result = actionName.hashCode();
 		result = 31 * result + serviceName.hashCode();
 		result = 31 * result + (newActionName != null ? newActionName.hashCode() : 0);
+		result = 31 * result + (deliverySettings != null ? deliverySettings.hashCode() : 0);
 		result = 31 * result + (forceChanges ? 1 : 0);
 		result = 31 * result + (actionDescriptor != null ? actionDescriptor.hashCode() : 0);
 		return result;

@@ -1,16 +1,13 @@
 package com.icl.integrator.model;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.Embeddable;
 
 /**
  * Created by bigblackbug on 2/5/14.
  */
-@Entity
-@Table(name = "DELIVERY_SETTINGS")
-public class DeliverySettings extends AbstractEntity {
+@Embeddable
+public class DeliverySettings {
 
 	private static final int DEFAULT_DELIVERY_RETRY_DELAY_MILLIS = 15000;
 
@@ -22,13 +19,10 @@ public class DeliverySettings extends AbstractEntity {
 	@Column(name = "RETRY_DELAY", nullable = false)
 	private long retryDelay;
 
-	@OneToOne(mappedBy = "deliverySettings")
-	private AbstractEndpointEntity endpoint;
-
 	public DeliverySettings() {
 	}
 
-	private DeliverySettings(long retryDelay, int retryNumber) {
+	public DeliverySettings(long retryDelay, int retryNumber) {
 		this.retryDelay = retryDelay;
 		this.retryNumber = retryNumber;
 	}
@@ -54,11 +48,4 @@ public class DeliverySettings extends AbstractEntity {
 		this.retryDelay = retryDelay;
 	}
 
-	public AbstractEndpointEntity getEndpoint() {
-		return endpoint;
-	}
-
-	public void setEndpoint(AbstractEndpointEntity endpoint) {
-		this.endpoint = endpoint;
-	}
 }

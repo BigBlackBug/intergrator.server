@@ -191,6 +191,9 @@
                         },
                         "actionDescriptor": {
                             "$ref": "#/definitions/actionDesc"
+                        },
+                        "deliverySettings":{
+                            "$ref": "#/definitions/deliverySettings"
                         }
                     }
                 }
@@ -270,7 +273,7 @@
         },
         "editActionDTO": {
             "type": "object",
-            "required": [ "actionName", "serviceName","forceChanges" ],
+            "required": [ "actionName", "serviceName", "forceChanges" ],
             "additionalProperties": false,
             "properties": {
                 "serviceName": {
@@ -287,7 +290,10 @@
                 },
                 "actionDescriptor": {
                     "$ref": "#/definitions/actionDesc"
-                }
+                },
+                "deliverySettings": {
+                    "$ref": "#/definitions/deliverySettings"
+                },
             }
         },
         "deliverySettings": {

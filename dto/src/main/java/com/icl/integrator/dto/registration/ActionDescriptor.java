@@ -17,7 +17,7 @@ public abstract class ActionDescriptor implements Serializable {
 
 	private EndpointType endpointType;
 
-	protected ActionDescriptor(ActionMethod actionMethod,EndpointType endpointType) {
+	protected ActionDescriptor(ActionMethod actionMethod, EndpointType endpointType) {
 		this.actionMethod = actionMethod;
 		this.endpointType = endpointType;
 	}

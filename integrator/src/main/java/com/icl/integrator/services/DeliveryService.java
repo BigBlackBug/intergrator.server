@@ -32,7 +32,7 @@ public class DeliveryService {
 	private static Log logger = LogFactory.getLog(DeliveryService.class);
 
 	@Autowired
-	protected Scheduler scheduler;
+	private Scheduler scheduler;
 
 	@Autowired
 	private EndpointConnectorFactory factory;

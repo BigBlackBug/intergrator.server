@@ -7,6 +7,9 @@ import java.io.Serializable;
  */
 public class DeliverySettingsDTO implements Serializable {
 
+	public static final DeliverySettingsDTO RESET_DELIVERY_SETTINGS =
+			new DeliverySettingsDTO(-1, -1);
+
 	private int retryNumber;
 
 	private long retryDelay;
