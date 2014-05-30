@@ -44,7 +44,7 @@ public abstract class AbstractActionEntity extends AbstractEntity implements Has
 	private IntegratorUser creator;
 
 	@Embedded
-	private DeliverySettings deliverySettings = DeliverySettings.createDefaultSettings();
+	private DeliverySettings deliverySettings;
 
 	protected AbstractActionEntity() {
 
