@@ -10,6 +10,14 @@ public class DeliverySettingsDTO implements Serializable {
 	public static final DeliverySettingsDTO RESET_DELIVERY_SETTINGS =
 			new DeliverySettingsDTO(-1, -1);
 
+	private static final int DEFAULT_DELIVERY_RETRY_DELAY_MILLIS = 15000;
+
+	private static final int DEFAULT_DELIVERY_ATTEMPT_NUMBER = 10;
+
+	public static final DeliverySettingsDTO DEFAULT_DELIVERY_SETTINGS =
+			new DeliverySettingsDTO(DEFAULT_DELIVERY_ATTEMPT_NUMBER,
+			                        DEFAULT_DELIVERY_RETRY_DELAY_MILLIS);
+
 	private int retryNumber;
 
 	private long retryDelay;

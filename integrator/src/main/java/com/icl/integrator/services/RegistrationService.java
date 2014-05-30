@@ -235,6 +235,7 @@ public class RegistrationService {
         if (deliverySettings == null) {
             settings = DeliverySettings.createDefaultSettings();
         } else {
+	        //TODO CHECK DS
             settings = new DeliverySettings();
             settings.setRetryDelay(deliverySettings.getRetryDelay());
             settings.setRetryNumber(deliverySettings.getRetryNumber());
@@ -254,6 +255,7 @@ public class RegistrationService {
         if (deliverySettings == null) {
             settings = DeliverySettings.createDefaultSettings();
         } else {
+	        //TODO CHECK DS
             settings = new DeliverySettings();
             settings.setRetryDelay(deliverySettings.getRetryDelay());
             settings.setRetryNumber(deliverySettings.getRetryNumber());
@@ -270,6 +272,7 @@ public class RegistrationService {
             endpoint.setCreator(creator);
             DeliverySettings settings;
             if (deliverySettings != null) {
+	            //TODO CHECK DS
                 settings = new DeliverySettings();
                 settings.setRetryDelay(deliverySettings.getRetryDelay());
                 settings.setRetryNumber(deliverySettings.getRetryNumber());
