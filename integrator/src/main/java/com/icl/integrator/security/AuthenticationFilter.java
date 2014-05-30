@@ -21,6 +21,8 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
 
 	public static final String DEFAULT_URL = "/login";
 
+	public static final String PACKET_ATTRIBUTE = "packet";
+
 	@Autowired
 	private ObjectMapper mapper;
 
@@ -28,10 +30,11 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
 		super(DEFAULT_URL);
 	}
 
+	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request,
 	                                            HttpServletResponse response) throws
 			AuthenticationException, IOException {
-		//TODO add packet validation. тут УГ с запросом, который гасится если его считать
+		//TODO add packet validation. навесить фильтр с валидацией до логина
 		if (!request.getMethod().equals("POST")) {
 			throw new AuthenticationServiceException(
 					"Authentication method not supported: " + request.getMethod());
@@ -43,6 +46,8 @@ public class AuthenticationFilter extends AbstractAuthenticationProcessingFilter
 				new TypeReference<IntegratorPacket<UserCredentialsDTO, DestinationDescriptor>>() {
 				};
 		IntegratorPacket<UserCredentialsDTO, DestinationDescriptor> packet = mapper.readValue(json, type);
+
+		request.setAttribute(PACKET_ATTRIBUTE, packet);
 
 		UserCredentialsDTO credentials = packet.getData();
 		UsernamePasswordAuthenticationToken authRequest =
