@@ -281,6 +281,7 @@ public class IntegratorWorkerService {
 		return null;
 	}
 
+	//TODO remove nonexistent. СУКА ТЕСТЫ ТЫ НАПИШЕШЬ КОГДА-НИБУДЬ???
 	public void removeService(String serviceName) {
 		persistenceService.removeService(serviceName);
 	}

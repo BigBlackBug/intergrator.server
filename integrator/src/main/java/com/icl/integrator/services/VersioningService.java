@@ -100,7 +100,6 @@ public class VersioningService {
 	}
 
 //	//	@Scheduled(fixedRate = 60000)
-//	//TODO fix
 //	public void scheduleUserRemoval() {
 //		UserVersionEntity peek = versionEntities.peek();
 //		if (peek == null) {

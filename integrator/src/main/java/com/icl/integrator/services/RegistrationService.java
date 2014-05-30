@@ -38,6 +38,8 @@ import java.util.UUID;
  * Time: 15:06
  * To change this template use File | Settings | File Templates.
  */
+//TODO когда сохраняем другой сервис с тем же именем и с тем же действием. разобраться
+
 @Service
 public class RegistrationService {
 

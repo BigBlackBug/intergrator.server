@@ -11,6 +11,7 @@ import com.icl.integrator.dto.editor.EditServiceDTO;
 import com.icl.integrator.dto.registration.*;
 import com.icl.integrator.services.AuthorizationService;
 import com.icl.integrator.springapi.IntegratorHttpAPI;
+import com.icl.integrator.util.IntegratorException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import java.util.Map;
  * Time: 9:16
  * To change this template use File | Settings | File Templates.
  */
+//TODO везде парсить исключения в errordto и выплёвывать только главные сообщения
 @Controller
 public class IntegratorHttpController implements IntegratorHttpAPI {
 
@@ -123,9 +125,13 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 			    fixConversion(packet, type);
 	    AddActionDTO<Y> data = fixedPacket.getData();
 	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	    if (!authService.hasAccessToService(data.getServiceName(), auth)) {
-		    return new ResponseDTO<>(new ErrorDTO(
-				    "Вы не можете добавлять действия к сервису, созданному не Вами"));
+	    try {
+		    if (!authService.hasAccessToService(data.getServiceName(), auth)) {
+			    return new ResponseDTO<>(new ErrorDTO(
+					    "Вы не можете добавлять действия к сервису, созданному не Вами"));
+		    }
+	    } catch (IntegratorException ex) {
+		    return new ResponseDTO<>(new ErrorDTO(ex));
 	    }
 	    return integratorService.addAction(fixedPacket);
     }
@@ -195,9 +201,13 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 				};
 		String serviceName = serviceNamePacket.getData();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (!authService.hasAccessToService(serviceName, auth)) {
-			return new ResponseDTO<>(new ErrorDTO(
+		try {
+			if (!authService.hasAccessToService(serviceName, auth)) {
+				return new ResponseDTO<>(new ErrorDTO(
 					"Вы не можете удалять сервис, созданный не Вами"));
+			}
+		} catch (IntegratorException ex) {
+			return new ResponseDTO<>(new ErrorDTO(ex));
 		}
 		return integratorService.removeService(fixConversion(serviceNamePacket, type));
 	}
@@ -213,9 +223,13 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 				fixConversion(editServiceDTO, type);
 		String serviceName = fixedDTO.getData().getServiceName();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (!authService.hasAccessToService(serviceName, auth)) {
-			return new ResponseDTO<>(new ErrorDTO(
-					"Вы не можете изменять сервис, созданный не Вами"));
+		try {
+			if (!authService.hasAccessToService(serviceName, auth)) {
+				return new ResponseDTO<>(new ErrorDTO(
+						"Вы не можете изменять сервис, созданный не Вами"));
+			}
+		} catch (IntegratorException ex) {
+			return new ResponseDTO<>(new ErrorDTO(ex));
 		}
 		return integratorService.editService(fixedDTO);
 	}
@@ -232,9 +246,13 @@ public class IntegratorHttpController implements IntegratorHttpAPI {
 		String serviceName = fixedDTO.getData().getServiceName();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		//TODO maybe rethink
-		if (!authService.hasAccessToService(serviceName, auth)) {
-			return new ResponseDTO<>(new ErrorDTO(
-					"Вы не можете изменять действие, созданное не Вами"));
+		try {
+			if (!authService.hasAccessToService(serviceName, auth)) {
+				return new ResponseDTO<>(new ErrorDTO(
+						"Вы не можете изменять действие, созданное не Вами"));
+			}
+		} catch (IntegratorException ex) {
+			return new ResponseDTO<>(new ErrorDTO(ex));
 		}
 		return integratorService.editAction(fixedDTO);
 	}
