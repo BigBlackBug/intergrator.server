@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.icl.integrator.dto.registration.ActionDescriptor;
 import com.icl.integrator.dto.registration.ActionEndpointDTO;
@@ -24,9 +25,11 @@ public class ActionEndpointDTODeserializer extends JsonDeserializer<ActionEndpoi
 		IntegratorObjectMapper mapper = new IntegratorObjectMapper();
 		String actionName = treeNode.get("actionName").asText();
 		TreeNode actionDescriptor = treeNode.get("actionDescriptor");
-		DeliverySettingsDTO deliverySettings =
-				mapper.readValue(treeNode.get("deliverySettings").toString(),
-				                 DeliverySettingsDTO.class);
+		JsonNode jsonNode = treeNode.get("deliverySettings");
+		DeliverySettingsDTO deliverySettings = null;
+		if (jsonNode != null) {
+			deliverySettings = mapper.readValue(jsonNode.toString(), DeliverySettingsDTO.class);
+		}
 		ActionDescriptor action = mapper.readValue(actionDescriptor.toString(),
 		                                           new TypeReference<ActionDescriptor>() {
 		                                      }
