@@ -500,21 +500,7 @@ public class IntegratorHttpClient implements IntegratorClient {
 	//TODO добавить шифрование
 	@Override
 	public void login(String username, String password) throws IntegratorClientException {
-//		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-//		body.add(IntegratorClientConstants.USERNAME_PARAM, username);
-//		body.add(IntegratorClientConstants.PASSWORD_PARAM, password);
-//		ResponseDTO responseDTO;
-//		try {
-//			URL url = new URL("HTTP", host, port,
-//			                  mainControllerPath + IntegratorClientConstants.LOGIN_URL);
-//			responseDTO = restTemplate.postForObject(url.toURI(), body, ResponseDTO.class);
-//		} catch (Exception ex) {
-//			throw new IntegratorClientException(ex);
-//		}
-//		//TODO если аутентификация успешна, то прилетает нулл. спасибо спрингсекьюрити за это
-//		if (responseDTO != null) {
-//			throw new AuthException(responseDTO.getError().getErrorMessage());
-//		}
+//		TODO если аутентификация успешна, то прилетает нулл. спасибо спрингсекьюрити за это
 		ResponseDTO responseDTO;
 		try {
 			IntegratorPacket<UserCredentialsDTO, DestinationDescriptor> packet =

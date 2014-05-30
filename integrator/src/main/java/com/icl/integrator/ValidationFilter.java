@@ -31,7 +31,6 @@ public class ValidationFilter implements Filter {
 
 	}
 
-	//TODO КОДИРОВКА
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 	                     FilterChain chain) throws IOException, ServletException {
@@ -45,7 +44,7 @@ public class ValidationFilter implements Filter {
 			validationService.validateIntegratorPacket(json);
 		} catch (PacketValidationException | ValidatorException pvex) {
 			logger.info("Ошибка валидации пакета", pvex);
-			response.setContentType("application/json");
+			response.setContentType("application/json; charset=UTF-8");
 			ResponseDTO error = new ResponseDTO(pvex);
 			String responseJson = objectMapper.writeValueAsString(error);
 			response.setContentLength(responseJson.length());

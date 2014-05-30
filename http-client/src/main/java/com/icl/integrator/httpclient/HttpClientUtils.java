@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class HttpClientUtils {
 
-	//TODO cyclic references
+	//TODO DELAYED cyclic references
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static <T> RequestDataDTO createRequestData(DeliveryPacketType deliveryPacketType, T data) {
