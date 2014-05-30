@@ -198,7 +198,7 @@
         },
         "addActionDTO": {
             "type": "object",
-            "required": [ "service", "actionRegistration" ],
+            "required": [ "serviceName", "actionRegistration" ],
             "additionalProperties": false,
             "properties": {
                 "serviceName": {

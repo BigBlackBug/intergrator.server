@@ -31,6 +31,7 @@ public class ValidationFilter implements Filter {
 
 	}
 
+	//TODO КОДИРОВКА
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 	                     FilterChain chain) throws IOException, ServletException {
