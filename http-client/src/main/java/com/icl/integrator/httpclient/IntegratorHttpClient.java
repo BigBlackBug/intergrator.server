@@ -500,7 +500,6 @@ public class IntegratorHttpClient implements IntegratorClient {
 	//TODO добавить шифрование
 	@Override
 	public void login(String username, String password) throws IntegratorClientException {
-//		TODO если аутентификация успешна, то прилетает нулл. спасибо спрингсекьюрити за это
 		ResponseDTO responseDTO;
 		try {
 			IntegratorPacket<UserCredentialsDTO, DestinationDescriptor> packet =
@@ -514,12 +513,11 @@ public class IntegratorHttpClient implements IntegratorClient {
 		} catch (Exception e) {
 			throw new IntegratorClientException(e);
 		}
-		if (responseDTO != null) {
+		if (!responseDTO.isSuccess()) {
 			throw new AuthException(responseDTO.getError().getErrorMessage());
 		}
 	}
 
-	//TODO 2 логаута подряд крешатся
 	@Override
 	public void logout() throws IntegratorClientException {
 		HttpStatus statusCode;

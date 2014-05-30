@@ -1,5 +1,7 @@
 package com.icl.integrator.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icl.integrator.dto.ResponseDTO;
 import com.icl.integrator.services.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -17,6 +19,9 @@ import java.io.IOException;
 public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
 	@Autowired
+	private ObjectMapper mapper;
+
+	@Autowired
 	private VersioningService versioningService;
 
 	private RequestCache requestCache = new HttpSessionRequestCache();
@@ -26,6 +31,7 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 	                                    final HttpServletResponse response,
 	                                    final Authentication authentication) throws
 			ServletException, IOException {
+		//TODO считать из пакета и отослать результат
 		versioningService.login(authentication.getName());
 
 		final SavedRequest savedRequest = requestCache.getRequest(request, response);
@@ -48,6 +54,9 @@ public class IntegratorAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 	private void finish(final HttpServletRequest request, final HttpServletResponse response)
 			throws IOException {
 		clearAuthenticationAttributes(request);
+		response.setHeader("Content-Type", "application/json; charset=UTF-8");
+		String responseValue = mapper.writeValueAsString(new ResponseDTO(true));
+		response.getWriter().append(responseValue);
 	}
 
 	public void setRequestCache(final RequestCache requestCache) {
