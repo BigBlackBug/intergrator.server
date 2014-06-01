@@ -33,7 +33,6 @@ import java.util.Map;
  * Time: 14:05
  * To change this template use File | Settings | File Templates.
  */
-//TODO доабвить настройки доставки к действию
 @Service
 public class IntegratorService implements IntegratorAPI {
 
